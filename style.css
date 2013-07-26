@@ -1,0 +1,56 @@
+html {
+    padding: 0;
+    margin: 0;
+    background: url(grey_wash_wall.png)
+}
+
+body {
+    font-family: Palatino Linotype, Palatino, Georgia, serif;
+    font-size: 14px;
+    line-height: 125%;
+
+}
+
+#chapter {
+    width: 45em;
+    margin: 0 auto;
+    background-color: white;
+    padding: 3em;
+    border-left: 1px solid black;
+    border-right: 1px solid black;
+    box-shadow: 0 0 27px rgba(0, 0, 0, 1);
+}
+
+#nav {
+    position: fixed;
+    top: 0.75em;
+    z-index: 2;
+    padding: 0.5em;
+    padding-top: 0.1em;
+    transition: background 0.5s;
+    border-radius: 3px
+}
+
+#nav h1 {
+    font-size: 100%;
+}
+
+#nav:hover {
+    background: rgba(255, 255, 255, 0.7);
+    opacity: 1.0;
+    transition: background 0.5s;
+}
+
+#nav ol {
+    display: block;
+    margin-left: 0;
+    padding-left: 0.5em;
+    padding-right: 1em;
+    list-style-position: inside;
+    opacity: 0;
+}
+
+#nav:hover ol {
+    opacity: 1.0;
+    transition: opacity 0.5s
+}
