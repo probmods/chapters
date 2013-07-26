@@ -10,7 +10,7 @@
 # generative-models.md
 
 pandoc --toc \
---template template.html \
+--template chapter.template \
 --read markdown \
 --write html5 \
 --mathjax \
