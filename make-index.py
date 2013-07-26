@@ -28,20 +28,15 @@ for url, chapter in chapters:
 
 lis = "\n" + "\n".join(lis) + "\n"
 
-ol = tag("ol", lis)
 
-with open("index.template", "r") as f:
-    index_template = f.read()
+## index.pytemplate -> index.html
+with open("index.pytemplate", "r") as fr, open("index.html", "w") as fw:
+    ol = tag("ol", lis)
+    template = fr.read() 
+    fw.write( template % {"chapters": ol} )
 
-with open("index.html", "w") as f:
-    f.write( index_template % {"chapters": ol} )
-
-## make chapters.js
-js_chapters = [];
-    
-for url, chapter in chapters:
-    js_chapters.append('["%(url)s", "%(chapter)s"]' % {"url": url, "chapter": chapter})
-
-js_chapters = "var __navChapters = [\n" + ",\n".join(js_chapters) + "\n];"
-    
-print js_chapters
+## chapter.pytemplate -> chapte.template
+with open("chapter.pytemplate", "r") as fr, open("chapter.template", "w") as fw:
+    olNav = tag("ol", lis)
+    template = fr.read() 
+    fw.write( template % {"chapters": ol} )
