@@ -1,0 +1,18 @@
+<html>
+  <head>
+    <title>ProbMods: $title$</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script src="injector.js" />
+  </head>
+<body>
+<div id="nav">
+<h1>Navigation</h1>
+%(chapters)s
+</div>
+
+<div id="chapter">
+$body$
+</div>
+</body>
+</html>

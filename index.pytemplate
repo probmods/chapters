@@ -1,0 +1,21 @@
+<html>
+<head>
+<title>ProbMods: Chapters</title>
+<link rel="stylesheet" type="text/css" href="template.css" />
+</head>
+<body>
+
+<h1 style='text-align: center'>Probabilistic Models of Cognition</h1>
+
+<h2>Prelude</h2>
+Goes here.
+
+<h2>Chapters</h2>
+%(chapters)s
+
+<h2>Contributors</h2>
+
+
+
+</body>
+</html>
