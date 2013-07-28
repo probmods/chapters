@@ -9,15 +9,16 @@
 # --output generative-models \
 # generative-models.md
 
+STEM=`echo $1 | sed -e "s/\.md//g"`
+
 pandoc --toc \
 --template chapter.template \
 --read markdown \
 --write html5 \
 --mathjax \
 --bibliography dev.bib \
---output $1 \
-$1.md
-
+--output $STEM \
+$STEM.md
 
 # TODO:
 # [ ] mathjax (vendor?)
