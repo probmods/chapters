@@ -3,7 +3,7 @@ from string import Template
 def tag(t, content, props = {}):
     substitutes = {"content": content, "tag": t}
     ## a little brittle, since we don't escape stuff in y
-    substitutes["props"] = " ".join( map(lambda (x, y): x + "='" + str(y) + "'", props.items()) )
+    substitutes["props"] = " ".join( map(lambda (x, y): x + "=\"" + str(y) + "\"", props.items()) )
     if len(substitutes["props"]) > 0:
         substitutes["props"] = " " + substitutes["props"]
     return "<%(tag)s%(props)s>%(content)s</%(tag)s>" % substitutes 
