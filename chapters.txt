@@ -1,2 +1,10 @@
 generative-models
 conditioning
+patterns-of-inference
+learning-as-conditional-inference
+occam's-razor
+hierarchical-models
+mixture-models
+non-parametric-models
+recursive-models
+inference-about-inference-nested-query
