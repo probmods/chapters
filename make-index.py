@@ -1,3 +1,4 @@
+import os
 from string import Template
 
 def tag(t, content, props = {}):
@@ -28,9 +29,11 @@ for url, chapter in chapters:
 
 lis = "\n" + "\n".join(lis) + "\n"
 
+## Compile index.md to index.pyhtml
+os.system("pandoc -S --template index.template index.md -o index.pyhtml")
 
-## index.pytemplate -> index.html
-with open("index.pytemplate", "r") as fr, open("index.html", "w") as fw:
+## Substitute in for %(chapters)s in index.pyhtml
+with open("index.pyhtml", "r") as fr, open("index.html", "w") as fw:
     ol = tag("ol", lis)
     template = fr.read() 
     fw.write( template % {"chapters": ol} )
