@@ -18,6 +18,8 @@ pandoc --toc \
 --mathjax \
 --bibliography dev.bib \
 --output $STEM \
+--variable num:$2 \
+--base-header-level 2 \
 $STEM.md
 
 # TODO:
