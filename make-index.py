@@ -35,8 +35,8 @@ with open("index.pytemplate", "r") as fr, open("index.html", "w") as fw:
     template = fr.read() 
     fw.write( template % {"chapters": ol} )
 
-## chapter.pytemplate -> chapte.template
+## chapter.pytemplate -> chapter.template
 with open("chapter.pytemplate", "r") as fr, open("chapter.template", "w") as fw:
     olNav = tag("ol", lis)
     template = fr.read() 
-    fw.write( template % {"chapters": ol} )
+    fw.write( template % {"chapters": olNav } )
