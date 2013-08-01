@@ -8,59 +8,104 @@ body {
     font-family: Palatino Linotype, Palatino, Georgia, serif;
     font-size: 14px;
     line-height: 125%;
-
+    padding: 0;
+    margin: 0;
 }
 
 #chapter {
     width: 45em;
     margin: 0 auto;
+    margin-top: 0;
+    margin-bottom: 3em;
     background-color: white;
     padding: 4em;
-    padding-top: 3em;
-    border-left: 1px solid black;
-    border-right: 1px solid black;
+    padding-top: 2em;
+    border: 1px solid black;
+    border-top: 0;
     box-shadow: 0 0 27px rgba(0, 0, 0, 1);
 }
 
 #nav {
-    position: fixed;
-    float: left;
-    top: 0.75em;
-    z-index: 2;
     padding: 0.5em;
-    padding-top: 0.1em;
+    padding-top: 0;
     transition: background 0.5s;
-    border-radius: 3px;
-    border: 1px solid transparent;
+    border-top: 1px solid #aaa;
+    border-bottom: 1px solid #aaa;
+    /* border: 1px solid black; */
+    margin: 0 auto;
+    margin-top: 1.5em;
+    width: 85%;
+    margin-bottom: 3em;
+    /* background-color: #cc0066; */
+    color: black
 }
 
-#nav:hover {
-    background: rgba(255, 255, 255, 0.95);
-    transition: background 0.5s;
-    border: 1px solid black;
-}
 
 #nav h1 {
     font-size: 100%;
     font-family: verdana;
     font-variant: small-caps;
-    color: white;
-    background-color: #cc0066;
+    /* background-color: #cc0066; */
     text-align: center;
-    padding-bottom: 3px;
-    border-radius: 2px;
+    /* border: 1px solid black; */
+    margin-top: 0;
+/* padding-bottom: 3px; */
 }
 
 #nav ol {
-    margin-left: 0;
-    padding-left: 0.5em;
-    padding-right: 1em;
-    list-style-position: inside;
-    opacity: 0;
-    transition: opacity 0.5s
+    /* border: 1px solid black; */
+    padding: 0;
+    margin: 0;
+    font-family: verdana;
+    font-size: 80%;
+    margin-left: 3em;
 }
 
-#nav:hover ol {
-    opacity: 1.0;
-    transition: opacity 0.5s
+#nav li {
+    /* list-style-position: inside; */
+    margin-right: 10px;
+
+}
+
+#nav li a {
+    /* text-transform: uppercase; */
+    color: #0099ff;
+/* color: black */
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: normal;
+}
+
+
+a:visited {
+    color:blue;
+}
+
+h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
+    color: black;
+    text-decoration: none
+}
+
+h1 a:visited, h2 a:visited, h3 a:visited, h4 a:visited, h5 a:visited, h6 a:visited {
+    color: black;
+    text-decoration: none
+}
+
+
+#book-title {
+    font-size: 40px;
+    font-style: italic;
+    text-align: center
+}
+
+h1.chapter-title {
+    /* font-size: 36px; */
+    font-weight: normal
+}
+
+textarea {
+    font-family: courier new;
+    width: 100%;
+    font-size: 12px
 }
