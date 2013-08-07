@@ -3,6 +3,8 @@
     <title>ProbMods: $title$</title>
     <link rel="stylesheet" type="text/css" href="style.css">
     <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script src="cookies-0.3.1.min.js"></script>
+    <script src="jquery-1.10.2.min.js"></script>
     <script src="injector.js"></script>
   </head>
 <body>
@@ -12,7 +14,10 @@
   <div id="nav">
     <h1 style='font-weight: bold'>chapters</h1>
     %(chapters)s
+    <div class="clear"></div>
   </div>
+
+  $toc$
 
 <h1 class='chapter-title'>$num$ $title$</h1>
 
