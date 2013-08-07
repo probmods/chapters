@@ -8,5 +8,12 @@ for file in $( cat chapters.txt ); do
     i=`expr $i + 1`
 done
 
-## TODO: compile files not specified
-## in chapters.txt
+## compile files not specified
+## in chapters.txt and that aren't the index
+## HT http://www.catonmat.net/blog/set-operations-in-unix-shell/
+## this is utter sorcery.
+for stem in $( comm -23 <(ls *.md | sed -e 's/\.md//g' | sort) <( (echo index; cat chapters.txt) | sort ) ); do
+    ./make-chapter.sh $stem
+done
+
+## IDEA: make 
