@@ -61,8 +61,15 @@ body {
     margin-left: 3em;
 }
 
+.clear {
+clear: both
+}
+
 #nav li {
-    /* list-style-position: inside; */
+    list-style-position: inside;
+    padding-left: 0px;
+    /* float: left; */
+    /* width: 30%; */
     margin-right: 10px;
 
 }
