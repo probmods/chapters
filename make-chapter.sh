@@ -1,15 +1,22 @@
 #!/bin/bash
 
-# pandoc --toc \
-# --template template.html \
-# --read markdown \
-# --write html5 \
-# --mathjax \
-# --bibliography dev.bib \
-# --output generative-models \
-# generative-models.md
+
+# NB: second argument to this file is 
+# a chapter number plus a period, e.g.,
+# 3.
 
 STEM=`echo $1 | sed -e "s/\.md//g"`
+
+baseheaderlevel="2"
+numberoffset=`echo $2 | sed -e "s/\./,0/g"`
+
+if [ -z "$2" ]
+then
+    baseheaderlevel="1"
+    numberoffset="0"
+fi
+
+echo "compiling $1 number-offset=$numberoffset baseheaderlevel=$baseheaderlevel"
 
 pandoc --toc \
 --template chapter.template \
@@ -19,8 +26,11 @@ pandoc --toc \
 --bibliography dev.bib \
 --output $STEM \
 --variable num:$2 \
---base-header-level 2 \
+--number-sections \
+--base-header-level $baseheaderlevel \
+--number-offset $numberoffset \
 $STEM.md
+
 
 # TODO:
 # [ ] mathjax (vendor?)
