@@ -24,7 +24,7 @@ pandoc --toc \
 --write html5 \
 --mathjax \
 --bibliography dev.bib \
---output $STEM \
+--output $STEM.html \
 --variable num:$2 \
 --number-sections \
 --base-header-level $baseheaderlevel \

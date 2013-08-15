@@ -23,7 +23,7 @@ for line in open("chapters.txt"):
 lis = []
 
 for url, chapter in chapters:
-    link = tag("a", chapter, {"href": url})
+    link = tag("a", chapter, {"href": url + ".html"})
     li = tag("li", link)
     lis.append(li)
 
