@@ -16,4 +16,4 @@ for stem in $( comm -23 <(ls *.md | sed -e 's/\.md//g' | sort) <( (echo index; c
     ./make-chapter.sh $stem
 done
 
-## IDEA: make 
+rm chapter.template
