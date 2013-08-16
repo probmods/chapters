@@ -25,60 +25,60 @@ body {
     box-shadow: 0 0 27px rgba(0, 0, 0, 1);
 }
 
-#nav {
-    padding: 0.5em;
-    padding-top: 0;
-    transition: background 0.5s;
-    border-top: 1px solid #aaa;
-    border-bottom: 1px solid #aaa;
-    /* border: 1px solid black; */
-    margin: 0 auto;
-    margin-top: 1.5em;
-    width: 85%;
-    margin-bottom: 3em;
-    /* background-color: #cc0066; */
-    color: black
+ul#nav {
+float: right;
+margin-top: -2em;
+font-family: verdana;
+font-size: 80%;
+margin-bottom: 4em;
+margin-right: -5em;
 }
 
 
-#nav h1 {
-    font-size: 100%;
-    font-family: verdana;
+#nav li {
+    display: inline;
+    padding: 5px 10px 5px 10px;
     font-variant: small-caps;
-    /* background-color: #cc0066; */
-    text-align: center;
-    /* border: 1px solid black; */
-    margin-top: 0;
-/* padding-bottom: 3px; */
+    font-weight: bold;
+    background-color: #cc0066;
+    color: white;
+    margin: 5px
 }
 
-#nav ol {
-    /* border: 1px solid black; */
-    padding: 0;
-    margin: 0;
-    font-family: verdana;
-    font-size: 80%;
-    margin-left: 3em;
+#nav a {
+    color: white; 
 }
 
 .clear {
 clear: both
 }
 
-#nav li {
+#nav ol {
+    border: 1px solid black;
+    background-color: #cc0066;
+    padding: 0;
+    margin: 0; 
+    margin-top: 3px;
+    margin-left: -5em;
+    width: 20em;
+    /* font-size: 80%; */
+    /* margin-left: 3em; */
+    display: none;
+    position: absolute; 
     list-style-position: inside;
-    padding-left: 0px;
-    /* float: left; */
-    /* width: 30%; */
-    margin-right: 10px;
-
 }
 
-#nav li a {
-    /* text-transform: uppercase; */
-    color: #0099ff;
-/* color: black */
+#nav ol li {
+    display: list-item
 }
+
+/* show the list of all chapters when the show class is
+applied */
+li.show ol {
+    display: block !important;
+}
+
+
 
 h1, h2, h3, h4, h5, h6 {
     font-weight: normal;
@@ -110,18 +110,19 @@ h1 a:visited, h2 a:visited, h3 a:visited, h4 a:visited, h5 a:visited, h6 a:visit
     text-align: center
 }
 
-h1.chapter-title {
+#chapter-title {
     /* font-size: 36px; */
+    margin-top: 2em;
     font-weight: normal
 }
 
-textarea {
-    font-family: courier new;
-    width: 100%;
-    font-size: 14px;
-    font-weight: 700;
-    color: #333;
-}
+/* textarea { */
+/*     font-family: courier new; */
+/*     width: 100%; */
+/*     font-size: 14px; */
+/*     font-weight: 700; */
+/*     color: #333; */
+/* } */
 
 code {
 /* background-color: #ffeeff; */
@@ -136,4 +137,9 @@ code {
 
 p {
     text-align: justify
+}
+
+.error {
+color: red;
+font-weight: bold
 }

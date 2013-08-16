@@ -5,21 +5,35 @@
     <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script src="cookies-0.3.1.min.js"></script>
     <script src="jquery-1.10.2.min.js"></script>
-    <script src="injector.js"></script>
+    <link rel="stylesheet" href="codemirror/codemirror.css">
+    <script src="codemirror/codemirror.js"></script>
+    <script src="codemirror/scheme.js"></script>
+    <script src="codemirror/matchbrackets.js"></script>
+    <script src="webchurch.js"></script>
   </head>
 <body>
+
+
   
 <div id="chapter">
-  <div id="book-title">Probabilistic Models of Cognition</div>
-  <div id="nav">
-    <h1 style='font-weight: bold'>chapters</h1>
-    %(chapters)s
-    <div class="clear"></div>
-  </div>
 
+  <ul id="nav">
+    <li id="all-chapters"><a href="#">all chapters</a>
+      %(chapters)s
+    </li>
+    <li id="login-link"><a href="/login/">login</a></li>
+  </ul>
+
+  
+  <div class="clear"></div>
+
+  <div id="book-title">Probabilistic Models of Cognition</div>
+
+  <h1 id="chapter-title">$num$ $title$</h1>
+
+  
   $toc$
 
-<h1 class='chapter-title'>$num$ $title$</h1>
 
   
 $body$
@@ -28,4 +42,7 @@ $body$
 
 
 </body>
+<script src="nav.js"></script>
+<script src="injector.js"></script>
+
 </html>
