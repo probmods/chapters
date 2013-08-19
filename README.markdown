@@ -36,7 +36,7 @@ In order, this will:
 
 The compile flow is probably more complicated than it needs to be.
 
-Each chapter gets compiled to a file named `[chapter-name]` (no `.html` extension; e.g., `generative-models`, `conditioning`). The dependency graph for each chapter is this:
+Each chapter gets compiled to a file named `[chapter-name].html`. The dependency graph for each chapter is this:
 
     +---------------+     +--------------------+
     | chapters.txt  |     | chapter.pytemplate |
@@ -45,11 +45,11 @@ Each chapter gets compiled to a file named `[chapter-name]` (no `.html` extensio
       |   +-----------------------+    |           +-------------------+
       +-->|   chapter.template    |<---+           | [chapter-name].md |
           +-----------------------+                +-------------------+
-                     +                                     +
-                     |                                     |
-                     |     +-------------------+           |
-                     +---->|   [chapter-name]  |<----------+
-                           +-------------------+
+                     +                                          +
+                     |                                          |
+                     |     +------------------------+           |
+                     +---->|   [chapter-name].html  |   <-------+
+                           +------------------------+
 
 The dependency graph for the homepage, `index.html`, is this:
 
