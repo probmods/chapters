@@ -1,10 +1,14 @@
 generative-models
 conditioning
 patterns-of-inference
+observing-sequences
+inference-about-inference-nested-query
+inference-process
 learning-as-conditional-inference
-occam's-razor
+grammar-based-induction-LoT
 hierarchical-models
+occam's-razor
 mixture-models
 non-parametric-models
-recursive-models
-inference-about-inference-nested-query
+appendix-language
+appendix-conjugate-exponential
