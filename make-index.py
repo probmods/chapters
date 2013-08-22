@@ -9,7 +9,7 @@ def tag(t, content, props = {}):
         substitutes["props"] = " " + substitutes["props"]
     return "<%(tag)s%(props)s>%(content)s</%(tag)s>" % substitutes 
 
-chapters = []
+chapters = [ ("index","Index") ]
 
 for line in open("chapters.txt"):
     url = line.lstrip().rstrip()
