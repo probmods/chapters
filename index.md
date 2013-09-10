@@ -1,8 +1,8 @@
 % Probabilistic Models of Cognition
 
-***Authors***: Noah Goodman,  Joshua B. Tenenbaum
+***Authors***: Noah D. Goodman, Joshua B. Tenenbaum, Timothy J. O'Donnell
 
-***Contributors***: Tim O'Donnell, Andreas Stuhlmuller, Tomer Ullman, John McCoy, Long Ouyang
+***Contributors***: Andreas Stuhlmuller, Tomer Ullman, John McCoy, Long Ouyang
 
 # Prelude
 
@@ -14,7 +14,7 @@ A generative model describes a process, usually one by which observable data is 
 
 It is possible to use deterministic generative models to describe possible ways a process could unfold, but due to sparsity of observations or actual randomness there will often be many ways that our observations could have been generated. How can we choose amongst them? Probability theory provides a system for reasoning under exactly this kind of uncertainty. Probabilistic generative models describe processes which unfold with some amount of randomness, and probabilistic inference describes ways to ask questions of such processes. This tutorial is concerned with the knowledge that can be represented by probabilistic generative models and the inferences that can be drawn from them.
 
-In order to make the idea of generative models precise we want a formal language that is designed to express the kinds of knowledge individuals have about the world. This language should be universal in the sense that it should be able to express any (computable) process. We build on the λ-calculus (as realized in functional programming languages) because the λ-calculus describes computational processes and captures the idea that what is important is causal dependence-- in particular the λ-calculus does not focus on the sequence of time, but rather on which events influence which other events. We introduce randomness into this language to construct a stochastic λ-calculus, and describe conditional inferences in this language.
+In order to make the idea of generative models precise we want a formal language that is designed to express the kinds of knowledge individuals have about the world. This language should be universal in the sense that it should be able to express any (computable) process. We build on the $\lambda$-calculus (as realized in functional programming languages) because the $\lambda$-calculus describes computational processes and captures the idea that what is important is causal dependence-- in particular the $\lambda$-calculus does not focus on the sequence of time, but rather on which events influence which other events. We introduce randomness into this language to construct a stochastic $\lambda$-calculus, and describe conditional inferences in this language.
 
 # Chapters
 %(chapters)s
