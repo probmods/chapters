@@ -1,9 +1,21 @@
 /* global _ */
 
+var listToArray = function(xs) {
+  var pair = xs;
+  var kar = xs[0];
+  var a = [];
+
+  while(pair.length == 2) {
+    a.push(pair[0]);
+    pair = pair[1];
+  }
+  return a;
+};
+
 _hist = function(samps) {
 
   // TODO: this is a hack. we want proper conversion of data types
-  var values = _.flatten(samps),
+  var values = listToArray(samps),
       n = values.length,
       counts = _(values)
         .uniq()
