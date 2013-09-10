@@ -2,13 +2,16 @@
 
 .CodeMirror {
   /* Set height, width, borders, and global font properties here */
+font-size: 12px !important;
   font-family: monospace;
-  height: 100px; 
+/*  height: 100px; */
   border: 1px solid #afafaf;
+  height: auto
 }
 .CodeMirror-scroll {
   /* Set scrolling behaviour here */
-  overflow: auto; 
+  overflow-x: auto; 
+  overflow-y: hidden
 }
 
 /* PADDING */
@@ -27,12 +30,16 @@
 /* GUTTER */
 
 .CodeMirror-gutters {
+display: none;
   border-right: 1px solid #ddd;
   background-color: #f7f7f7;
   white-space: nowrap;
 }
-.CodeMirror-linenumbers {}
+.CodeMirror-linenumbers {
+display: none
+}
 .CodeMirror-linenumber {
+display: none;
   padding: 0 3px 0 5px;
   min-width: 20px;
   text-align: right;
@@ -115,7 +122,7 @@ div.CodeMirror span.CodeMirror-nonmatchingbracket {color: #f22;}
   /* See overflow: hidden in .CodeMirror */
   margin-bottom: -30px; margin-right: -30px;
   padding-bottom: 30px; padding-right: 30px;
-  height: 100%;
+  /* height: 100%; */
   outline: none; /* Prevent dragging from highlighting the element */
   position: relative;
 }
@@ -247,3 +254,4 @@ div.CodeMirror span.CodeMirror-nonmatchingbracket {color: #f22;}
     visibility: hidden;
   }
 }
+

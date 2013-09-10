@@ -34,12 +34,12 @@ os.system("pandoc -S --template index.template index.md -o index.pyhtml")
 
 ## Substitute in for %(chapters)s in index.pyhtml
 with open("index.pyhtml", "r") as fr, open("index.html", "w") as fw:
-    ol = tag("ol", lis)
+    ol = tag("ol", lis, {"start": 0})
     template = fr.read() 
     fw.write( template % {"chapters": ol} )
 
 ## chapter.pytemplate -> chapter.template
 with open("chapter.pytemplate", "r") as fr, open("chapter.template", "w") as fw:
-    olNav = tag("ol", lis)
+    olNav = tag("ol", lis, {"start": 0})
     template = fr.read() 
     fw.write( template % {"chapters": olNav } )
