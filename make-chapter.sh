@@ -19,10 +19,12 @@ fi
 echo "compiling $1 number-offset=$numberoffset baseheaderlevel=$baseheaderlevel"
 
 pandoc --toc \
+--smart \
 --template chapter.template \
 --read markdown \
 --write html5 \
 --mathjax \
+--csl apa.csl \
 --bibliography dev.bib \
 --output $STEM.html \
 --variable num:$2 \
@@ -32,11 +34,16 @@ pandoc --toc \
 $STEM.md
 
 
+
 # TODO:
 # [ ] mathjax (vendor?)
 # [.] bibtex (still need csl style)
 # [.] template
 # [.] citations
+
+# the csl property we want is citation-label
+# HT http://citationstyles.org/downloads/specification.html#id99
+
 # [ ] editor injector
 
 
