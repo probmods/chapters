@@ -7,135 +7,74 @@ function deep_copy(obj) { return JSON.parse(JSON.stringify(obj)); }
 
 // TODO: add all kinds of error-checking.
 function church_astify(expr) {
-	function get_tokens(tree) { return expr.slice(tree["range"][0], tree["range"][1]); }
-
-	function get_atom(tree) {
-		var tokens = get_tokens(tree);
-		if (tokens.length == 1) {
-			return tokens[0];
-		} else if (tokens.length == 2) {
-			return "()";
-		} else {
-			throw new Error();
-		}
-	}
-
-	function has_children(tree) { return tree["children"].length > 0}
-
-	function literal_helper(tree) {
-		if (has_children(tree)) {
-			var result = [];
-			for (var i = 0; i < tree["children"].length; i++) {
-				result.push(literal_helper(tree["children"][i]));
-			}
-			return result
-		} else {
-			return get_atom(tree);
-		}
-	}
-
-	function define_helper(trees) {
-		var variable;
-		var body;
-		if (has_children(trees[0])) {
-			var variable_and_formals = literal_helper(trees[0]);
-			variable = variable_and_formals[0];
-			body_children = [variable_and_formals.slice(1), main_helper([trees[1]])[0]]
-			body = {"head": "lambda", "children": body_children};
-		} else {
-			variable = get_atom(trees[0]);
-			body = main_helper([trees[1]])[0];
-		}
-		return [variable, body];
-	}
-
-	function lambda_helper(trees) {
-		var args = trees[0];
-		var procs = trees.slice(1);
-		var children = [];
-		children.push(literal_helper(args));
-		children = children.concat(main_helper(procs));
-		return children;
-	}
-
-	function call_helper(tree) {
-		var node = {}
-		var head;
-		var first_child = tree["children"][0];
-		var rest_children = tree["children"].slice(1);
-		if (has_children(first_child)) {
-			head = call_helper(first_child);
-		} else {
-			head = get_atom(first_child);
-		}
-		node["head"] = head;
-		if (head == "define") {
-			node["children"] = define_helper(rest_children);
-		} else if (head == "lambda" || head == "lambda-query") {
-			node["children"] = lambda_helper(rest_children);
-		} else if (head == "'" || head == "quote") {
-			console.log(head, "HI")
-		} else {
-			node["children"] = main_helper(rest_children);
-		}
-		return node;
-	}
-
-	function main_helper(trees) {
-		var nodes = []
-		for (var i = 0; i < trees.length; i++) {
-			var tree = trees[i];
-			if (has_children(tree)) {
-				nodes.push(call_helper(tree));
-			} else {
-				nodes.push(get_atom(tree));
-			}
-		}
-		return nodes;
-	}
-
-	function make_range_trees(expr) {
-		function read_many_expressions(expr, start_index) {
-			var children = [];
-			var end_index = 0;
-			while (end_index < expr.length && expr[end_index] != ")") {
-				child = read_one_expression(expr.slice(end_index), start_index+end_index);
-				children.push(child);
-				end_index = end_index + child["range"][1] - child["range"][0];
-			}
-			return children;
-		}
-
-		function read_one_expression(expr, start_index) {
-			var children = [];
-			var end_index = 0;
-			if (expr[end_index] == "(") {
-				end_index++;
-				children = read_many_expressions(expr.slice(end_index), start_index+end_index);
-				if (children.length > 0) {
-					end_index = end_index + children[children.length-1]["range"][1] - children[0]["range"][0] + 1;
+	// Destroys the passed expression
+	function astify_expr(expr) {
+		function helper(top_level) {
+			var result = []
+			while (expr.length > 0) {
+				if (expr[0] == "(") {
+					expr.shift()
+					result.push(helper(false));
+				} else if (expr[0] == ")") {
+					if (top_level) {
+						throw new Error("Unexpected close parens");
+					} else {
+						expr.shift();
+						return result;
+					}
 				} else {
-					end_index++;
+					result.push(expr.shift());
 				}
-			} else if (expr[end_index] == "'") {
-				end_index++;
-				child = read_one_expression(expr.slice(end_index), start_index+end_index);
-				children.push(child);
-				end_index = end_index + child["range"][1] - child["range"][0];
-			} else {
-				end_index++;
 			}
-			return {"range" : [start_index, start_index+end_index], "children": children};
+			if (top_level) {
+				return result;
+			} else {
+				throw new Error("Unclosed parens");
+			}
 		}
-
-		return read_many_expressions(expr, 0);
+		return helper(true);
 	}
 
-	return main_helper(make_range_trees(expr));
+	function traverse(ast, fn) {
+		ast = fn(ast);
+		for (var i = 0; i < ast.length; i++) {
+			if (Array.isArray(ast[i])) {
+				ast[i] = traverse(ast[i], fn);
+			}
+		}
+		return ast;
+	}
+
+	function dsgr_define(ast) {
+		if (ast[0] == "define" && Array.isArray(ast[1])) {
+			var lambda = ["lambda", ast[1].slice(1)].concat(ast.slice(2));
+			return ["define", ast[1][0], lambda];
+		} else {
+			return ast
+		}
+	}
+
+	function dsgr_quote(ast) {
+		for (var i = ast.length - 2; i >= 0; i--) {
+			if (ast[i] == "'") {
+				ast.splice(i, 2, ["quote", ast[i+1]]);
+			}
+		}
+		return ast;
+	}
+
+	var desugar_fns = [dsgr_define, dsgr_quote];
+
+	var ast = astify_expr(expr);
+	for (var i = 0; i < desugar_fns.length; i++) {
+		ast = traverse(ast, desugar_fns[i]);
+	}
+
+	return ast;
 }
 
 exports.church_astify = church_astify;
-},{}],"Si6Pk/":[function(require,module,exports){
+},{}],"ICPH2U":[function(require,module,exports){
 function sizeof(obj) { return Object.keys(obj).length; }
 
 function args_to_array(args) { return Array.prototype.slice.call(args, 0 ); }
@@ -201,14 +140,34 @@ function or() {
 	return false;
 }
 
-function eq() {
-	var args = args_to_array(arguments);
+function cmp_nums(cmp_fn, args) {
 	assertAtLeastNumArgs(args, 2)
-	for (var i = 0; i < args.length; i++) {
+	for (var i = 0; i < args.length - 1; i++) {
 		assertType(args[i], "number");
-		if (args[i] != args[0]) return false; 
+		if (!cmp_fn(args[i], args[i+1])) return false; 
 	}
 	return true;
+}
+
+
+function greater() {
+	return cmp_nums(function(x, y) {return x > y;}, args_to_array(arguments));
+}
+
+function less() {
+	return cmp_nums(function(x, y) {return x < y;}, args_to_array(arguments));
+}
+
+function geq() {
+	return cmp_nums(function(x, y) {return x >= y;}, args_to_array(arguments));
+}
+
+function leq() {
+	return cmp_nums(function(x, y) {return x <= y;}, args_to_array(arguments));
+}
+
+function eq() {
+	return cmp_nums(function(x, y) {return x == y;}, args_to_array(arguments));
 }
 
 function list() {
@@ -273,6 +232,44 @@ function repeat(n, fn) {
 	return list.apply(null, results);
 }
 
+function apply(fn, list) {
+	assertType(fn, "function");
+	assertList(list);
+	return fn.apply(null, listToArray(list));
+}
+
+function map() {
+	function helper(lists) {
+		var fn_args = []
+		var remaining_lists = []
+		for (var i = 0; i < lists.length; i++) {
+			if (lists[i].length == 0) {
+				return [];
+			} else {
+				fn_args.push(lists[i][0]);
+				remaining_lists.push(lists[i][1]);
+			}
+		}
+		return [fn.apply(null, fn_args), helper(remaining_lists)];
+	}
+
+	var args = args_to_array(arguments);
+	assertAtLeastNumArgs(args, 2);
+	fn = args[0];
+	lists = args.slice(1);
+	return helper(lists);
+}
+
+function listToArray(list) {
+	var array = [];
+	while (list.length != 0) {
+		var left = list[0];
+		array.push(Array.isArray(left) ? listToArray(left) : left);
+		list = list[1];
+	}
+	return array;
+}
+
 function assertType(n, type) {
 	if (typeof(n) != type) {
 		throw new Error('"' + n + '" is not a ' + type); 
@@ -282,6 +279,17 @@ function assertType(n, type) {
 function assertInteger(n) {
 	if (typeof(n) != "number" && parseInt(n) != n) {
 		throw new Error('"' + n + '" is not an integer'); 
+	}
+}
+
+function assertList(list) {
+	if (Array.isArray(list)) {
+		if (list.length == 0) {
+			return;
+		} else if (list.length != 2) {
+			throw new Error("Expected list");
+		}
+		assertList(list[1]);
 	}
 }
 
@@ -302,6 +310,10 @@ module.exports = {
 	minus: minus,
 	mult: mult,
 	div: div,
+	greater: greater,
+	less: less,
+	geq: geq,
+	leq: leq,
 	eq: eq,
 
 	and: and,
@@ -313,9 +325,12 @@ module.exports = {
 	first: first,
 	rest: rest,
 	length: length,
-	repeat: repeat
+	repeat: repeat,
+
+	apply: apply,
+	map: map
 }
-},{}],"NQbGnO":[function(require,module,exports){
+},{}],"FaLuca":[function(require,module,exports){
 var escodegen = require('escodegen');
 var tokenize = require('./tokenize.js').tokenize;
 var church_astify = require('./church_astify.js').church_astify;
@@ -328,7 +343,41 @@ function church_to_js(church) {
 module.exports = {
 	church_to_js: church_to_js
 };
-},{"./church_astify.js":1,"./js_astify.js":4,"./tokenize.js":14,"escodegen":15}],4:[function(require,module,exports){
+},{"./church_astify.js":1,"./js_astify.js":5,"./tokenize.js":15,"escodegen":16}],"dXQVgk":[function(require,module,exports){
+function format_result(obj) {
+	function format_result_in_list_helper(obj) {
+		if (obj.length == 2) {
+			return " " + format_result(obj[0]) + format_result_in_list_helper(obj[1]);
+		} else if (obj.length == 0) {
+			return ")";
+		} else {
+			return " . " + format_result(obj) + ")";
+		}
+	}
+
+	if (Array.isArray(obj)) {
+		if (obj.length == 2) {
+			return "(" + format_result(obj[0]) + format_result_in_list_helper(obj[1]);
+		} else {
+			return "()";
+		}
+	} else {
+		if (typeof(obj) == "boolean") {
+			if (obj) {
+				return "#t";
+			} else {
+				return "#f";
+			}
+		} else {
+			return "" + obj;
+		}
+	}
+}
+
+module.exports = {
+	format_result: format_result
+};
+},{}],5:[function(require,module,exports){
 // var esprima = require('esprima');
 var escodegen = require('escodegen');
 
@@ -365,6 +414,10 @@ var church_builtins_map = {
 	"length": "length",
 	"repeat": "repeat",
 
+	"apply": "apply",
+	"map": "map",
+
+	"mem": "mem",
 	"flip": "flip",
 	"multinomial": "multinomial"
 }
@@ -439,7 +492,7 @@ var block_statement_node = {
 
 function is_string(s) { return s[0] == "\""; }
 function is_number(s) { return !isNaN(parseFloat(s)); }
-function is_identifier(s) { return !(is_string(s) || is_number(s)); }
+function is_identifier(s) { return !(is_string(s) || is_number(s) || Array.isArray(s)); }
 
 function strip_quotes(s) { return s.slice(1, -1); }
 function get_value_of_string_or_number(s) { 
@@ -479,14 +532,14 @@ function deep_copy(obj) { return JSON.parse(JSON.stringify(obj)); }
 function church_tree_to_esprima_ast(church_tree) {
 	function make_declaration(church_tree) {
 		var node = deep_copy(declaration_node);
-		node["declarations"][0]["id"]["name"] = rename(church_tree["children"][0]);
-		node["declarations"][0]["init"] = make_expression(church_tree["children"][1]);
+		node["declarations"][0]["id"]["name"] = rename(church_tree[1]);
+		node["declarations"][0]["init"] = make_expression(church_tree[2]);
 		return node;
 	}
 
 	function make_function_expression(church_tree) {
-		var lambda_args = church_tree["children"][0];
-		var church_actions = church_tree["children"].slice(1);
+		var lambda_args = church_tree[1];
+		var church_actions = church_tree.slice(2);
 		var func_expression;
 		if (typeof(lambda_args) == "object") {
 			func_expression = deep_copy(function_expression_node);
@@ -505,8 +558,8 @@ function church_tree_to_esprima_ast(church_tree) {
 	}
 
 	function make_lambda_query_expression(church_tree) {
-		var lambda_args = church_tree["children"][0];
-		var params = church_tree["children"].slice(1);
+		var lambda_args = church_tree[1];
+		var params = church_tree.slice(2);
 		if (params.length < 2) {
 			throw new Error("Wrong number of arguments");
 		}
@@ -535,7 +588,7 @@ function church_tree_to_esprima_ast(church_tree) {
 	}
 
 	function make_mh_query_expression(church_tree) {
-		var params = church_tree["children"];
+		var params = church_tree.slice(1);
 		// TODO: better error-checking
 		if (params.length < 5) {
 			throw new Error("Wrong number of arguments");
@@ -570,8 +623,8 @@ function church_tree_to_esprima_ast(church_tree) {
 
 	function make_call_expression(church_tree) {
 		var call_expression = deep_copy(call_expression_node);
-		call_expression["callee"] = make_expression(church_tree["head"]);
-		call_expression["arguments"] = make_expression_list(church_tree["children"]);
+		call_expression["callee"] = make_expression(church_tree[0]);
+		call_expression["arguments"] = make_expression_list(church_tree.slice(1));
 		return call_expression;
 	}
 
@@ -585,31 +638,52 @@ function church_tree_to_esprima_ast(church_tree) {
 		var if_expression = deep_copy(call_expression_node);
 		var callee = deep_copy(function_expression_node);
 		var if_statement = deep_copy(if_statement_node);
-		if_statement["test"] = make_expression(church_tree["children"][0]);
+		if_statement["test"] = make_expression(church_tree[1]);
 		if_statement["consequent"] = deep_copy(block_statement_node);
-		if_statement["consequent"]["body"].push(make_return_statement(church_tree["children"][1]));
+		if_statement["consequent"]["body"].push(make_return_statement(church_tree[2]));
 
-		if (church_tree["children"].length == 3) {
+		if (church_tree.length == 4) {
 			if_statement["alternate"] = deep_copy(block_statement_node);
-			if_statement["alternate"]["body"].push(make_return_statement(church_tree["children"][2]));
+			if_statement["alternate"]["body"].push(make_return_statement(church_tree[3]));
 		}
 		callee["body"]["body"] = [if_statement];
 		if_expression["callee"] = callee;
 		return if_expression;
 	}
 
+	function make_quoted_expression(church_tree) {
+		function quote_helper(quoted) {
+			if (Array.isArray(quoted)) {
+				var array = deep_copy(array_node);
+				if (quoted.length > 0) {
+					array["elements"] = [quote_helper(quoted[0]), quote_helper(quoted.slice(1))];
+				}
+				return array;
+			} else {
+				if (is_identifier(quoted)) {
+					return make_simple_expression('"' + quoted + '"');
+				} else {
+					return make_simple_expression(quoted);
+				}
+			}
+		}
+		return quote_helper(church_tree[1]);
+	}
+
 	function make_expression(church_tree) {
 		// TODO: Turn this into a shorter map-style thing.
-		if (typeof(church_tree) == "object") {
-			if (church_tree["head"] == "lambda") {
+		if (Array.isArray(church_tree) && church_tree.length > 0) {
+			if (church_tree[0] == "lambda") {
 				return make_function_expression(church_tree);
-			} else if (church_tree["head"] == "lambda-query") {
+			} else if (church_tree[0] == "lambda-query") {
 				return make_lambda_query_expression(church_tree);
-			} else if (church_tree["head"] == "if") {
+			} else if (church_tree[0] == "if") {
 				return make_if_expression(church_tree);
-			} else if (church_tree["head"] == "define") {
+			} else if (church_tree[0] == "define") {
 				// TODO: figure out whether to catch defines here or in make_expression_statement
-			} else if (church_tree["head"] == "mh-query") {
+			} else if (church_tree[0] == "quote") {
+				return make_quoted_expression(church_tree);
+			} else if (church_tree[0] == "mh-query") {
 				return make_mh_query_expression(church_tree);
 			} else {
 				return make_call_expression(church_tree);
@@ -621,7 +695,7 @@ function church_tree_to_esprima_ast(church_tree) {
 
 	function make_simple_expression(church_leaf) {
 		var expression = deep_copy(expression_node);
-		if (church_leaf == "()") {
+		if (Array.isArray(church_leaf) && church_leaf.length == 0) {
 			expression["type"] = "ArrayExpression";
 			expression["elements"] = [];
 		} else if (true_aliases.indexOf(church_leaf) != -1) {
@@ -654,7 +728,7 @@ function church_tree_to_esprima_ast(church_tree) {
 	}
 
 	function make_expression_statement(church_tree) {
-		if (church_tree["head"] == "define") {
+		if (church_tree[0] == "define") {
 			return make_declaration(church_tree);
 		} else {
 			var expr_statement = deep_copy(expression_statement_node);
@@ -678,7 +752,7 @@ function church_tree_to_esprima_ast(church_tree) {
 }
 
 exports.church_tree_to_esprima_ast = church_tree_to_esprima_ast;
-},{"escodegen":15}],5:[function(require,module,exports){
+},{"escodegen":16}],6:[function(require,module,exports){
 
 // Repeat a computation n times
 function ntimes(times, block)
@@ -715,7 +789,7 @@ module.exports =
 	until: until,
 	repeat: repeat
 }
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 var trace = require("./trace")
 
 
@@ -1282,7 +1356,7 @@ module.exports =
 	dirichlet_logprob: dirichlet_logprob,
 	dirichlet: dirichlet
 }
-},{"./trace":11}],"dtecpu":[function(require,module,exports){
+},{"./trace":12}],"bXD3KN":[function(require,module,exports){
 var trace = require("./trace")
 var erp = require("./erp")
 var control = require("./control")
@@ -1322,7 +1396,7 @@ and since not everyone will need/want to use it, the index does not forward
 the exports from transport. Include transport directly if you want those
 features (or call transport from the command line to transfom files directly)
 */
-},{"./control":5,"./erp":6,"./inference":8,"./marginalize":9,"./memoize":10,"./trace":11}],8:[function(require,module,exports){
+},{"./control":6,"./erp":7,"./inference":9,"./marginalize":10,"./memoize":11,"./trace":12}],9:[function(require,module,exports){
 var trace = require("./trace")
 var util = require("./util")
 
@@ -1719,7 +1793,7 @@ module.exports =
 	traceMH: traceMH,
 	LARJMH: LARJMH
 }
-},{"./trace":11,"./util":"vowcaP"}],9:[function(require,module,exports){
+},{"./trace":12,"./util":"EBGQkK"}],10:[function(require,module,exports){
 
 //this file provides a utility for marginalizing a function.
 //it caches the marginal for each argument set, thus providing a simple dynamic programming construct.
@@ -1845,7 +1919,7 @@ marginalize: marginalize
 
 
 
-},{"./erp":6,"./inference":8,"./trace":11}],10:[function(require,module,exports){
+},{"./erp":7,"./inference":9,"./trace":12}],11:[function(require,module,exports){
 var trace = require("./trace")
 
 /*
@@ -1872,7 +1946,7 @@ module.exports =
 	mem: mem
 }
 
-},{"./trace":11}],11:[function(require,module,exports){
+},{"./trace":12}],12:[function(require,module,exports){
 var util = require("./util")
 
 // Toggle for switching between different variable naming implementations
@@ -2360,7 +2434,7 @@ module.exports =
 	factor: factor,
 	condition: condition
 }
-},{"./util":"vowcaP"}],"HR3a2a":[function(require,module,exports){
+},{"./util":"EBGQkK"}],"mzTW5X":[function(require,module,exports){
 var process=require("__browserify_process");var fs = require("fs")
 var esprima = require("esprima")
 var escodegen = require("escodegen")
@@ -2471,7 +2545,7 @@ if (require.main === module)
 	fs.writeFileSync(process.argv[3],
 		probTransform(fs.readFileSync(process.argv[2])))
 }
-},{"__browserify_process":36,"escodegen":15,"escodegen/node_modules/estraverse":16,"esprima":29,"fs":32}],"vowcaP":[function(require,module,exports){
+},{"__browserify_process":38,"escodegen":16,"escodegen/node_modules/estraverse":17,"esprima":29,"fs":30}],"EBGQkK":[function(require,module,exports){
 var global=self;
 function openModule(mod)
 {
@@ -2521,7 +2595,7 @@ module.exports =
 	randomChoice: randomChoice,
 	keys: keys
 }
-},{}],14:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 var delimiters = ["(", ")", "'", "\""]
 var whitespace_re = /^\s/
 
@@ -2563,7 +2637,7 @@ function tokenize(s) {
 }
 
 exports.tokenize = tokenize;
-},{}],15:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 var global=self;/*
   Copyright (C) 2012 Michael Ficarra <escodegen.copyright@michael.ficarra.me>
   Copyright (C) 2012 Robert Gust-Bardon <donate@robert.gust-bardon.org>
@@ -4840,7 +4914,7 @@ var global=self;/*
 }());
 /* vim: set sw=4 ts=4 et tw=80 : */
 
-},{"./package.json":28,"estraverse":16,"source-map":17}],16:[function(require,module,exports){
+},{"./package.json":28,"estraverse":17,"source-map":18}],17:[function(require,module,exports){
 /*
   Copyright (C) 2012 Yusuke Suzuki <utatane.tea@gmail.com>
   Copyright (C) 2012 Ariya Hidayat <ariya.hidayat@gmail.com>
@@ -5157,7 +5231,7 @@ var global=self;/*
 }));
 /* vim: set sw=4 ts=4 et tw=80 : */
 
-},{}],17:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 /*
  * Copyright 2009-2011 Mozilla Foundation and contributors
  * Licensed under the New BSD license. See LICENSE.txt or:
@@ -5167,7 +5241,7 @@ exports.SourceMapGenerator = require('./source-map/source-map-generator').Source
 exports.SourceMapConsumer = require('./source-map/source-map-consumer').SourceMapConsumer;
 exports.SourceNode = require('./source-map/source-node').SourceNode;
 
-},{"./source-map/source-map-consumer":24,"./source-map/source-map-generator":25,"./source-map/source-node":21}],18:[function(require,module,exports){
+},{"./source-map/source-map-consumer":23,"./source-map/source-map-generator":24,"./source-map/source-node":25}],19:[function(require,module,exports){
 /* -*- Mode: js; js-indent-level: 2; -*- */
 /*
  * Copyright 2011 Mozilla Foundation and contributors
@@ -5265,7 +5339,7 @@ define(function (require, exports, module) {
 
 });
 
-},{"./util":26,"amdefine":27}],19:[function(require,module,exports){
+},{"./util":26,"amdefine":27}],20:[function(require,module,exports){
 /* -*- Mode: js; js-indent-level: 2; -*- */
 /*
  * Copyright 2011 Mozilla Foundation and contributors
@@ -5411,7 +5485,7 @@ define(function (require, exports, module) {
 
 });
 
-},{"./base64":20,"amdefine":27}],20:[function(require,module,exports){
+},{"./base64":21,"amdefine":27}],21:[function(require,module,exports){
 /* -*- Mode: js; js-indent-level: 2; -*- */
 /*
  * Copyright 2011 Mozilla Foundation and contributors
@@ -5455,364 +5529,7 @@ define(function (require, exports, module) {
 
 });
 
-},{"amdefine":27}],21:[function(require,module,exports){
-/* -*- Mode: js; js-indent-level: 2; -*- */
-/*
- * Copyright 2011 Mozilla Foundation and contributors
- * Licensed under the New BSD license. See LICENSE or:
- * http://opensource.org/licenses/BSD-3-Clause
- */
-if (typeof define !== 'function') {
-    var define = require('amdefine')(module, require);
-}
-define(function (require, exports, module) {
-
-  var SourceMapGenerator = require('./source-map-generator').SourceMapGenerator;
-  var util = require('./util');
-
-  /**
-   * SourceNodes provide a way to abstract over interpolating/concatenating
-   * snippets of generated JavaScript source code while maintaining the line and
-   * column information associated with the original source code.
-   *
-   * @param aLine The original line number.
-   * @param aColumn The original column number.
-   * @param aSource The original source's filename.
-   * @param aChunks Optional. An array of strings which are snippets of
-   *        generated JS, or other SourceNodes.
-   * @param aName The original identifier.
-   */
-  function SourceNode(aLine, aColumn, aSource, aChunks, aName) {
-    this.children = [];
-    this.sourceContents = {};
-    this.line = aLine === undefined ? null : aLine;
-    this.column = aColumn === undefined ? null : aColumn;
-    this.source = aSource === undefined ? null : aSource;
-    this.name = aName === undefined ? null : aName;
-    if (aChunks != null) this.add(aChunks);
-  }
-
-  /**
-   * Creates a SourceNode from generated code and a SourceMapConsumer.
-   *
-   * @param aGeneratedCode The generated code
-   * @param aSourceMapConsumer The SourceMap for the generated code
-   */
-  SourceNode.fromStringWithSourceMap =
-    function SourceNode_fromStringWithSourceMap(aGeneratedCode, aSourceMapConsumer) {
-      // The SourceNode we want to fill with the generated code
-      // and the SourceMap
-      var node = new SourceNode();
-
-      // The generated code
-      // Processed fragments are removed from this array.
-      var remainingLines = aGeneratedCode.split('\n');
-
-      // We need to remember the position of "remainingLines"
-      var lastGeneratedLine = 1, lastGeneratedColumn = 0;
-
-      // The generate SourceNodes we need a code range.
-      // To extract it current and last mapping is used.
-      // Here we store the last mapping.
-      var lastMapping = null;
-
-      aSourceMapConsumer.eachMapping(function (mapping) {
-        if (lastMapping === null) {
-          // We add the generated code until the first mapping
-          // to the SourceNode without any mapping.
-          // Each line is added as separate string.
-          while (lastGeneratedLine < mapping.generatedLine) {
-            node.add(remainingLines.shift() + "\n");
-            lastGeneratedLine++;
-          }
-          if (lastGeneratedColumn < mapping.generatedColumn) {
-            var nextLine = remainingLines[0];
-            node.add(nextLine.substr(0, mapping.generatedColumn));
-            remainingLines[0] = nextLine.substr(mapping.generatedColumn);
-            lastGeneratedColumn = mapping.generatedColumn;
-          }
-        } else {
-          // We add the code from "lastMapping" to "mapping":
-          // First check if there is a new line in between.
-          if (lastGeneratedLine < mapping.generatedLine) {
-            var code = "";
-            // Associate full lines with "lastMapping"
-            do {
-              code += remainingLines.shift() + "\n";
-              lastGeneratedLine++;
-              lastGeneratedColumn = 0;
-            } while (lastGeneratedLine < mapping.generatedLine);
-            // When we reached the correct line, we add code until we
-            // reach the correct column too.
-            if (lastGeneratedColumn < mapping.generatedColumn) {
-              var nextLine = remainingLines[0];
-              code += nextLine.substr(0, mapping.generatedColumn);
-              remainingLines[0] = nextLine.substr(mapping.generatedColumn);
-              lastGeneratedColumn = mapping.generatedColumn;
-            }
-            // Create the SourceNode.
-            addMappingWithCode(lastMapping, code);
-          } else {
-            // There is no new line in between.
-            // Associate the code between "lastGeneratedColumn" and
-            // "mapping.generatedColumn" with "lastMapping"
-            var nextLine = remainingLines[0];
-            var code = nextLine.substr(0, mapping.generatedColumn -
-                                          lastGeneratedColumn);
-            remainingLines[0] = nextLine.substr(mapping.generatedColumn -
-                                                lastGeneratedColumn);
-            lastGeneratedColumn = mapping.generatedColumn;
-            addMappingWithCode(lastMapping, code);
-          }
-        }
-        lastMapping = mapping;
-      }, this);
-      // We have processed all mappings.
-      // Associate the remaining code in the current line with "lastMapping"
-      // and add the remaining lines without any mapping
-      addMappingWithCode(lastMapping, remainingLines.join("\n"));
-
-      // Copy sourcesContent into SourceNode
-      aSourceMapConsumer.sources.forEach(function (sourceFile) {
-        var content = aSourceMapConsumer.sourceContentFor(sourceFile);
-        if (content) {
-          node.setSourceContent(sourceFile, content);
-        }
-      });
-
-      return node;
-
-      function addMappingWithCode(mapping, code) {
-        if (mapping === null || mapping.source === undefined) {
-          node.add(code);
-        } else {
-          node.add(new SourceNode(mapping.originalLine,
-                                  mapping.originalColumn,
-                                  mapping.source,
-                                  code,
-                                  mapping.name));
-        }
-      }
-    };
-
-  /**
-   * Add a chunk of generated JS to this source node.
-   *
-   * @param aChunk A string snippet of generated JS code, another instance of
-   *        SourceNode, or an array where each member is one of those things.
-   */
-  SourceNode.prototype.add = function SourceNode_add(aChunk) {
-    if (Array.isArray(aChunk)) {
-      aChunk.forEach(function (chunk) {
-        this.add(chunk);
-      }, this);
-    }
-    else if (aChunk instanceof SourceNode || typeof aChunk === "string") {
-      if (aChunk) {
-        this.children.push(aChunk);
-      }
-    }
-    else {
-      throw new TypeError(
-        "Expected a SourceNode, string, or an array of SourceNodes and strings. Got " + aChunk
-      );
-    }
-    return this;
-  };
-
-  /**
-   * Add a chunk of generated JS to the beginning of this source node.
-   *
-   * @param aChunk A string snippet of generated JS code, another instance of
-   *        SourceNode, or an array where each member is one of those things.
-   */
-  SourceNode.prototype.prepend = function SourceNode_prepend(aChunk) {
-    if (Array.isArray(aChunk)) {
-      for (var i = aChunk.length-1; i >= 0; i--) {
-        this.prepend(aChunk[i]);
-      }
-    }
-    else if (aChunk instanceof SourceNode || typeof aChunk === "string") {
-      this.children.unshift(aChunk);
-    }
-    else {
-      throw new TypeError(
-        "Expected a SourceNode, string, or an array of SourceNodes and strings. Got " + aChunk
-      );
-    }
-    return this;
-  };
-
-  /**
-   * Walk over the tree of JS snippets in this node and its children. The
-   * walking function is called once for each snippet of JS and is passed that
-   * snippet and the its original associated source's line/column location.
-   *
-   * @param aFn The traversal function.
-   */
-  SourceNode.prototype.walk = function SourceNode_walk(aFn) {
-    this.children.forEach(function (chunk) {
-      if (chunk instanceof SourceNode) {
-        chunk.walk(aFn);
-      }
-      else {
-        if (chunk !== '') {
-          aFn(chunk, { source: this.source,
-                       line: this.line,
-                       column: this.column,
-                       name: this.name });
-        }
-      }
-    }, this);
-  };
-
-  /**
-   * Like `String.prototype.join` except for SourceNodes. Inserts `aStr` between
-   * each of `this.children`.
-   *
-   * @param aSep The separator.
-   */
-  SourceNode.prototype.join = function SourceNode_join(aSep) {
-    var newChildren;
-    var i;
-    var len = this.children.length;
-    if (len > 0) {
-      newChildren = [];
-      for (i = 0; i < len-1; i++) {
-        newChildren.push(this.children[i]);
-        newChildren.push(aSep);
-      }
-      newChildren.push(this.children[i]);
-      this.children = newChildren;
-    }
-    return this;
-  };
-
-  /**
-   * Call String.prototype.replace on the very right-most source snippet. Useful
-   * for trimming whitespace from the end of a source node, etc.
-   *
-   * @param aPattern The pattern to replace.
-   * @param aReplacement The thing to replace the pattern with.
-   */
-  SourceNode.prototype.replaceRight = function SourceNode_replaceRight(aPattern, aReplacement) {
-    var lastChild = this.children[this.children.length - 1];
-    if (lastChild instanceof SourceNode) {
-      lastChild.replaceRight(aPattern, aReplacement);
-    }
-    else if (typeof lastChild === 'string') {
-      this.children[this.children.length - 1] = lastChild.replace(aPattern, aReplacement);
-    }
-    else {
-      this.children.push(''.replace(aPattern, aReplacement));
-    }
-    return this;
-  };
-
-  /**
-   * Set the source content for a source file. This will be added to the SourceMapGenerator
-   * in the sourcesContent field.
-   *
-   * @param aSourceFile The filename of the source file
-   * @param aSourceContent The content of the source file
-   */
-  SourceNode.prototype.setSourceContent =
-    function SourceNode_setSourceContent(aSourceFile, aSourceContent) {
-      this.sourceContents[util.toSetString(aSourceFile)] = aSourceContent;
-    };
-
-  /**
-   * Walk over the tree of SourceNodes. The walking function is called for each
-   * source file content and is passed the filename and source content.
-   *
-   * @param aFn The traversal function.
-   */
-  SourceNode.prototype.walkSourceContents =
-    function SourceNode_walkSourceContents(aFn) {
-      this.children.forEach(function (chunk) {
-        if (chunk instanceof SourceNode) {
-          chunk.walkSourceContents(aFn);
-        }
-      }, this);
-      Object.keys(this.sourceContents).forEach(function (sourceFileKey) {
-        aFn(util.fromSetString(sourceFileKey), this.sourceContents[sourceFileKey]);
-      }, this);
-    };
-
-  /**
-   * Return the string representation of this source node. Walks over the tree
-   * and concatenates all the various snippets together to one string.
-   */
-  SourceNode.prototype.toString = function SourceNode_toString() {
-    var str = "";
-    this.walk(function (chunk) {
-      str += chunk;
-    });
-    return str;
-  };
-
-  /**
-   * Returns the string representation of this source node along with a source
-   * map.
-   */
-  SourceNode.prototype.toStringWithSourceMap = function SourceNode_toStringWithSourceMap(aArgs) {
-    var generated = {
-      code: "",
-      line: 1,
-      column: 0
-    };
-    var map = new SourceMapGenerator(aArgs);
-    var sourceMappingActive = false;
-    this.walk(function (chunk, original) {
-      generated.code += chunk;
-      if (original.source !== null
-          && original.line !== null
-          && original.column !== null) {
-        map.addMapping({
-          source: original.source,
-          original: {
-            line: original.line,
-            column: original.column
-          },
-          generated: {
-            line: generated.line,
-            column: generated.column
-          },
-          name: original.name
-        });
-        sourceMappingActive = true;
-      } else if (sourceMappingActive) {
-        map.addMapping({
-          generated: {
-            line: generated.line,
-            column: generated.column
-          }
-        });
-        sourceMappingActive = false;
-      }
-      chunk.split('').forEach(function (ch) {
-        if (ch === '\n') {
-          generated.line++;
-          generated.column = 0;
-        } else {
-          generated.column++;
-        }
-      });
-    });
-    this.walkSourceContents(function (sourceFile, sourceContent) {
-      map.setSourceContent(sourceFile, sourceContent);
-    });
-
-    return { code: generated.code, map: map };
-  };
-
-  exports.SourceNode = SourceNode;
-
-});
-
-},{"./source-map-generator":25,"./util":26,"amdefine":27}],"./church_builtins":[function(require,module,exports){
-module.exports=require('Si6Pk/');
-},{}],23:[function(require,module,exports){
+},{"amdefine":27}],22:[function(require,module,exports){
 /* -*- Mode: js; js-indent-level: 2; -*- */
 /*
  * Copyright 2011 Mozilla Foundation and contributors
@@ -5895,7 +5612,7 @@ define(function (require, exports, module) {
 
 });
 
-},{"amdefine":27}],24:[function(require,module,exports){
+},{"amdefine":27}],23:[function(require,module,exports){
 /* -*- Mode: js; js-indent-level: 2; -*- */
 /*
  * Copyright 2011 Mozilla Foundation and contributors
@@ -6338,7 +6055,7 @@ define(function (require, exports, module) {
 
 });
 
-},{"./array-set":18,"./base64-vlq":19,"./binary-search":23,"./util":26,"amdefine":27}],25:[function(require,module,exports){
+},{"./array-set":19,"./base64-vlq":20,"./binary-search":22,"./util":26,"amdefine":27}],24:[function(require,module,exports){
 /* -*- Mode: js; js-indent-level: 2; -*- */
 /*
  * Copyright 2011 Mozilla Foundation and contributors
@@ -6721,7 +6438,362 @@ define(function (require, exports, module) {
 
 });
 
-},{"./array-set":18,"./base64-vlq":19,"./util":26,"amdefine":27}],26:[function(require,module,exports){
+},{"./array-set":19,"./base64-vlq":20,"./util":26,"amdefine":27}],25:[function(require,module,exports){
+/* -*- Mode: js; js-indent-level: 2; -*- */
+/*
+ * Copyright 2011 Mozilla Foundation and contributors
+ * Licensed under the New BSD license. See LICENSE or:
+ * http://opensource.org/licenses/BSD-3-Clause
+ */
+if (typeof define !== 'function') {
+    var define = require('amdefine')(module, require);
+}
+define(function (require, exports, module) {
+
+  var SourceMapGenerator = require('./source-map-generator').SourceMapGenerator;
+  var util = require('./util');
+
+  /**
+   * SourceNodes provide a way to abstract over interpolating/concatenating
+   * snippets of generated JavaScript source code while maintaining the line and
+   * column information associated with the original source code.
+   *
+   * @param aLine The original line number.
+   * @param aColumn The original column number.
+   * @param aSource The original source's filename.
+   * @param aChunks Optional. An array of strings which are snippets of
+   *        generated JS, or other SourceNodes.
+   * @param aName The original identifier.
+   */
+  function SourceNode(aLine, aColumn, aSource, aChunks, aName) {
+    this.children = [];
+    this.sourceContents = {};
+    this.line = aLine === undefined ? null : aLine;
+    this.column = aColumn === undefined ? null : aColumn;
+    this.source = aSource === undefined ? null : aSource;
+    this.name = aName === undefined ? null : aName;
+    if (aChunks != null) this.add(aChunks);
+  }
+
+  /**
+   * Creates a SourceNode from generated code and a SourceMapConsumer.
+   *
+   * @param aGeneratedCode The generated code
+   * @param aSourceMapConsumer The SourceMap for the generated code
+   */
+  SourceNode.fromStringWithSourceMap =
+    function SourceNode_fromStringWithSourceMap(aGeneratedCode, aSourceMapConsumer) {
+      // The SourceNode we want to fill with the generated code
+      // and the SourceMap
+      var node = new SourceNode();
+
+      // The generated code
+      // Processed fragments are removed from this array.
+      var remainingLines = aGeneratedCode.split('\n');
+
+      // We need to remember the position of "remainingLines"
+      var lastGeneratedLine = 1, lastGeneratedColumn = 0;
+
+      // The generate SourceNodes we need a code range.
+      // To extract it current and last mapping is used.
+      // Here we store the last mapping.
+      var lastMapping = null;
+
+      aSourceMapConsumer.eachMapping(function (mapping) {
+        if (lastMapping === null) {
+          // We add the generated code until the first mapping
+          // to the SourceNode without any mapping.
+          // Each line is added as separate string.
+          while (lastGeneratedLine < mapping.generatedLine) {
+            node.add(remainingLines.shift() + "\n");
+            lastGeneratedLine++;
+          }
+          if (lastGeneratedColumn < mapping.generatedColumn) {
+            var nextLine = remainingLines[0];
+            node.add(nextLine.substr(0, mapping.generatedColumn));
+            remainingLines[0] = nextLine.substr(mapping.generatedColumn);
+            lastGeneratedColumn = mapping.generatedColumn;
+          }
+        } else {
+          // We add the code from "lastMapping" to "mapping":
+          // First check if there is a new line in between.
+          if (lastGeneratedLine < mapping.generatedLine) {
+            var code = "";
+            // Associate full lines with "lastMapping"
+            do {
+              code += remainingLines.shift() + "\n";
+              lastGeneratedLine++;
+              lastGeneratedColumn = 0;
+            } while (lastGeneratedLine < mapping.generatedLine);
+            // When we reached the correct line, we add code until we
+            // reach the correct column too.
+            if (lastGeneratedColumn < mapping.generatedColumn) {
+              var nextLine = remainingLines[0];
+              code += nextLine.substr(0, mapping.generatedColumn);
+              remainingLines[0] = nextLine.substr(mapping.generatedColumn);
+              lastGeneratedColumn = mapping.generatedColumn;
+            }
+            // Create the SourceNode.
+            addMappingWithCode(lastMapping, code);
+          } else {
+            // There is no new line in between.
+            // Associate the code between "lastGeneratedColumn" and
+            // "mapping.generatedColumn" with "lastMapping"
+            var nextLine = remainingLines[0];
+            var code = nextLine.substr(0, mapping.generatedColumn -
+                                          lastGeneratedColumn);
+            remainingLines[0] = nextLine.substr(mapping.generatedColumn -
+                                                lastGeneratedColumn);
+            lastGeneratedColumn = mapping.generatedColumn;
+            addMappingWithCode(lastMapping, code);
+          }
+        }
+        lastMapping = mapping;
+      }, this);
+      // We have processed all mappings.
+      // Associate the remaining code in the current line with "lastMapping"
+      // and add the remaining lines without any mapping
+      addMappingWithCode(lastMapping, remainingLines.join("\n"));
+
+      // Copy sourcesContent into SourceNode
+      aSourceMapConsumer.sources.forEach(function (sourceFile) {
+        var content = aSourceMapConsumer.sourceContentFor(sourceFile);
+        if (content) {
+          node.setSourceContent(sourceFile, content);
+        }
+      });
+
+      return node;
+
+      function addMappingWithCode(mapping, code) {
+        if (mapping === null || mapping.source === undefined) {
+          node.add(code);
+        } else {
+          node.add(new SourceNode(mapping.originalLine,
+                                  mapping.originalColumn,
+                                  mapping.source,
+                                  code,
+                                  mapping.name));
+        }
+      }
+    };
+
+  /**
+   * Add a chunk of generated JS to this source node.
+   *
+   * @param aChunk A string snippet of generated JS code, another instance of
+   *        SourceNode, or an array where each member is one of those things.
+   */
+  SourceNode.prototype.add = function SourceNode_add(aChunk) {
+    if (Array.isArray(aChunk)) {
+      aChunk.forEach(function (chunk) {
+        this.add(chunk);
+      }, this);
+    }
+    else if (aChunk instanceof SourceNode || typeof aChunk === "string") {
+      if (aChunk) {
+        this.children.push(aChunk);
+      }
+    }
+    else {
+      throw new TypeError(
+        "Expected a SourceNode, string, or an array of SourceNodes and strings. Got " + aChunk
+      );
+    }
+    return this;
+  };
+
+  /**
+   * Add a chunk of generated JS to the beginning of this source node.
+   *
+   * @param aChunk A string snippet of generated JS code, another instance of
+   *        SourceNode, or an array where each member is one of those things.
+   */
+  SourceNode.prototype.prepend = function SourceNode_prepend(aChunk) {
+    if (Array.isArray(aChunk)) {
+      for (var i = aChunk.length-1; i >= 0; i--) {
+        this.prepend(aChunk[i]);
+      }
+    }
+    else if (aChunk instanceof SourceNode || typeof aChunk === "string") {
+      this.children.unshift(aChunk);
+    }
+    else {
+      throw new TypeError(
+        "Expected a SourceNode, string, or an array of SourceNodes and strings. Got " + aChunk
+      );
+    }
+    return this;
+  };
+
+  /**
+   * Walk over the tree of JS snippets in this node and its children. The
+   * walking function is called once for each snippet of JS and is passed that
+   * snippet and the its original associated source's line/column location.
+   *
+   * @param aFn The traversal function.
+   */
+  SourceNode.prototype.walk = function SourceNode_walk(aFn) {
+    this.children.forEach(function (chunk) {
+      if (chunk instanceof SourceNode) {
+        chunk.walk(aFn);
+      }
+      else {
+        if (chunk !== '') {
+          aFn(chunk, { source: this.source,
+                       line: this.line,
+                       column: this.column,
+                       name: this.name });
+        }
+      }
+    }, this);
+  };
+
+  /**
+   * Like `String.prototype.join` except for SourceNodes. Inserts `aStr` between
+   * each of `this.children`.
+   *
+   * @param aSep The separator.
+   */
+  SourceNode.prototype.join = function SourceNode_join(aSep) {
+    var newChildren;
+    var i;
+    var len = this.children.length;
+    if (len > 0) {
+      newChildren = [];
+      for (i = 0; i < len-1; i++) {
+        newChildren.push(this.children[i]);
+        newChildren.push(aSep);
+      }
+      newChildren.push(this.children[i]);
+      this.children = newChildren;
+    }
+    return this;
+  };
+
+  /**
+   * Call String.prototype.replace on the very right-most source snippet. Useful
+   * for trimming whitespace from the end of a source node, etc.
+   *
+   * @param aPattern The pattern to replace.
+   * @param aReplacement The thing to replace the pattern with.
+   */
+  SourceNode.prototype.replaceRight = function SourceNode_replaceRight(aPattern, aReplacement) {
+    var lastChild = this.children[this.children.length - 1];
+    if (lastChild instanceof SourceNode) {
+      lastChild.replaceRight(aPattern, aReplacement);
+    }
+    else if (typeof lastChild === 'string') {
+      this.children[this.children.length - 1] = lastChild.replace(aPattern, aReplacement);
+    }
+    else {
+      this.children.push(''.replace(aPattern, aReplacement));
+    }
+    return this;
+  };
+
+  /**
+   * Set the source content for a source file. This will be added to the SourceMapGenerator
+   * in the sourcesContent field.
+   *
+   * @param aSourceFile The filename of the source file
+   * @param aSourceContent The content of the source file
+   */
+  SourceNode.prototype.setSourceContent =
+    function SourceNode_setSourceContent(aSourceFile, aSourceContent) {
+      this.sourceContents[util.toSetString(aSourceFile)] = aSourceContent;
+    };
+
+  /**
+   * Walk over the tree of SourceNodes. The walking function is called for each
+   * source file content and is passed the filename and source content.
+   *
+   * @param aFn The traversal function.
+   */
+  SourceNode.prototype.walkSourceContents =
+    function SourceNode_walkSourceContents(aFn) {
+      this.children.forEach(function (chunk) {
+        if (chunk instanceof SourceNode) {
+          chunk.walkSourceContents(aFn);
+        }
+      }, this);
+      Object.keys(this.sourceContents).forEach(function (sourceFileKey) {
+        aFn(util.fromSetString(sourceFileKey), this.sourceContents[sourceFileKey]);
+      }, this);
+    };
+
+  /**
+   * Return the string representation of this source node. Walks over the tree
+   * and concatenates all the various snippets together to one string.
+   */
+  SourceNode.prototype.toString = function SourceNode_toString() {
+    var str = "";
+    this.walk(function (chunk) {
+      str += chunk;
+    });
+    return str;
+  };
+
+  /**
+   * Returns the string representation of this source node along with a source
+   * map.
+   */
+  SourceNode.prototype.toStringWithSourceMap = function SourceNode_toStringWithSourceMap(aArgs) {
+    var generated = {
+      code: "",
+      line: 1,
+      column: 0
+    };
+    var map = new SourceMapGenerator(aArgs);
+    var sourceMappingActive = false;
+    this.walk(function (chunk, original) {
+      generated.code += chunk;
+      if (original.source !== null
+          && original.line !== null
+          && original.column !== null) {
+        map.addMapping({
+          source: original.source,
+          original: {
+            line: original.line,
+            column: original.column
+          },
+          generated: {
+            line: generated.line,
+            column: generated.column
+          },
+          name: original.name
+        });
+        sourceMappingActive = true;
+      } else if (sourceMappingActive) {
+        map.addMapping({
+          generated: {
+            line: generated.line,
+            column: generated.column
+          }
+        });
+        sourceMappingActive = false;
+      }
+      chunk.split('').forEach(function (ch) {
+        if (ch === '\n') {
+          generated.line++;
+          generated.column = 0;
+        } else {
+          generated.column++;
+        }
+      });
+    });
+    this.walkSourceContents(function (sourceFile, sourceContent) {
+      map.setSourceContent(sourceFile, sourceContent);
+    });
+
+    return { code: generated.code, map: map };
+  };
+
+  exports.SourceNode = SourceNode;
+
+});
+
+},{"./source-map-generator":24,"./util":26,"amdefine":27}],26:[function(require,module,exports){
 /* -*- Mode: js; js-indent-level: 2; -*- */
 /*
  * Copyright 2011 Mozilla Foundation and contributors
@@ -7141,7 +7213,7 @@ function amdefine(module, requireFn) {
 
 module.exports = amdefine;
 
-},{"__browserify_process":36,"path":33}],28:[function(require,module,exports){
+},{"__browserify_process":38,"path":31}],28:[function(require,module,exports){
 module.exports={
   "name": "escodegen",
   "description": "ECMAScript code generator",
@@ -11115,14 +11187,10 @@ parseStatement: true, parseSourceElement: true */
 }));
 /* vim: set sw=4 ts=4 et tw=80 : */
 
-},{}],"./church_to_js":[function(require,module,exports){
-module.exports=require('NQbGnO');
-},{}],"./probabilistic/util":[function(require,module,exports){
-module.exports=require('vowcaP');
-},{}],32:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 // nothing to see here... no file methods for the browser
 
-},{}],33:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 var process=require("__browserify_process");function filter (xs, fn) {
     var res = [];
     for (var i = 0; i < xs.length; i++) {
@@ -11301,11 +11369,19 @@ exports.relative = function(from, to) {
 
 exports.sep = '/';
 
-},{"__browserify_process":36}],"./probabilistic/index":[function(require,module,exports){
-module.exports=require('dtecpu');
+},{"__browserify_process":38}],"./church_builtins":[function(require,module,exports){
+module.exports=require('ICPH2U');
+},{}],"./format_result":[function(require,module,exports){
+module.exports=require('dXQVgk');
+},{}],"./probabilistic/util":[function(require,module,exports){
+module.exports=require('EBGQkK');
+},{}],"./probabilistic/index":[function(require,module,exports){
+module.exports=require('bXD3KN');
+},{}],"./church_to_js":[function(require,module,exports){
+module.exports=require('FaLuca');
 },{}],"./probabilistic/transform":[function(require,module,exports){
-module.exports=require('HR3a2a');
-},{}],36:[function(require,module,exports){
+module.exports=require('mzTW5X');
+},{}],38:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};

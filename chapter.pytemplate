@@ -2,47 +2,26 @@
   <head>
     <title>ProbMods: $title$</title>
     <link rel="stylesheet" type="text/css" href="style.css">
-    <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script src="cookies-0.3.1.min.js"></script>
-    <script src="jquery-1.10.2.min.js"></script>
-    <link rel="stylesheet" href="codemirror/codemirror.css">
-    <script src="codemirror/codemirror.js"></script>
-    <script src="codemirror/scheme.js"></script>
-    <script src="codemirror/matchbrackets.js"></script>
-    <script src="webchurch.js"></script>
+    <link rel="stylesheet" type="text/css" href="codemirror/codemirror.css"> 
+    <script src="scripts/underscore-min.js"></script> 
+    <script src="scripts/jquery.js"></script>
   </head>
 <body>
-
-
-  
-<div id="chapter">
-
+<div id="chapter"> 
   <ul id="nav">
     <li id="all-chapters"><a href="#">all chapters</a>
       %(chapters)s
     </li>
     <li id="login-link"><a href="/login/">login</a></li>
-  </ul>
-
-  
-  <div class="clear"></div>
-
-  <div id="book-title">Probabilistic Models of Cognition</div>
-
-  <h1 id="chapter-title">$num$ $title$</h1>
-
-  
-  $toc$
-
-
-  
+  </ul> 
+  <div class="clear"></div> 
+  <div id="book-title">Probabilistic Models of Cognition</div> 
+  <h1 id="chapter-title">$num$ $title$</h1> 
+  $toc$  
 $body$
-</div>
-
-
-
+</div> 
 </body>
-<script src="nav.js"></script>
-<script src="injector.js"></script>
+
+<script src="scripts/load-dependencies.js"></script>
 
 </html>
