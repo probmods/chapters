@@ -94,7 +94,9 @@ _hist = function(samps) {
       .call(xAxis)
       .append("text")
       .text("Frequency")
-      .attr("dy", "3em");
+      .attr("dy", "3em")
+      .attr("text-anchor", "end")
+      .attr("dx", width);
 
     svg.append("g")
       .attr("class", "y axis")
