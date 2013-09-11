@@ -18,15 +18,30 @@ var listToArray = function(xs) {
 
 _hist = function(samps) {
 
+  function mySort(array) {
+    var firstElem = array[0];
+    if (typeof(firstElem) == "number") {
+      return array.sort(function(a,b) {return a-b});
+    }
+    if (typeof(firstElem) == "string") {
+      return array.sort();
+    }
+    if (Object.prototype.toString.call(firstElem) === '[object Array]') {
+      return array;
+    }
+    return array;
+  }
+
   // TODO: this is a hack. we want proper conversion of data types
-  var values = listToArray(samps),
+  var values = mySort(listToArray(samps)),
+      strValues = values.map(function(x) {return x.toString();}),
       n = values.length,
-      counts = _(values)
+      counts = _(strValues)
         .uniq()
         .map(function(val) {
           return {
             value: val,
-            freq: _(values).filter(function(x) { return x == val}).length / n
+            freq: _(strValues).filter(function(x) {return x == val;}).length / n
           };
         }),
       maxFreq = _(counts).chain().map(function(x) { return x.freq}).max().value();
