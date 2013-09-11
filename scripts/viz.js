@@ -6,7 +6,11 @@ var listToArray = function(xs) {
   var a = [];
 
   while(pair.length == 2) {
-    a.push(pair[0]);
+    var nextVal = pair[0];
+    if (Object.prototype.toString.call( nextVal ) === '[object Array]') {
+      nextVal = listToArray(nextVal);
+    }
+    a.push(nextVal);
     pair = pair[1];
   }
   return a;
