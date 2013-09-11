@@ -32,7 +32,7 @@ _hist = function(samps) {
     var div = $div[0];
     
     //var margin = {top: 20, right: 20, bottom: 30, left: 40},
-    var margin = {top: 20, right: 20, bottom: 30, left: 60},
+    var margin = {top: 20, right: 20, bottom: 50, left: 20},
         width = 0.8 * $div.width() - margin.left - margin.right,
         height = 300 - margin.top - margin.bottom;
 
@@ -44,9 +44,11 @@ _hist = function(samps) {
     var y = d3.scale.linear()
           .range([height, 0]);*/
     var x = d3.scale.linear()
+          .domain([0, maxFreq])
           .range([0, width]);
     var y = d3.scale.ordinal()
-          .rangeRoundBands([0, height], .1);
+          .domain(values)
+          .rangeRoundBands([height, 0], .1);
 
 /*    var xAxis = d3.svg.axis()
           .scale(x)
@@ -58,11 +60,11 @@ _hist = function(samps) {
           .tickFormat(formatPercent);*/
     var xAxis = d3.svg.axis()
                   .scale(x)
-                  .orient("left");
-    var yAxis = d3.svg.axis()
-                  .scale(y)
                   .orient("bottom")
                   .tickFormat(formatPercent);
+    var yAxis = d3.svg.axis()
+                  .scale(y)
+                  .orient("left");
 
     var svg = d3.select(div).append("svg")
           .attr("class", "chart")
@@ -78,33 +80,22 @@ _hist = function(samps) {
     //   x.domain(data.map(function(d) { return d.letter; }));
     //   y.domain([0, d3.max(data, function(d) { return d.frequency; })]);
 
-/*    x.domain( values );
-    y.domain( [0, maxFreq] ); */
-    y.domain( values );
-    x.domain( [0, maxFreq] );
+/*    y.domain( values );
+    x.domain( [0, maxFreq] );*/
     
     var data = counts;
 
-/*    svg.append("g")
+    svg.append("g")
       .attr("class", "x axis")
       .attr("transform", "translate(0," + height + ")")
-      .call(xAxis);*/
+      .call(xAxis)
+      .append("text")
+      .text("Frequency")
+      .attr("dy", "3em");
 
     svg.append("g")
       .attr("class", "y axis")
-      .attr("transform", "translate(0," + height + ")")
-      .call(xAxis);
-
-/*    svg.append("g")
-      .attr("class", "y axis")
-      .call(yAxis)
-      .append("text")
-      .attr("transform", "rotate(-90)")
-      //.attr("y", 6)
-      //.attr("dy", "-3em")
-      .attr("dy", "-3.2em")
-      .style("text-anchor", "end")
-      .text("Frequency");*/
+      .call(yAxis);
 
 /*    svg.selectAll(".bar")
       .data(data)
@@ -118,10 +109,9 @@ _hist = function(samps) {
       .data(data)
       .enter().append("rect")
       .attr("class", "bar")
-      .attr("x", 0)
-      .attr("height", y.rangeBand())
       .attr("y", function(d) {return y(d.value);})
-      .attr("width", function(d) {return width - x(d.freq);});
+      .attr("width", function(d) { return width - x(d.freq); })
+      .attr("height", y.rangeBand());
     // });
 
     return data;
