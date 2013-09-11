@@ -28,10 +28,10 @@ pandoc --toc \
 --bibliography dev.bib \
 --output $STEM.html \
 --variable num:$2 \
---number-sections \
---base-header-level $baseheaderlevel \
---number-offset $numberoffset \
 $STEM.md
+#--base-header-level $baseheaderlevel \
+#--number-offset $numberoffset \
+#--number-sections \
 
 
 
