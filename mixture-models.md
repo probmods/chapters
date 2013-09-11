@@ -357,7 +357,7 @@ Human perception is often skewed by our expectations. A common example of this i
 
 Notice that the perceived distances between input sounds are skewed relative to the actual acoustic distances – that is they are attracted towards the category centers.
 
-<img src='Pme.png' />
+<img src='images/Pme.png' />
 
 # Unknown Numbers of Categories
 

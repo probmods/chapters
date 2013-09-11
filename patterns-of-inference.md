@@ -125,7 +125,7 @@ Successful learning and reasoning with causal models typically depends on exploi
 
 The figure below defines a Bayesian network for the medical diagnosis example. The graph contains a node for each random variable assignment (`define` statement) in our church program, with links to that node from each variable that appears in the assignment expression. There is a CPT for each node, with a column for each value of the random variable, and a row for each combination of values for its parents.
 
-![](Med-diag-bnet1.jpg)
+<img src='images/Med-diag-bnet1.jpg' width=600 />
 
 Simple generative models will have a corresponding graphical model that captures all of the dependencies (and *in*dependencies) of the model, without capturing the precise *form* of these functions. For example, while the graphical model shown above faithfully represents the probability distribution encoded by the church program, it captures the *noisy-OR* form of the causal dependencies only implicitly. As a result, the CPTs provide a less compact representation of the conditional probabilities than the church model. For instance, the CPT for `cough` specifies 4 parameters -- one for each pair of values of `lung-disease` and `cold` (the second entry in each row is determined by the constraint that the conditional distribution of `cough` must sum to 1). In contrast, the `define` statement for `cold` in church specifies only 3 parameters: the base rate of `cough`, and the strength with which `lung-disease` and `cold` cause `cough`. This difference becomes more pronounced for noisy-OR relations with many causes -- the size of the CPT for a node will be exponential in the number of parents, while the number of terms in the noisy-OR expression in church for that node will be linear in the number of causal dependencies (why?). As we will see, this has important implications for the ability to learn the values of the parameters from data.
 
@@ -138,9 +138,9 @@ The relationships between causal structure and correlational structure, or stati
 <style classes="bg-gray">
 <collapse name="Basic patterns of statistical dependence">
 
-![](Marg-dep1.jpg)
+![](images/Marg-dep1.jpg)
 
-![](Cond-dep1.jpg)
+![](images/Cond-dep1.jpg)
 
 </collapse>
 </style>
@@ -538,11 +538,11 @@ Most striking is when conditional inference appears to violate or alter the appa
 
 In vision, the luminance of a surface depends on two factors, the illumination of the surface (how much light is hitting it) and its reflectance. The actual luminance is the product of the two factors. Thus luminance is inherently ambiguous. The visual system has to determine what proportion of the luminance is due to reflectance and what proportion is due to the illumination of the scene. This has led to a famous illusion known as the *checker shadow illusion* discovered by Ted Adelson.
 
-<img src='Checkershadow_illusion_small.png' width='400' />
+<img src='images/Checkershadow_illusion_small.png' width='400' />
 
 The illusion results from the fact that in the image above both the square labeled A and the square labeled B are actually the same shade of gray. This can be seen in the figure below where they are connected by solid gray bars on either side.
 
-<img src='Checkershadow_proof_small.png' width='400' />
+<img src='images/Checkershadow_proof_small.png' width='400' />
 
 What is happening here is that the presence of the cylinder is providing evidence that the illumination of square B is actually less than that of square A. Thus we perceive square B as having higher reflectance since its luminance is identical to square A and we believe there is less light hitting it. The following program implements a simple version of this scenario "before" we see the shadow cast by the cylinder.
 
@@ -570,7 +570,7 @@ What is happening here is that the presence of the cylinder is providing evidenc
 
 Here we have introduced a third kind of primitive random procedure, `gaussian` which outputs real numbers, in addition to `flip` (which outputs binary truth values) and `beta` (which outputs numbers in the interval [0,1]).  `gaussian` implements the well-known Gaussian or normal distribution. It takes two parameters: a mean, $\mu$, and a variance, $\sigma^2$.
 
-<img src='Normal_distribution_pdf.png' width='400' />
+<img src='images/Normal_distribution_pdf.png' width='400' />
 
 The probability density function for the normal distribution is:
 $$ P(x \mid \mu,\sigma) = \frac{1}{\sqrt{2\pi\sigma^2}}\; \exp{\Big[ \frac{-(x-\mu)^2}{2\sigma^2} \Big] } $$
@@ -612,7 +612,7 @@ The two cylinders illusion of Kersten is another nice example of explaining away
 
 <!-- http://vision.psych.umn.edu/users/kersten/kersten-lab/images/twocylinders.gif -->
 
-<img src='Kersten_et_al_explaining_away.PNG‎' width='400' />
+<img src='images/Kersten_et_al_explaining_away.png' width='400' />
 
 (This image is from Kersten, Mamassian and Yuille, Annual Review of Psychology 2004)
 

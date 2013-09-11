@@ -242,7 +242,7 @@ The general form of a lambda expression is:
  (lambda arguments body)
 The first sub-expression of the lambda, the arguments, is a list of symbols that tells us what the inputs to the function will be called; the second sub-expression, the body, tells us what to do with these inputs. The value which results from a lambda expression is called a *compound procedure*. When a compound procedure is applied to input values (e.g. when `double` was applied to `3`) we imagine identifying (also called *binding*) the argument variables with these inputs, then evaluating the body. As another simple example, consider this function:
 
-![](Sicp-lambda-diagram.png)
+![](images/Sicp-lambda-diagram.png)
 
 We can also use `lambda` to construct more complex stochastic functions from the primitive ones. Here is a stochastic function that will only sometimes double its input:
 

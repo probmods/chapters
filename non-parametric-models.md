@@ -177,7 +177,7 @@ The DP is said to *concentrate* the base measure.  Draws from a normal distribut
 
 The way that the DP concentrates the underlying base measure is illustrated in the following figure.
 
-<img src='Concentration.png' width='400' />
+<img src='images/Concentration.png' width='300' />
 
 In the stick-breaking construction stick heights become shorter on average as we walk further down the number line. This means that earlier draws from the DP are more likely to be redrawn than later draws.
 When we use the DP to construct `DPmem` the memoized function will therefore tend to favor *reuse* of earlier computed values. Intuitively, we will use `DPmem` when we need to model reuse of samples in a scenario where we do not know in advance how many samples we need.
@@ -772,8 +772,8 @@ Psychology: Learning, Memory, and Cognition.</ref>
 
 The results are shown below.
 
-<img src='unifying-table.png' width='800' />
+<img src='images/unifying-table.png' width='500' />
 
-<img src='unifying.png' width='800' />
+<img src='images/unifying.png' width='600' />
 
 

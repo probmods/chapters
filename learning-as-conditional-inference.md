@@ -136,7 +136,7 @@ Our hypothesis generating function needs to be able to draw `coin-weight` not fr
 Here are a few examples of `beta`'s output for different choices of the parameters:
 :
 
-<img src='Beta_distribution_pdf.png' width='400' />
+<img src='images/Beta_distribution_pdf.png' width='400' />
 The height of each curve in these plots represents the relative probability of generating a coin weight at the corresponding x-value, for a range of `beta` pseudo-count parameters.
 Get a feeling for the beta distribution by sampling from it with different psuedo-count parameters (note that the parameters must be greater than zero, but can be less than one):
 

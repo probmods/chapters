@@ -414,7 +414,7 @@ This pair of mutually recursive functions represents a teacher choosing examples
 
 To make this concrete, assume that there are two dice, A and B, which each have three sides (red, green, blue) that have weights like so:
 
-<img src=' pedagogy-pic.png ' width='300' />
+<img src='images/pedagogy-pic.png ' width='300' />
 
 Which hypothesis will the learner infer if the teacher shows the green side?
 
