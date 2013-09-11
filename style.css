@@ -211,6 +211,13 @@ span.citation {
     fill: none;
 }
 
+.axis text {
+font-size: 16px;
+font-family: Palatino Linotype, Palatino, Georgia, serif;
+stroke: none;
+fill: black;
+}
+
 pre {
     font-size: 12px;
     border: 1px solid #afafaf;

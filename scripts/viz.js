@@ -31,26 +31,27 @@ _hist = function(samps) {
 
     var div = $div[0];
     
-    var margin = {top: 20, right: 20, bottom: 30, left: 40},
+    //TODO: make left margin vary depending on how long the names of the elements in the list are
+    var margin = {top: 20, right: 20, bottom: 50, left: 60},
         width = 0.8 * $div.width() - margin.left - margin.right,
         height = 300 - margin.top - margin.bottom;
 
     var formatPercent = d3.format(".0%");
 
-    var x = d3.scale.ordinal()
-          .rangeRoundBands([0, width], .1);
-
-    var y = d3.scale.linear()
-          .range([height, 0]);
+    var x = d3.scale.linear()
+          .domain([0, maxFreq])
+          .range([0, width]);
+    var y = d3.scale.ordinal()
+          .domain(values)
+          .rangeRoundBands([height, 0], .1);
 
     var xAxis = d3.svg.axis()
-          .scale(x)
-          .orient("bottom");
-
+                  .scale(x)
+                  .orient("bottom")
+                  .tickFormat(formatPercent);
     var yAxis = d3.svg.axis()
-          .scale(y)
-          .orient("left")
-          .tickFormat(formatPercent);
+                  .scale(y)
+                  .orient("left");
 
     var svg = d3.select(div).append("svg")
           .attr("class", "chart")
@@ -65,35 +66,29 @@ _hist = function(samps) {
     //   debugger;
     //   x.domain(data.map(function(d) { return d.letter; }));
     //   y.domain([0, d3.max(data, function(d) { return d.frequency; })]);
-
-    x.domain( values );
-    y.domain( [0, maxFreq] ); 
     
     var data = counts;
 
     svg.append("g")
       .attr("class", "x axis")
       .attr("transform", "translate(0," + height + ")")
-      .call(xAxis);
+      .call(xAxis)
+      .append("text")
+      .text("Frequency")
+      .attr("dy", "3em");
 
     svg.append("g")
       .attr("class", "y axis")
-      .call(yAxis)
-      .append("text")
-      .attr("transform", "rotate(-90)")
-      .attr("y", 6)
-      .attr("dy", "-3em")
-      .style("text-anchor", "end")
-      .text("Frequency");
+      .call(yAxis);
 
     svg.selectAll(".bar")
       .data(data)
       .enter().append("rect")
       .attr("class", "bar")
-      .attr("x", function(d) { return x(d.value); })
-      .attr("width", x.rangeBand())
-      .attr("y", function(d) { return y(d.freq); })
-      .attr("height", function(d) { return height - y(d.freq); });
+      .attr("x", 0)
+      .attr("y", function(d) {return y(d.value);})
+      .attr("width", function(d) { return x(d.freq); })
+      .attr("height", y.rangeBand());
     // });
 
     return data;
