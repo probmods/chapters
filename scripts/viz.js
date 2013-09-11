@@ -38,20 +38,31 @@ _hist = function(samps) {
 
     var formatPercent = d3.format(".0%");
 
-    var x = d3.scale.ordinal()
+/*    var x = d3.scale.ordinal()
           .rangeRoundBands([0, width], .1);
 
     var y = d3.scale.linear()
-          .range([height, 0]);
+          .range([height, 0]);*/
+    var x = d3.scale.linear()
+          .range([0, width]);
+    var y = d3.scale.ordinal()
+          .rangeRoundBands([0, height], .1);
 
-    var xAxis = d3.svg.axis()
+/*    var xAxis = d3.svg.axis()
           .scale(x)
           .orient("bottom");
 
     var yAxis = d3.svg.axis()
           .scale(y)
           .orient("left")
-          .tickFormat(formatPercent);
+          .tickFormat(formatPercent);*/
+    var xAxis = d3.svg.axis()
+                  .scale(x)
+                  .orient("left");
+    var yAxis = d3.svg.axis()
+                  .scale(y)
+                  .orient("bottom")
+                  .tickFormat(formatPercent);
 
     var svg = d3.select(div).append("svg")
           .attr("class", "chart")
@@ -67,17 +78,24 @@ _hist = function(samps) {
     //   x.domain(data.map(function(d) { return d.letter; }));
     //   y.domain([0, d3.max(data, function(d) { return d.frequency; })]);
 
-    x.domain( values );
-    y.domain( [0, maxFreq] ); 
+/*    x.domain( values );
+    y.domain( [0, maxFreq] ); */
+    y.domain( values );
+    x.domain( [0, maxFreq] );
     
     var data = counts;
 
-    svg.append("g")
+/*    svg.append("g")
       .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis);*/
+
+    svg.append("g")
+      .attr("class", "y axis")
       .attr("transform", "translate(0," + height + ")")
       .call(xAxis);
 
-    svg.append("g")
+/*    svg.append("g")
       .attr("class", "y axis")
       .call(yAxis)
       .append("text")
@@ -86,16 +104,24 @@ _hist = function(samps) {
       //.attr("dy", "-3em")
       .attr("dy", "-3.2em")
       .style("text-anchor", "end")
-      .text("Frequency");
+      .text("Frequency");*/
 
-    svg.selectAll(".bar")
+/*    svg.selectAll(".bar")
       .data(data)
       .enter().append("rect")
       .attr("class", "bar")
       .attr("x", function(d) { return x(d.value); })
       .attr("width", x.rangeBand())
       .attr("y", function(d) { return y(d.freq); })
-      .attr("height", function(d) { return height - y(d.freq); });
+      .attr("height", function(d) { return height - y(d.freq); });*/
+    svg.selectAll(".bar")
+      .data(data)
+      .enter().append("rect")
+      .attr("class", "bar")
+      .attr("x", 0)
+      .attr("height", y.rangeBand())
+      .attr("y", function(d) {return y(d.value);})
+      .attr("width", function(d) {return width - x(d.freq);});
     // });
 
     return data;
