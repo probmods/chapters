@@ -31,18 +31,13 @@ _hist = function(samps) {
 
     var div = $div[0];
     
-    //var margin = {top: 20, right: 20, bottom: 30, left: 40},
-    var margin = {top: 20, right: 20, bottom: 50, left: 20},
+    //TODO: make left margin vary depending on how long the names of the elements in the list are
+    var margin = {top: 20, right: 20, bottom: 50, left: 60},
         width = 0.8 * $div.width() - margin.left - margin.right,
         height = 300 - margin.top - margin.bottom;
 
     var formatPercent = d3.format(".0%");
 
-/*    var x = d3.scale.ordinal()
-          .rangeRoundBands([0, width], .1);
-
-    var y = d3.scale.linear()
-          .range([height, 0]);*/
     var x = d3.scale.linear()
           .domain([0, maxFreq])
           .range([0, width]);
@@ -50,14 +45,6 @@ _hist = function(samps) {
           .domain(values)
           .rangeRoundBands([height, 0], .1);
 
-/*    var xAxis = d3.svg.axis()
-          .scale(x)
-          .orient("bottom");
-
-    var yAxis = d3.svg.axis()
-          .scale(y)
-          .orient("left")
-          .tickFormat(formatPercent);*/
     var xAxis = d3.svg.axis()
                   .scale(x)
                   .orient("bottom")
@@ -79,9 +66,6 @@ _hist = function(samps) {
     //   debugger;
     //   x.domain(data.map(function(d) { return d.letter; }));
     //   y.domain([0, d3.max(data, function(d) { return d.frequency; })]);
-
-/*    y.domain( values );
-    x.domain( [0, maxFreq] );*/
     
     var data = counts;
 
@@ -97,20 +81,13 @@ _hist = function(samps) {
       .attr("class", "y axis")
       .call(yAxis);
 
-/*    svg.selectAll(".bar")
-      .data(data)
-      .enter().append("rect")
-      .attr("class", "bar")
-      .attr("x", function(d) { return x(d.value); })
-      .attr("width", x.rangeBand())
-      .attr("y", function(d) { return y(d.freq); })
-      .attr("height", function(d) { return height - y(d.freq); });*/
     svg.selectAll(".bar")
       .data(data)
       .enter().append("rect")
       .attr("class", "bar")
+      .attr("x", 0)
       .attr("y", function(d) {return y(d.value);})
-      .attr("width", function(d) { return width - x(d.freq); })
+      .attr("width", function(d) { return x(d.freq); })
       .attr("height", y.rangeBand());
     // });
 
