@@ -31,7 +31,8 @@ _hist = function(samps) {
 
     var div = $div[0];
     
-    var margin = {top: 20, right: 20, bottom: 30, left: 40},
+    //var margin = {top: 20, right: 20, bottom: 30, left: 40},
+    var margin = {top: 20, right: 20, bottom: 30, left: 60},
         width = 0.8 * $div.width() - margin.left - margin.right,
         height = 300 - margin.top - margin.bottom;
 
@@ -81,8 +82,9 @@ _hist = function(samps) {
       .call(yAxis)
       .append("text")
       .attr("transform", "rotate(-90)")
-      .attr("y", 6)
-      .attr("dy", "-3em")
+      //.attr("y", 6)
+      //.attr("dy", "-3em")
+      .attr("dy", "-3.2em")
       .style("text-anchor", "end")
       .text("Frequency");
 
