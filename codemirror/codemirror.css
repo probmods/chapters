@@ -8,9 +8,14 @@ font-size: 12px !important;
   border: 1px solid #afafaf;
   height: auto
 }
+
+pre {
+overflow-x: auto
+}
+
 .CodeMirror-scroll {
   /* Set scrolling behaviour here */
-  overflow-x: auto; 
+  overflow-x: auto;
   overflow-y: hidden
 }
 

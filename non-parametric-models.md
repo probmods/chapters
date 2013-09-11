@@ -261,7 +261,7 @@ If you have looked at the literature on Bayesian models of cognition in the last
 
 We imagine a restaurant with an infinite number of tables. The first customer enters the restaurant and sits at the first unoccupied table.  The ($N+1$)th customer enters the restaurant and sits at either an already occupied table or a new, unoccupied table, according to the following distribution.
 
-$\tau^{(N+1)} |  \tau^{(1)},..., \tau^{(N)},\alpha \sim \sum_{i=1}^{K}   \frac{
+$$\tau^{(N+1)} |  \tau^{(1)},..., \tau^{(N)},\alpha \sim \sum_{i=1}^{K}   \frac{
   				y_i
 			}{
 				N + \alpha
@@ -270,7 +270,7 @@ $\tau^{(N+1)} |  \tau^{(1)},..., \tau^{(N)},\alpha \sim \sum_{i=1}^{K}   \frac{
 				 \alpha
 			}{
 				N + \alpha
-			} \delta_{\tau_{K+1}}$
+			} \delta_{\tau_{K+1}}$$
 
 $N$ is the total number of customers in the restaurant. $K$ is the total number of occupied tables, indexed by $1 \geq i \geq K$. $\tau^{(j)}$ refers to the table chosen by the $j$th customer. $\tau_i$ refers to $i$th occupied table in the restaurant. $y_i$ is the number of customers seated at table $\tau_i$; $\delta_{\tau}$ is the $\delta$-distribution which puts all of its mass on table $\tau$.  $\alpha \geq 0$ is the *concentration parameter* of the model.
 
@@ -468,7 +468,7 @@ Many models in the literature use a small generalization of the CRP known as the
 
 The process is defined as follows. The first customer enters the restaurant and sits at the first table. The ($N+1$)th customer enters the restaurant and sits at either an already occupied table or a new one, according to the following distribution.
 
-$
+$$
   \tau^{(N+1)} |  \tau^{(1)},...,\tau^{(N)}, a, b \sim \sum_{i=1}^{K}  \frac{
   				y_i - a
 			}{
@@ -479,27 +479,27 @@ $
 			}{
 				N + b
 			} \delta_{\tau_{K+1}}
-$
+$$
 
 Here all variables are the same as in the CRP, except for $a$ and $b$.  $b \geq 0$ corresponds to the CRP $\alpha$ parameter. $0 \leq a \leq 1$ is a new *discount* parameter which moves a fraction of a unit of probability mass from each occupied table to the new table. When it is $1$, every customer will sit at their own table. When it is $0$ the distribution becomes the single-parameter CRP. The $a$ parameter can be thought of as controlling the *productivity* of a restaurant: how much sitting at a new table depends on how many tables already exist. On average, $a$ will be the limiting proportion of tables in the restaurant which have only a single customer. The $b$ parameter controls the rate of growth of new tables in relation to the total number of customers $N$ as before.
 
 Like the CRP, the sequential sampling scheme outlined above generates a distribution over partitions for unbounded numbers of objects. Given some vector of table counts $\vec{y}$, A closed-form expression for this probability can be given as follows. First, define the following generalization of the factorial function, which multiples $m$ integers in increments of size $a$ starting at $x$.
 
-$
+$$
 	[x]_{m,s} =
 	\begin{cases}
-		1 & \mathrm{for} m=0 \\
-		x(x+s)...(x+(m-1)s)& \mathrm{for}  m > 0
+		1 & \textrm{for } m=0 \\
+		x(x+s)...(x+(m-1)s)& \textrm{for }  m > 0
 	\end{cases}
-$
+$$
 
 Note that $[1]_{m,1} = m!$.
 
 The probability of the partition given by the count vector, $\vec{y}$, is defined by:
 
-$
-	P( \vec{y} | a, b) = \frac{[b+a]_{K-1,a}}{[b+1]_{N-1,1}} \prod_{i=1}^{K}[1-a]_{y_i-1,1}
-$
+$$
+	P( \vec{y} \mid a, b) = \frac{[b+a]_{K-1,a}}{[b+1]_{N-1,1}} \prod_{i=1}^{K}[1-a]_{y_i-1,1}
+$$
 
 It is easy to confirm that in the special case of $a = 0$ and $b >0$, this reduces to the closed form for CRP by noting that $[1]_{m,1} = m!  = \Gamma[m+1]$. In what follows, we will assume that we have a higher-order function `PYmem` which takes three arguments `a`, `b`, and `proc` and returns the PYP-memoized version of `proc`.
 
@@ -523,8 +523,8 @@ to learn mixture models where the number of categories is infinite.
 However, the categories associated with each  table or stick in the
 DP/CRP are unstructured&mdash;real life categories have complex
 relationships with one another. For example, they are often organized
-into hierarchies: a **German shepherd*'  is a type of *'dog**, which is a
-type of **animal*', which is type of *'living thing**, and so on.
+into hierarchies: a **German shepherd**  is a type of **dog**, which is a
+type of **animal**, which is type of **living thing**, and so on.
 
 In [[Example: One-shot learning of visual categories]], we already saw
 how such hierarchies of categories could lead to efficient one-shot
@@ -730,8 +730,8 @@ Both prototype and exemplar theories are based on similarity, and the
 probability that an observation is assigned to category $c_{N}
 $ can be given by
 
-::$p(c_{N} | x_N, \vec{x}_{N-1}, \vec{c}_{N-1}) =
-\frac{\eta_{N,j}\beta_{N,j}}{\sum_{c} \eta_{N,c}\beta_{N,c}}$
+$$p(c_{N} \mid x_N, \vec{x}_{N-1}, \vec{c}_{N-1}) =
+\frac{\eta_{N,j}\beta_{N,j}}{\sum_{c} \eta_{N,c}\beta_{N,c}}$$
 
 where $\eta_{N,i}$ is the similarity between observation
 $N$ and category $i$, and
@@ -742,7 +742,7 @@ Exemplar models treat the similarity between observation
 $N$ and a category as a sum over all members of the
 category.
 
-$$\eta_{N,i} = \sum_{i|c_{i} = j } \eta_{N,i}$$
+$$\eta_{N,i} = \sum_{i \mid c_{i} = j } \eta_{N,i}$$
 
 Prototype models treat the similarity as the similarity between
 observation $N$ and the single stored prototype.
@@ -772,10 +772,7 @@ Psychology: Learning, Memory, and Cognition.</ref>
 
 The results are shown below.
 
-::
-
 <img src='unifying-table.png' width='800' />
-::
 
 <img src='unifying.png' width='800' />
 

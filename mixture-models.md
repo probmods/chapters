@@ -239,7 +239,7 @@ distributions over words.
 
 (Adapted from: Maye, J., Werker, J. F., and Gerken, L. (2002). Infant sensitivity to distributional information can affect phonetic discrimination. Cognition, 82:B101–B111.)
 
-[[image:Maye.png]]
+<img src='Maye.png' />
 
 ~~~~ {."mit-church"}
 (define (noisy=? x y) (and (flip (expt 0.1 (abs (- (first x) (first y)))))
@@ -292,7 +292,7 @@ distributions over words.
 
 (This example is adapted from: Feldman, N. H., Griffiths, T. L., and Morgan, J. L. (2009). The influence of categories on perception: Explaining the perceptual magnet effect as optimal statistical inference. Psychological Review, 116(4):752–782.)
 
-Human perception is often skewed by our expectations. A common example of this is called 'categorical perception' – when we perceive objects as being more similar to the category prototype than they really are. In phonology this is been particularly important and is called the perceptual magnet effect: Hearers regularize a speech sound into the category that they think it corresponds to. Of course this category isn't known a priori, so a hearer must be doing a simultaneous inference of what category the speech sound corresponded to, and what the sound must have been… In the below code we model this as a mixture model over the latent categories of sounds, combined with a noisy observation process.
+Human perception is often skewed by our expectations. A common example of this is called *categorical perception* -- when we perceive objects as being more similar to the category prototype than they really are. In phonology this is been particularly important and is called the perceptual magnet effect: Hearers regularize a speech sound into the category that they think it corresponds to. Of course this category isn't known a priori, so a hearer must be doing a simultaneous inference of what category the speech sound corresponded to, and what the sound must have been. In the below code we model this as a mixture model over the latent categories of sounds, combined with a noisy observation process.
 
 ~~~~ {.mit-church}
 (define (noisy= target value variance)
@@ -357,7 +357,7 @@ Human perception is often skewed by our expectations. A common example of this i
 
 Notice that the perceived distances between input sounds are skewed relative to the actual acoustic distances – that is they are attracted towards the category centers.
 
-[[image:Pme.png]]
+<img src='Pme.png' />
 
 # Unknown Numbers of Categories
 
@@ -432,7 +432,7 @@ We could extend this model by allowing it to infer that there are more than two 
 ~~~~
 Vary the amount of evidence and see how the inferred number of bags changes.
 
-For the prior on `num-bags` we used the *Poisson distribution* [http://en.wikipedia.org/wiki/Poisson_distribution] which is a distribution on  non-negative integers. It is convenient, though implies strong prior knowledge (perhaps too strong for this example). We have also used the special function `gensym`, which returns a fresh symbol every time it is called. It can be used to generate an unbounded set of labels for things like classes, categories and mixture components.
+For the prior on `num-bags` we used the [*Poisson distribution*](http://en.wikipedia.org/wiki/Poisson_distribution) which is a distribution on  non-negative integers. It is convenient, though implies strong prior knowledge (perhaps too strong for this example). We have also used the special function `gensym`, which returns a fresh symbol every time it is called. It can be used to generate an unbounded set of labels for things like classes, categories and mixture components.
 Each evaluation of `gensym` results in a unique (although cryptic) symbol:
 
 ~~~~
