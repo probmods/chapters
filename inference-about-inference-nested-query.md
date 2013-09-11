@@ -372,8 +372,7 @@ An agent can have knowledge of some parts of the world and not others. To captur
 ### Belief
 
 
-= Communication and Language=
-
+# Communication and Language
 
 
 ## A Communication Game

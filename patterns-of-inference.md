@@ -573,7 +573,7 @@ Here we have introduced a third kind of primitive random procedure, `gaussian` w
 <img src='Normal_distribution_pdf.png' width='400' />
 
 The probability density function for the normal distribution is:
-$$ P(x \mid \mu,\sigma) = \tfrac{1}{\sqrt{2\pi\sigma^2}}\; \exp{ -\frac{(x-\mu)^2}{2\sigma^2} } $$
+$$ P(x \mid \mu,\sigma) = \frac{1}{\sqrt{2\pi\sigma^2}}\; \exp{\Big[ \frac{-(x-\mu)^2}{2\sigma^2} \Big] } $$
 
 Now let's condition on the presence of the cylinder.
 
@@ -642,7 +642,7 @@ condition on effect of observing contour
 
 # Exercises
 
-## 1
+## Causal and statistical dependency
 
 For each of the following programs:
 
@@ -700,7 +700,7 @@ For each of the following programs:
 ~~~~
 
 
-## 2
+## Epidemiology
 
 Imagine that you are an epidemiologist and you are determining people's cause of death. In this simplified world, there are two main diseases, cancer and the common cold. People rarely have cancer, $p( \text{cancer}) = 0.00001$, but when they do have cancer, it is often fatal, $p( \text{death} \mid \text{cancer} ) = 0.9$. People are much more likely to have a common cold, $p( \text{cold} ) = 0.2$, but it is rarely fatal, $p( \text{death} \mid \text{cold} ) = 0.00006$. Very rarely, people also die of other causes $p(\text{death} \mid \text{other}) = 0.000000001$.
 
