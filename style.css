@@ -25,13 +25,17 @@ body {
     box-shadow: 0 0 27px rgba(0, 0, 0, 1);
 }
 
+#chapter > ul li {
+    line-height: 140%;
+}
+
 ul#nav {
-float: right;
-margin-top: -2em;
-font-family: verdana;
-font-size: 80%;
-margin-bottom: 4em;
-margin-right: -5em;
+    float: right;
+    margin-top: -2em;
+    font-family: verdana;
+    font-size: 80%;
+    margin-bottom: 4em;
+    margin-right: -5em;
 }
 
 
@@ -50,7 +54,7 @@ margin-right: -5em;
 }
 
 .clear {
-clear: both
+    clear: both
 }
 
 #nav ol {
@@ -73,7 +77,7 @@ clear: both
 }
 
 /* show the list of all chapters when the show class is
-applied */
+   applied */
 li.show ol {
     display: block !important;
 }
@@ -84,12 +88,17 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: normal;
     line-height: 110%;
     border-bottom: 1px dotted gray;
+    position: relative;
 }
 
 .header-section-number {
-margin-right: 0.25em;
-margin-left: -6%;
-color: gray;
+    position: absolute;
+    left: -70px;
+    width: 70px;
+    display: block;
+    text-align: center;
+    /* float: left; */
+    color: #cc0066;
 }
 
 
@@ -148,12 +157,12 @@ p {
 }
 
 .error {
-color: red;
-font-weight: bold
+    color: red;
+    font-weight: bold
 }
 
 span.citekey {
-display: none
+    display: none
 }
 
 span.citation {
@@ -189,35 +198,41 @@ span.citation {
 
 
 .chart {
-   font: 12px sans-serif; 
-   fill: steelblue;
-   stroke: #333333;
-   text-align: right;
-   padding: 3px;
-   margin: 1px;
-   color: white;
- }
+    font: 12px sans-serif; 
+    fill: steelblue;
+    stroke: #333333;
+    text-align: right;
+    padding: 3px;
+    margin: 1px;
+    color: white;
+}
 
 .axis path, .axis line {
-fill: none;
+    fill: none;
 }
 
 pre {
-font-size: 12px;
-border: 1px solid #afafaf;
+    font-size: 12px;
+    border: 1px solid #afafaf;
 }
 
 p > code {
-border-radius: 2px;
-background-color: #fafafa;
-border: 1px solid #dfdfdf;
-font-size: 12px;
-padding: 0 2px 0 2px;
+    border-radius: 2px;
+    background-color: #fafafa;
+    border: 1px solid #dfdfdf;
+    font-size: 12px;
+    padding: 0 2px 0 2px;
 }
 
 h1 > a > code, h2 > a > code, h3 > a > code, h4 > a > code, h5 > a > code, li > a > code {
-border-radius: 2px;
-background-color: #fafafa;
-border: 1px solid #dfdfdf;
-padding: 0 2px 0 2px;
+    border-radius: 2px;
+    background-color: #fafafa;
+    border: 1px solid #dfdfdf;
+    padding: 0 2px 0 2px;
+}
+
+.bg-yellow {
+    background-color: #f2efc2;
+    padding: 5px;
+    border: 1px solid #f3ce00;
 }
