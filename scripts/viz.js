@@ -19,7 +19,7 @@ var listToArray = function(xs) {
   return a;
 };
 
-_hist = function(samps) {
+_hist = function(samps, title) {
 
   function mySort(array) {
     var firstElem = array[0];
@@ -54,7 +54,7 @@ _hist = function(samps) {
     var div = $div[0];
     
     //TODO: make left margin vary depending on how long the names of the elements in the list are
-    var margin = {top: 20, right: 20, bottom: 50, left: 60},
+    var margin = {top: 40, right: 20, bottom: 50, left: 60},
         width = 0.8 * $div.width() - margin.left - margin.right,
         height = 300 - margin.top - margin.bottom;
 
@@ -114,6 +114,15 @@ _hist = function(samps) {
       .attr("width", function(d) { return x(d.freq); })
       .attr("height", y.rangeBand());
     // });
+    
+    svg.append("text")
+        .attr("x", (width / 2))             
+        .attr("y", 0 - (margin.top / 2))
+        .attr("text-anchor", "middle")  
+        .style("font-size", "24px") 
+        .attr("stroke", "none") 
+        .attr("fill", "black")
+        .text(title);
 
     return data;
 
