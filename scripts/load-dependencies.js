@@ -36,7 +36,8 @@
       paths: [_u("//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML")]
     },
     webchurch: {
-      paths: ["scripts/webchurch.js"]
+      //paths: ["scripts/webchurch.js"]
+      paths: ["http://stanford.edu/~juliusc/webchurch/webchurch.js"]
     },
     cm: {
       paths: ["codemirror/codemirror.js"]
@@ -67,7 +68,7 @@
     },
     viz: {
       paths: ["scripts/viz.js"],
-      parents: ["d3"]
+      parents: ["d3", "webchurch"]
     } 
   };
 

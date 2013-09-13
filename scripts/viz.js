@@ -1,5 +1,7 @@
 /* global _ */
 
+var format_result = require("./format_result").format_result;
+
 var listToArray = function(xs) {
   var pair = xs;
   var kar = xs[0];
@@ -7,9 +9,10 @@ var listToArray = function(xs) {
 
   while(pair.length == 2) {
     var nextVal = pair[0];
+    /*
     if (Object.prototype.toString.call( nextVal ) === '[object Array]') {
       nextVal = listToArray(nextVal);
-    }
+    } */
     a.push(nextVal);
     pair = pair[1];
   }
@@ -33,8 +36,8 @@ _hist = function(samps) {
   }
 
   // TODO: this is a hack. we want proper conversion of data types
-  var values = mySort(listToArray(samps)),
-      strValues = values.map(function(x) {return x.toString();}),
+  var values = mySort(listToArray(samps)).map(function(x) {return format_result(x);}),
+      strValues = values,//values.map(function(x) {return format_result(x);}),
       n = values.length,
       counts = _(strValues)
         .uniq()

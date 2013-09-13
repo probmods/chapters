@@ -8,6 +8,8 @@ var js_outmirror = null,
     util = require("./probabilistic/util"),
     transform = require("./probabilistic/transform");
 
+var format_result = require("./format_result").format_result;
+
 util.openModule(pr);
 util.openModule(church_builtins);
 
@@ -46,7 +48,6 @@ util.openModule(church_builtins);
         viewportMargin: Infinity
       });
 
-
     var $container = $(editor.display.wrapper),
         $results = $("<div class='results'>"),
         $runButton = $("<button>").html("Run");
@@ -81,10 +82,13 @@ util.openModule(church_builtins);
         if (typeof runResult == "function") {
           // otherwise, call the function with the current div as an argument
           underlyingData = runResult($results);
+          //underlyingData = format_result(runResult($results));
         }
         else {
+          runResult = format_result(runResult);
           // if we get back a string, just show the text
           underlyingData = runResult;
+          //underlyingData = format_result(runResult);
           $results.removeClass("error").text(runResult);
         } 
         
