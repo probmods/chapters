@@ -1,8 +1,8 @@
 % Probabilistic Models of Cognition
 
-***Authors***: Noah D. Goodman, Joshua B. Tenenbaum, Timothy J. O'Donnell
+***Authors***: Noah D. Goodman and Joshua B. Tenenbaum
 
-***Contributors***: Andreas Stuhlmuller, Tomer Ullman, John McCoy, Long Ouyang
+***Contributors***: Timothy J. O'Donnell, Andreas Stuhlmuller, Tomer Ullman, John McCoy, Long Ouyang
 
 # Prelude
 
@@ -21,4 +21,4 @@ In order to make the idea of generative models precise we want a formal language
 
 # Acknowledgements
 
-The construction and ongoing support of this tutorial are made possible by grants from the Office of Naval Research, the James S. McDonnell Foundation, and the Stanford VPOL.
+The construction and ongoing support of this tutorial are made possible by grants from the Office of Naval Research, the James S. McDonnell Foundation, the National Science Foundation, and the Stanford VPOL.
