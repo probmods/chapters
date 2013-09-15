@@ -1,18 +1,15 @@
 % Generative Models
 
-# Defining Simple Generative Models
+# Defining Generative Models
 
-As our formal model of computation we start with the $\lambda$-calculus, and its embodiment in the LISP family of programming languages.  The $\lambda$-calculus is a formal system which was invented by Alonzo Church in the 1920's. Church introduced the $\lambda$-calculus as a model and formalization of computation, that is, as a way of formalizing the notion of an effectively computable function. The lambda calculus is a *universal* model of computation -- it is conjectured to be equivalent to all other notions of classical computation (the $\lambda$-calculus was shown to have the same computational power as the Turing machine and vice versa by Alan Turing in his famous paper which introduced the Turing machine). It is remarkable that the $\lambda$-calculus is universal because it has only two basic operations: creating and applying functions.
+We wish to describe in formal terms how to generate states of the world. That is, we wish to describe the causal process, or steps that unfold, leading to some potentially observable states. The key idea of this section is that these generative processes can be described as *computations*, but computations that involve random choices to capture uncertainty about the process.
 
-In 1958 John McCarthy introduced LISP (**LIS**t **P**rocessing), a programming language based on the $\lambda$-calculus. Scheme is a variant of LISP developed by Guy L. Steele and Gerald Jay Sussman with particularly simple syntax and semantics. We will use Scheme-style notation for the $\lambda$-calculus in this tutorial. The Church programming language -- named in honor of Alonzo Church -- is a generalization of Scheme which introduces the notion of probabilistic computation to the language. In the next few sections of this tutorial, we introduce the basics of Church programming and show how to use it to build generative models.
+As our formal model of computation we start with the $\lambda$-calculus, and its embodiment in the LISP family of programming languages.  The $\lambda$-calculus is a formal system which was invented by Alonzo Church in the 1920's. Church introduced the $\lambda$-calculus as a model and formalization of computation, that is, as a way of formalizing the notion of an effectively computable function. The lambda calculus is a *universal* model of computation -- it is conjectured to be equivalent to all other notions of classical computation (the $\lambda$-calculus was shown to have the same computational power as the Turing machine and vice versa by Alan Turing in his famous paper which introduced the Turing machine [TODO: cite]). It is remarkable that the $\lambda$-calculus is universal because it has only two basic operations: creating and applying functions.
 
-The $\lambda$-calculus formalizes the notion of computation using *functions*. Computation is performed in the $\lambda$-calculus by applying functions to arguments to compute results.  Function application in Church looks like this:
+In 1958 John McCarthy introduced LISP (**LIS**t **P**rocessing), a programming language based on the $\lambda$-calculus. Scheme is a variant of LISP developed by Guy L. Steele and Gerald Jay Sussman with particularly simple syntax and semantics. We will use Scheme-style notation for the $\lambda$-calculus in this tutorial. For a quick introduction to programming in Scheme see [the appendix on Scheme basics](appendix-scheme.html).
 
-~~~~ {.bher}
-(+ 1 1)
-~~~~
-
-Here we see the function `+` applied to two arguments: `1` and `1`. Note that in Church the name of the function comes *first* and the parentheses go outside the function. This is sometimes called *Polish notation*. If you run this simple program above you will see the resulting *value* of this function application.  Since `+` is a *deterministic* function you will always get the same return value if you run the program many times.
+The Church programming language -- named in honor of Alonzo Church -- is a generalization of Scheme which introduces the notion of probabilistic computation to the language.
+In the next few sections of this tutorial, we show how to use Church to build generative models (building on standard notions of computation, as realized in Scheme).
 
 In Church, in addition to deterministic functions, we have a set of random functions implementing *random choices.*  These random primitive functions are called *Exchangeable Random Primitives* (XRPs). Application of an XRP results in a *sample* from the probability distribution defined by that XRP.  For example, the simplest XRP is `flip` which results in either true or false -- it simulates a (possibly biased) coin toss. (Note that the return values `true` and `false` will look like this in the output: `#t` and `#f`.)
 
@@ -36,15 +33,6 @@ The `flip` function is the simplest XRP in Church, but you will find other XRPs 
 Many but not all of the XRPs and other basic functions implemented in Church can be found on the [[Automatically generated documentation]] page.
 </div> 
 
-## Building More Complex Programs
-
-A Church program is syntactically composed of nested *expressions.* Roughly speaking an expression is either a simple value, or anything between parentheses `()`.  In a deterministic LISP, like Scheme, all expressions without [free variables](http://en.wikipedia.org/wiki/Free_variables_and_bound_variables) have a single fixed value which is computed by a process known as *evaluation*. For example, consider the following more complex expression:
-
-~~~~
-(and true (or true false))
-~~~~
-
-This expression has an *operator*, the logical function `and`, and *arguments*, `true` and the *subexpression* which is itself an application of `or`. When reasoning about evaluation, it is best to think of evaluating the subexpressions first, then applying the function to the return values of its arguments. In this example `or` is first applied to `true` and `false`, returning true, then `and` is applied to `true` and the subexpression's return value, again returning true.
 
 For another example, consider:
 
@@ -60,60 +48,44 @@ For another example, consider:
 This expression is composed of an `if` conditional that evaluates the first expression (a flip here) then evaluates the second expression if the first is true or otherwise evaluates the third expression.<ref>The branching construct, `if`, is strictly not a function, because it does not evaluate all of its arguments, but instead *short-circuits* evaluating only the second or third. It has a value like any other function.</ref>
 (We have also used comments here: anything after a semicolon is ignored when evaluating.) Notice that the first `flip` has an argument: flip with an argument is a biased random choice. In this case this flip will be true with probability 0.7.
 
-We often want to name objects in our programs so that they can be reused. This can be done with the `define` statement. `define` looks like this:
-
-<pre>(define variable-name expression)</pre>
-
-`variable-name` is a *symbol* that is bound to the value that `expression` evaluates to. When variables themselves are evaluated they return the value that they have been bound to:
+We can use `lambda` to construct more complex stochastic functions from the primitive ones. Here is a stochastic function that will only sometimes double its input:
 
 ~~~~
-(define some-variable 10) ;assign the value 10 to the variable some-variable
+(define noisy-double (lambda (x) (if (flip) x (+ x x))))
 
-(if (flip)
-    100
-    some-variable) ;when this is evaluated it looks up and returns the value 10
+(noisy-double 3)
 ~~~~
 
-If you run this program several times you will notice that it sometimes returns 10. This is because when `flip` returns `false` the variable `some-variable` is evaluated, and since it is bound to 10, that value is returned.
+A lambda expression with an empty argument list, `(lambda () ...)`, is called a *thunk*: this is a function that takes no input arguments. If we apply a thunk (to no arguments!) we get a return value back, for example `(flip)`, and if we do this many times we can figure out the marginal probability of each return value.  Thus a thunk is an object that represents a whole *probability distribution*. By using higher-order functions we can construct and manipulate probability distributions.  A good example comes from coin flipping....
 
-## Lists and symbols
-
-There are several special kinds of values in Church. One kind of special value is a *list*: a sequence of other values. Lists can be built using the `list` function and manipulated using functions such as `first` (get the first element in a list) and `rest` (get the rest of the list after the first element).
+Higher-order functions like `repeat`, `map`, `apply` (or `sum`) can be quite useful.  Here we use them to visualize the number of heads we expect to see if we flip a weighted coin (weight = 0.8) 10 times.  We'll repeat this experiment 1000 times and then use `hist` to visualize the results.  Try varying the coin weight or the number of repetitions to see how the expected distribution changes.
 
 ~~~~
-(first ;get the first element of
-  (rest  ;get non-first elements of
-    (list "this" "is" "a" "list"))) ;build a list!
+(define make-coin (lambda (weight) (lambda () (flip weight))))
+(define coin (make-coin 0.8))
+
+(define data (repeat 1000 (lambda () (sum (map (lambda (x) (if x 1 0)) (repeat 10 coin))))))
+(hist data  "Distribution of coin flips")
 ~~~~
-Experiment with different combinations of these functions. What happens when you apply `list` to the result of `list`? (In this program we have used another kind of special value: a string, which is anything between double-quotes.)
 
-Lists are a fundamental data structure in LISP-like languages. In fact, a Church program is just a list -- the list of expressions comprising the program.
 
-Sometimes we wish to treat a piece of Church code "literally", that is, to view it as a value rather than an expression. We can do this using a special `quote` operation (which can also be written with a single quote: `(quote ...)` is the same as `'...`):
 
-~~~~
-(define quoted-value '(1 2 3))
-(first quoted-value)
-~~~~
-What is the value of `quoted-value`? What happens if you remove the quote? Why?
-
-If we quote the name of a variable, what we get back is a symbol: a value which is the literal variable, rather than the value it is bound to. A symbol is just an identifier; it will be equal to itself, but to no other symbol:
+It is possible to have a ''stochastic recursion'' that randomly decides whether to stop. Importantly, such recursion must be constructed to halt eventually (with probability 1). For example, an important probability distribution is the ''geometric distribution''. The geometric distribution is a distribution over the non-negative integers that represents the probability of flipping a coin <math>N</math> times and getting exactly 1 head. This distribution can be written in Church with the following simple recursion.
 
 ~~~~
-(define foo 1)
-(list
- ;a symbol is equal to itself
- (equal? 'foo 'foo)
- ;but not equal to any other symbol
- (equal? 'foo 'bar)
- ;or value
- (equal? 'foo 2)
- ;even the value that it is bound to as a variable
- (equal? 'foo foo))
-~~~~
-The ability to make new symbols as needed is a crucial feature in building models that reason over unbounded worlds, as we'll see below.
+(define (geometric p) 
+  (if (flip p) 
+      0 
+      (+ 1 (geometric p))))
 
-## Example: Causal Models in Medical Diagnosis
+(geometric .8)
+~~~~
+
+Notice that the base case of the recursion is probabilistic. There is no upper bound on how long the computation can go on, although the probability of reaching some number declines quickly as we walk out on the number line.
+
+
+
+# Example: Causal Models in Medical Diagnosis
 
 Generative knowledge is often *causal* knowledge.  As an example of how causal knowledge can be encoded in Church expressions, consider a simplified medical scenario:
 
@@ -227,54 +199,6 @@ We can write this using probability notation as: $P(A) = \sum_{B} P(A,B)$ , wher
 Using the product rule we can determine that the probability in the example above is 0.25 for each sequence that leads to return value `#t`, then, by the sum rule, the probability of `#t` is 0.25+0.25+0.25=0.75.
 
 Using the sum rule to compute the probability of a final value is called *marginalization*. From the point of view of sampling processes marginalization is simply ignoring (or not looking at) intermediate random values that are created on the way to a final return value. From the point of view of directly computing probabilities, marginalization is summing over all the possible "histories" that could lead to a return value.
-
-# Building Functions and Distributions: `lambda`
-
-The power of lambda calculus as a model of computation comes from the ability to make new functions. To do so, we use the `lambda` primitive. For example, we can construct a function that doubles any number it is applied to:
-
-~~~~
-(define double (lambda (x) (+ x x)))
-
-(double 3)
-~~~~
-
-The general form of a lambda expression is:
- (lambda arguments body)
-The first sub-expression of the lambda, the arguments, is a list of symbols that tells us what the inputs to the function will be called; the second sub-expression, the body, tells us what to do with these inputs. The value which results from a lambda expression is called a *compound procedure*. When a compound procedure is applied to input values (e.g. when `double` was applied to `3`) we imagine identifying (also called *binding*) the argument variables with these inputs, then evaluating the body. As another simple example, consider this function:
-
-![](images/Sicp-lambda-diagram.png)
-
-We can also use `lambda` to construct more complex stochastic functions from the primitive ones. Here is a stochastic function that will only sometimes double its input:
-
-~~~~
-(define noisy-double (lambda (x) (if (flip) x (+ x x))))
-
-(noisy-double 3)
-~~~~
-
-In lambda calculus we can build procedures that manipulate any kind of value -- even other procedures. Here we define a function `twice` which takes a procedure and returns a new procedure that applies the original twice:
-
-~~~~
-(define double (lambda (x) (+ x x)))
-
-(define twice (lambda (f) (lambda (x) (f (f x)))))
-
-((twice double) 3)
-~~~~
-
-This ability to make *higher-order* functions is what makes the lambda calculus a universal model of computation.
-
-Since we often want to assign names to functions, `(define (foo x) ...)` is short ("syntactic sugar") for  `(define foo (lambda (x) ...))`. For example we could have written the previous example:
-
-~~~~
-(define (double x) (+ x x))
-
-(define (twice f) (lambda (x) (f (f x))))
-
-((twice double) 3)
-~~~~
-
-A lambda expression with an empty argument list, `(lambda () ...)`, is called a *thunk*: this is a function that takes no input arguments. If we apply a thunk (to no arguments!) we get a return value back, for example `(flip)`, and if we do this many times we can figure out the marginal probability of each return value.  Thus a thunk is an object that represents a whole *probability distribution*. By using higher-order functions we can construct and manipulate probability distributions.  A good example comes from coin flipping....
 
 
 ## Example: Flipping Coins
@@ -446,7 +370,7 @@ for optimizing programs by avoiding repeated work (see
 as in Church, we can see this taken further and memoization
 actually affects the *expressivity* of the language.
 
-## Example: Bayesian Tug of War
+# Example: Bayesian Tug of War
 
 Imagine a game of tug of war, where each person may be strong or weak, and may be lazy or not on each match. If a person is lazy they only pull with half their strength. The team that pulls hardest will win. We assume that half of all people are strong, and that on any match, each person has a 1 in 3 chance of being lazy.  This program runs a tournament between several teams, mixing up players across teams.  Can you guess who is strong or weak, looking at the tournament results?
 
@@ -474,31 +398,18 @@ Imagine a game of tug of war, where each person may be strong or weak, and may b
 
 Notice that `strength` is memoized because this is a property of a person true across many matches, while `lazy` isn't.  Each time you run this program, however, a new "random world" will be created: people's strengths will be randomly re-generated and used in all the matches.
 
-## Useful Higher-Order Functions
 
-In the above example we have used several useful utility functions. `map` is a higher-order function that takes a procedure (here built using `lambda`) and applies it to each element of a list (here the list of team members). After getting the list of how much each team member is pulling, we want to add them up. The procedure `+` expects to be applied directly to some numbers, as in `(+ 1 2 3 4)`, not to a list of numbers; `(+ (1 2 3 4))` would produce an error.  So we use the higher-order function `apply`, which applies a procedure to a list as if the list were direct arguments to the procedure.  The standard functions `sum` and `product` can be easily defined in terms of `(apply + ...)` and `(apply * ...)`, respectively.  Just to illustrate this:
 
-~~~~
-(define my-list '(3 5 2047))
-(list "These numbers should all be equal:" (sum my-list) (apply + my-list) (+ 3 5 2047))
-~~~~
+#Example: Intuitive physics
 
-Higher-order functions like `repeat`, `map`, `apply` (or `sum`) can be quite useful.  Here we use them to visualize the number of heads we expect to see if we flip a weighted coin (weight = 0.8) 10 times.  We'll repeat this experiment 1000 times and then use `hist` to visualize the results.  Try varying the coin weight or the number of repetitions to see how the expected distribution changes.
 
-~~~~
-(define make-coin (lambda (weight) (lambda () (flip weight))))
-(define coin (make-coin 0.8))
 
-(define data (repeat 1000 (lambda () (sum (map (lambda (x) (if x 1 0)) (repeat 10 coin))))))
-(hist data  "Distribution of coin flips")
-~~~~
 
-The `map` higher-order function can be used to map a function of more than one argument over multiple lists, element by element.  For example, here is the MATLAB "dot-star" function (or ".*") written using `map`:
 
-~~~~
-(define dot-star (lambda (v1 v2) (map * v1 v2)))
-(dot-star '(1 2 3) '(4 5 6))
-~~~~
+
+
+
+
 
 
 
