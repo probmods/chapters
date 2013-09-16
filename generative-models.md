@@ -29,9 +29,8 @@ An important idea here is that `flip` can be thought of in two different ways. F
 
 The `flip` function is the simplest XRP in Church, but you will find other XRPs corresponding to familiar probability distributions, such as `gaussian`, `gamma`, `dirichlet`, and so on.
 
-<div class="bg-yellow">
-Many but not all of the XRPs and other basic functions implemented in Church can be found on the [[Automatically generated documentation]] page.
-</div> 
+
+[FIXME: Many but not all of the XRPs and other basic functions implemented in Church can be found on the [[Automatically generated documentation]] page.]
 
 
 For another example, consider:
@@ -70,7 +69,7 @@ Higher-order functions like `repeat`, `map`, `apply` (or `sum`) can be quite use
 
 
 
-It is possible to have a ''stochastic recursion'' that randomly decides whether to stop. Importantly, such recursion must be constructed to halt eventually (with probability 1). For example, an important probability distribution is the ''geometric distribution''. The geometric distribution is a distribution over the non-negative integers that represents the probability of flipping a coin <math>N</math> times and getting exactly 1 head. This distribution can be written in Church with the following simple recursion.
+It is possible to have a ''stochastic recursion'' that randomly decides whether to stop. Importantly, such recursion must be constructed to halt eventually (with probability 1). For example, an important probability distribution is the ''geometric distribution''. The geometric distribution is a distribution over the non-negative integers that represents the probability of flipping a coin $N$ times and getting exactly 1 head. This distribution can be written in Church with the following simple recursion.
 
 ~~~~
 (define (geometric p) 
@@ -402,7 +401,7 @@ Notice that `strength` is memoized because this is a property of a person true a
 
 #Example: Intuitive physics
 
-
+<!-- Put in simple 2d physics examples here: plinko, stability, ping-pong. -->
 
 
 
