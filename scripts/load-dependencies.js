@@ -69,7 +69,14 @@
     viz: {
       paths: ["scripts/viz.js"],
       parents: ["d3", "webchurch"]
-    } 
+    },
+    plinko: {
+      paths: ["scripts/plinko.js"],
+      parents: ["box2dweb"]
+    },
+    box2dweb: {
+      paths: ["scripts/Box2dWeb-2.1.a.3.js"]
+    }
   };
 
   // explicitly fill in the parent, child relationships
