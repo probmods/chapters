@@ -55,7 +55,85 @@ We can use `lambda` to construct more complex stochastic functions from the prim
 (noisy-double 3)
 ~~~~
 
-A lambda expression with an empty argument list, `(lambda () ...)`, is called a *thunk*: this is a function that takes no input arguments. If we apply a thunk (to no arguments!) we get a return value back, for example `(flip)`, and if we do this many times we can figure out the marginal probability of each return value.  Thus a thunk is an object that represents a whole *probability distribution*. By using higher-order functions we can construct and manipulate probability distributions.  A good example comes from coin flipping....
+A lambda expression with an empty argument list, `(lambda () ...)`, is called a *thunk*: this is a function that takes no input arguments. If we apply a thunk (to no arguments!) we get a return value back, for example `(flip)`, and if we do this many times we can figure out the marginal probability of each return value.  Thus a thunk is an object that represents a whole *probability distribution*. By using higher-order functions we can construct and manipulate probability distributions.  A good example comes from coin flipping...
+
+## Example: Flipping Coins
+
+The following program defines a fair coin, and flips it 20 times:
+
+~~~~
+(define fair-coin (lambda () (if (flip 0.5) 'h 't))) ;the thunk is a fair coin
+(hist (repeat 20 fair-coin) "fair coin")
+~~~~
+
+
+This program defines a "trick" coin that comes up heads most of the time (95%), and flips it 20 times:
+
+~~~~
+(define trick-coin (lambda () (if (flip 0.95) 'h 't)))
+(hist (repeat 20 trick-coin) "trick coin")
+~~~~
+
+<style classes="bg-yellow">
+<em>Note on Church syntax:</em>
+
+A common mistake when defining names for new functions and using them with higher-order functions like `repeat` is to confuse the name of a thunk with the name of a variable that stands for the output of a single function evaluation.  For instance, why doesn't this work?
+
+~~~~
+(define trick-coin-1 (if (flip 0.95) 'h 't))
+(hist (repeat 20 trick-coin-1) "trick coin")
+~~~~
+The higher-order function `repeat` requires as input a thunk, a procedure (or function) with no arguments, as returned by `lambda` in the examples above.  Consider the difference in what is returned by these two code fragments:
+
+~~~~
+(define trick-coin-1 (if (flip 0.95) 'h 't))
+trick-coin-1
+~~~~
+`trick-coin-1` names a variable that is defined to be the result of evaluating the `(if ...)` expression a single time (either `h` or `t`), while below `trick-coin-2` names a thunk that can serve as the input to the higher-order function `repeat`.
+
+~~~~
+(define trick-coin-2 (lambda () (if (flip 0.95) 'h 't)))
+trick-coin-2
+~~~~
+The difference between these two programs becomes particularly subtle when using the `(define (name) ... )` syntax.  Simply putting the name to be defined in parentheses turns a variable definition into a thunk definition:
+
+~~~~
+(define (trick-coin-2) (if (flip 0.95) 'h 't))
+trick-coin-2
+~~~~
+To Church the last two definitions of `trick-coin-2` are the same -- both output a thunk -- although superficially the last one looks more similar to the variable definition that assigns `trick-coin-1` to a single value of `h` or `t`.
+</style>
+
+The higher-order function `make-coin` takes in a weight and outputs a function (a thunk) describing a coin with that weight.  Then we can use `make-coin` to make the coins above, or others.
+
+~~~~
+(define (make-coin weight) (lambda () (if (flip weight) 'h 't)))
+(define fair-coin (make-coin 0.5))
+(define trick-coin (make-coin 0.95))
+(define bent-coin (make-coin 0.25))
+
+(hist (repeat 20 fair-coin) "20 fair coin flips")
+(hist (repeat 20 trick-coin) "20 trick coin flips")
+(hist (repeat 20 bent-coin) "20 bent coin flips")
+~~~~
+
+We can also define a higher-order function that takes a "coin" and "bends it":
+
+~~~~
+(define (make-coin weight) (lambda () (if (flip weight) 'h 't)))
+(define (bend coin)
+  (lambda () (if (equal? (coin) 'h)
+                 ( (make-coin 0.7) )
+                 ( (make-coin 0.1) ) )))
+
+(define fair-coin (make-coin 0.5))
+(define bent-coin (bend fair-coin))
+
+(hist (repeat 100 bent-coin) "bent coin")
+"done"
+~~~~
+Make sure you understand how the `bend` function works! Why are there an "extra" pair of parentheses outside each `make-coin` statement?
+
 
 Higher-order functions like `repeat`, `map`, `apply` (or `sum`) can be quite useful.  Here we use them to visualize the number of heads we expect to see if we flip a weighted coin (weight = 0.8) 10 times.  We'll repeat this experiment 1000 times and then use `hist` to visualize the results.  Try varying the coin weight or the number of repetitions to see how the expected distribution changes.
 
@@ -66,22 +144,6 @@ Higher-order functions like `repeat`, `map`, `apply` (or `sum`) can be quite use
 (define data (repeat 1000 (lambda () (sum (map (lambda (x) (if x 1 0)) (repeat 10 coin))))))
 (hist data  "Distribution of coin flips")
 ~~~~
-
-
-
-It is possible to have a ''stochastic recursion'' that randomly decides whether to stop. Importantly, such recursion must be constructed to halt eventually (with probability 1). For example, an important probability distribution is the ''geometric distribution''. The geometric distribution is a distribution over the non-negative integers that represents the probability of flipping a coin $N$ times and getting exactly 1 head. This distribution can be written in Church with the following simple recursion.
-
-~~~~
-(define (geometric p) 
-  (if (flip p) 
-      0 
-      (+ 1 (geometric p))))
-
-(geometric .8)
-~~~~
-
-Notice that the base case of the recursion is probabilistic. There is no upper bound on how long the computation can go on, although the probability of reaching some number declines quickly as we walk out on the number line.
-
 
 
 # Example: Causal Models in Medical Diagnosis
@@ -132,6 +194,8 @@ This program generates random conditions for a patient in a doctor's office.  It
 Now there are four possible diseases and four symptoms.  Each disease causes a different pattern of symptoms.  The causal relations are now probabilistic: Only some patients with a cold have a cough (50%), or a fever (30%).  There is also a catch-all disease category "other", which has a low probability of causing any symptom.  *Noisy logical* functions, or functions built from `and`, `or`, and `flip`, provide a simple but expressive way to describe probabilistic causal dependencies between Boolean (true-false valued) variables.
 
 When you run the above code, the program generates a list of symptoms for a hypothetical patient.  Most likely all the symptoms will be false, as (thankfully) each of these diseases is rare.  Experiment with running the program multiple times.  Now try modifying the `define` statement for one of the diseases, setting it to be true, to simulate only patients known to have that disease.  For example, replace `(define lung-cancer (flip 0.01))` with `(define lung-cancer true)`. Run the program several times to observe the characteristic patterns of symptoms for that disease.
+
+
 
 # Prediction, Simulation, and Probabilities
 
@@ -200,83 +264,23 @@ Using the product rule we can determine that the probability in the example abov
 Using the sum rule to compute the probability of a final value is called *marginalization*. From the point of view of sampling processes marginalization is simply ignoring (or not looking at) intermediate random values that are created on the way to a final return value. From the point of view of directly computing probabilities, marginalization is summing over all the possible "histories" that could lead to a return value.
 
 
-## Example: Flipping Coins
 
-The following program defines a fair coin, and flips it 20 times:
+# Stochastic recursion
 
-~~~~
-(define fair-coin (lambda () (if (flip 0.5) 'h 't))) ;the thunk is a fair coin
-(hist (repeat 20 fair-coin) "fair coin")
-~~~~
-
-
-This program defines a "trick" coin that comes up heads most of the time (95%), and flips it 20 times:
+It is possible to have a ''stochastic recursion'' that randomly decides whether to stop. Importantly, such recursion must be constructed to halt eventually (with probability 1). For example, an important probability distribution is the ''geometric distribution''. The geometric distribution is a distribution over the non-negative integers that represents the probability of flipping a coin $N$ times and getting exactly 1 head. This distribution can be written in Church with the following simple recursion.
 
 ~~~~
-(define trick-coin (lambda () (if (flip 0.95) 'h 't)))
-(hist (repeat 20 trick-coin) "trick coin")
+(define (geometric p) 
+  (if (flip p) 
+      0 
+      (+ 1 (geometric p))))
+
+(geometric .8)
 ~~~~
 
-<style classes="bg-yellow">
-<em>Note on Church syntax:</em>
+Notice that the base case of the recursion is probabilistic. There is no upper bound on how long the computation can go on, although the probability of reaching some number declines quickly as we walk out on the number line.
 
-A common mistake when defining names for new functions and using them with higher-order functions like `repeat` is to confuse the name of a thunk with the name of a variable that stands for the output of a single function evaluation.  For instance, why doesn't this work?
 
-~~~~
-(define trick-coin-1 (if (flip 0.95) 'h 't))
-(hist (repeat 20 trick-coin-1) "trick coin")
-~~~~
-The higher-order function `repeat` requires as input a thunk, a procedure (or function) with no arguments, as returned by `lambda` in the examples above.  Consider the difference in what is returned by these two code fragments:
-
-~~~~
-(define trick-coin-1 (if (flip 0.95) 'h 't))
-trick-coin-1
-~~~~
-`trick-coin-1` names a variable that is defined to be the result of evaluating the `(if ...)` expression a single time (either `h` or `t`), while below `trick-coin-2` names a thunk that can serve as the input to the higher-order function `repeat`.
-
-~~~~
-(define trick-coin-2 (lambda () (if (flip 0.95) 'h 't)))
-trick-coin-2
-~~~~
-The difference between these two programs becomes particularly subtle when using the `(define (name) ... )` syntax.  Simply putting the name to be defined in parentheses turns a variable definition into a thunk definition:
-
-~~~~
-(define (trick-coin-2) (if (flip 0.95) 'h 't))
-trick-coin-2
-~~~~
-To Church the last two definitions of `trick-coin-2` are the same -- both output a thunk -- although superficially the last one looks more similar to the variable definition that assigns `trick-coin-1` to a single value of `h` or `t`.
-</style>
-
-The higher-order function `make-coin` takes in a weight and outputs a function (a thunk) describing a coin with that weight.  Then we can use `make-coin` to make the coins above, or others.
-
-~~~~
-(define (make-coin weight) (lambda () (if (flip weight) 'h 't)))
-(define fair-coin (make-coin 0.5))
-(define trick-coin (make-coin 0.95))
-(define bent-coin (make-coin 0.25))
-
-(hist (repeat 20 fair-coin) "20 fair coin flips")
-(hist (repeat 20 trick-coin) "20 trick coin flips")
-(hist (repeat 20 bent-coin) "20 bent coin flips")
-"done"
-~~~~
-
-We can also define a higher-order function that takes a "coin" and "bends it":
-
-~~~~
-(define (make-coin weight) (lambda () (if (flip weight) 'h 't)))
-(define (bend coin)
-  (lambda () (if (equal? (coin) 'h)
-                 ( (make-coin 0.7) )
-                 ( (make-coin 0.1) ) )))
-
-(define fair-coin (make-coin 0.5))
-(define bent-coin (bend fair-coin))
-
-(hist (repeat 100 bent-coin) "bent coin")
-"done"
-~~~~
-Make sure you understand how the `bend` function works! Why are there an "extra" pair of parentheses outside each `make-coin` statement?
 
 # Persistent Randomness: `mem`
 
@@ -403,186 +407,17 @@ Notice that `strength` is memoized because this is a property of a person true a
 
 <!-- Put in simple 2d physics examples here: plinko, stability, ping-pong. -->
 
+~~~~
+(define pegRadius 3)
+(define binHeight 120)
+(define binWidth 5)
 
+(define w (makeWorld))
+(plinko w)
+(animatePhysics 1000 w)
 
+~~~~
 
 
 
 
-
-
-
-<!-- Note: the following was removed from the Hierarchical Models section. Possibly some should go here, though not all.
-
-# Packaging Randomness with `lambda`
-
-In the first part of the tutorial we introduced the abstraction operator, `lambda`. `lambda` is a function constructor. It takes
-as arguments a number of formal parameters, and some code using those parameters, and returns a packaged function that when applied to
-some values will bind those values to its formal parameters and execute the code. In the stochastic $\lambda$-calculus,
-`lambda` allows us to build arbitrary reusable generative processes.
-
-XRPs themselves, of course, represent simple reusable generative processes. For example, `flip` (with no arguments) defines a generative process that generates observation from an unbiased coin. It models the (admittedly trivial) "causal process" of flipping an unbiased coin. `flip` also has a version which takes an argument, specifying the weight of the coin, allowing us to implement biased coin flips. With `lambda` we can package up a biased call to `flip` into a procedure which can then be reused.
-
-{{#churchserv:
-(define my-coin (lambda () (flip .7)))
-
-(my-coin)
-(my-coin)
-
-}}
-
-Our "coin" in this case is a procedure of no arguments that can be called ("flipped") as many times as we like. In functional programming a procedure of
-no arguments like this one is called a *thunk.*
-
-{{#churchserv:
-(define my-thunk
- (lambda ()
-      (+ 1 2)))
-
-(my-thunk)
-}}
-
-A deterministic thunk can only ever return a single value. Thus in deterministic LISPs, like Scheme, we can think of thunks as constant values.  For example, the thunk above is equivalent in meaning to the value `3` with respect to the behavior of a program it is used in. However, in Church, the meaning of a thunk is no longer a necessarily a single value. Thunks can return different values on different calls. In fact, in Church thunks can be thought of as the *definition* of sampleable probability distributions.
-
-In defining `my-coin` as a thunk we "wrapped-up" or "encapsulated" the coin weight $.7$ inside of the procedure. In functional programming this construct, where we wrap up some information inside of a procedure is called a *closure*, because some information is "closed over" in the body of the function. This is a fundamental and important concept, as we will see shortly. It is not only constants like .7 which can be closed over, but also other kinds of information.
-
-{{#churchserv:
-(define my-coin-weight .7)
-(define my-coin (lambda () (flip my-coin-weight)))
-
-(my-coin)
-}}
-
-Here we have captured a variable `my-coin-weight` in the closure, rather than a simple value. So far, however, our examples have only packaged constant information into the closure. In the next section we will see how we can use closures to build reusable stochastic processes which have randomness at multiple levels.
-
-# Hierarchical Generative Models
-
-Using thunks and closures we can now implement our first hierarchical generative process. Let's imagine that we want to model a mint producing coins (with poor quality control). The coins will be mostly close to unbiased, but not all exactly weighted at .5. We can achieve this by modifying the proceeding code to **first** sample the weight of the coin from some distribution, and then wrap up that weight inside of the thunk.
-
-
-First, we will need to choose a distribution for the coin weights coming out of the factory. For this, we will use a *beta* distribution. A beta distribution is a distribution on real numbers between 0 and 1, thus it can be thought of as a distribution on coin weights. The beta distribution takes two parameters that are called *pseudo-counts*. Pseudo-counts can be thought of the number of heads or tails that came up in some (imagined) prior set of coin tosses. Here are a few examples of different values for the parameters of the beta distribution.
-
-<img src='Beta_distribution_pdf.png' width='400' />
-
-To understand how the pseudo-counts work notice that as the proportion of pseudo-counts favors either heads or tails, then the beta distribution becomes more skewed towards coin weights which are biased in that direction. When the pseudo-counts are symmetric, then the distribution is peaked at .5. As the **total** number of pseudo-counts becomes greater then the distribution becomes more and more steeply peaked. For instance, $Beta(2,2)$ and $Beta(10,10)$ both have their mean at .5, but the latter has much lower variance. Note that $Beta(1,1)$ is the uniform distribution on the (0,1) interval. When the pseudo-counts are less than 1 then the distribution becomes more steeply peaked close to 0 and 1 (this is also where our interpretation of pseudo-counts as previous flips starts to break down).
-
-{{#churchserv:
-(define my-coin-weight (first (beta 1 1)))
-(define my-coin (lambda () (flip my-coin-weight)))
-
-(my-coin)
-(my-coin)
-}}
-
-In this example it was extremely important that we used a closure. This allows all applications of  `my-coin` to be flips of a coin with the *same weight*. In other words, we choose the weight of the coin *once* and this weight is shared across all flips of the biased coin in the future. It is this sharing of higher-level random choices that gives hierarchical modeling its power. Also note, that this sharing accurately models our causal understanding of the coin factory. The factor produces coins, some of which are biased. One the coin is manufactured, however, its bias does not change.
-
-If instead we had written this:
-
-{{#churchserv:
-(define my-coin (lambda () (flip  (beta 1 1))))
-
-(my-coin)
-(my-coin)
-}}
-
-Then each time we applied `my-coin` we would first sample a different coin weight. The beta distribution in these examples is what is called *prior distribution* on the coin weight. When we build hierarchical models we talk about each level being a *prior* on the one below.
-
-# Packaging Reusable Random Processes with `lambda` and `let`
-
-In the preceding section we showed how to build a hierarchical generative process for biased coins. To do this we drew a value from a `beta` random variable and then assigned it to a particular variable `my-coin-weight`. We needed to name the `beta` draw so that we could package it into the closure.
-
-It is always possible to use `define` to explicitly name your variables like this, however, there is another very important and useful LISP expression which can be used instead.  `define` let's us name *global* variables -- variables which we have access to anywhere in the program -- however, often we want to bind a variable in some local context. `let` allows us to do this.  `let` has the following syntax:
-
-<pre>
-(let ( (var-name-1 expression-1)
-        (var-name-2 expression-2)
-        ...
-        (var-name-N expression-N) )
-     body-of-let-where-variables-have-scope )
-</pre>
-
-The variables inside of the `let` expression only have scope until the end of the `let` expression. The value of the whole `let`-expression is just the value of the body -- whatever the body evaluates to. We can use `let` to define our hierarchical coin.
-
-{{#churchserv:
-(define my-coin
-	(let ((weight (beta 1 1)))
-	 (lambda () (flip weight))))
-
-(my-coin)
-}}
-
-We use `let` to bind a draw from `beta` to the variable `weight`, we then enclose this variable in a closure and return it.  There is something worth noting about this example.  The value of the `let`-expression here is a **procedure** object returned by `lambda`. This is another instance of the important feature of LISP that procedures are *first-class objects*. This means that they can be the value of an expression, they can be passed to other procedures as arguments, they can be returned by procedures, and they can be stored as data.
-
-In fact, `let` is actually just syntactic sugar for  a more cumbersome use of  $\lambda$-abstraction. The schematic `let` expression above could be rewritten as the following `lambda`-expression.
-
-<pre>
-((lambda (var-name-1 var-name-2 ... var-name-N)
-    body-of-lambda-where-variables-have-scope ) expression-1 expression-2 ... expression-N)
-</pre>
-
-Here we have created an anonymous procedure with formal parameters`var-name-1 var-name-2 ... var-name-N`, and have applied this to the expressions that get bound into those variables as arguments. Internally Church turns `let` expressions into `lambda` expressions of this form, but it is provided because it is much easier to read.
-
-Sometimes it is useful to refer to one of the earlier variables when defining later variables in a `let`-binding. To do this you must `let*` which has the following syntax.
-
-<pre>
-(let* ( (var-name-1 expression-1)
-         (var-name-2 expression-2-using-variable-1)
-         ...
-         (var-name-N expression-N-using-variables-1-to-(N-1) ))
-     body-of-let-where-variables-have-scope )
-</pre>
-
-For example, suppose that we wanted to put a prior on our beta distribution pseudo-counts. For instance, suppose that there were ten different factories all reproducing coins, and we think that the quality control varies from factory to factory. We can model this assumption by placing a prior on the pseudocounts of `beta`.
-
-A typical distribution for this purpose is the *gamma distribution*.
-
-<img src='Gamma_distribution_pdf.svg' width='325' />
-
-Putting a gamma prior on our pseudocounts we can write our new generative process using `let*`.
-
-{{#churchserv:
-(define my-coin
-	(let* ((pseudo-head (gamma 1 2))
-                (pseudo-tail (gamma 1 2))
-                (weight (beta pseudo-head pseudo-tail)))
-	 (lambda () (flip weight))))
-
-(my-coin)
-}}
-
-Earlier we claimed that the variables bound by a `let` only have scope inside the body of the `let`. One thing you may be wondering is how the procedure `my-coin` still has access to the values bound by the `let` after it has been returned. To explain this, we need to explain how variables work in Church.
-Scheme and Church are languages that are *lexically* or *statically scoped*. What this means is that value of a variable is the value that the variable had wherever it was defined. In other words, the value of the variables named *weight* inside of the closure is the value it had inside the `let` binding. In particular, this means that the following code works properly.
-
-{{#churchserv:
-(define my-coin
-	(let ((weight (beta 1 1)))
-	 (lambda () (flip weight))))
-
-(define weight 'some-symbol)
-
-(my-coin)
-}}
-
-How do Scheme and Church implement this? All variable bindings are stored in a data structure called an *environment*. The environment is essentially a set of key-value pairs, where the keys are variable names and the values are the values that the variable names are bound to. When a procedure object is constructed in Church it gets a copy of the local environment that exists *at the moment it is defined*. When we call that procedure it looks up the variables in this local environment. Variable bindings in environments are *ordered* so that the "closest" binding is used.  For example, the following code also still works correctly.
-
-{{#churchserv:
-(define weight 'some-symbol)
-
-(define my-coin
-	(let ((weight (beta 1 1)))
-	 (lambda () (flip weight))))
-
-(my-coin)
-
-}}
-
-
-The first binding to `weight`, bound by the `define`, is *shadowed*, by the second, so when we evaluate the procedure object that is bound to `my-coin` it always uses the more local, "closer" `let`-bound version of `weight`.
-
--->
-
-Here's an example of a generative model.
-
-<canvas id="plinkoCanvas" width="350" height="500" style="background-color:#333333;" onload="initPlinko();"></canvas>
-<br/>
-<button onClick="initPlinko(6, 7);">Simulate</button>
