@@ -70,9 +70,9 @@
       paths: ["scripts/viz.js"],
       parents: ["d3", "webchurch"]
     },
-    plinko: {
-      paths: ["scripts/plinko.js"],
-      parents: ["box2dweb"]
+    phys: {
+      paths: ["scripts/phys.js"],
+      parents: ["box2dweb", "webchurch"]
     },
     box2dweb: {
       paths: ["scripts/Box2dWeb-2.1.a.3.js"]
