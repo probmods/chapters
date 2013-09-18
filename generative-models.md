@@ -403,6 +403,16 @@ Notice that `strength` is memoized because this is a property of a person true a
 
 <!-- Put in simple 2d physics examples here: plinko, stability, ping-pong. -->
 
+~~~~
+(define pegRadius 3)
+(define binHeight 120)
+(define binWidth 5)
+
+(define w (makeWorld))
+(plinko w)
+(animatePhysics 1000 w)
+
+~~~~
 
 
 
@@ -580,9 +590,3 @@ How do Scheme and Church implement this? All variable bindings are stored in a d
 The first binding to `weight`, bound by the `define`, is *shadowed*, by the second, so when we evaluate the procedure object that is bound to `my-coin` it always uses the more local, "closer" `let`-bound version of `weight`.
 
 -->
-
-Here's an example of a generative model.
-
-<canvas id="plinkoCanvas" width="350" height="500" style="background-color:#333333;" onload="initPlinko();"></canvas>
-<br/>
-<button onClick="initPlinko(6, 7);">Simulate</button>
