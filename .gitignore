@@ -3,3 +3,4 @@ haskell/*
 chapter.template
 *.html
 *.pyhtml
+scripts/mathjax/*
