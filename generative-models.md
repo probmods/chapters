@@ -673,5 +673,6 @@ The first binding to `weight`, bound by the `define`, is *shadowed*, by the seco
 
 Here's an example of a generative model.
 
-<button onClick="initPlinko(6, 7);">Simulate</button>
 <canvas id="plinkoCanvas" width="350" height="500" style="background-color:#333333;" onload="initPlinko();"></canvas>
+<br/>
+<button onClick="initPlinko(6, 7);">Simulate</button>
