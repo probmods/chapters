@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
   <head>
     <title>ProbMods: $title$</title>
@@ -5,9 +6,10 @@
     <link rel="stylesheet" type="text/css" href="codemirror/codemirror.css"> 
     <script src="scripts/underscore-min.js"></script> 
     <script src="scripts/jquery.js"></script>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
   </head>
 <body>
-<div id="chapter"> 
+<div id="chapter">
   <ul id="nav">
     <li id="all-chapters"><a href="#">all chapters</a>
       %(chapters)s
