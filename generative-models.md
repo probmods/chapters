@@ -55,7 +55,85 @@ We can use `lambda` to construct more complex stochastic functions from the prim
 (noisy-double 3)
 ~~~~
 
-A lambda expression with an empty argument list, `(lambda () ...)`, is called a *thunk*: this is a function that takes no input arguments. If we apply a thunk (to no arguments!) we get a return value back, for example `(flip)`, and if we do this many times we can figure out the marginal probability of each return value.  Thus a thunk is an object that represents a whole *probability distribution*. By using higher-order functions we can construct and manipulate probability distributions.  A good example comes from coin flipping....
+A lambda expression with an empty argument list, `(lambda () ...)`, is called a *thunk*: this is a function that takes no input arguments. If we apply a thunk (to no arguments!) we get a return value back, for example `(flip)`, and if we do this many times we can figure out the marginal probability of each return value.  Thus a thunk is an object that represents a whole *probability distribution*. By using higher-order functions we can construct and manipulate probability distributions.  A good example comes from coin flipping...
+
+## Example: Flipping Coins
+
+The following program defines a fair coin, and flips it 20 times:
+
+~~~~
+(define fair-coin (lambda () (if (flip 0.5) 'h 't))) ;the thunk is a fair coin
+(hist (repeat 20 fair-coin) "fair coin")
+~~~~
+
+
+This program defines a "trick" coin that comes up heads most of the time (95%), and flips it 20 times:
+
+~~~~
+(define trick-coin (lambda () (if (flip 0.95) 'h 't)))
+(hist (repeat 20 trick-coin) "trick coin")
+~~~~
+
+<style classes="bg-yellow">
+<em>Note on Church syntax:</em>
+
+A common mistake when defining names for new functions and using them with higher-order functions like `repeat` is to confuse the name of a thunk with the name of a variable that stands for the output of a single function evaluation.  For instance, why doesn't this work?
+
+~~~~
+(define trick-coin-1 (if (flip 0.95) 'h 't))
+(hist (repeat 20 trick-coin-1) "trick coin")
+~~~~
+The higher-order function `repeat` requires as input a thunk, a procedure (or function) with no arguments, as returned by `lambda` in the examples above.  Consider the difference in what is returned by these two code fragments:
+
+~~~~
+(define trick-coin-1 (if (flip 0.95) 'h 't))
+trick-coin-1
+~~~~
+`trick-coin-1` names a variable that is defined to be the result of evaluating the `(if ...)` expression a single time (either `h` or `t`), while below `trick-coin-2` names a thunk that can serve as the input to the higher-order function `repeat`.
+
+~~~~
+(define trick-coin-2 (lambda () (if (flip 0.95) 'h 't)))
+trick-coin-2
+~~~~
+The difference between these two programs becomes particularly subtle when using the `(define (name) ... )` syntax.  Simply putting the name to be defined in parentheses turns a variable definition into a thunk definition:
+
+~~~~
+(define (trick-coin-2) (if (flip 0.95) 'h 't))
+trick-coin-2
+~~~~
+To Church the last two definitions of `trick-coin-2` are the same -- both output a thunk -- although superficially the last one looks more similar to the variable definition that assigns `trick-coin-1` to a single value of `h` or `t`.
+</style>
+
+The higher-order function `make-coin` takes in a weight and outputs a function (a thunk) describing a coin with that weight.  Then we can use `make-coin` to make the coins above, or others.
+
+~~~~
+(define (make-coin weight) (lambda () (if (flip weight) 'h 't)))
+(define fair-coin (make-coin 0.5))
+(define trick-coin (make-coin 0.95))
+(define bent-coin (make-coin 0.25))
+
+(hist (repeat 20 fair-coin) "20 fair coin flips")
+(hist (repeat 20 trick-coin) "20 trick coin flips")
+(hist (repeat 20 bent-coin) "20 bent coin flips")
+~~~~
+
+We can also define a higher-order function that takes a "coin" and "bends it":
+
+~~~~
+(define (make-coin weight) (lambda () (if (flip weight) 'h 't)))
+(define (bend coin)
+  (lambda () (if (equal? (coin) 'h)
+                 ( (make-coin 0.7) )
+                 ( (make-coin 0.1) ) )))
+
+(define fair-coin (make-coin 0.5))
+(define bent-coin (bend fair-coin))
+
+(hist (repeat 100 bent-coin) "bent coin")
+"done"
+~~~~
+Make sure you understand how the `bend` function works! Why are there an "extra" pair of parentheses outside each `make-coin` statement?
+
 
 Higher-order functions like `repeat`, `map`, `apply` (or `sum`) can be quite useful.  Here we use them to visualize the number of heads we expect to see if we flip a weighted coin (weight = 0.8) 10 times.  We'll repeat this experiment 1000 times and then use `hist` to visualize the results.  Try varying the coin weight or the number of repetitions to see how the expected distribution changes.
 
@@ -66,22 +144,6 @@ Higher-order functions like `repeat`, `map`, `apply` (or `sum`) can be quite use
 (define data (repeat 1000 (lambda () (sum (map (lambda (x) (if x 1 0)) (repeat 10 coin))))))
 (hist data  "Distribution of coin flips")
 ~~~~
-
-
-
-It is possible to have a ''stochastic recursion'' that randomly decides whether to stop. Importantly, such recursion must be constructed to halt eventually (with probability 1). For example, an important probability distribution is the ''geometric distribution''. The geometric distribution is a distribution over the non-negative integers that represents the probability of flipping a coin $N$ times and getting exactly 1 head. This distribution can be written in Church with the following simple recursion.
-
-~~~~
-(define (geometric p) 
-  (if (flip p) 
-      0 
-      (+ 1 (geometric p))))
-
-(geometric .8)
-~~~~
-
-Notice that the base case of the recursion is probabilistic. There is no upper bound on how long the computation can go on, although the probability of reaching some number declines quickly as we walk out on the number line.
-
 
 
 # Example: Causal Models in Medical Diagnosis
@@ -132,6 +194,8 @@ This program generates random conditions for a patient in a doctor's office.  It
 Now there are four possible diseases and four symptoms.  Each disease causes a different pattern of symptoms.  The causal relations are now probabilistic: Only some patients with a cold have a cough (50%), or a fever (30%).  There is also a catch-all disease category "other", which has a low probability of causing any symptom.  *Noisy logical* functions, or functions built from `and`, `or`, and `flip`, provide a simple but expressive way to describe probabilistic causal dependencies between Boolean (true-false valued) variables.
 
 When you run the above code, the program generates a list of symptoms for a hypothetical patient.  Most likely all the symptoms will be false, as (thankfully) each of these diseases is rare.  Experiment with running the program multiple times.  Now try modifying the `define` statement for one of the diseases, setting it to be true, to simulate only patients known to have that disease.  For example, replace `(define lung-cancer (flip 0.01))` with `(define lung-cancer true)`. Run the program several times to observe the characteristic patterns of symptoms for that disease.
+
+
 
 # Prediction, Simulation, and Probabilities
 
@@ -200,83 +264,23 @@ Using the product rule we can determine that the probability in the example abov
 Using the sum rule to compute the probability of a final value is called *marginalization*. From the point of view of sampling processes marginalization is simply ignoring (or not looking at) intermediate random values that are created on the way to a final return value. From the point of view of directly computing probabilities, marginalization is summing over all the possible "histories" that could lead to a return value.
 
 
-## Example: Flipping Coins
 
-The following program defines a fair coin, and flips it 20 times:
+# Stochastic recursion
 
-~~~~
-(define fair-coin (lambda () (if (flip 0.5) 'h 't))) ;the thunk is a fair coin
-(hist (repeat 20 fair-coin) "fair coin")
-~~~~
-
-
-This program defines a "trick" coin that comes up heads most of the time (95%), and flips it 20 times:
+It is possible to have a ''stochastic recursion'' that randomly decides whether to stop. Importantly, such recursion must be constructed to halt eventually (with probability 1). For example, an important probability distribution is the ''geometric distribution''. The geometric distribution is a distribution over the non-negative integers that represents the probability of flipping a coin $N$ times and getting exactly 1 head. This distribution can be written in Church with the following simple recursion.
 
 ~~~~
-(define trick-coin (lambda () (if (flip 0.95) 'h 't)))
-(hist (repeat 20 trick-coin) "trick coin")
+(define (geometric p) 
+  (if (flip p) 
+      0 
+      (+ 1 (geometric p))))
+
+(geometric .8)
 ~~~~
 
-<style classes="bg-yellow">
-<em>Note on Church syntax:</em>
+Notice that the base case of the recursion is probabilistic. There is no upper bound on how long the computation can go on, although the probability of reaching some number declines quickly as we walk out on the number line.
 
-A common mistake when defining names for new functions and using them with higher-order functions like `repeat` is to confuse the name of a thunk with the name of a variable that stands for the output of a single function evaluation.  For instance, why doesn't this work?
 
-~~~~
-(define trick-coin-1 (if (flip 0.95) 'h 't))
-(hist (repeat 20 trick-coin-1) "trick coin")
-~~~~
-The higher-order function `repeat` requires as input a thunk, a procedure (or function) with no arguments, as returned by `lambda` in the examples above.  Consider the difference in what is returned by these two code fragments:
-
-~~~~
-(define trick-coin-1 (if (flip 0.95) 'h 't))
-trick-coin-1
-~~~~
-`trick-coin-1` names a variable that is defined to be the result of evaluating the `(if ...)` expression a single time (either `h` or `t`), while below `trick-coin-2` names a thunk that can serve as the input to the higher-order function `repeat`.
-
-~~~~
-(define trick-coin-2 (lambda () (if (flip 0.95) 'h 't)))
-trick-coin-2
-~~~~
-The difference between these two programs becomes particularly subtle when using the `(define (name) ... )` syntax.  Simply putting the name to be defined in parentheses turns a variable definition into a thunk definition:
-
-~~~~
-(define (trick-coin-2) (if (flip 0.95) 'h 't))
-trick-coin-2
-~~~~
-To Church the last two definitions of `trick-coin-2` are the same -- both output a thunk -- although superficially the last one looks more similar to the variable definition that assigns `trick-coin-1` to a single value of `h` or `t`.
-</style>
-
-The higher-order function `make-coin` takes in a weight and outputs a function (a thunk) describing a coin with that weight.  Then we can use `make-coin` to make the coins above, or others.
-
-~~~~
-(define (make-coin weight) (lambda () (if (flip weight) 'h 't)))
-(define fair-coin (make-coin 0.5))
-(define trick-coin (make-coin 0.95))
-(define bent-coin (make-coin 0.25))
-
-(hist (repeat 20 fair-coin) "20 fair coin flips")
-(hist (repeat 20 trick-coin) "20 trick coin flips")
-(hist (repeat 20 bent-coin) "20 bent coin flips")
-"done"
-~~~~
-
-We can also define a higher-order function that takes a "coin" and "bends it":
-
-~~~~
-(define (make-coin weight) (lambda () (if (flip weight) 'h 't)))
-(define (bend coin)
-  (lambda () (if (equal? (coin) 'h)
-                 ( (make-coin 0.7) )
-                 ( (make-coin 0.1) ) )))
-
-(define fair-coin (make-coin 0.5))
-(define bent-coin (bend fair-coin))
-
-(hist (repeat 100 bent-coin) "bent coin")
-"done"
-~~~~
-Make sure you understand how the `bend` function works! Why are there an "extra" pair of parentheses outside each `make-coin` statement?
 
 # Persistent Randomness: `mem`
 
