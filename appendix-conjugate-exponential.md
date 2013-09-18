@@ -1,4 +1,4 @@
-% Conjugate models and exponential families
+% Appendix: Conjugate models and exponential families
 
 # TODO
 

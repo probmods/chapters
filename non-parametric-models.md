@@ -359,6 +359,37 @@ Church provides a higher-order procedure which implements CRP based stochastic m
 (sample-utterance)
 ~~~~
 
+
+# Example: Infinite Hidden Markov Models 
+
+Just as when we considered the [[Mixture and Non-Parametric Models#Infinite Mixture Models | unknown latent categories]], we may wish to have a hidden Markov model over an unknown number of latent symbols. We can do this by again using a reusable source of state symbols:
+<church engine=mit-church>
+(define vocabulary '(chef omelet soup eat work bake))
+
+(define (get-state) (DPmem 0.5 gensym))
+
+(define state->transition-model
+  (mem (lambda (state) (DPmem 1.0 (get-state)))))
+
+(define (transition state)
+  (sample (state->transition-model state)))
+
+(define state->observation-model
+  (mem (lambda (state) (dirichlet (make-list (length vocabulary) 1)))))
+
+(define (observation state)
+  (multinomial vocabulary (state->observation-model state)))
+
+(define (sample-words last-state)
+  (if (flip 0.2)
+      '()
+      (pair (observation last-state) (sample-words (transition last-state)))))
+
+(sample-words 'start)
+</church>
+This model is known as the ''infinite hidden Markov model''. Notice how the transition model uses a separate DPmemoized function for each latent state: with some probability it will reuse a transition from this state, otherwise it will transition to a new state drawn from the globally shared source or state symbols&mdash;a DPmemoized <tt>gensym</tt>.
+
+
 # Example: The Infinite Relational Model
 
 (Adapted from: Kemp, C., Tenenbaum, J. B., Griffiths, T. L., Yamada, T. & Ueda, N. (2006).  Learning systems of concepts with an infinite relational model. Proceedings of the 21st National Conference on Artificial Intelligence.)

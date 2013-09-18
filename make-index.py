@@ -30,7 +30,7 @@ for url, chapter in chapters:
 lis = "\n" + "\n".join(lis) + "\n"
 
 ## Compile index.md to index.pyhtml
-os.system("pandoc -S --template index.template index.md -o index.pyhtml")
+os.system("pandoc -S --mathjax --template index.template index.md -o index.pyhtml")
 
 ## Substitute in for %(chapters)s in index.pyhtml
 with open("index.pyhtml", "r") as fr, open("index.html", "w") as fw:
