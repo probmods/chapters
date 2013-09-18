@@ -54,7 +54,7 @@ _hist = function(samps, title) {
     var div = $div[0];
     
     //TODO: make left margin vary depending on how long the names of the elements in the list are
-    var margin = {top: 40, right: 20, bottom: 50, left: 60},
+    var margin = {top: 40, right: 20, bottom: 60, left: 60},
         width = 0.8 * $div.width() - margin.left - margin.right,
         height = 300 - margin.top - margin.bottom;
 
@@ -98,8 +98,8 @@ _hist = function(samps, title) {
       .append("text")
       .text("Frequency")
       .attr("dy", "3em")
-      .attr("text-anchor", "end")
-      .attr("dx", width);
+      .attr("x", (width/2))
+      .attr("text-anchor", "middle");
 
     svg.append("g")
       .attr("class", "y axis")
