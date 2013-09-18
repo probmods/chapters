@@ -1,7 +1,7 @@
 html {
     padding: 0;
     margin: 0;
-    background: url(grey_wash_wall.png)
+    background: url(grey_wash_wall.png);
 }
 
 body {
@@ -20,9 +20,8 @@ body {
     background-color: white;
     padding: 5em;
     padding-top: 2em;
-    border: 1px solid black;
-    border-top: 0;
-    box-shadow: 0 0 27px rgba(0, 0, 0, 1);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 1);
+
 }
 
 #chapter > ul li {
