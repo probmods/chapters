@@ -5,12 +5,14 @@
 font-size: 12px !important;
   font-family: monospace;
 /*  height: 100px; */
-  border: 1px solid #afafaf;
-  height: auto
+  border: 1px solid #9f9f9f;
+  height: auto;
+border-radius: 3px
 }
 
 pre {
-overflow-x: auto
+overflow-x: auto;
+border-radius: 3px
 }
 
 .CodeMirror-scroll {
