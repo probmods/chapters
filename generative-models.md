@@ -440,7 +440,7 @@ Notice that `strength` is memoized because this is a property of a person true a
 
 (define (plinkoBin) (whichBin (runPlinko)))
 
-(hist (repeat 20 plinkoBin))
+(density (repeat 20 plinkoBin) "Plinko" #t)
 
 
 ~~~~
@@ -465,5 +465,28 @@ Same model with animation:
 
 ~~~~
 
+Random falling things:
+
+~~~~
+(define (dim) (uniform 5 20))
+(define (xPos) (uniform 0 worldWidth))
+(define (yPos) (uniform 0 worldHeight))
+
+(define emptyWorld (makeWorld))
+(define groundedWorld (addRect emptyWorld
+                               (/ worldWidth 2)
+                               worldHeight
+                               worldWidth
+                               10
+                               #t))
+
+(define (addRndCircle w) (addCircle w (xPos) (yPos) (dim) #f))
+(define (addRndRect w) (addRect w (xPos) (yPos) (dim) (dim) #f))
+
+(define world (addRndCircle (addRndRect (addRndCircle groundedWorld))))
+
+(animatePhysics 1000 world)
+
+~~~~
 
 
