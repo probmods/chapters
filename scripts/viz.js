@@ -51,6 +51,31 @@ _hist = function(samps, title) {
         }),
       maxFreq = _(counts).chain().map(function(x) { return x.freq}).max().value();
 
+  var xMin = Math.min.apply(Math, values);
+  var xMax = Math.max.apply(Math, values);
+  var maxBins = 20;
+  var myValues;
+  var myCounts;
+  if (counts.length > maxBins) {
+    myValues = values.map(function(val) {
+      return Math.round((val - xMin) / (xMax - xMin) * maxBins);
+    });
+    var n = values.length;
+    var myCounts = _(myValues)
+    .uniq()
+    .map(function(val) {
+      return {
+        value: val,
+        freq: _(myValues).filter(function(x) {return x == val;}).length / n
+      };
+    });
+    var myMaxFreq = _(myCounts).chain().map(function(x) { return x.freq}).max().value();
+  } else {
+    myValues = values;
+    myCounts = counts;
+    myMaxFreq = maxFreq;
+  }
+
   return function($div) {
 
     var $histDiv = $("<div></div>").appendTo($div);
@@ -62,10 +87,10 @@ _hist = function(samps, title) {
         height = 300 - margin.top - margin.bottom;
 
     var x = d3.scale.linear()
-          .domain([0, maxFreq])
+          .domain([0, myMaxFreq])
           .range([0, width]);
     var y = d3.scale.ordinal()
-          .domain(values)
+          .domain(myValues)
           .rangeRoundBands([height, 0], .1);
 
     var xAxis = d3.svg.axis()
@@ -90,7 +115,7 @@ _hist = function(samps, title) {
     //   x.domain(data.map(function(d) { return d.letter; }));
     //   y.domain([0, d3.max(data, function(d) { return d.frequency; })]);
     
-    var data = counts;
+    var data = myCounts;
 
     svg.append("g")
       .attr("class", "x axis")
@@ -151,6 +176,29 @@ _density = function(samps, title, withHist) {
           };
         }),
       maxFreq = _(counts).chain().map(function(x) { return x.freq}).max().value();
+  
+  var xMin = Math.min.apply(Math, values);
+  var xMax = Math.max.apply(Math, values);
+  var maxBins = 20;
+  var myValues;
+  var myCounts;
+  if (counts.length > maxBins) {
+    myValues = values.map(function(val) {
+      return Math.round((val - xMin) / (xMax - xMin) * maxBins);
+    });
+    var n = values.length;
+    var myCounts = _(myValues)
+    .uniq()
+    .map(function(val) {
+      return {
+        value: val,
+        freq: _(myValues).filter(function(x) {return x == val;}).length / n
+      };
+    });
+  } else {
+    myValues = values;
+    myCounts = counts;
+  }
 
   return function($div) {
 
@@ -161,9 +209,7 @@ _density = function(samps, title, withHist) {
     var margin = {top: 40, right: 20, bottom: 30, left: 40},
         width = 0.8 * $div.width() - margin.left - margin.right,
         height = 300 - margin.top - margin.bottom;
-        
-    var xMin = Math.min.apply(Math, values);
-    var xMax = Math.max.apply(Math, values);
+
     var range = xMax - xMin;
     var x = d3.scale.linear()
         .domain([xMin, xMax])
@@ -188,7 +234,7 @@ _density = function(samps, title, withHist) {
 
     var kde = kernelDensityEstimator(epanechnikovKernel(3), x.ticks(100));
 
-    var frequencies = counts.map(function(x) {return x.freq;});
+    var frequencies = myCounts.map(function(x) {return x.freq;});
     var densities = kde(values).map(function(x) {return x[1];});
     var maxDens = Math.max.apply(Math, densities);
     var maxFreq = Math.max.apply(Math, frequencies);
@@ -215,7 +261,7 @@ _density = function(samps, title, withHist) {
           .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
     
     if (withHist) {
-      drawHist(svg, counts, values, width, height, y, xMax, xMin);
+      drawHist(svg, myCounts, myValues, width, height, y, xMax, xMin);
     }
 
     svg.append("g")
@@ -253,12 +299,12 @@ _density = function(samps, title, withHist) {
 
 };
 
-function drawHist(svg, counts, values, width, height, y, xMax, xMin) {
+function drawHist(svg, myCounts, myValues, width, height, y, xMax, xMin) {
   var histX = d3.scale.ordinal()
-                .domain(values)
+                .domain(myValues)
                 .rangeRoundBands([0, width], .1);
   svg.selectAll(".bar")
-    .data(counts)
+    .data(myCounts)
     .enter().append("rect")
     .attr("class", "bar")
     .attr("fill", "none")
