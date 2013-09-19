@@ -417,54 +417,44 @@ Notice that `strength` is memoized because this is a property of a person true a
 <!-- Put in simple 2d physics examples here: plinko, stability, ping-pong. -->
 
 ~~~~
-(define nrow 6)
-(define ncol 7)
-
+(define marbleRadius 8)
 (define xCenter (/ worldWidth 2))
+(define nrow 7)
+(define ncol 7)
 (define binWidth (/ worldWidth ncol))
 
-(define emptyWorld (makeWorld))
-(define plinkoWorld (plinko emptyWorld nrow ncol))
+(define (marbleX) (+ xCenter (uniform -1 1))) ;*almost* the center
 
-(define marbleRadius 9)
-(define (marbleX) (+ xCenter (uniform -1 1)))
-;a function that takes a world and returns a new world with a marble ready to fall
-(define (addMarble w) (addCircle w (marbleX) 0 marbleRadius #f))
+;the pegs, walls, and bins of the plinko machine
+(define emptyPlinko (plinkoWorld nrow ncol))
 
-(define (getX worldList) (first (first worldList)))
+;place a marble at the top and almost at the center
+(define (world) (addCircle emptyPlinko (marbleX) 0 marbleRadius #f))
 
-;clearObjects takes a world and a boolean that says whether to delete static
-;objects
-(define (runPlinko) (runPhysics 1000 (addMarble (clearObjects plinkoWorld #f))))
-(define (whichBin run) (round (/ (getX (getObjects run)) binWidth)))
+;run physics and find out what bin the marble fell into
+(define (runPlinko) (plinkoWhichBin (runPhysics 1000 world) ncol))
 
-(define (plinkoBin) (whichBin (runPlinko)))
-
-(density (repeat 20 plinkoBin) "Plinko" #t)
-
+(hist (repeat 100 runPlinko) "Plinko")
 
 ~~~~
 
 Same model with animation:
 
 ~~~~
-(define marbleRadius 9)
+(define marbleRadius 8)
 (define xCenter (/ worldWidth 2))
-(define nrow 6)
+(define nrow 7)
 (define ncol 7)
 (define binWidth (/ worldWidth ncol))
 
-(define emptyWorld (makeWorld))
-(define plinkoWorld (plinko emptyWorld nrow ncol))
+(define (marbleX) (+ xCenter (uniform -1 1)))
 
-(define marbleRandomness 1)
-(define (marbleX) (+ xCenter (* marbleRandomness (uniform -1 1))))
-(define (addMarble w) (addCircle w (marbleX) 0 marbleRadius #f))
-
-(animatePhysics 1000 (addMarble plinkoWorld))
+(define (world) (addCircle (plinkoWorld nrow ncol) (marbleX) 0 marbleRadius #f))
+(animatePhysics 1000 world)
 
 ~~~~
 
+<!--
 Random falling things:
 
 ~~~~
@@ -488,5 +478,5 @@ Random falling things:
 (animatePhysics 1000 world)
 
 ~~~~
-
+-->
 
