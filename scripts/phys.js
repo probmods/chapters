@@ -18,6 +18,8 @@ return  window.requestAnimationFrame       ||
 var CANVAS_WIDTH = 350;
 var CANVAS_HEIGHT = 500;
 var SCALE = 30; // 1 meter = 30 pixels
+_worldWidth = CANVAS_WIDTH;
+_worldHeight = CANVAS_HEIGHT;
 
 var  b2World = Box2D.Dynamics.b2World,
      b2Vec2 = Box2D.Common.Math.b2Vec2,
@@ -38,9 +40,9 @@ fixDef.density = 1.0;
 fixDef.friction = 0.1;
 fixDef.restitution = 0.2;
 
-_plinko = function(world) {
-  nrow = 6;
-  ncol = 7;
+var bodyDef = new b2BodyDef;
+
+_plinko = function(world, nrow, ncol) {
 
   // a ficture definition defines the properties of the object
   var fixDef = new b2FixtureDef;
@@ -63,7 +65,7 @@ _plinko = function(world) {
   var marbleRadius = 0.3;
   var pegRadius = 0.1;
   var binHeight = 4;
-  var binWidth = 5/SCALE;
+  var wallWidth = 5 / SCALE;
   
   //pegs
   fixDef.shape = new b2CircleShape(pegRadius);
@@ -80,7 +82,7 @@ _plinko = function(world) {
   //bins
   for (var c=0; c < ncol + 2; c++) {
     fixDef.shape = new b2PolygonShape;
-    fixDef.shape.SetAsBox(binWidth / 2, binHeight / 2);
+    fixDef.shape.SetAsBox(wallWidth / 2, binHeight / 2);
     bodyDef.position.x = CANVAS_WIDTH / (ncol + 1) * c / SCALE;
     bodyDef.position.y = (CANVAS_HEIGHT / SCALE) - (binHeight / 2);
     world.CreateBody(bodyDef).CreateFixture(fixDef);
@@ -89,21 +91,15 @@ _plinko = function(world) {
   //walls
   function drawWall(xpos) {
     fixDef.shape = new b2PolygonShape;
-    fixDef.shape.SetAsBox(binWidth / 2, CANVAS_HEIGHT / 2 / SCALE);
+    fixDef.shape.SetAsBox(wallWidth / 2, CANVAS_HEIGHT / 2 / SCALE);
     bodyDef.position.x = xpos;
     bodyDef.position.y = CANVAS_HEIGHT / 2 / SCALE;
     world.CreateBody(bodyDef).CreateFixture(fixDef);
   }
   drawWall(0);
   drawWall(CANVAS_WIDTH / SCALE);
-
-  //falling marble
-  bodyDef.type = b2Body.b2_dynamicBody;
-  fixDef.shape = new b2CircleShape(marbleRadius);
-  bodyDef.position.x = CANVAS_WIDTH / SCALE / 2 + (Math.random()-0.5)*0.1;
-  bodyDef.position.y = 0;
-  var marble = world.CreateBody(bodyDef).CreateFixture(fixDef);
-  var marble2 = world.CreateBody(bodyDef).CreateFixture(fixDef);
+  
+  return world;
 }
 
 //make a standard world, with standard size, gravity, object properties, etc. returns the empty world.
@@ -117,22 +113,29 @@ _makeWorld = function() {
 
 //this should add a viz area to the results section (like hist) and animate physics on world for specified number of time steps. return world as above. (note: possibly instead of animating right away we should render first frame and then have a "simulate" button, so that we can watch when we want…)
 _animatePhysics = function(steps, world) {
-  var initPositions = [];
-  var body = world.GetBodyList();
-  while (body != null) {
-    var initX = body.GetPosition().x;
-    var initY = body.GetPosition().y;
-    var initPos = new b2Vec2(initX, initY);
-    initPositions.push(initPos);
-    body = body.GetNext();
+  var initPositions;
+
+  function init() {
+    initPositions = [];
+    var body = world.GetBodyList();
+    while (body != null) {
+      var initX = body.GetPosition().x;
+      var initY = body.GetPosition().y;
+      var initPos = new b2Vec2(initX, initY);
+      initPositions.push(initPos);
+      body = body.GetNext();
+    }
   }
+  init();
 
   function simulate(canvas, steps) {
     var body = world.GetBodyList();
+    var zero = new b2Vec2(0, 0);
     for (var i=0; i<initPositions.length; i++) {
       var initPos = initPositions[i];
       body.SetPosition(initPos);
       body.SetAwake(true);
+      body.SetLinearVelocity(zero);	
       body = body.GetNext();
     }
     //setup debug draw
@@ -148,8 +151,8 @@ _animatePhysics = function(steps, world) {
       if (stepsSoFar < steps) {
         world.Step(
              1 / 60   //frame-rate
-          ,  8//10       //velocity iterations
-          ,  3//10       //position iterations
+          ,  10       //velocity iterations
+          ,  10       //position iterations
         );
       }
       
@@ -164,16 +167,26 @@ _animatePhysics = function(steps, world) {
   }
 
   return function($div) {
-    $div.append("<br/>");
     var $physicsDiv = $("<div>").appendTo($div);
+    $physicsDiv.append("<br/>");
     var $canvas = $("<canvas/>").appendTo($physicsDiv);
     $canvas.attr("width", CANVAS_WIDTH)
-           .attr("height", CANVAS_HEIGHT)
-           .attr("style", "background-color:#333333;");
+           .attr("style", "background-color:#333333;")
+           .attr("height", CANVAS_HEIGHT);
     $physicsDiv.append("<br/>");
     var $button = $("<button>Simulate</button>").appendTo($physicsDiv);
     $button.click(function() {
       simulate($canvas, steps);
+    });
+    var $clearButton = $("<button>Delete Animation Window</button>")
+    $clearButton.appendTo($physicsDiv);
+    $clearButton.click(function() {
+      var count = world.GetBodyCount();
+      for (var i=0; i<count; i++) {
+        var body = world.GetBodyList();
+        world.DestroyBody(body);
+      }
+      $physicsDiv.remove();
     });
     return "";
   };
@@ -181,7 +194,16 @@ _animatePhysics = function(steps, world) {
 };
 
 //add a circle at specified position (x and y are between 0 and 1) and radius. return world with circle added.
-_addCircle = function(world, x,y,r,isStatic) {
+_addCircle = function(world, x, y, r, isStatic) {
+  if (isStatic) {
+    bodyDef.type = b2Body.b2_staticBody;
+  } else {
+    bodyDef.type = b2Body.b2_dynamicBody;
+  }
+  fixDef.shape = new b2CircleShape(r / SCALE);
+  bodyDef.position.x = x / SCALE;
+  bodyDef.position.y = y / SCALE;
+  world.CreateBody(bodyDef).CreateFixture(fixDef);
   return world;
 }
 
@@ -195,7 +217,23 @@ _getObjects = function(world) {
 
 //this should run physics forward on world for specified number of time steps. return resulting world. no display or animation. (and no timeouts -- as fast as simulator runs…)
 _runPhysics = function(steps, world) {
-  return function($div) {
-    return "";
-  };
+  for (var i=0; i<steps; i++) {
+    world.Step(
+         1 / 60   //frame-rate
+      ,  10       //velocity iterations
+      ,  10       //position iterations
+    );
+  }
+  //return positions of dynamic objects
+  var dynamicObjs = [];
+  var body = world.GetBodyList();
+  var count = world.GetBodyCount();
+  for (var i=0; i<count; i++) {
+    if (body.GetType() == 2) {
+      dynamicObjs.push(arrayToList([body.GetPosition().x * SCALE,
+                                    body.GetPosition().y * SCALE]));
+    }
+    body = body.GetNext();
+  }
+  return arrayToList(dynamicObjs);
 }

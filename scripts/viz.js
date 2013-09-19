@@ -51,7 +51,8 @@ _hist = function(samps, title) {
 
   return function($div) {
 
-    var div = $div[0];
+    var $histDiv = $("<div></div>").appendTo($div);
+    var div = $histDiv[0];
     
     //TODO: make left margin vary depending on how long the names of the elements in the list are
     var margin = {top: 40, right: 20, bottom: 60, left: 60},
@@ -123,6 +124,12 @@ _hist = function(samps, title) {
         .attr("stroke", "none") 
         .attr("fill", "black")
         .text(title);
+        
+    var $clearButton = $("<button>Delete Histogram</button>")
+    $clearButton.appendTo($histDiv);
+    $clearButton.click(function() {
+      $histDiv.remove();
+    });
 
     return data;
 

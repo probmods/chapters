@@ -408,16 +408,52 @@ Notice that `strength` is memoized because this is a property of a person true a
 <!-- Put in simple 2d physics examples here: plinko, stability, ping-pong. -->
 
 ~~~~
-(define pegRadius 3)
-(define binHeight 120)
-(define binWidth 5)
+(define nrow 6)
+(define ncol 7)
 
-(define w (makeWorld))
-(plinko w)
-(animatePhysics 1000 w)
+(define xCenter (/ worldWidth 2))
+(define binWidth (/ worldWidth ncol))
+
+(define emptyWorld (makeWorld))
+(define plinkoWorld (plinko emptyWorld nrow ncol))
+
+(define marbleRadius 9)
+(define (marbleX) (+ xCenter (uniform -1 1)))
+;a function that takes a world and returns a new world with a marble ready to fall
+(define (addMarble w) (addCircle w (marbleX) 0 marbleRadius #f))
+
+(define (getX worldList) (first (first worldList)))
+(define (runPlinko) (runPhysics 1000 (addMarble plinkoWorld)))
+(define (whichBin result) (round (/ (getX result) binWidth)))
+
+(define (plinkoBin) (whichBin (runPlinko)))
+
+(hist (repeat 20 plinkoBin))
 
 ~~~~
 
+Same model with animation:
+
+~~~~
+(define pegRadius 3)
+(define binHeight 120)
+(define wallWidth 5)
+(define marbleRadius 9)
+(define xCenter (/ worldWidth 2))
+(define nrow 6)
+(define ncol 7)
+(define binWidth (/ worldWidth ncol))
+
+(define emptyWorld (makeWorld))
+(define plinkoWorld (plinko emptyWorld nrow ncol))
+
+(define marbleRandomness 1)
+(define (marbleX) (+ xCenter (* marbleRandomness (uniform -1 1))))
+(define (addMarble w) (addCircle w (marbleX) 0 marbleRadius #f))
+
+(animatePhysics 1000 (addMarble plinkoWorld))
+
+~~~~
 
 
 
