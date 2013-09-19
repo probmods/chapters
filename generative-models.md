@@ -14,16 +14,14 @@ Simulation is intimately connected to degrees of belief. For instance, imagine t
 There is one more thing to note about our Plinko machine above: we are using a computer program to *simulate* the simulation. Computers can be seen as universal simulators. How can we, clearly and precisely, describe the simulation we want a computer to do?
 
 
-# Defining Generative Models
+# Building Generative Models
 
-We wish to describe in formal terms how to generate states of the world. That is, we wish to describe the causal process, or steps that unfold, leading to some potentially observable states. The key idea of this section is that these generative processes can be described as *computations* -- computations that involve random choices to capture uncertainty about the process.
+We wish to describe in formal terms how to generate states of the world. That is, we wish to describe the causal process, or steps that unfold, leading to some potentially observable states. The key idea of this section is that these generative processes can be described as *computations*---computations that involve random choices to capture uncertainty about the process.
 
-As our formal model of computation we start with the $\lambda$-calculus, and its embodiment in the LISP family of programming languages.  The $\lambda$-calculus is a formal system which was invented by Alonzo Church in the 1920's. Church introduced the $\lambda$-calculus as a model and formalization of computation, that is, as a way of formalizing the notion of an effectively computable function. The lambda calculus is a *universal* model of computation -- it is conjectured to be equivalent to all other notions of classical computation (the $\lambda$-calculus was shown to have the same computational power as the Turing machine and vice versa by Alan Turing in his famous paper which introduced the Turing machine [TODO: cite]). It is remarkable that the $\lambda$-calculus is universal because it has only two basic operations: creating and applying functions.
+As our formal model of computation we start with the $\lambda$-calculus, and its embodiment in the LISP family of programming languages.  The $\lambda$-calculus is a formal system which was invented by Alonzo Church in the 1920's as a way of formalizing the notion of an effectively computable function [@Church192?]. The $\lambda$-calculus has only two basic operations for computing: creating and applying functions. Despite this simplicity, it is a *universal* model of computation---it is (conjectured to be) equivalent to all other notions of classical computation. (The $\lambda$-calculus was shown to have the same computational power as the Turing machine, and vice versa, by Alan Turing in his famous paper which introduced the Turing machine [@Turing1937]).
 
 In 1958 John McCarthy introduced LISP (**LIS**t **P**rocessing), a programming language based on the $\lambda$-calculus. Scheme is a variant of LISP developed by Guy L. Steele and Gerald Jay Sussman with particularly simple syntax and semantics. We will use Scheme-style notation for the $\lambda$-calculus in this tutorial. For a quick introduction to programming in Scheme see [the appendix on Scheme basics](appendix-scheme.html).
-
-The Church programming language -- named in honor of Alonzo Church -- is a generalization of Scheme which introduces the notion of probabilistic computation to the language.
-In the next few sections of this tutorial, we show how to use Church to build generative models (building on standard notions of computation, as realized in Scheme).
+The Church programming language [@Goodman2008], named in honor of Alonzo Church, is a generalization of Scheme which introduces the notion of probabilistic computation to the language. This addition results in a powerful language for describing generative models.
 
 In Church, in addition to deterministic functions, we have a set of random functions implementing *random choices.*  These random primitive functions are called *Exchangeable Random Primitives* (XRPs). Application of an XRP results in a *sample* from the probability distribution defined by that XRP.  For example, the simplest XRP is `flip` which results in either true or false -- it simulates a (possibly biased) coin toss. (Note that the return values `true` and `false` will look like this in the output: `#t` and `#f`.)
 
@@ -31,7 +29,10 @@ In Church, in addition to deterministic functions, we have a set of random funct
 (flip)
 ~~~~
 
-Run this program a few times. You will get back a different sample on each execution. Also, notice the parentheses around `flip`. These are meaningful; they tell Church that you are asking for an application of the XRP `flip`. Delete the parentheses and see what happens. The object that was returned is the `flip`  *procedure* object. *Procedure* is just another word for an actual implementation of some function. In Church, each time you run a program you get a *sample* by simulating the computations and random choices that the program specifies. If you run the program many times, and collect the values in a histogram, you can see what a typical sample looks like:
+Run this program a few times. You will get back a different sample on each execution. Also, notice the parentheses around `flip`. These are meaningful; they tell Church that you are asking for an application of the XRP `flip`---resulting in a sample.
+Without parentheses `flip` is a *procedure* object---a representation of the simulator itself, which can be used to get samples. 
+
+In Church, each time you run a program you get a *sample* by simulating the computations and random choices that the program specifies. If you run the program many times, and collect the values in a histogram, you can see what a typical sample looks like:
 
 ~~~~
 (hist (repeat 1000 flip) "Flips")
@@ -39,29 +40,26 @@ Run this program a few times. You will get back a different sample on each execu
 
 Here we have used the `repeat` procedure which takes a number of repetitions, $K$, and a random distribution (in this case `flip`) and returns a list of $K$ samples from that distribution. We have used the `hist` procedure to display the results of taking 1000 samples from `flip`. As you can see, the result is an approximately uniform distribution over `true` and `false`.
 
-An important idea here is that `flip` can be thought of in two different ways. From one perspective, `flip` is a procedure which returns a sample from a fair coin. That is, it's a *sampler* or *simulator*. From another perspective, `flip` is *itself* a characterization of the distribution over `true` and `false`. When we think about probabilistic programs we will often move back and forth between these two views, emphasizing either the sampling perspective or the distributional perspective. (With suitable restrictions this duality is complete: any Church program implicitly represents a distribution and any distribution can be represented  by a Church program. See [[The Meaning of Probabilistic Programs]] for more details on this duality.) We return to this relationship between probability and simulation below.
+An important idea here is that `flip` can be thought of in two different ways. From one perspective, `flip` is a procedure which returns a sample from a fair coin. That is, it's a *sampler* or *simulator*. From another perspective, `flip` is *itself* a characterization of the distribution over `true` and `false`. When we think about probabilistic programs we will often move back and forth between these two views, emphasizing either the sampling perspective or the distributional perspective. (With suitable restrictions this duality is complete: any Church program implicitly represents a distribution and any distribution can be represented  by a Church program [see e.g. @Ackerman2011 for more details on this duality].) We return to this relationship between probability and simulation below.
 
-The `flip` function is the simplest XRP in Church, but you will find other XRPs corresponding to familiar probability distributions, such as `gaussian`, `gamma`, `dirichlet`, and so on.
-
-
-[FIXME: Many but not all of the XRPs and other basic functions implemented in Church can be found on the [[Automatically generated documentation]] page.]
-
-
-For another example, consider:
+The `flip` function is the simplest XRP in Church, but you will find other XRPs corresponding to familiar probability distributions, such as `gaussian`, `gamma`, `dirichlet`, and so on. 
+<!-- TODO: Many but not all of the XRPs and other basic functions implemented in Church can be found on the church reference appendix. -->
+Using these XRPs we can construct more complex expressions that describe more complicated sampling processes. For instance here we describe a process that samples a number by multiplying two samples from a Guassian distribution:
 
 ~~~~
-;this line is a comment
-(if
- (flip 0.7)         ;the condition of "if"
- 100                ;the consequent ("then")
- (or (flip) (flip)) ;the alternate ("else")
-)
+(* (gaussian 0 1) (gaussian 0 1) )
 ~~~~
 
-This expression is composed of an `if` conditional that evaluates the first expression (a flip here) then evaluates the second expression if the first is true or otherwise evaluates the third expression.<ref>The branching construct, `if`, is strictly not a function, because it does not evaluate all of its arguments, but instead *short-circuits* evaluating only the second or third. It has a value like any other function.</ref>
-(We have also used comments here: anything after a semicolon is ignored when evaluating.) Notice that the first `flip` has an argument: flip with an argument is a biased random choice. In this case this flip will be true with probability 0.7.
+What if we want to invoke this sampling process multiple times? We would like to construct a stochastic function that multiplies two Gaussians each time it is called.
+We can use `lambda` to construct such complex stochastic functions from the primitive ones. 
 
-We can use `lambda` to construct more complex stochastic functions from the primitive ones. Here is a stochastic function that will only sometimes double its input:
+~~~~
+(define two-gaussians (lambda () (* (gaussian 0 1) (gaussian 0 1) )))
+(density (repeat 100 two-gaussians))
+~~~~
+
+A lambda expression with an empty argument list, `(lambda () ...)`, is called a *thunk*: this is a function that takes no input arguments. If we apply a thunk (to no arguments!) we get a return value back, for example `(flip)`. A thunk is an object that represents a whole *probability distribution*.  
+Complex functions can also have arguments. Here is a stochastic function that will only sometimes double its input:
 
 ~~~~
 (define noisy-double (lambda (x) (if (flip) x (+ x x))))
@@ -69,7 +67,7 @@ We can use `lambda` to construct more complex stochastic functions from the prim
 (noisy-double 3)
 ~~~~
 
-A lambda expression with an empty argument list, `(lambda () ...)`, is called a *thunk*: this is a function that takes no input arguments. If we apply a thunk (to no arguments!) we get a return value back, for example `(flip)`, and if we do this many times we can figure out the marginal probability of each return value.  Thus a thunk is an object that represents a whole *probability distribution*. By using higher-order functions we can construct and manipulate probability distributions.  A good example comes from coin flipping...
+By using higher-order functions we can construct and manipulate probability distributions.  A good example comes from coin flipping...
 
 ## Example: Flipping Coins
 
@@ -144,12 +142,11 @@ We can also define a higher-order function that takes a "coin" and "bends it":
 (define bent-coin (bend fair-coin))
 
 (hist (repeat 100 bent-coin) "bent coin")
-"done"
 ~~~~
 Make sure you understand how the `bend` function works! Why are there an "extra" pair of parentheses outside each `make-coin` statement?
 
 
-Higher-order functions like `repeat`, `map`, `apply` (or `sum`) can be quite useful.  Here we use them to visualize the number of heads we expect to see if we flip a weighted coin (weight = 0.8) 10 times.  We'll repeat this experiment 1000 times and then use `hist` to visualize the results.  Try varying the coin weight or the number of repetitions to see how the expected distribution changes.
+Higher-order functions like `repeat`, `map`, and `apply` can be quite useful.  Here we use them to visualize the number of heads we expect to see if we flip a weighted coin (weight = 0.8) 10 times.  We'll repeat this experiment 1000 times and then use `hist` to visualize the results.  Try varying the coin weight or the number of repetitions to see how the expected distribution changes.
 
 ~~~~
 (define make-coin (lambda (weight) (lambda () (flip weight))))
