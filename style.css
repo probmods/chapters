@@ -30,9 +30,9 @@ body {
 
 ul#nav {
     float: right;
-    margin-top: -2em;
+    margin-top: -1em;
     font-family: verdana;
-    font-size: 80%;
+    font-size: 70%;
     margin-bottom: 4em;
     margin-right: -5em;
 }
@@ -41,15 +41,18 @@ ul#nav {
 #nav li {
     display: inline;
     padding: 5px 10px 5px 10px;
-    font-variant: small-caps;
+    /* font-variant: small-caps; */
     font-weight: bold;
-    background-color: #cc0066;
-    color: white;
-    margin: 5px
+    /* background-color: #cc0066; */
+    background-color: #99ccff;
+    border-radius: 2px;
+    border: 1px solid gray;
+    margin: 5px;
 }
 
 #nav a {
-    color: white; 
+    color: black;
+    text-decoration: none;
 }
 
 .clear {
@@ -57,8 +60,8 @@ ul#nav {
 }
 
 #nav ol {
+    background-color: white;
     border: 1px solid black;
-    background-color: #cc0066;
     padding: 0;
     margin: 0; 
     margin-top: 3px;
@@ -241,4 +244,23 @@ h1 > a > code, h2 > a > code, h3 > a > code, h4 > a > code, h5 > a > code, li > 
     background-color: #f2efc2;
     padding: 5px;
     border: 1px solid #f3ce00;
+}
+
+.line {
+  fill: none;
+  stroke: #000;
+  stroke-width: 1.5px;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.bar { 
+  fill: steelblue;
+  stroke: #333333;
+  shape-rendering: crispEdges;
 }

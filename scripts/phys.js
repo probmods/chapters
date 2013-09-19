@@ -207,8 +207,19 @@ _addCircle = function(world, x, y, r, isStatic) {
   return world;
 }
 
-//width and height are 1/2 widths!
-_addRect = function(world, x,y,w,h,isStatic) {
+//width and height are actual in the church code, but 1/2 in the box2dweb code
+_addRect = function(world, x, y, w, h, isStatic) {
+  if (isStatic) {
+    bodyDef.type = b2Body.b2_staticBody;
+  } else {
+    bodyDef.type = b2Body.b2_dynamicBody;
+  }
+  fixDef.shape = new b2PolygonShape;
+  fixDef.shape.SetAsBox(w / 2 / SCALE, h / 2 / SCALE);
+  bodyDef.position.x = x / SCALE;
+  bodyDef.position.y = y / SCALE;
+  world.CreateBody(bodyDef).CreateFixture(fixDef);
+  return world;
 }
 
 //this should run physics forward on world for specified number of time steps. return resulting world. no display or animation. (and no timeouts -- as fast as simulator runs…)

@@ -11,10 +11,13 @@
 <body>
 <div id="chapter">
   <ul id="nav">
-    <li id="all-chapters"><a href="#">all chapters</a>
+    <li id="all-chapters"><a href="#">All chapters</a>
       %(chapters)s
     </li>
-    <li id="login-link"><a href="/login/">login</a></li>
+    <li id="register-link"><a href="register">Register</a></li>
+    <li id="login-link"><a href="login">Login</a></li>
+    <li id="profile-link" style='display: none'><a href="profile">Profile</a></li>
+    <li id="logout-link" style='display: none'><a href="logout">Logout</a></li>
   </ul> 
   <div class="clear"></div> 
   <div id="book-title">Probabilistic Models of Cognition</div> 
