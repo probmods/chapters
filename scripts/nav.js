@@ -9,7 +9,7 @@ $(document).ready(function() {
 (function() {
   var loggedIn = Cookies.get("loggedin") || false;
 
-if (true) {
+if (loggedIn) {
   $("#login-link, #register-link").hide();
   $("#logout-link, #profile-link").show();
 }
