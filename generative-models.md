@@ -432,21 +432,22 @@ Notice that `strength` is memoized because this is a property of a person true a
 (define (addMarble w) (addCircle w (marbleX) 0 marbleRadius #f))
 
 (define (getX worldList) (first (first worldList)))
-(define (runPlinko) (runPhysics 1000 (addMarble plinkoWorld)))
-(define (whichBin result) (round (/ (getX result) binWidth)))
+
+;clearObjects takes a world and a boolean that says whether to delete static
+;objects
+(define (runPlinko) (runPhysics 1000 (addMarble (clearObjects plinkoWorld #f))))
+(define (whichBin run) (round (/ (getX (getObjects run)) binWidth)))
 
 (define (plinkoBin) (whichBin (runPlinko)))
 
 (hist (repeat 20 plinkoBin))
+
 
 ~~~~
 
 Same model with animation:
 
 ~~~~
-(define pegRadius 3)
-(define binHeight 120)
-(define wallWidth 5)
 (define marbleRadius 9)
 (define xCenter (/ worldWidth 2))
 (define nrow 6)

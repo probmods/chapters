@@ -211,10 +211,6 @@ _addCircle = function(world, x, y, r, isStatic) {
 _addRect = function(world, x,y,w,h,isStatic) {
 }
 
-//get the objects in a world, in some format that's easy to use in church. (e.g. a list of objects, where each object is a list of (type x y ..) or such.)
-_getObjects = function(world) {
-}
-
 //this should run physics forward on world for specified number of time steps. return resulting world. no display or animation. (and no timeouts -- as fast as simulator runs…)
 _runPhysics = function(steps, world) {
   for (var i=0; i<steps; i++) {
@@ -224,6 +220,11 @@ _runPhysics = function(steps, world) {
       ,  10       //position iterations
     );
   }
+  return world;
+}
+
+//get the objects in a world, in some format that's easy to use in church. (e.g. a list of objects, where each object is a list of (type x y x_velocity y_velocity) or such.)
+_getObjects = function(world) {
   //return positions of dynamic objects
   var dynamicObjs = [];
   var body = world.GetBodyList();
@@ -231,9 +232,31 @@ _runPhysics = function(steps, world) {
   for (var i=0; i<count; i++) {
     if (body.GetType() == 2) {
       dynamicObjs.push(arrayToList([body.GetPosition().x * SCALE,
-                                    body.GetPosition().y * SCALE]));
+                                    body.GetPosition().y * SCALE,
+                                    body.GetLinearVelocity().x * SCALE,
+                                    body.GetLinearVelocity().y * SCALE]));
     }
     body = body.GetNext();
   }
   return arrayToList(dynamicObjs);
+}
+
+//get the objects in a world, in some format that's easy to use in church. (e.g. a list of objects, where each object is a list of (type x y x_velocity y_velocity) or such.)
+_clearObjects = function(world, clearStatic) {
+  var body = world.GetBodyList();
+  while (body) {
+    var clear;
+    if (clearStatic) {
+      clear = true;
+    } else {
+      clear = body.GetType() == 2;
+    }
+    if (clear) {
+      world.DestroyBody(body);
+      var body = world.GetBodyList();
+    } else {
+      body = body.GetNext();
+    }
+  }
+  return world;
 }
