@@ -1,8 +1,17 @@
 % Generative Models
 
+#Models, simulation, and degrees of belief
+
+
+
+
+
+<!-- plinko -->
+
+
 # Defining Generative Models
 
-We wish to describe in formal terms how to generate states of the world. That is, we wish to describe the causal process, or steps that unfold, leading to some potentially observable states. The key idea of this section is that these generative processes can be described as *computations*, but computations that involve random choices to capture uncertainty about the process.
+We wish to describe in formal terms how to generate states of the world. That is, we wish to describe the causal process, or steps that unfold, leading to some potentially observable states. The key idea of this section is that these generative processes can be described as *computations* -- computations that involve random choices to capture uncertainty about the process.
 
 As our formal model of computation we start with the $\lambda$-calculus, and its embodiment in the LISP family of programming languages.  The $\lambda$-calculus is a formal system which was invented by Alonzo Church in the 1920's. Church introduced the $\lambda$-calculus as a model and formalization of computation, that is, as a way of formalizing the notion of an effectively computable function. The lambda calculus is a *universal* model of computation -- it is conjectured to be equivalent to all other notions of classical computation (the $\lambda$-calculus was shown to have the same computational power as the Turing machine and vice versa by Alan Turing in his famous paper which introduced the Turing machine [TODO: cite]). It is remarkable that the $\lambda$-calculus is universal because it has only two basic operations: creating and applying functions.
 

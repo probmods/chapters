@@ -1,6 +1,8 @@
 % Models for sequences of observations
 
 
+<!--   iid, exchangeable, (definetti,) n-gram, hmm, PCFG -->
+
 # I.I.D. and exchangeable sequences
 
 
