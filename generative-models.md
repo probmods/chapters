@@ -459,7 +459,6 @@ Same model with animation:
 
 ~~~~
 
-<!--
 Random falling things:
 
 ~~~~
@@ -467,7 +466,6 @@ Random falling things:
 (define (xPos) (uniform 0 worldWidth))
 (define (yPos) (uniform 0 worldHeight))
 
-(define emptyWorld (makeWorld))
 (define groundedWorld (addRect emptyWorld
                                (/ worldWidth 2)
                                worldHeight
@@ -478,10 +476,9 @@ Random falling things:
 (define (addRndCircle w) (addCircle w (xPos) (yPos) (dim) #f))
 (define (addRndRect w) (addRect w (xPos) (yPos) (dim) (dim) #f))
 
-(define world (addRndCircle (addRndRect (addRndCircle groundedWorld))))
+(define (world) (addRndCircle (addRndRect (addRndCircle groundedWorld))))
 
 (animatePhysics 1000 world)
 
 ~~~~
--->
 

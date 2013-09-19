@@ -153,10 +153,19 @@ function getDynamicObjPositions(churchWorld) {
   return positions;
 }
 
+_emptyWorld = arrayToList([]);
+
 //add a circle at specified position (x and y are between 0 and 1) and radius. return world with circle added.
 _addCircle = function(churchWorld, x, y, r, isStatic) {
   var jsWorld = churchWorld_to_jsWorld(churchWorld);
   jsWorld.push( [ ["circle", isStatic, [r]],
+                    [x, y] ] );
+  return jsWorld_to_churchWorld(jsWorld);
+}
+
+_addRect = function(churchWorld, x, y, w, h, isStatic) {
+  var jsWorld = churchWorld_to_jsWorld(churchWorld);
+  jsWorld.push( [ ["rect", isStatic, [w, h]],
                     [x, y] ] );
   return jsWorld_to_churchWorld(jsWorld);
 }
