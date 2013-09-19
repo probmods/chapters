@@ -18,6 +18,22 @@ A Church program is syntactically composed of nested *expressions.* Roughly spea
 
 This expression has an *operator*, the logical function `and`, and *arguments*, `true` and the *subexpression* which is itself an application of `or`. When reasoning about evaluation, it is best to think of evaluating the subexpressions first, then applying the function to the return values of its arguments. In this example `or` is first applied to `true` and `false`, returning true, then `and` is applied to `true` and the subexpression's return value, again returning true.
 
+As a slightly more complex example, consider:
+
+~~~~
+;this line is a comment
+(if
+ (= 1 2)         ;the condition of "if"
+ 100                ;the consequent ("then")
+ (or true false) ;the alternate ("else")
+)
+~~~~
+
+This expression is composed of an `if` conditional that evaluates the first expression (a test here of whether `1` equals `2`) then evaluates the second expression if the first is true or otherwise evaluates the third expression.
+The operator `if` is strictly not a function, because it does not evaluate all of its arguments, but instead *short-circuits* evaluating only the second or third. It has a value like any other function.
+(We have also used comments here: anything after a semicolon is ignored when evaluating.) 
+
+
 We often want to name objects in our programs so that they can be reused. This can be done with the `define` statement. `define` looks like this:
 
 <pre>(define variable-name expression)</pre>
