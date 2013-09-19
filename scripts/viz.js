@@ -171,9 +171,26 @@ _density = function(samps, title, withHist) {
     var xAxis = d3.svg.axis()
         .scale(x)
         .orient("bottom");
+        
+    function kernelDensityEstimator(kernel, x) {
+      return function(sample) {
+        return x.map(function(x) {
+          return [x, d3.mean(sample, function(v) { return kernel(x - v); })];
+        });
+      };
+    }
+
+    function epanechnikovKernel(scale) {
+      return function(u) {
+        return Math.abs(u /= scale) <= 1 ? .75 * (1 - u * u) / scale : 0;
+      };
+    }
+
+    var kde = kernelDensityEstimator(epanechnikovKernel(3), x.ticks(100));
 
     var frequencies = counts.map(function(x) {return x.freq;});
-    var yMax = Math.max.apply(Math, frequencies);
+    var densities = kde(values).map(function(x) {return x[1];});
+    var yMax = Math.max.apply(Math, densities);
     var y = d3.scale.linear()
         .domain([0, yMax])
         .range([height, 0]);
@@ -206,22 +223,6 @@ _density = function(samps, title, withHist) {
     svg.append("g")
         .attr("class", "y axis")
         .call(yAxis);
-        
-    function kernelDensityEstimator(kernel, x) {
-      return function(sample) {
-        return x.map(function(x) {
-          return [x, d3.mean(sample, function(v) { return kernel(x - v); })];
-        });
-      };
-    }
-
-    function epanechnikovKernel(scale) {
-      return function(u) {
-        return Math.abs(u /= scale) <= 1 ? .75 * (1 - u * u) / scale : 0;
-      };
-    }
-
-    var kde = kernelDensityEstimator(epanechnikovKernel(3), x.ticks(100));
     svg.append("path")
         .datum(kde(values))
         .attr("class", "line")
