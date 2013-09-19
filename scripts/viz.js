@@ -190,15 +190,17 @@ _density = function(samps, title, withHist) {
 
     var frequencies = counts.map(function(x) {return x.freq;});
     var densities = kde(values).map(function(x) {return x[1];});
-    var yMax = Math.max.apply(Math, densities);
+    var maxDens = Math.max.apply(Math, densities);
+    var maxFreq = Math.max.apply(Math, frequencies);
+    var yMax = Math.max(maxDens, maxFreq);
     var y = d3.scale.linear()
         .domain([0, yMax])
         .range([height, 0]);
     var yAxis = d3.svg.axis()
         .scale(y)
         .ticks(5)
-        .orient("left");
-        //.tickFormat(d3.format("%"));
+        .orient("left")
+        .tickFormat(d3.format("%"));
 
     var line = d3.svg.line()
         .x(function(d) { return x(d[0]); })
