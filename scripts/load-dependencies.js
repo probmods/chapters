@@ -76,6 +76,10 @@
     },
     box2dweb: {
       paths: ["scripts/Box2dWeb-2.1.a.3.js"]
+    },
+    plinko: {
+      paths: ["scripts/plinko.js"],
+      parents: ["box2dweb"]
     }
   };
 

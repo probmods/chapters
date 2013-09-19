@@ -2,11 +2,16 @@
 
 #Models, simulation, and degrees of belief
 
+One view of knowledge is that the mind maintains working models of parts of the world. 'Model' in the sense that it captures some of the structure in the world, but not all (and what it captures need not be exactly what is in the world---just useful). 'Working' in the sense that it can be used to simulate this part of the world, imagining what will follow from different initial conditions. As an example take the Plinko machine: a box with uniformly spaced pegs, with bins at the bottom. Into this box we can drop marbles:
 
+<canvas id="plinkocanvas" width="600" height="600"" style="background-color:#333333;"></canvas>
+<button onclick="plinkoinit();">Set-up Plinko!</button>
 
+The plinko machine is a 'working model' for many physical processes in which many small perturbations accumulate---for instance a leaf falling from a tree. It is an approximation to these systems because we use a discrete grid (the pegs) and discrete bins. Yet it is useful as a model: for instance, we can ask where we expect a marble to end up depending on where we drop it in, by running the machine several times---simulating the outcome.
 
+Simulation is intimately connected to degrees of belief. For instance, imagine that someone has dropped a marble into the plinko machine; before looking at the outcome, you can probably report how much you believe that the ball has landed in each possible bin. Indeed, if you run the plinko machine many times, you will see a shape emerge in the bins. The number of balls in a bin gives you some idea how much you should expect a new marble to end up there. This 'shape of expected outcomes' can be formalized as a probability distribution (described below). Indeed, there is an intimate connection between simulation and probability, which we explore in the rest of this section.
 
-<!-- plinko -->
+There is one more thing to note about our Plinko machine above: we are using a computer program to *simulate* the simulation. Computers can be seen as universal simulators. How can we, clearly and precisely, describe the simulation we want a computer to do?
 
 
 # Defining Generative Models
