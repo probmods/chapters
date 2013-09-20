@@ -150,12 +150,6 @@ _hist = function(samps, title) {
         .attr("fill", "black")
         .text(title);
         
-    var $clearButton = $("<button>Delete Histogram</button>")
-    $clearButton.appendTo($histDiv);
-    $clearButton.click(function() {
-      $histDiv.remove();
-    });
-
     return data;
 
   };
@@ -267,7 +261,8 @@ _density = function(samps, title, withHist) {
     svg.append("g")
         .attr("class", "x axis")
         .attr("transform", "translate(0," + height + ")")
-        .call(xAxis)
+        .call(xAxis);
+    
     svg.append("g")
         .attr("class", "y axis")
         .call(yAxis);
@@ -286,12 +281,6 @@ _density = function(samps, title, withHist) {
         .attr("fill", "black")
         .text(title);
  
-    var $clearButton = $("<button>Delete Density Plot</button>")
-    $clearButton.appendTo($densDiv);
-    $clearButton.click(function() {
-      $densDiv.remove();
-    });
-
     var data = counts;
     return data;
 
