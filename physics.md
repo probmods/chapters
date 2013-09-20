@@ -1,5 +1,6 @@
 % testing physics
 
+TO DO!!!!!!!!!!!!!!!!!!!!!!!:
 
 ~~~~
 (define marbleRadius 8)
@@ -30,7 +31,7 @@
 
 ~~~~
 
-Same model with animation:
+Same model with animation (WORKS):
 
 ~~~~
 (define marbleRadius 8)
@@ -46,7 +47,7 @@ Same model with animation:
 
 ~~~~
 
-Random falling things:
+Random falling things (change this up so there are 3 shapes at the top and 2 bigger fixed shapes further down):
 
 ~~~~
 (define (dim) (uniform 5 20))
@@ -69,7 +70,7 @@ Random falling things:
 
 ~~~~
 
-Towers:
+Towers (rewrite makeTowerWorld in Church):
 
 ~~~~
 (define towerWorld (makeTowerWorld))
@@ -77,37 +78,7 @@ Towers:
 
 ~~~~
 
-Tower Stability:
-
-<!--
-~~~~
-(define (getY obj) (second (second obj)))
-;y position is 0 at the TOP of the screen
-(define (highestY world) (min (map getY world)))
-
-(define eps 10) ;things might move around a little, but within 10 pixels is close
-(define (approxEqual a b) (< (abs (- a b)) 10))
-
-(define (doesTowerFall initialW finalW) (not (approxEqual (highestY initialW)
-                                                          (highestY finalW))))
-
-
-(define initW (makeTowerWorld))
-(define finalW (runPhysics 1000 initW))
-(define initYs (map getY initW))
-(define finalYs (map getY finalW))
-
-;(define (towerRun initialW) (doesTowerFall initialW
-;                                           (runPhysics 1000 initialW)))
-;(define initialWorlds (repeat 10 makeTowerWorld))
-;(define towerResults (map towerRun initialWorlds))
-
-(list (min initYs)
-      (min finalYs))
-
-
-~~~~
--->
+Tower Stability (WORKS):
 
 ~~~~
 (define (getY obj) (second (second obj)))
@@ -127,7 +98,7 @@ Tower Stability:
 
 ~~~~
 
-Counter-Inutitively Stable Structure:
+Counter-Inutitively Stable Structure (WORKS):
 
 ~~~~
 (define almostUnstableWorld (list (list (list 'rect #t (list 350 5))
@@ -148,5 +119,33 @@ Counter-Inutitively Stable Structure:
 
 Same structure, this time with noise:
 
+Tower Hist:
+
+~~~~
+(define (getY obj) (second (second obj)))
+;y position is 0 at the TOP of the screen
+(define (highestY world) (min (map getY world)))
+
+(define eps 10) ;things might move around a little, but within 10 pixels is close
+(define (approxEqual a b) (< (abs (- a b)) 10))
+
+(define (doesTowerFall initialW finalW) (not (approxEqual (highestY initialW)
+                                                          (highestY finalW))))
 
 
+
+(define w (addCircle emptyWorld 50 50 (list 4) #f))
+(define (sup) w)
+               
+
+;(define initialWorlds (repeat 2 makeTowerWorld))
+(define initialWorlds (repeat 2 sup))
+(define (towerRun w) (doesTowerFall w (runPhysics 1000 w)))
+;(map towerRun initialWorlds)
+
+;(define initW (makeTowerWorld))
+;(towerRun initW)
+(doesTowerFall (second initialWorlds) (runPhysics 1000 (second initialWorlds)))
+initialWorlds
+
+~~~~
