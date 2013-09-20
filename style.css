@@ -20,8 +20,7 @@ body {
     background-color: white;
     padding: 5em;
     padding-top: 2em;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 1);
-
+    box-shadow: 0 0 15px rgba(0, 0, 0, 1); 
 }
 
 #chapter > ul li {
@@ -38,7 +37,7 @@ ul#nav {
 }
 
 
-#nav li {
+#nav > li {
     display: inline;
     padding: 5px 10px 5px 10px;
     /* font-variant: small-caps; */
@@ -53,6 +52,7 @@ ul#nav {
 #nav a {
     color: black;
     text-decoration: none;
+width: 100%
 }
 
 .clear {
@@ -61,7 +61,8 @@ ul#nav {
 
 #nav ol {
     background-color: white;
-    border: 1px solid black;
+    border: 1px solid gray;
+    border-radius: 2px;
     padding: 0;
     margin: 0; 
     margin-top: 3px;
@@ -72,15 +73,28 @@ ul#nav {
     display: none;
     position: absolute; 
     list-style-position: inside;
+    z-index: 999999;
 }
 
 #nav ol li {
-    display: list-item
+    display: list-item;
+    padding: 5px 10px 5px 10px;
+    font-weight: normal;
+} 
+
+#nav ol li:hover {
+    background-color: #dd0000;
+    color: white;
 }
+
+#nav ol li:hover a {
+    color: white;
+}
+
 
 /* show the list of all chapters when the show class is
    applied */
-li.show ol {
+li.show ol, #nav ol:hover {
     display: block !important;
 }
 
@@ -225,6 +239,10 @@ pre {
     border: 1px solid #afafaf;
 }
 
+pre:empty {
+    border: none
+}
+
 p > code {
     border-radius: 2px;
     background-color: #fafafa;
@@ -263,4 +281,65 @@ h1 > a > code, h2 > a > code, h3 > a > code, h4 > a > code, h5 > a > code, li > 
   fill: steelblue;
   stroke: #333333;
   shape-rendering: crispEdges;
+}
+
+.code-controls {
+position: absolute;
+top: 0px;
+right: 1px;
+margin: 0;
+padding: 0;
+z-index: 999;
+}
+
+.code-settings {
+float: right;
+margin: 0;
+padding: 0;
+list-style-type: none;
+display: none
+}
+
+.code-settings li {
+display: none;
+} 
+
+.code-settings li.cog {
+display: inline;
+}
+
+.code-settings li.cog button {
+background: none;
+border: none;
+padding-right: 0;
+}
+
+.code-settings li.cog img {
+opacity: 0.3;
+}
+
+
+.code-settings:hover .cog img {
+opacity: 1;
+
+}
+
+.code-settings:hover li {
+display: inline;
+}
+
+button.run {
+position: absolute;
+bottom: 0;
+right: 0;
+z-index: 999;
+display: none
+}
+
+.CodeMirror-focused {
+box-shadow: 3px 3px 3px #99ccff; 
+}
+
+.CodeMirror-focused button.run, .CodeMirror-focused .code-settings {
+display: block
 }

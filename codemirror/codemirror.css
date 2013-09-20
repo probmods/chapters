@@ -7,6 +7,7 @@ font-size: 12px !important;
 /*  height: 100px; */
   border: 1px solid #9f9f9f;
   height: auto;
+min-height: 3.5em;
 border-radius: 3px
 }
 
