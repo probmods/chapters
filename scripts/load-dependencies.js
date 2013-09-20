@@ -18,6 +18,11 @@
  cosmetics.js
 
  */
+
+_.templateSettings = {
+  interpolate: /\{\{(.+?)\}\}/g
+};
+
 (function() {
   // NB: path is relative to main content directory
   // for simplicity, don't allow // retrievals
@@ -34,6 +39,9 @@
   var libs = {
     mathjax: {
       paths: [_u("//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML")]
+    },
+    periodicalupdater: {
+      paths: ["scripts/jquery.periodicalupdater.js"]
     },
     webchurch: {
       //paths: ["scripts/webchurch.js"]
@@ -55,7 +63,7 @@
     },
     injector: {
       paths: ["scripts/injector.js"],
-      parents: ["webchurch", "cm", "cmscheme", "cmbrackets", "cookies"]
+      parents: ["webchurch", "cm", "cmscheme", "cmbrackets", "cookies", "periodicalupdater", "viz"]
     },
     nav: {
       paths: ["scripts/nav.js"]
@@ -144,7 +152,7 @@
             script.src = path;
             script.async = true;
             script.onload = function(f) {
-              console.log('loaded ' + loadedLibName + 'from head');
+              console.log('loaded ' + loadedLibName + ' from head');
               success();
             };
             document.getElementsByTagName('head')[0].appendChild(script);
