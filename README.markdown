@@ -14,11 +14,11 @@ Source files should be named `[filename].md`. There is one special source file, 
 
 The syntax for the .md files is [Pandoc-extended Markdown](http://johnmacfarlane.net/pandoc/README.html#pandocs-markdown). I highly recommend reading through that page before modifying the source files. A decent example of the syntax in action lives in `generative-models.md`. One convention is worth mentioning. We use the "fenced" code-block syntax, e.g., 
 
-    ~~~~ {.bher data-exercise="simple-flip"}
+    ~~~~ {data-engine="bher" data-exercise="simple-flip"}
     (flip (0.5))
     ~~~~
 
-Within the curly braces, `.bher` specifies that this code block will be run through the `bher` inference engine (the current choices are `bher`, `mit-church`, `cosh`, `jsChurch`; we'll soon have a new option thanks to Julius's work on ProbJS). This engine property will be injected as a CSS class in the compiled HTML. The `data-exercise` property indicates the name of the exercise; this is used to organize records in the database of student-run programs. It is permissible to not declare a `data-exercise` property (in this case, the database won't store runs for this exercise), but if such a property is declared, **it must be unique within the chapter file**.
+Within the curly braces, `data-engine="bher"` specifies that this code block will be run through the `bher` inference engine (the current choices are `webchurch`, `bher`, `mit-church`, and `cosh`). This engine property will be injected as a CSS class in the compiled HTML. The `data-exercise` property indicates the name of the exercise; this is used to organize records in the database of student-run programs. It is permissible to not declare a `data-exercise` property (in this case, the database won't store runs for this exercise), but if such a property is declared, **it must be unique within the chapter file**.
 
 The look and feel of the book is controlled by three files: `chapter.pytemplate`, `index.template`, and `style.css`.
 
