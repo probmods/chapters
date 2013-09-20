@@ -482,110 +482,103 @@ Random falling things:
 
 # Exercises
 
-## 1
-Here are three church programs:
+1) Here are three church programs:
 
-~~~~
-(if (flip) (flip 0.7) (flip 0.1))
-~~~~
+	~~~~
+	(if (flip) (flip 0.7) (flip 0.1))
+	~~~~
 
-~~~~
-(flip (if (flip) 0.7 0.1))
-~~~~
+	~~~~
+	(flip (if (flip) 0.7 0.1))
+	~~~~
 
-~~~~
-(flip 0.4) 
-~~~~
+	~~~~
+	(flip 0.4) 
+	~~~~
 
-A) Show that the marginal distribution on return values for these three programs is the same by directly computing the probability using the rules of probability (hint: write down each possible history of random choices for each program). Check your answers by sampling from the programs. 
+	A) Show that the marginal distribution on return values for these three programs is the same by directly computing the probability using the rules of probability (hint: write down each possible history of random choices for each program). Check your answers by sampling from the programs. 
 
-B) Explain why these different-looking programs can give the same results.
-
-
-## 2
-Explain why (in terms of the evaluation process) these two programs give different answers (i.e. have different distributions on return values):
-
-~~~~
-(define foo (flip))
-(list foo foo foo)
-~~~~
-
-~~~~
-(define (foo) (flip))
-(list (foo) (foo) (foo))
-~~~~
+	B) Explain why these different-looking programs can give the same results.
 
 
-## 3
-In the simple medical diagnosis example we imagined a generative process for the diseases and symptoms of a single patient. If we wanted to represent the diseases of many patients we might have tried to make each disease and symptom into a ''function'' from a person to whether they have that disease, like this:
+2) Explain why (in terms of the evaluation process) these two programs give different answers (i.e. have different distributions on return values):
 
-~~~~
-(define (lung-cancer person)  (flip 0.01))
-(define (cold person)  (flip 0.2))
+	~~~~
+	(define foo (flip))
+	(list foo foo foo)
+	~~~~
 
-(define (cough person) (or (cold person) (lung-cancer person)))
-
-(list  (cough 'bob) (cough 'alice))
-~~~~
-
-Why doesn't this work correctly if we try to do the same thing for the more complex medical diagnosis example? How could we fix it?
+	~~~~
+	(define (foo) (flip))
+	(list (foo) (foo) (foo))
+	~~~~
 
 
-## 4
-Work through the evaluation process for the `bend` higher-order function in this example:
+3) In the simple medical diagnosis example we imagined a generative process for the diseases and symptoms of a single patient. If we wanted to represent the diseases of many patients we might have tried to make each disease and symptom into a ''function'' from a person to whether they have that disease, like this:
 
-~~~~
-(define (make-coin weight) (lambda () (if (flip weight) 'h 't)))
-(define (bend coin) 
-  (lambda () (if (equal? (coin) 'h) 
-                 ( (make-coin 0.7) )
-                 ( (make-coin 0.1) ) )))
+	~~~~
+	(define (lung-cancer person)  (flip 0.01))
+	(define (cold person)  (flip 0.2))
 
-(define fair-coin (make-coin 0.5))
-(define bent-coin (bend fair-coin))
+	(define (cough person) (or (cold person) (lung-cancer person)))
 
-(hist (repeat 100 bent-coin) "bent coin")
-~~~~
+	(list  (cough 'bob) (cough 'alice))
+	~~~~
 
-Directly compute the probability of the bent coin in the example. Check your answer by comparing to the histogram of many samples.
-
-## 5
-Here are four expressions you could evaluate using the model (the set of definitions) from the tug-of-war example:
-
-~~~~
-(winner '(alice) '(bob))
-
-(equal? '(alice) (winner '(alice) '(bob)))
-
-(and (equal? '(alice) (winner '(alice) '(bob)))  
-     (equal? '(alice) (winner '(alice) '(fred))))
-
-(and (equal? '(alice) (winner '(alice) '(bob))) 
-     (equal? '(jane) (winner '(jane) '(fred))))
-~~~~
-
-A) Write down the sequence of expression evaluations and random choices that will be made in evaluating each expression.
-
-B) Directly compute the probability for each possible return value from each expression.
-
-C) Why are the probabilities different for the last two? Explain both in terms of the probability calculations you did and in terms of the "causal" process of evaluating and making random choices.
+	Why doesn't this work correctly if we try to do the same thing for the more complex medical diagnosis example? How could we fix it?
 
 
-## 6 
-Convert the following probability table to a compact Church program:
+4) Work through the evaluation process for the `bend` higher-order function in this example:
 
- A      B     P(A,B)
-----  ----- -------------
- F      F     0.14
- F      T     0.96
- T      F     0.4
- T      T     0.4
+	~~~~
+	(define (make-coin weight) (lambda () (if (flip weight) 'h 't)))
+	(define (bend coin) 
+	  (lambda () (if (equal? (coin) 'h) 
+	                 ( (make-coin 0.7) )
+	                 ( (make-coin 0.1) ) )))
+	
+	(define fair-coin (make-coin 0.5))
+	(define bent-coin (bend fair-coin))
+	
+	(hist (repeat 100 bent-coin) "bent coin")
+	~~~~
+
+	Directly compute the probability of the bent coin in the example. Check your answer by comparing to the histogram of many samples.
+
+5) Here are four expressions you could evaluate using the model (the set of definitions) from the tug-of-war example:
+
+	~~~~
+	(winner '(alice) '(bob))
+
+	(equal? '(alice) (winner '(alice) '(bob)))
+
+	(and (equal? '(alice) (winner '(alice) '(bob)))  
+	     (equal? '(alice) (winner '(alice) '(fred))))
+
+	(and (equal? '(alice) (winner '(alice) '(bob))) 
+	     (equal? '(jane) (winner '(jane) '(fred))))
+	~~~~
+
+	A) Write down the sequence of expression evaluations and random choices that will be made in evaluating each expression.
+
+	B) Directly compute the probability for each possible return value from each expression.
+
+	C) Why are the probabilities different for the last two? Explain both in terms of the probability calculations you did and in terms of the "causal" process of evaluating and making random choices.
+
+
+6) Convert the following probability table to a compact Church program:
+
+	 A      B     P(A,B)
+	----  ----- -------------
+ 	F      F     0.14
+ 	F      T     0.96
+ 	T      F     0.4
+ 	T      T     0.4
  
- 
-Hint: fix the probability of A and then define the probability of B to *depend* on whether A is true or not. Run your Church program and build a histogram to check that you get the correct distribution
+	Hint: fix the probability of A and then define the probability of B to *depend* on whether A is true or not. Run your Church program and build a histogram to check that you get the correct distribution
 
-~~~~
-(define a ...)
-(define b ...)
-(list a b)
-~~~~
+	~~~~
+	(define a ...)
+	(define b ...)
+	(list a b)
+	~~~~
