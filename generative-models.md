@@ -426,7 +426,7 @@ We have included such a 2-dimensional physics simulator, the function `runPhysic
 (define (addRndCircle w) (addCircle w (xPos) (yPos) (dim) #f))
 (define (addRndRect w) (addRect w (xPos) (yPos) (dim) (dim) #f))
 
-(define (world) (addRndCircle (addRndRect (addRndCircle groundedWorld))))
+(define world (addRndCircle (addRndRect (addRndCircle groundedWorld))))
 
 (animatePhysics 1000 world)
 ~~~~
@@ -434,98 +434,16 @@ We have included such a 2-dimensional physics simulator, the function `runPhysic
 There are many judgments that you could imagine making with such a physics simulator. @Hamrick2011 have explored human intuitions about the stability of block towers. Look at several different random block towers; first judge whether you think the tower is stable, then simulate to find out if it is:
 
 ~~~~
+(define towerWorld (makeTowerWorld))
 (animatePhysics 1000 towerWorld)
 ~~~~
 
 Were you often right? Were there some cases of 'surprisingly stable' towers?  @Hamrick2011 account for these cases by positing that people are not entirely sure where the blocks are initially (perhaps due to noise in visual perception). Thus our intuitions of stability are really stability given noise (or the expected stability marginalizing over slightly different initial configurations). We can realize this measure of stability as:
 
 ~~~~
+;not working yet
 (define (runTower) (doesTowerFall (runPhysics 1000 towerWorld)))
 (hist (repeat 10 runTower))
-~~~~
-
-
-
-
-
-
-
-~~~~
-(define marbleRadius 8)
-(define xCenter (/ worldWidth 2))
-(define nrow 7)
-(define ncol 7)
-(define binWidth (/ worldWidth ncol))
-
-(define (marbleX) (+ xCenter (uniform -1 1))) ;*almost* the center
-
-;the pegs, walls, and bins of the plinko machine
-(define emptyPlinko (plinkoWorld nrow ncol))
-
-;place a marble at the top and almost at the center
-(define (world) (addCircle emptyPlinko (marbleX) 0 marbleRadius #f))
-
-;run physics and find out what bin the marble fell into
-;note: run physics now returns the final world, followed by the initial world
-;(so randomization is recorded)
-(define (runPlinko) (plinkoWhichBin (runPhysics 1000 world) ncol))
-
-(hist (repeat 100 runPlinko) "Plinko")
-
-~~~~
-
-Same model with animation:
-
-~~~~
-(define marbleRadius 8)
-(define xCenter (/ worldWidth 2))
-(define nrow 7)
-(define ncol 7)
-(define binWidth (/ worldWidth ncol))
-
-(define (marbleX) (+ xCenter (uniform -1 1)))
-
-(define (world) (addCircle (plinkoWorld nrow ncol) (marbleX) 0 marbleRadius #f))
-(animatePhysics 1000 world)
-
-~~~~
-
-Random falling things:
-
-~~~~
-(define (dim) (uniform 5 20))
-(define (xPos) (uniform 0 worldWidth))
-(define (yPos) (uniform 0 worldHeight))
-
-(define groundedWorld (addRect emptyWorld
-                               (/ worldWidth 2)
-                               worldHeight
-                               worldWidth
-                               10
-                               #t))
-
-(define (addRndCircle w) (addCircle w (xPos) (yPos) (dim) #f))
-(define (addRndRect w) (addRect w (xPos) (yPos) (dim) (dim) #f))
-
-(define (world) (addRndCircle (addRndRect (addRndCircle groundedWorld))))
-
-(animatePhysics 1000 world)
-
-~~~~
-
-Towers:
-
-~~~~
-(animatePhysics 1000 towerWorld)
-
-~~~~
-
-Tower Stability:
-
-~~~~
-(define (runTower) (doesTowerFall (runPhysics 1000 towerWorld)))
-(hist (repeat 10 runTower))
-
 ~~~~
 
 # Exercises
