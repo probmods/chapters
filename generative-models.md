@@ -482,6 +482,14 @@ Towers:
 
 ~~~~
 
+Tower Stability:
+
+~~~~
+(define (runTower) (isTowerStable (runPhysics 1000 towerWorld)))
+(hist (repeat 10 runTower))
+
+~~~~
+
 # Exercises
 
 1) Here are three church programs:

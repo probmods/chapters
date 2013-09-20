@@ -375,19 +375,27 @@ _towerWorld = function() {
   return jsWorld_to_churchWorld(tower);
 }
 
-
-/*_isTowerStable = function(churchWorlds {
+_isTowerStable = function(churchWorlds) {
+  function worldSort(a,b) {
+    return a[1][1] - b[1][1];
+  }
+  function approxEqual(a,b) {
+    var eps = 10; //pixels
+    return Math.abs(a - b) < eps;
+  }
   var arrayWorlds = listToArray(churchWorlds);
-  var finalWorld = arrayWorlds[0];
-  var initialWorld = arrayWorlds[1];
+  var finalWorld = churchWorld_to_jsWorld(arrayWorlds[0]).sort(worldSort);
+  var initialWorld = churchWorld_to_jsWorld(arrayWorlds[1]).sort(worldSort);
   var stable = true;
   for (var i=0; i<finalWorld.length; i++) {
     var initialObj = initialWorld[i];
     var finalObj = finalWorld[i];
-    if (!(initialObj[1][1] == finalObj[1][1])) {
+    console.log(initialObj);
+    console.log(finalObj);
+    if (!approxEqual(initialObj[1][1], finalObj[1][1])) {
       stable = false;
       return stable;
     }
   }
   return stable;
-}*/
+}
