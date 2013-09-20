@@ -473,6 +473,13 @@ Random falling things:
 
 ~~~~
 
+Towers:
+
+~~~~
+(animatePhysics 1000 towerWorld)
+
+~~~~
+
 # Exercises
 
 1) Here are three church programs:
