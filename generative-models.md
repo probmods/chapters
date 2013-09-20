@@ -485,7 +485,7 @@ Towers:
 Tower Stability:
 
 ~~~~
-(define (runTower) (isTowerStable (runPhysics 1000 towerWorld)))
+(define (runTower) (doesTowerFall (runPhysics 1000 towerWorld)))
 (hist (repeat 10 runTower))
 
 ~~~~

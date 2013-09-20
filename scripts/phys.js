@@ -375,7 +375,7 @@ _towerWorld = function() {
   return jsWorld_to_churchWorld(tower);
 }
 
-_isTowerStable = function(churchWorlds) {
+_doesTowerFall = function(churchWorlds) {
   function worldSort(a,b) {
     return a[1][1] - b[1][1];
   }
