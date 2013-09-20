@@ -4,8 +4,8 @@
 
 One view of knowledge is that the mind maintains working models of parts of the world. 'Model' in the sense that it captures some of the structure in the world, but not all (and what it captures need not be exactly what is in the world---just useful). 'Working' in the sense that it can be used to simulate this part of the world, imagining what will follow from different initial conditions. As an example take the Plinko machine: a box with uniformly spaced pegs, with bins at the bottom. Into this box we can drop marbles:
 
-<canvas id="plinkocanvas" width="600" height="600"" style="background-color:#333333;"></canvas>
-<button onclick="plinkoinit();">Set-up Plinko!</button>
+<canvas id="plinkocanvas" width="10" height="10"" style="background-color:#333333;"></canvas>
+<button id="makeplinko" onclick="plinkoinit(); $('#makeplinko').hide();">Set-up Plinko!</button>
 
 The plinko machine is a 'working model' for many physical processes in which many small perturbations accumulate---for instance a leaf falling from a tree. It is an approximation to these systems because we use a discrete grid (the pegs) and discrete bins. Yet it is useful as a model: for instance, we can ask where we expect a marble to end up depending on where we drop it in, by running the machine several times---simulating the outcome.
 
@@ -408,6 +408,8 @@ Notice that `strength` is memoized because this is a property of a person true a
 
 #Example: Intuitive physics
 
+@Hamrick2011 have explored human intuitions about the stability of block towers.
+
 <!-- Put in simple 2d physics examples here: plinko, stability, ping-pong. -->
 
 ~~~~
@@ -426,6 +428,8 @@ Notice that `strength` is memoized because this is a property of a person true a
 (define (world) (addCircle emptyPlinko (marbleX) 0 marbleRadius #f))
 
 ;run physics and find out what bin the marble fell into
+;note: run physics now returns the final world, followed by the initial world
+;(so randomization is recorded)
 (define (runPlinko) (plinkoWhichBin (runPhysics 1000 world) ncol))
 
 (hist (repeat 100 runPlinko) "Plinko")
@@ -471,6 +475,20 @@ Random falling things:
 
 ~~~~
 
+Towers:
+
+~~~~
+(animatePhysics 1000 towerWorld)
+
+~~~~
+
+Tower Stability:
+
+~~~~
+(define (runTower) (doesTowerFall (runPhysics 1000 towerWorld)))
+(hist (repeat 10 runTower))
+
+~~~~
 
 # Exercises
 
