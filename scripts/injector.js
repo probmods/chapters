@@ -244,7 +244,10 @@ util.openModule(church_builtins);
 
     // editor
     var editor = CodeMirror(
-      function(el) {$(item).replaceWith(el);},
+      function(el) {
+        var $ioContainer = $("<div class='io'></div");
+//        $ioContainer.append(el);
+        $(item).replaceWith(el);},
       {
         value: text,
         lineNumbers: true,
@@ -278,10 +281,10 @@ util.openModule(church_builtins);
     });
 
     // reset button
-    var $resetButton = $("<button>").html("Reset").css('float', 'right');
+    var $resetButton = $("<button>").html("Reset");
 
     // run button
-    var $runButton = $("<button>").html("Run"); 
+    var $runButton = $("<button class='run'>").html("Run");
     $runButton.click(function() {
       $results.html('');
       var churchCode = editor.getValue();
@@ -309,12 +312,24 @@ util.openModule(church_builtins);
       runners[editor.engine](exerciseName, churchCode, editor); 
     });
 
-    // add non-codemirror bits after codemirror
-    $(editor.display.wrapper).attr("id", "ex-"+ exerciseName).after( $runButton,
-                                                                     $engineSelector,
-                                                                     $resetButton,
-                                                                     $results ); 
+    var $codeControls = $("<div class='code-controls'>");
+    // HT http://somerandomdude.com/work/open-iconic/#
+    var $settingsMenu = $("<ul class='code-settings'>");
+    $settingsMenu.append(
+      $('<li class="cog">').append( "<button><img src='cog_32x32.png' width=11 height=11></button>" ),
+      $('<li>').append( $resetButton[0] ),
+      $('<li>').append( $engineSelector[0] )
+    ); 
 
+    $codeControls.append($settingsMenu);
+    
+    $(editor.display.wrapper).prepend($codeControls, $runButton);
+    // var $settingsMenu = $("<div class='settings-menu'>");
+    // $settingsMenu.append( $engineSelector, $resetButton); 
+
+    // add non-codemirror bits after codemirror
+    $(editor.display.wrapper).attr("id", "ex-"+ exerciseName).after( $results );
+    
     editor.$runButton = $runButton;
     editor.$engineSelector = $engineSelector;
     editor.$resetButton = $resetButton;
