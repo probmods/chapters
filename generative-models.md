@@ -295,7 +295,7 @@ There is no upper bound on how long the computation can go on, although the prob
 
 # Persistent Randomness: `mem`
 
-Consider building a model with a set of objects that each have a randomly chosen property. For instance, describing the eye colors of a set of people:
+It is often useful to model a set of objects that each have a randomly chosen property. For instance, describing the eye colors of a set of people:
 
 ~~~~
 (define (eye-color person) (uniform-draw '(blue green brown)))
@@ -310,22 +310,13 @@ The results of this generative process are clearly wrong: Bob's eye
 color can change each time we ask about it! What we want is a model in
 which eye color is random, but *persistent.* We can do this using
 another Church primitive: `mem`. `mem` is a higher order
-function: it takes a procedure and produces a *memoized* version of
+function that takes a procedure and produces a *memoized* version of
 the procedure.
-<!-- The original procedure is wrapped in some logic which
-intercepts calls to the underlying procedure. The first time the
-procedure is called with some arguments, the underlying procedure is
-invoked to get a return value. This return value is then stored in a
-table with associated with the input arguments. Finally, the value is
-returned to the caller. If the memoized procedure is called again with
-the same arguments, the value associated with those arguments is
-simply looked up an returned without calling the underlying procedure
-again. -->
 When a stochastic procedure is memoized, it will
-sample a random value on the **first** call, and then return that
-same value when called with the same arguments thereafter. The
+sample a random value the *first* time it is used for some arguments, but return that
+same value when called with those arguments thereafter. The
 resulting memoized procedure has a persistent value within each "run"
-of the generative model. For instance consider the equality of two
+of the generative model (or simulated world). For instance consider the equality of two
 flips, and the equality of two memoized flips:
 
 ~~~~
@@ -341,8 +332,7 @@ Now returning to the eye color example, we can represent the notion that eye col
 
 ~~~~
 (define eye-color
-  (mem
-    (lambda (person) (uniform-draw '(blue green brown)))))
+  (mem (lambda (person) (uniform-draw '(blue green brown)))))
 
 (list
  (eye-color 'bob)
@@ -350,8 +340,8 @@ Now returning to the eye color example, we can represent the notion that eye col
  (eye-color 'bob) )
 ~~~~
 
-This type of modeling is called *random world* style (McAllester,
-Milch, Goodman, 2008). Note that we don't have to specify ahead of
+This type of modeling is called *random world* style [@Mcallester2008].
+Note that we don't have to specify ahead of
 time the people whose eye color we will ask about: the distribution on
 eye colors is implicitly defined over the infinite set of possible
 people, but only constructed "lazily" when needed.  Memoizing
@@ -366,9 +356,10 @@ outcome of the $n$th flip of a particular coin:
       (list (flip-n 1) (flip-n 12) (flip-n 47) (flip-n 1548)))
 ~~~~
 
-There are in principle a countably infinite number of such flips, each independent
-of all the others.  But the outcome of the $n$th flip -- the 1st, the
-12th, the 47th, or the 1548th -- once determined, will always have the same value.
+There are a countably infinite number of such flips, each independent
+of all the others. The outcome of each, once determined, will always have the same value.
+
+<!--
 Here we define a function that encodes the outcome of the $n$th flip
 of the $m$th coin, a doubly infinite set of properties:
 
@@ -377,24 +368,25 @@ of the $m$th coin, a doubly infinite set of properties:
 (list (list (flip-n-coin-m 1 1) (flip-n-coin-m 12 1) (flip-n-coin-m 1 47) (flip-n-coin-m 12 47))
       (list (flip-n-coin-m 1 3) (flip-n-coin-m 12 3) (flip-n-coin-m 1 47) (flip-n-coin-m 12 47)))
 ~~~~
+-->
 
-In traditional computer science memoization is an important technique
-for optimizing programs by avoiding repeated work (see
-[[Memoization as Optimization]]). In the probabilistic setting, such
-as in Church, we can see this taken further and memoization
-actually affects the *expressivity* of the language.
+In computer science memoization is an important technique
+for optimizing programs by avoiding repeated work.  
+In the probabilistic setting, such as in Church, memoization actually affects the meaning of the memoized function.
+
+
 
 # Example: Bayesian Tug of War
 
-Imagine a game of tug of war, where each person may be strong or weak, and may be lazy or not on each match. If a person is lazy they only pull with half their strength. The team that pulls hardest will win. We assume that half of all people are strong, and that on any match, each person has a 1 in 3 chance of being lazy.  This program runs a tournament between several teams, mixing up players across teams.  Can you guess who is strong or weak, looking at the tournament results?
+Imagine a game of tug of war, where each person may be strong or weak, and may be lazy or not on each match. If a person is lazy they only pull with half their strength. The team that pulls hardest will win. We assume that strength is a continuous property of an individual, and that on any match, each person has a 25% chance of being lazy.  This Church program runs a tournament between several teams, mixing up players across teams.  Can you guess who is strong or weak, looking at the tournament results?
 
 ~~~~
-(define strength (mem (lambda (person) (if (flip) 10 5))))
+(define strength (mem (lambda (person) (gaussian 0 1))))
 
-(define lazy (lambda (person) (flip (/ 1 3))))
+(define lazy (lambda (person) (flip 0.25)))
 
 (define (total-pulling team)
-  (apply +
+  (sum
          (map (lambda (person) (if (lazy person) (/ (strength person) 2) (strength person)))
               team)))
 
@@ -410,7 +402,7 @@ Imagine a game of tug of war, where each person may be strong or weak, and may b
 
 ~~~~
 
-Notice that `strength` is memoized because this is a property of a person true across many matches, while `lazy` isn't.  Each time you run this program, however, a new "random world" will be created: people's strengths will be randomly re-generated and used in all the matches.
+Notice that `strength` is memoized because this is a property of a person true across many matches, while `lazy` isn't.  Each time you run this program, however, a new "random world" will be created: people's strengths will be randomly re-generated, then used in all the matches.
 
 
 
@@ -564,6 +556,15 @@ Random falling things:
 	B) Directly compute the probability for each possible return value from each expression.
 
 	C) Why are the probabilities different for the last two? Explain both in terms of the probability calculations you did and in terms of the "causal" process of evaluating and making random choices.
+
+#) Use the rules of probability, described above, to compute the probability that the geometric distribution define by the following stochastic recursion returns the number 5.
+
+	~~~~
+	(define (geometric p) 
+	  (if (flip p) 
+	      0 
+	      (+ 1 (geometric p))))
+	~~~~
 
 
 6) Convert the following probability table to a compact Church program:
