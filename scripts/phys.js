@@ -93,8 +93,7 @@ function clearWorld() {
 }
 
 //take church world maker and apply it to the box2d world
-function applyWorld(worldMaker) {
-  var initialWorld = worldMaker();
+function applyWorld(initialWorld) {
   var worldList = churchWorld_to_jsWorld(initialWorld);
   for (var i=0; i<worldList.length; i++) {
     var worldObj = worldList[i];
@@ -211,9 +210,8 @@ _addRect = function(churchWorld, x, y, w, h, isStatic) {
   return jsWorld_to_churchWorld(jsWorld);
 }
 
-_plinkoWhichBin = function(churchWorlds, ncol) {
-  var churchWorld = listToArray(churchWorlds)[0];
-  var positions = getDynamicObjPositions(churchWorld);
+_plinkoWhichBin = function(finalWorld, ncol) {
+  var positions = getDynamicObjPositions(finalWorld);
   var x = positions[0][0];
   return Math.round(x / (_worldWidth / ncol));
 }
@@ -248,9 +246,9 @@ _plinkoWorld = function(nrow, ncol) {
   return jsWorld_to_churchWorld([ground].concat(pegs, walls, bins));
 }
 
-_runPhysics = function(steps, worldMaker) {
+_runPhysics = function(steps, initialWorld) {
   clearWorld();
-  var initialWorld = applyWorld(worldMaker);
+  applyWorld(initialWorld);
   for (var s=0; s<steps; s++) {
     world.Step(
          1 / 60   //frame-rate
@@ -258,15 +256,14 @@ _runPhysics = function(steps, worldMaker) {
       ,  10       //position iterations
     );
   }
-  var finalWorld = churchWorld_from_bodyList(world.GetBodyList());
-  return arrayToList([finalWorld, initialWorld]);
+  return churchWorld_from_bodyList(world.GetBodyList());
 }
 
-_animatePhysics = function(steps, worldMaker) {
+_animatePhysics = function(steps, initialWorld) {
   function simulate(canvas, steps, initializeStep) {
     if (initializeStep) {
       clearWorld();
-      applyWorld(worldMaker);
+      applyWorld(initialWorld);
     }
     //setup debug draw
     var debugDraw = new b2DebugDraw();
@@ -284,9 +281,9 @@ _animatePhysics = function(steps, worldMaker) {
           ,  10       //velocity iterations
           ,  10       //position iterations
         );
-      } else {
+      } //else {
         //stopAnim();
-      }
+      //}
       
       world.DrawDebugData();
       world.ClearForces();
@@ -329,7 +326,7 @@ _animatePhysics = function(steps, worldMaker) {
   };
 }
 
-_towerWorld = function() {
+_makeTowerWorld = function() {
   var wallWidth = 5;
   var tower = [ [ [ "rect", true, [_worldWidth, wallWidth] ],
                    [ _worldWidth / 2, _worldHeight ] ] ];
@@ -372,10 +369,11 @@ _towerWorld = function() {
     addBlock(previous, center);
     center = false;
   }
+  console.log(format_result(jsWorld_to_churchWorld(tower)));
   return jsWorld_to_churchWorld(tower);
 }
 
-_doesTowerFall = function(churchWorlds) {
+/*_jsDoesTowerFall = function(churchWorlds) {
   function worldSort(a,b) {
     return a[1][1] - b[1][1];
   }
@@ -386,16 +384,21 @@ _doesTowerFall = function(churchWorlds) {
   var arrayWorlds = listToArray(churchWorlds);
   var finalWorld = churchWorld_to_jsWorld(arrayWorlds[0]).sort(worldSort);
   var initialWorld = churchWorld_to_jsWorld(arrayWorlds[1]).sort(worldSort);
-  var stable = true;
+  var towerFalls = false;
   for (var i=0; i<finalWorld.length; i++) {
     var initialObj = initialWorld[i];
     var finalObj = finalWorld[i];
-    console.log(initialObj);
-    console.log(finalObj);
     if (!approxEqual(initialObj[1][1], finalObj[1][1])) {
-      stable = false;
-      return stable;
+      towerFalls = true;
+      return towerFalls;
     }
   }
-  return stable;
+  return towerFalls;
+}*/
+
+_max = function(listyList) {
+  return Math.max.apply(Math, listToArray(listyList));
+}
+_min = function(listyList) {
+  return Math.min.apply(Math, listToArray(listyList));
 }
