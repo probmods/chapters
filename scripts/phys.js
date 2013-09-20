@@ -256,9 +256,11 @@ _runPhysics = function(steps, worldMaker) {
 }
 
 _animatePhysics = function(steps, worldMaker) {
-  function simulate(canvas, steps) {
-    clearWorld();
-    applyWorld(worldMaker);
+  function simulate(canvas, steps, initializeStep) {
+    if (initializeStep) {
+      clearWorld();
+      applyWorld(worldMaker);
+    }
     //setup debug draw
     var debugDraw = new b2DebugDraw();
     debugDraw.SetSprite(canvas[0].getContext("2d"));
@@ -297,10 +299,13 @@ _animatePhysics = function(steps, worldMaker) {
            .attr("style", "background-color:#333333;")
            .attr("height", _worldHeight);
     $physicsDiv.append("<br/>");
-    simulate($canvas, 1);
+    var initializeStep = true;
+    simulate($canvas, 1, initializeStep);
+    initializeStep = false;
     var $button = $("<button>Simulate</button>").appendTo($physicsDiv);
     $button.click(function() {
-      simulate($canvas, steps);
+      simulate($canvas, steps, initializeStep);
+      initializeStep = true;
     });
     var $clearButton = $("<button>Delete Animation Window</button>")
     $clearButton.appendTo($physicsDiv);
