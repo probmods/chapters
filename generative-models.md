@@ -434,6 +434,8 @@ Notice that `strength` is memoized because this is a property of a person true a
 (define (world) (addCircle emptyPlinko (marbleX) 0 marbleRadius #f))
 
 ;run physics and find out what bin the marble fell into
+;note: run physics now returns the final world, followed by the initial world
+;(so randomization is recorded)
 (define (runPlinko) (plinkoWhichBin (runPhysics 1000 world) ncol))
 
 (hist (repeat 100 runPlinko) "Plinko")
@@ -479,3 +481,8 @@ Random falling things:
 
 ~~~~
 
+Towers:
+
+~~~~
+(animatePhysics 1000 towerWorld)
+~~~~
