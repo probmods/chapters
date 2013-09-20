@@ -1,3 +1,5 @@
+//var intuitivePhysics = {}
+
 /*
 shim layer with setTimeout fallback
 from paul irish:
@@ -44,6 +46,24 @@ fixDef.friction = 0.1;
 fixDef.restitution = 0.2;
 
 var bodyDef = new b2BodyDef;
+
+function listToArray(list, recurse) {
+	var array = [];
+	while (list.length > 0) {
+		var left = list[0];
+		array.push((Array.isArray(left) && recurse) ? listToArray(left) : left);
+		list = list[1];
+	}
+	return array;
+}
+
+function arrayToList(arr) {
+	if (arr.length == 0) {
+		return the_empty_list;
+	} else {
+		return [arr[0], arrayToList(arr.slice(1))];
+	}
+}
 
 function clearWorld() {
   var count = world.GetBodyCount();
