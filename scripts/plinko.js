@@ -17,6 +17,8 @@ window.requestAnimFrame = (function(){
 
 function plinkoinit() {
   var canvas = $('#plinkocanvas')[0];
+    canvas.width = 600
+    canvas.height = 600
   var SCALE = 30; // 1 meter = 30 pixels
 
   var  b2World = Box2D.Dynamics.b2World,
