@@ -17,6 +17,22 @@ return  window.requestAnimationFrame       ||
         };
 })();
 
+var requestId;
+
+/*
+function start() {
+    if (!requestId) {
+       loop();
+    }
+}*/
+
+function stopAnim() {
+    if (requestId) {
+       window.cancelAnimationFrame(requestId);
+       requestId = undefined;
+    }
+}
+
 var SCALE = 30; // 1 meter = 30 pixels
 _worldWidth = 350;
 _worldHeight = 500;
@@ -259,13 +275,15 @@ _animatePhysics = function(steps, worldMaker) {
           ,  10       //velocity iterations
           ,  10       //position iterations
         );
+      } else {
+        stopAnim();
       }
       
       world.DrawDebugData();
       world.ClearForces();
       
       stepsSoFar++;
-      requestAnimFrame(function() {update(stepsSoFar);});
+      requestId = requestAnimFrame(function() {update(stepsSoFar);});
     };
 
     requestAnimFrame(function() {update(0);});
@@ -279,6 +297,7 @@ _animatePhysics = function(steps, worldMaker) {
            .attr("style", "background-color:#333333;")
            .attr("height", _worldHeight);
     $physicsDiv.append("<br/>");
+    simulate($canvas, 1);
     var $button = $("<button>Simulate</button>").appendTo($physicsDiv);
     $button.click(function() {
       simulate($canvas, steps);
@@ -291,6 +310,7 @@ _animatePhysics = function(steps, worldMaker) {
         var body = world.GetBodyList();
         world.DestroyBody(body);
       }
+      stopAnim();
       $physicsDiv.remove();
     });
     return "";
