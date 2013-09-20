@@ -450,15 +450,15 @@ Were you often right? Were there some cases of 'surprisingly stable' towers?  @H
 
 1) Here are three church programs:
 
-	~~~~
+	~~~~ {data-exercise="ex1.1"}
 	(if (flip) (flip 0.7) (flip 0.1))
 	~~~~
 
-	~~~~
+	~~~~ {data-exercise="ex1.2"}
 	(flip (if (flip) 0.7 0.1))
 	~~~~
 
-	~~~~
+	~~~~ {data-exercise="ex1.3"}
 	(flip 0.4) 
 	~~~~
 
@@ -469,12 +469,12 @@ Were you often right? Were there some cases of 'surprisingly stable' towers?  @H
 
 2) Explain why (in terms of the evaluation process) these two programs give different answers (i.e. have different distributions on return values):
 
-	~~~~
+	~~~~ {data-exercise="ex2.1"}
 	(define foo (flip))
 	(list foo foo foo)
 	~~~~
 
-	~~~~
+	~~~~ {data-exercise="ex2.2"}
 	(define (foo) (flip))
 	(list (foo) (foo) (foo))
 	~~~~
@@ -482,7 +482,7 @@ Were you often right? Were there some cases of 'surprisingly stable' towers?  @H
 
 3) In the simple medical diagnosis example we imagined a generative process for the diseases and symptoms of a single patient. If we wanted to represent the diseases of many patients we might have tried to make each disease and symptom into a ''function'' from a person to whether they have that disease, like this:
 
-	~~~~
+	~~~~ {data-exercise="ex3"}
 	(define (lung-cancer person)  (flip 0.01))
 	(define (cold person)  (flip 0.2))
 
@@ -496,7 +496,7 @@ Were you often right? Were there some cases of 'surprisingly stable' towers?  @H
 
 4) Work through the evaluation process for the `bend` higher-order function in this example:
 
-	~~~~
+	~~~~ {data-exercise="ex4"}
 	(define (make-coin weight) (lambda () (if (flip weight) 'h 't)))
 	(define (bend coin) 
 	  (lambda () (if (equal? (coin) 'h) 
@@ -513,7 +513,7 @@ Were you often right? Were there some cases of 'surprisingly stable' towers?  @H
 
 5) Here are four expressions you could evaluate using the model (the set of definitions) from the tug-of-war example:
 
-	~~~~
+	~~~~ {data-exercise="ex5"}
 	(winner '(alice) '(bob))
 
 	(equal? '(alice) (winner '(alice) '(bob)))
@@ -533,7 +533,7 @@ Were you often right? Were there some cases of 'surprisingly stable' towers?  @H
 
 #) Use the rules of probability, described above, to compute the probability that the geometric distribution define by the following stochastic recursion returns the number 5.
 
-	~~~~
+	~~~~ {data-exercise="ex6"}
 	(define (geometric p) 
 	  (if (flip p) 
 	      0 
@@ -541,7 +541,7 @@ Were you often right? Were there some cases of 'surprisingly stable' towers?  @H
 	~~~~
 
 
-6) Convert the following probability table to a compact Church program:
+#) Convert the following probability table to a compact Church program:
 
 	 A      B     P(A,B)
 	----  ----- -------------
@@ -552,7 +552,7 @@ Were you often right? Were there some cases of 'surprisingly stable' towers?  @H
  
 	Hint: fix the probability of A and then define the probability of B to *depend* on whether A is true or not. Run your Church program and build a histogram to check that you get the correct distribution
 
-	~~~~
+	~~~~ {data-exercise="ex7"}
 	(define a ...)
 	(define b ...)
 	(list a b)
