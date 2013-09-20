@@ -128,6 +128,8 @@ The higher-order function `make-coin` takes in a weight and outputs a function (
 (hist (repeat 20 trick-coin) "20 trick coin flips")
 (hist (repeat 20 bent-coin) "20 bent coin flips")
 ~~~~
+<!--FIXME: multiple hists... -->
+
 
 We can also define a higher-order function that takes a "coin" and "bends it":
 
@@ -224,15 +226,14 @@ As we did above, we can sample many times and examine the histogram of return va
 
 (hist (repeat 1000 random-pair) "return values")
 ~~~~
-(The parentheses around `random-pair` make an object that can be sampled from many times in a single execution of the program; this is described below, but the details aren't important for now.)
 
-We see by examining this histogram that `(#t #f)` comes out about 0.25 of the time. We may define the **probability** of a return value to be the fraction of times (in the long run) that this value is returned from evaluating the program -- then the probability of `(#t #f)` from the above program is 0.25.
+We see by examining this histogram that `(#t #f)` comes out about 25% of the time. We may define the **probability** of a return value to be the fraction of times (in the long run) that this value is returned from evaluating the program -- then the probability of `(#t #f)` from the above program is 0.25.
 
-Even for very complicated programs we can predict the probability of different outcomes by simulating (sampling from) the program. It is also often useful to compute these probabilties directly by reasoning about the sampling process.
+Even for very complicated programs we can predict the probability of different outcomes by simulating (sampling from) the program. It is also often useful to compute these probabilities directly by reasoning about the sampling process.
 
 ## Product Rule
 
-In the above example we take three steps to compute the output value: we sample from the first `(flip)`, then from the second, then we make a list from their values. To make this more clear let us re-write the program as:
+In the above example we take three steps to compute the output value: we sample from the first `(flip)`, then from the second, then we make a list from these values. To make this more clear let us re-write the program as:
 
 ~~~~
 (define A (flip))
@@ -240,7 +241,7 @@ In the above example we take three steps to compute the output value: we sample 
 (define C (list A B))
 C
 ~~~~
-We can directly observe (as we did above) that the probability of `#t` for `A` is 0.5, and the probability of `#f` from `B` is 0.5. Can we use these two probabilities to arrive at the probability of 0.25 for the overall outcome `C=(#t #f)`? Yes, using the *product rule* of probabilities:
+We can directly observe (as we did above) that the probability of `#t` for `A` is 0.5, and the probability of `#f` from `B` is 0.5. Can we use these two probabilities to arrive at the probability of 0.25 for the overall outcome `C` = `(#t #f)`? Yes, using the *product rule* of probabilities:
  The probability of two random choices is the product of their individual probabilities.
 The probability of several random choices together is often called the *joint probability* and written as $P(A,B)$.
 Since the first and second random choices must each have their specified values in order to get `(#t #f)` in the example, the joint probability is their product: 0.25.
@@ -248,12 +249,12 @@ Since the first and second random choices must each have their specified values 
 We must be careful when applying this rule, since the probability of a choice can depend on the probabilities of previous choices. For instance, compute the probability of `(#t #f)` resulting from this program:
 
 ~~~~
-(define a (flip))
-(define b (flip (if a 0.3 0.7)))
-(list a b)
+(define A (flip))
+(define B (flip (if A 0.3 0.7)))
+(list A B)
 ~~~~
 
-In general, the joint probability of two random choices $A$ and $B$ made sequentially, in that order, can be written as $P(A,B) = P(A) P(B|A)$.  This is read as the product of the probability of $A$ and the probability of "$B$ given $A$", or "$B$ conditioned on $A$" -- that is, the probability of making choice $B$ given that choice $A$ has been made in a certain way.  Only when the second choice is independent of the first choice does this expression reduce to a product of the simple probabilities of each choice individually: $P(A,B) = P(A) P(B)$.
+In general, the joint probability of two random choices $A$ and $B$ made sequentially, in that order, can be written as $P(A,B) = P(A) P(B|A)$.  This is read as the product of the probability of $A$ and the probability of "$B$ given $A$", or "$B$ conditioned on $A$"---that is, the probability of making choice $B$ given that choice $A$ has been made in a certain way.  Only when the second choice does not depend on (or "look at") the first choice does this expression reduce to a simple product of the probabilities of each choice individually: $P(A,B) = P(A) P(B)$.
 
 What is the relation between $P(A,B)$ and $P(B,A)$, the joint probability of the same choices written in the opposite order?  The only logically consistent definitions of probability require that these two probabilities be equal, so $P(A) P(B|A) = P(B) P(A|B)$.  This is the basis of <em>Bayes' theorem</em>, which we will encounter later.  <!--For more see [[The Meaning of Probabilistic Programs]].-->
 
@@ -269,16 +270,16 @@ We can sample from this program and determine that the probability of returning 
 We cannot simply use the product rule to determine this probability because we don't know the sequence of random choices that led to this return value.
 However we can notice that the program will return true if the two component choices are `#t,#t`, or `#t,#f`, or `#f,#t`. To combine these possibilities we use another rule for probabilities:
  If there are two alternative sequences of choices that lead to the same return value, the probability of this return value is the sum of the probabilities of the sequences.
-We can write this using probability notation as: $P(A) = \sum_{B} P(A,B)$ , where we view $A$ as the final value and $B$ as the sequence of random choices on the way to that value.
+We can write this using probability notation as: $P(A) = \sum_{B} P(A,B)$, where we view $A$ as the final value and $B$ as a random choice on the way to that value.
 Using the product rule we can determine that the probability in the example above is 0.25 for each sequence that leads to return value `#t`, then, by the sum rule, the probability of `#t` is 0.25+0.25+0.25=0.75.
 
-Using the sum rule to compute the probability of a final value is called *marginalization*. From the point of view of sampling processes marginalization is simply ignoring (or not looking at) intermediate random values that are created on the way to a final return value. From the point of view of directly computing probabilities, marginalization is summing over all the possible "histories" that could lead to a return value.
+Using the sum rule to compute the probability of a final value is called *marginalization*. From the point of view of sampling processes marginalization is simply ignoring (or not looking at) intermediate random values that are created on the way to a final return value. From the point of view of directly computing probabilities, marginalization is summing over all the possible "histories" that could lead to a return value. Putting the product and sum rules together, the marginal probability of return values from a program that we have explored above is the sum over sampling histories of the product over choice probabilities---a computation that can quickly grow unmanageable, but can be approximated by sampling.
 
 
 
 # Stochastic recursion
 
-It is possible to have a ''stochastic recursion'' that randomly decides whether to stop. Importantly, such recursion must be constructed to halt eventually (with probability 1). For example, an important probability distribution is the ''geometric distribution''. The geometric distribution is a distribution over the non-negative integers that represents the probability of flipping a coin $N$ times and getting exactly 1 head. This distribution can be written in Church with the following simple recursion.
+[Recursive functions](appendix-scheme.html#recursion) are a powerful way to structure computation in deterministic systems. In Church it is possible to have a *stochastic* recursion that randomly decides whether to stop. For example, the *geometric distribution* is a probability distribution over the non-negative integers that represents the probability of flipping a coin $N$ times and getting `true` exactly once:
 
 ~~~~
 (define (geometric p) 
@@ -286,16 +287,15 @@ It is possible to have a ''stochastic recursion'' that randomly decides whether 
       0 
       (+ 1 (geometric p))))
 
-(geometric .8)
+(hist (repeat 1000 (lambda () (geometric 0.6))) "Geometric of 0.6")
 ~~~~
 
-Notice that the base case of the recursion is probabilistic. There is no upper bound on how long the computation can go on, although the probability of reaching some number declines quickly as we walk out on the number line.
-
+There is no upper bound on how long the computation can go on, although the probability of reaching some number declines quickly as we go. Indeed, stochastic recursions must be constructed to halt eventually (with probability 1). 
 
 
 # Persistent Randomness: `mem`
 
-Consider building a model with a set of objects that each have a randomly chosen property. For instance, describing the eye colors of a set of people:
+It is often useful to model a set of objects that each have a randomly chosen property. For instance, describing the eye colors of a set of people:
 
 ~~~~
 (define (eye-color person) (uniform-draw '(blue green brown)))
@@ -310,22 +310,13 @@ The results of this generative process are clearly wrong: Bob's eye
 color can change each time we ask about it! What we want is a model in
 which eye color is random, but *persistent.* We can do this using
 another Church primitive: `mem`. `mem` is a higher order
-function: it takes a procedure and produces a *memoized* version of
+function that takes a procedure and produces a *memoized* version of
 the procedure.
-<!-- The original procedure is wrapped in some logic which
-intercepts calls to the underlying procedure. The first time the
-procedure is called with some arguments, the underlying procedure is
-invoked to get a return value. This return value is then stored in a
-table with associated with the input arguments. Finally, the value is
-returned to the caller. If the memoized procedure is called again with
-the same arguments, the value associated with those arguments is
-simply looked up an returned without calling the underlying procedure
-again. -->
 When a stochastic procedure is memoized, it will
-sample a random value on the **first** call, and then return that
-same value when called with the same arguments thereafter. The
+sample a random value the *first* time it is used for some arguments, but return that
+same value when called with those arguments thereafter. The
 resulting memoized procedure has a persistent value within each "run"
-of the generative model. For instance consider the equality of two
+of the generative model (or simulated world). For instance consider the equality of two
 flips, and the equality of two memoized flips:
 
 ~~~~
@@ -341,8 +332,7 @@ Now returning to the eye color example, we can represent the notion that eye col
 
 ~~~~
 (define eye-color
-  (mem
-    (lambda (person) (uniform-draw '(blue green brown)))))
+  (mem (lambda (person) (uniform-draw '(blue green brown)))))
 
 (list
  (eye-color 'bob)
@@ -350,8 +340,8 @@ Now returning to the eye color example, we can represent the notion that eye col
  (eye-color 'bob) )
 ~~~~
 
-This type of modeling is called *random world* style (McAllester,
-Milch, Goodman, 2008). Note that we don't have to specify ahead of
+This type of modeling is called *random world* style [@Mcallester2008].
+Note that we don't have to specify ahead of
 time the people whose eye color we will ask about: the distribution on
 eye colors is implicitly defined over the infinite set of possible
 people, but only constructed "lazily" when needed.  Memoizing
@@ -366,9 +356,10 @@ outcome of the $n$th flip of a particular coin:
       (list (flip-n 1) (flip-n 12) (flip-n 47) (flip-n 1548)))
 ~~~~
 
-There are in principle a countably infinite number of such flips, each independent
-of all the others.  But the outcome of the $n$th flip -- the 1st, the
-12th, the 47th, or the 1548th -- once determined, will always have the same value.
+There are a countably infinite number of such flips, each independent
+of all the others. The outcome of each, once determined, will always have the same value.
+
+<!--
 Here we define a function that encodes the outcome of the $n$th flip
 of the $m$th coin, a doubly infinite set of properties:
 
@@ -377,24 +368,25 @@ of the $m$th coin, a doubly infinite set of properties:
 (list (list (flip-n-coin-m 1 1) (flip-n-coin-m 12 1) (flip-n-coin-m 1 47) (flip-n-coin-m 12 47))
       (list (flip-n-coin-m 1 3) (flip-n-coin-m 12 3) (flip-n-coin-m 1 47) (flip-n-coin-m 12 47)))
 ~~~~
+-->
 
-In traditional computer science memoization is an important technique
-for optimizing programs by avoiding repeated work (see
-[[Memoization as Optimization]]). In the probabilistic setting, such
-as in Church, we can see this taken further and memoization
-actually affects the *expressivity* of the language.
+In computer science memoization is an important technique
+for optimizing programs by avoiding repeated work.  
+In the probabilistic setting, such as in Church, memoization actually affects the meaning of the memoized function.
+
+
 
 # Example: Bayesian Tug of War
 
-Imagine a game of tug of war, where each person may be strong or weak, and may be lazy or not on each match. If a person is lazy they only pull with half their strength. The team that pulls hardest will win. We assume that half of all people are strong, and that on any match, each person has a 1 in 3 chance of being lazy.  This program runs a tournament between several teams, mixing up players across teams.  Can you guess who is strong or weak, looking at the tournament results?
+Imagine a game of tug of war, where each person may be strong or weak, and may be lazy or not on each match. If a person is lazy they only pull with half their strength. The team that pulls hardest will win. We assume that strength is a continuous property of an individual, and that on any match, each person has a 25% chance of being lazy.  This Church program runs a tournament between several teams, mixing up players across teams.  Can you guess who is strong or weak, looking at the tournament results?
 
 ~~~~
-(define strength (mem (lambda (person) (if (flip) 10 5))))
+(define strength (mem (lambda (person) (gaussian 0 1))))
 
-(define lazy (lambda (person) (flip (/ 1 3))))
+(define lazy (lambda (person) (flip 0.25)))
 
 (define (total-pulling team)
-  (apply +
+  (sum
          (map (lambda (person) (if (lazy person) (/ (strength person) 2) (strength person)))
               team)))
 
@@ -410,7 +402,7 @@ Imagine a game of tug of war, where each person may be strong or weak, and may b
 
 ~~~~
 
-Notice that `strength` is memoized because this is a property of a person true across many matches, while `lazy` isn't.  Each time you run this program, however, a new "random world" will be created: people's strengths will be randomly re-generated and used in all the matches.
+Notice that `strength` is memoized because this is a property of a person true across many matches, while `lazy` isn't.  Each time you run this program, however, a new "random world" will be created: people's strengths will be randomly re-generated, then used in all the matches.
 
 
 
@@ -481,8 +473,114 @@ Random falling things:
 
 ~~~~
 
-Towers:
+# Exercises
 
-~~~~
-(animatePhysics 1000 towerWorld)
-~~~~
+1) Here are three church programs:
+
+	~~~~
+	(if (flip) (flip 0.7) (flip 0.1))
+	~~~~
+
+	~~~~
+	(flip (if (flip) 0.7 0.1))
+	~~~~
+
+	~~~~
+	(flip 0.4) 
+	~~~~
+
+	A) Show that the marginal distribution on return values for these three programs is the same by directly computing the probability using the rules of probability (hint: write down each possible history of random choices for each program). Check your answers by sampling from the programs. 
+
+	B) Explain why these different-looking programs can give the same results.
+
+
+2) Explain why (in terms of the evaluation process) these two programs give different answers (i.e. have different distributions on return values):
+
+	~~~~
+	(define foo (flip))
+	(list foo foo foo)
+	~~~~
+
+	~~~~
+	(define (foo) (flip))
+	(list (foo) (foo) (foo))
+	~~~~
+
+
+3) In the simple medical diagnosis example we imagined a generative process for the diseases and symptoms of a single patient. If we wanted to represent the diseases of many patients we might have tried to make each disease and symptom into a ''function'' from a person to whether they have that disease, like this:
+
+	~~~~
+	(define (lung-cancer person)  (flip 0.01))
+	(define (cold person)  (flip 0.2))
+
+	(define (cough person) (or (cold person) (lung-cancer person)))
+
+	(list  (cough 'bob) (cough 'alice))
+	~~~~
+
+	Why doesn't this work correctly if we try to do the same thing for the more complex medical diagnosis example? How could we fix it?
+
+
+4) Work through the evaluation process for the `bend` higher-order function in this example:
+
+	~~~~
+	(define (make-coin weight) (lambda () (if (flip weight) 'h 't)))
+	(define (bend coin) 
+	  (lambda () (if (equal? (coin) 'h) 
+	                 ( (make-coin 0.7) )
+	                 ( (make-coin 0.1) ) )))
+	
+	(define fair-coin (make-coin 0.5))
+	(define bent-coin (bend fair-coin))
+	
+	(hist (repeat 100 bent-coin) "bent coin")
+	~~~~
+
+	Directly compute the probability of the bent coin in the example. Check your answer by comparing to the histogram of many samples.
+
+5) Here are four expressions you could evaluate using the model (the set of definitions) from the tug-of-war example:
+
+	~~~~
+	(winner '(alice) '(bob))
+
+	(equal? '(alice) (winner '(alice) '(bob)))
+
+	(and (equal? '(alice) (winner '(alice) '(bob)))  
+	     (equal? '(alice) (winner '(alice) '(fred))))
+
+	(and (equal? '(alice) (winner '(alice) '(bob))) 
+	     (equal? '(jane) (winner '(jane) '(fred))))
+	~~~~
+
+	A) Write down the sequence of expression evaluations and random choices that will be made in evaluating each expression.
+
+	B) Directly compute the probability for each possible return value from each expression.
+
+	C) Why are the probabilities different for the last two? Explain both in terms of the probability calculations you did and in terms of the "causal" process of evaluating and making random choices.
+
+#) Use the rules of probability, described above, to compute the probability that the geometric distribution define by the following stochastic recursion returns the number 5.
+
+	~~~~
+	(define (geometric p) 
+	  (if (flip p) 
+	      0 
+	      (+ 1 (geometric p))))
+	~~~~
+
+
+6) Convert the following probability table to a compact Church program:
+
+	 A      B     P(A,B)
+	----  ----- -------------
+ 	F      F     0.14
+ 	F      T     0.96
+ 	T      F     0.4
+ 	T      T     0.4
+ 
+	Hint: fix the probability of A and then define the probability of B to *depend* on whether A is true or not. Run your Church program and build a histogram to check that you get the correct distribution
+
+	~~~~
+	(define a ...)
+	(define b ...)
+	(list a b)
+	~~~~

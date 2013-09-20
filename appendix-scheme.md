@@ -135,7 +135,7 @@ In the above example we have used several useful utility functions. `map` is a h
 (list "These numbers should all be equal:" (sum my-list) (apply + my-list) (+ 3 5 2047))
 ~~~~
 
-Higher-order functions like `repeat`, `map`, `apply` (or `sum`) can be quite useful.  Here we use them to visualize the number of heads we expect to see if we flip a weighted coin (weight = 0.8) 10 times.  We'll repeat this experiment 1000 times and then use `hist` to visualize the results.  Try varying the coin weight or the number of repetitions to see how the expected distribution changes.
+Higher-order functions like `repeat`, `map`, or `apply` can be quite useful.  Here we use them to visualize the number of heads we expect to see if we flip a weighted coin (weight = 0.8) 10 times.  We'll repeat this experiment 1000 times and then use `hist` to visualize the results.  Try varying the coin weight or the number of repetitions to see how the expected distribution changes.
 
 ~~~~
 (define make-coin (lambda (weight) (lambda () (flip weight))))
