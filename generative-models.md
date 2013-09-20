@@ -408,9 +408,47 @@ Notice that `strength` is memoized because this is a property of a person true a
 
 #Example: Intuitive physics
 
-@Hamrick2011 have explored human intuitions about the stability of block towers.
+Humans have a deep intuitive understanding of everyday physics---this allows us to make furniture, appreciate sculpture, and play baseball. How can we describe this intuitive physics? One approach is to posit that humans have a generative model that captures key aspects of real physics, though perhaps with approximations and noise. This mental physics simulator could for instance approximate Newtonian mechanics, allowing us to imagine the future state of a collection of (rigid) bodies.
+We have included such a 2-dimensional physics simulator, the function `runPhysics`, that takes a collection of physical objects and runs physics 'forward' by some amount of time. (We also have `animatePhysics`, which does the same, but gives us an animation to see what is happening.) We can use this to imagine the outcome of various initial states, as in the Plinko machine example above:
 
-<!-- Put in simple 2d physics examples here: plinko, stability, ping-pong. -->
+~~~~
+(define (dim) (uniform 5 20))
+(define (xPos) (uniform 0 worldWidth))
+(define (yPos) (uniform 0 worldHeight))
+
+(define groundedWorld (addRect emptyWorld
+                               (/ worldWidth 2)
+                               worldHeight
+                               worldWidth
+                               10
+                               #t))
+
+(define (addRndCircle w) (addCircle w (xPos) (yPos) (dim) #f))
+(define (addRndRect w) (addRect w (xPos) (yPos) (dim) (dim) #f))
+
+(define (world) (addRndCircle (addRndRect (addRndCircle groundedWorld))))
+
+(animatePhysics 1000 world)
+~~~~
+
+There are many judgments that you could imagine making with such a physics simulator. @Hamrick2011 have explored human intuitions about the stability of block towers. Look at several different random block towers; first judge whether you think the tower is stable, then simulate to find out if it is:
+
+~~~~
+(animatePhysics 1000 towerWorld)
+~~~~
+
+Were you often right? Were there some cases of 'surprisingly stable' towers?  @Hamrick2011 account for these cases by positing that people are not entirely sure where the blocks are initially (perhaps due to noise in visual perception). Thus our intuitions of stability are really stability given noise (or the expected stability marginalizing over slightly different initial configurations). We can realize this measure of stability as:
+
+~~~~
+(define (runTower) (doesTowerFall (runPhysics 1000 towerWorld)))
+(hist (repeat 10 runTower))
+~~~~
+
+
+
+
+
+
 
 ~~~~
 (define marbleRadius 8)
