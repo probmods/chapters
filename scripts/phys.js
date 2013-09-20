@@ -27,10 +27,10 @@ function start() {
 }*/
 
 function stopAnim() {
-    if (requestId) {
-       window.cancelAnimationFrame(requestId);
-       requestId = undefined;
-    }
+  if (requestId) {
+    window.cancelAnimationFrame(requestId);
+    requestId = undefined;
+  }
 }
 
 var SCALE = 30; // 1 meter = 30 pixels
@@ -73,6 +73,8 @@ function listToArray(list, recurse) {
 	}
 	return array;
 }
+
+var the_empty_list = [];
 
 function arrayToList(arr) {
 	if (arr.length == 0) {
@@ -283,7 +285,7 @@ _animatePhysics = function(steps, worldMaker) {
           ,  10       //position iterations
         );
       } else {
-        stopAnim();
+        //stopAnim();
       }
       
       world.DrawDebugData();
