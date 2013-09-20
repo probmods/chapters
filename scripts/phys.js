@@ -373,8 +373,8 @@ _towerWorld = function() {
   return jsWorld_to_churchWorld(tower);
 }
 
-/*
-_isTowerStable = function(churchWorlds {
+
+/*_isTowerStable = function(churchWorlds {
   var arrayWorlds = listToArray(churchWorlds);
   var finalWorld = arrayWorlds[0];
   var initialWorld = arrayWorlds[1];
