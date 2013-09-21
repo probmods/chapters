@@ -250,12 +250,12 @@ util.openModule(church_builtins);
         $(item).replaceWith(el);},
       {
         value: text,
-        lineNumbers: true,
+        lineNumbers: false,
         matchBrackets: true,
         continueComments: "Enter",
         viewportMargin: Infinity
       });
-    editor.engine = selectedEngine || 'webchurch'; 
+    editor.engine = selectedEngine || 'webchurch';
 
     // results div
     var $results = $("<pre class='results'>"); 
