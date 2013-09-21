@@ -469,12 +469,12 @@ Were you often right? Were there some cases of 'surprisingly stable' towers?  @H
 
 2) Explain why (in terms of the evaluation process) these two programs give different answers (i.e. have different distributions on return values):
 
-	~~~~ {data-exercise="ex2.1"}
+	~~~~ {data-exercise="ex2-1"}
 	(define foo (flip))
 	(list foo foo foo)
 	~~~~
 
-	~~~~ {data-exercise="ex2.2"}
+	~~~~ {data-exercise="ex2-2"}
 	(define (foo) (flip))
 	(list (foo) (foo) (foo))
 	~~~~

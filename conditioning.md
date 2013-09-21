@@ -512,87 +512,83 @@ A model very similar to this was used in Gerstenberg and Goodman (2012)<ref>Ping
 
 # Exercises
 
-## Conditioning and intervention
+1) Conditioning and intervention: In the example on [[Generative Models#Example: Causal Models in Medical Diagnosis | Medical Diagnosis]] from the [[Generative Models]] section we suggested understanding the patterns of symptoms for a particular disease by changing the program to make that disease always true.
 
-In the example on [[Generative Models#Example: Causal Models in Medical Diagnosis | Medical Diagnosis]] from the [[Generative Models]] section we suggested understanding the patterns of symptoms for a particular disease by changing the program to make that disease always true.
+	A) For this example, does this procedure give the same answers as using `query` to *condition* on the disease being true?
 
-a. For this example, does this procedure give the same answers as using `query` to *condition* on the disease being true?
+	B) Why would this procedure give different answers than conditioning for more general hypotheticals? Construct an example where these are different. Then translate this into a Church model and show that intervening and observation give different answers. Hint: think about intervening versus observing on a variable that has a causal parent.
 
-b. Why would this procedure give different answers than conditioning for more general hypotheticals? Construct an example where these are different. Then translate this into a Church model and show that intervening and observation give different answers. Hint: think about intervening versus observing on a variable that has a causal parent.
+2) Computing marginals: Use the rules for computing probabilities to compute the marginal distribution on return values from these Church programs.
 
-## Computing marginals
+	~~~~ {data-exercise="ex2-1"}
+	(rejection-query
+	  (define a (flip))
+	  (define b (flip))
+	  a
+	  (or a b))
+	~~~~
 
-Use the rules for computing probabilities to compute the marginal distribution on return values from these Church programs.
+	~~~~ {data-exercise="ex2-2"}
+	(rejection-query
+	 (define nice (mem (lambda (person) (flip 0.7))))
+	 (define (smiles person) (if (nice person) (flip 0.8) (flip 0.5)))
+	 (nice 'alice)
+	 (and (smiles 'alice)  (smiles 'bob) (smiles 'alice)))
+	~~~~
 
-~~~~
-(rejection-query
-  (define a (flip))
-  (define b (flip))
-  a
-  (or a b))
-~~~~
+3) Extending the smiles model:
 
-~~~~
-(rejection-query
- (define nice (mem (lambda (person) (flip 0.7))))
- (define (smiles person) (if (nice person) (flip 0.8) (flip 0.5)))
- (nice 'alice)
- (and (smiles 'alice)  (smiles 'bob) (smiles 'alice)))
-~~~~
+	A) Describe (using ordinary English) what the second Church program above means.
 
-## Extending the smiles model
+	B) How would you change it if you thought people are more likely to smile if they want something? If you think some people are more likely to want something than others? If you think nice people are less likely to want something?
 
-a. Describe (using ordinary English) what the second Church program above means.
-b. How would you change it if you thought people are more likely to smile if they want something? If you think some people are more likely to want something than others? If you think nice people are less likely to want something?
-c. Given your extended model, how would you ask whether someone wants something from you, given that they are smiling and have rarely smiled before? Show the Church program and a histogram of the answers -- in what ways do these answers make intuitive sense or fail to?
+	C) Given your extended model, how would you ask whether someone wants something from you, given that they are smiling and have rarely smiled before? Show the Church program and a histogram of the answers -- in what ways do these answers make intuitive sense or fail to?
 
-## Casino game
-
-Suppose that you are playing the following game at a casino. In this game, a machine randomly gives you a letter of the alphabet and the probability of winning depends on which letter you receive. The machine gives the letters a, e, i, o, u, y (the vowels) with probability 0.01 each and the remaining letters (i.e., the consonants) with probability 0.047 each. Let's use the variable $h$ to denote the letter that you receive; the probability of winning for a given $h$ is $1/Q(h)^2$, where $Q(h)$ denotes the numeric position of the letter (e.g., $Q(\textrm{a}) = 1, Q(\textrm{b}) = 2$, and so on).
+4) Casino game: Suppose that you are playing the following game at a casino. In this game, a machine randomly gives you a letter of the alphabet and the probability of winning depends on which letter you receive. The machine gives the letters a, e, i, o, u, y (the vowels) with probability 0.01 each and the remaining letters (i.e., the consonants) with probability 0.047 each. Let's use the variable $h$ to denote the letter that you receive; the probability of winning for a given $h$ is $1/Q(h)^2$, where $Q(h)$ denotes the numeric position of the letter (e.g., $Q(\textrm{a}) = 1, Q(\textrm{b}) = 2$, and so on).
 Let's express this in formal terms. The hypothesis space, $H$, is the set of letters $\{a, b, c, d, \dots, y, z\}$ and the prior probability of a hypothesis $h$ is   0.01 for vowels (a, e, i, o, u, y) and 0.047 for consonants. The likelihood, $p(d \mid h) = 1/Q(h)^2$, is the probability of winning given that you drew some letter $h$.
 
-a. (Here, give your answers in English, not math) What does the $d$ in $p(d \mid h)$ represent? What does the posterior $p(h \mid d)$ represent?
+	A) (Here, give your answers in English, not math) What does the $d$ in $p(d \mid h)$ represent? What does the posterior $p(h \mid d)$ represent?
 
-b. Manually compute $p(h \mid d)$ for each hypothesis (Excel or something like it is helpful here). Remember to normalize - make sure that summing all your $p(h \mid d)$ values gives you 1.
+	B) Manually compute $p(h \mid d)$ for each hypothesis (Excel or something like it is helpful here). Remember to normalize - make sure that summing all your $p(h \mid d)$ values gives you 1.
 Now, we're going to write this model in Church using the `cosh` engine. Here is some starter code for you:
 
-~~~~ {.cosh}
-;; define some variables and utility functions
-(define letters '(a b c d e f g h i j k l m n o p q r s t u v w x y z) )
-(define (vowel? letter) (if (member letter '(a e i o u y)) #t #f))
-(define letter-probabilities (map (lambda (letter) (if (vowel? letter) 0.01 0.047)) letters))
-
-(define (my-list-index needle haystack counter)
-  (if (null? haystack)
-      'error
-      (if (equal? needle (first haystack))
-          counter
-          (my-list-index needle (rest haystack) (+ 1 counter)))))
-
-(define (get-position letter) (my-list-index letter letters 1))
-
-;; actually compute p(h | d)
-(rejection-query
- (define my-letter (multinomial letters letter-probabilities))
-
- (define my-position (get-position my-letter))
- (define my-win-probability (/ 1.0 (* my-position my-position)))
- (define win? ...)
-
- ;; query
- ...
-
- ;; condition
- ...
-)
-~~~~
-
-c. What does the `my-list-index` function do? What would happen if you ran `(my-list-index 'mango '(apple banana) 1)`?
-
-d. What does the `multinomial` function do? Use `multinomial` to express this distribution: TODO
-
-e. Fill in the `...`'s in the code to compute $p(h \mid d)$. Include a screenshot of the resulting graph. What letter has the highest posterior probability? In English, what does it mean that this letter has the highest posterior? Make sure that your Church answers and hand-computed answers agree - note that this demonstrates the equivalence between the program view of conditional probability and the distributional view.
-
-f. Which is higher, $p(\text{vowel} \mid d)$ or $p(\text{consonant} \mid d)$? Answer this using the Church code you wrote (hint: use the `vowel?` function)
-
-g. What difference do you see between your code and the mathematical notation? What are the advantages and disadvantages of each? Which do you prefer?
+		~~~~ {data-engine="cosh" data-exercise="ex5"}
+		;; define some variables and utility functions
+		(define letters '(a b c d e f g h i j k l m n o p q r s t u v w x y z) )
+		(define (vowel? letter) (if (member letter '(a e i o u y)) #t #f))
+		(define letter-probabilities (map (lambda (letter) (if (vowel? letter) 0.01 0.047)) letters))
+		
+		(define (my-list-index needle haystack counter)
+		  (if (null? haystack)
+		      'error
+		      (if (equal? needle (first haystack))
+		          counter
+		          (my-list-index needle (rest haystack) (+ 1 counter)))))
+		
+		(define (get-position letter) (my-list-index letter letters 1))
+		
+		;; actually compute p(h | d)
+		(rejection-query
+		 (define my-letter (multinomial letters letter-probabilities))
+		
+		 (define my-position (get-position my-letter))
+		 (define my-win-probability (/ 1.0 (* my-position my-position)))
+		 (define win? ...)
+		
+		 ;; query
+		 ...
+		
+		 ;; condition
+		 ...
+		)
+		~~~~
+	
+	C) What does the `my-list-index` function do? What would happen if you ran `(my-list-index 'mango '(apple banana) 1)`?
+	
+	D) What does the `multinomial` function do? Use `multinomial` to express this distribution: TODO
+	
+	E) Fill in the `...`'s in the code to compute $p(h \mid d)$. Include a screenshot of the resulting graph. What letter has the highest posterior probability? In English, what does it mean that this letter has the highest posterior? Make sure that your Church answers and hand-computed answers agree - note that this demonstrates the equivalence between the program view of conditional probability and the distributional view.
+	
+	F) Which is higher, $p(\text{vowel} \mid d)$ or $p(\text{consonant} \mid d)$? Answer this using the Church code you wrote (hint: use the `vowel?` function)
+	
+	G) What difference do you see between your code and the mathematical notation? What are the advantages and disadvantages of each? Which do you prefer?

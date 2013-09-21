@@ -331,6 +331,7 @@ Explaining away effects can be more indirect.  Instead of observing the truth va
 (and smokes chest-pain cough) with (and smokes chest-pain cough fever) or
                                    (and smokes chest-pain cough (not fever))
 ~~~~
+
 In this case, finding out that the patient either does or does not have a fever makes a crucial difference in whether we think that the patient has lung disease... even though fever itself is not at all diagnostic of lung disease, and there is no causal connection between them.
 <!--
 This is an important point, but I'm not sure how to work it in.  It should also be made more general, beyond linguistics:
@@ -340,6 +341,7 @@ In models in cognitive science in general and linguistics in particular this kin
 -->
 
 We can express the general phenomenon of explaining away with the following schematic Church query:
+
 ~~~~ {.norun}
 (query
   (define a ...)
@@ -351,6 +353,7 @@ We can express the general phenomenon of explaining away with the following sche
 
   (and (equal? data some-value) (equal? a some-other-value)))
 ~~~~
+
 We have defined two independent variables `a` and `b` both of which are used to define the value of our data. If we condition on the data and `a` the posterior distribution on `b` will now be dependent on `a`: observing additional information about `a` changes our conclusions about `b`.
 
 The most typical pattern of explaining away we see in causal reasoning is a kind of *anti-correlation*: the probabilities of two possible causes for the same effect increase when the effect is observed, but they are conditionally anti-correlated, so that observing additional evidence in favor of one cause should lower our degree of belief in the other cause.  However, the coupling in belief
@@ -642,78 +645,72 @@ condition on effect of observing contour
 
 # Exercises
 
-## Causal and statistical dependency
+1) Causal and statistical dependency. For each of the following programs:
+	* Draw the dependency diagram (Bayes net). If you don't have software on your computer for doing this, Google Docs has a decent interface for creating drawings.
+	* Use informal evaluation order reasoning and the intervention method to determine causal dependency between A and B.
+	* Use conditioning to determine whether A and B are statistically dependent.
 
-For each of the following programs:
-
-- Draw the dependency diagram (Bayes net). If you don't have software on your computer for doing this, Google Docs has a decent interface for creating drawings.
-- Use informal evaluation order reasoning and the intervention method to determine causal dependency between A and B.
-- Use conditioning to determine whether A and B are statistically dependent.
-
-(a)
-
-~~~~ {.cosh}
-(define a (flip))
-(define b (flip))
-(define c (flip (if (and a b) 0.8 0.5)))
-~~~~
-
-(b)
-
-~~~~ {.cosh}
-(define a (flip))
-(define b (flip (if a 0.9 0.2)))
-(define c (flip (if b 0.7 0.1)))
-~~~~
-
-(c)
-
-~~~~ {.cosh}
-(define a (flip))
-(define b (flip (if a 0.9 0.2)))
-(define c (flip (if a 0.7 0.1)))
-~~~~
-
-(d)
-
-~~~~ {.cosh}
-(define a (flip 0.6))
-(define c (flip 0.1))
-(define z (uniform-draw (list a c)))
-(define b (if z 'foo 'bar))
-~~~~
-
-(e)
-
-~~~~ {.mit-church}
-(define exam-fair-prior .8)
-(define does-homework-prior .8)
-(define exam-fair? (mem (lambda (exam) (flip exam-fair-prior))))
-(define does-homework? (mem (lambda (student) (flip does-homework-prior))))
-
-(define (pass? student exam) (flip (if (exam-fair? exam)
-                                       (if (does-homework? student) 0.9 0.5)
-                                       (if (does-homework? student) 0.2 0.1))))
-
-(define a (pass? 'alice 'history-exam))
-(define b (pass? 'bob 'history-exam))
-~~~~
+	A)
+	
+	~~~~ {data-exercise="ex1-1"}
+	(define a (flip))
+	(define b (flip))
+	(define c (flip (if (and a b) 0.8 0.5)))
+	~~~~
+	
+	B)
+	
+	~~~~ {data-exercise="ex1-2"}
+	(define a (flip))
+	(define b (flip (if a 0.9 0.2)))
+	(define c (flip (if b 0.7 0.1)))
+	~~~~
+	
+	C)
+	
+	~~~~ {data-exercise="ex1-3"}
+	(define a (flip))
+	(define b (flip (if a 0.9 0.2)))
+	(define c (flip (if a 0.7 0.1)))
+	~~~~
+	
+	D)
+	
+	~~~~ {data-exercise="ex1-4"}
+	(define a (flip 0.6))
+	(define c (flip 0.1))
+	(define z (uniform-draw (list a c)))
+	(define b (if z 'foo 'bar))
+	~~~~
+	
+	E)
+	
+	~~~~  {data-exercise="ex1-5"}
+	(define exam-fair-prior .8)
+	(define does-homework-prior .8)
+	(define exam-fair? (mem (lambda (exam) (flip exam-fair-prior))))
+	(define does-homework? (mem (lambda (student) (flip does-homework-prior))))
+	
+	(define (pass? student exam) (flip (if (exam-fair? exam)
+	                                       (if (does-homework? student) 0.9 0.5)
+	                                       (if (does-homework? student) 0.2 0.1))))
+	
+	(define a (pass? 'alice 'history-exam))
+	(define b (pass? 'bob 'history-exam))
+	~~~~
 
 
-## Epidemiology
+#) Epidemiology: Imagine that you are an epidemiologist and you are determining people's cause of death. In this simplified world, there are two main diseases, cancer and the common cold. People rarely have cancer, $p( \text{cancer}) = 0.00001$, but when they do have cancer, it is often fatal, $p( \text{death} \mid \text{cancer} ) = 0.9$. People are much more likely to have a common cold, $p( \text{cold} ) = 0.2$, but it is rarely fatal, $p( \text{death} \mid \text{cold} ) = 0.00006$. Very rarely, people also die of other causes $p(\text{death} \mid \text{other}) = 0.000000001$.
 
-Imagine that you are an epidemiologist and you are determining people's cause of death. In this simplified world, there are two main diseases, cancer and the common cold. People rarely have cancer, $p( \text{cancer}) = 0.00001$, but when they do have cancer, it is often fatal, $p( \text{death} \mid \text{cancer} ) = 0.9$. People are much more likely to have a common cold, $p( \text{cold} ) = 0.2$, but it is rarely fatal, $p( \text{death} \mid \text{cold} ) = 0.00006$. Very rarely, people also die of other causes $p(\text{death} \mid \text{other}) = 0.000000001$.
-
-Write this model in Church program and use cosh to answer these questions:
-
-a. Compute $p( \text{cancer} \mid \text{death} \wedge \text{cold} )$ and $p( \text{cancer} \mid \text{death} \wedge \text{no cold} )$. How do these probabilities compare to $p( \text{cancer} \mid \text{death} )$ and $p( \text{cancer} )$? Using these probabilities, give an example of explaining away.
-
-b. Compute $p( \text{cold} \mid \text{death} \wedge \text{cancer} )$ and $p( \text{cold} \mid \text{death} \wedge \text{no cancer} )$. How do these probabilities compare to $p( \text{cold} \mid \text{death} )$ and $p( \text{cold} )$? Using these probabilities, give an example of explaining away.
-
-Be sure to include your code in your answer.
-
-~~~~ {.cosh}
-;; use rejection-query and cosh for inference
-(rejection-query
-...)
-~~~~
+	Write this model in Church program and use cosh to answer these questions (Be sure to include your code in your answer.):
+	
+	~~~~ {data-exercise="ex2"}
+	;; use rejection-query and cosh for inference
+	(rejection-query
+	...)
+	~~~~	
+	
+	A) Compute $p( \text{cancer} \mid \text{death} \wedge \text{cold} )$ and $p( \text{cancer} \mid \text{death} \wedge \text{no cold} )$. How do these probabilities compare to $p( \text{cancer} \mid \text{death} )$ and $p( \text{cancer} )$? Using these probabilities, give an example of explaining away.
+	
+	B) Compute $p( \text{cold} \mid \text{death} \wedge \text{cancer} )$ and $p( \text{cold} \mid \text{death} \wedge \text{no cancer} )$. How do these probabilities compare to $p( \text{cold} \mid \text{death} )$ and $p( \text{cold} )$? Using these probabilities, give an example of explaining away.
+	
