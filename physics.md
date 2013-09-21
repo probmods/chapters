@@ -1,6 +1,6 @@
 % testing physics
 
-TO DO!!!!!!!!!!!!!!!!!!!!!!!:
+WORKS
 
 ~~~~
 (define marbleRadius 8)
@@ -17,17 +17,9 @@ TO DO!!!!!!!!!!!!!!!!!!!!!!!:
 ;place a marble at the top and almost at the center
 (define (setupPlinko) (addCircle emptyPlinko (marbleX) 0 marbleRadius #f))
 
-(define (dropMarble world) (runPhysics 1000 world))
-(map dropMarble (repeat 1 setupPlinko))
-
-;(hist (map plinkoWhichBin (map (lambda (w) (runPhysics w)) (repeat 100 setupPlinko))))
-
-;run physics and find out what bin the marble fell into
-;note: run physics now returns the final world, followed by the initial world
-;(so randomization is recorded)
-;(define (runPlinko) (plinkoWhichBin (runPhysics 1000 world) ncol))
-
-;(hist (repeat 100 runPlinko) "Plinko")
+(define initialWorlds (repeat 50 setupPlinko))
+(define (plinkoRun w) (plinkoWhichBin (runPhysics 1000 w) ncol))
+(hist (map plinkoRun initialWorlds) "Plinko")
 
 ~~~~
 
@@ -47,34 +39,74 @@ Same model with animation (WORKS):
 
 ~~~~
 
-Random falling things (change this up so there are 3 shapes at the top and 2 bigger fixed shapes further down):
+Random falling things (WORKS):
 
 ~~~~
 (define (dim) (uniform 5 20))
-(define (xPos) (uniform 0 worldWidth))
-(define (yPos) (uniform 0 worldHeight))
+(define (staticDim) (uniform 10 50))
+(define (shape) (if (flip) "circle" "rect"))
+(define (xpos) (uniform 100 (- worldWidth 100)))
+(define (ypos) (uniform 100 (- worldHeight 100)))
 
-(define groundedWorld (addRect emptyWorld
-                               (/ worldWidth 2)
-                               worldHeight
-                               worldWidth
-                               10
-                               #t))
+(define (makeFallingShape) (list (list (shape) #f (list (dim) (dim)))
+                                       (list (xpos) 0)))
 
-(define (addRndCircle w) (addCircle w (xPos) (yPos) (dim) #f))
-(define (addRndRect w) (addRect w (xPos) (yPos) (dim) (dim) #f))
+(define (makeStaticShape) (list (list (shape) #t (list (staticDim) (staticDim)))
+                                      (list (xpos) (ypos))))
 
-(define world (addRndCircle (addRndRect (addRndCircle groundedWorld))))
+(define (makeGround) (list (list "rect" #t (list worldWidth 10))
+                                       (list (/ worldWidth 2) worldHeight)))
+(define fallingWorld (list (makeGround)
+                           (makeFallingShape) (makeFallingShape) (makeFallingShape)
+                           (makeStaticShape) (makeStaticShape)))
 
-(animatePhysics 1000 world)
-
-~~~~
-
-Towers (rewrite makeTowerWorld in Church):
+(animatePhysics 1000 fallingWorld)
 
 ~~~~
-(define towerWorld (makeTowerWorld))
-(animatePhysics 1000 towerWorld)
+
+Towers (WORKS):
+
+~~~~
+(define (getWidth worldObj) (first (third (first worldObj))))
+(define (getHeight worldObj) (second (third (first worldObj))))
+(define (getX worldObj) (first (second worldObj)))
+(define (getY worldObj) (second (second worldObj)))
+(define (firstXpos) (uniform 50 (- worldWidth 20)))
+
+(define (dim) (uniform 10 50))
+(define (xpos prevBlock)
+  (define prevW (getWidth prevBlock))
+  (define prevX (getX prevBlock))
+  (uniform (- prevX prevW) (+ prevX prevW)))
+(define (ypos prevBlock h)
+  (define prevY (getY prevBlock))
+  (define prevH (getHeight prevBlock))
+  (- prevY prevH h))
+
+(define ground (list (list "rect" #t (list worldWidth 10))
+                     (list (/ worldWidth 2) worldHeight)))
+
+(define (addFirstBlock prevBlock)
+  (define w (dim))
+  (define h (dim))
+  (list (list "rect" #f (list w h))
+        (list (firstXpos) (ypos prevBlock h))))
+
+(define (addBlock prevBlock)
+  (define w (dim))
+  (define h (dim))
+  (list (list "rect" #f (list w h))
+        (list (xpos prevBlock) (ypos prevBlock h))))
+
+(define (makeTowerWorld)
+  (define firstBlock (addFirstBlock ground) )
+  (define secondBlock (addBlock firstBlock))
+  (define thirdBlock (addBlock secondBlock))
+  (define fourthBlock (addBlock thirdBlock))
+  (define fifthBlock (addBlock fourthBlock))
+  (list ground firstBlock secondBlock thirdBlock fourthBlock fifthBlock))
+
+(animatePhysics 1000 (makeTowerWorld))
 
 ~~~~
 
@@ -119,7 +151,7 @@ Counter-Inutitively Stable Structure (WORKS):
 
 Same structure, this time with noise:
 
-Tower Hist:
+Tower Hist (WORKS):
 
 ~~~~
 (define (getY obj) (second (second obj)))
@@ -138,14 +170,33 @@ Tower Hist:
 (define (sup) w)
                
 
-;(define initialWorlds (repeat 2 makeTowerWorld))
-(define initialWorlds (repeat 2 sup))
+(define initialWorlds (repeat 20 makeTowerWorld))
 (define (towerRun w) (doesTowerFall w (runPhysics 1000 w)))
-;(map towerRun initialWorlds)
+(hist (map towerRun initialWorlds) "Does a Random Tower Fall?")
 
-;(define initW (makeTowerWorld))
-;(towerRun initW)
-(doesTowerFall (second initialWorlds) (runPhysics 1000 (second initialWorlds)))
-initialWorlds
+~~~~
+
+Tower Noise:
+
+~~~~
+(define (getY obj) (second (second obj)))
+;y position is 0 at the TOP of the screen
+(define (highestY world) (min (map getY world)))
+
+(define eps 10) ;things might move around a little, but within 10 pixels is close
+(define (approxEqual a b) (< (abs (- a b)) 10))
+
+(define (doesTowerFall initialW finalW) (not (approxEqual (highestY initialW)
+                                                          (highestY finalW))))
+
+
+
+(define w (addCircle emptyWorld 50 50 (list 4) #f))
+(define (sup) w)
+               
+
+(define initialWorlds (repeat 20 makeTowerWorld))
+(define (towerRun w) (doesTowerFall w (runPhysics 1000 w)))
+(hist (map towerRun initialWorlds) "Does a Random Tower Fall?")
 
 ~~~~

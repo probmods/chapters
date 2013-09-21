@@ -402,3 +402,7 @@ _max = function(listyList) {
 _min = function(listyList) {
   return Math.min.apply(Math, listToArray(listyList));
 }
+
+_third = function(listyList) {
+  return listToArray(listyList)[2];
+}
