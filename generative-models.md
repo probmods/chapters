@@ -412,6 +412,35 @@ Humans have a deep intuitive understanding of everyday physics---this allows us 
 We have included such a 2-dimensional physics simulator, the function `runPhysics`, that takes a collection of physical objects and runs physics 'forward' by some amount of time. (We also have `animatePhysics`, which does the same, but gives us an animation to see what is happening.) We can use this to imagine the outcome of various initial states, as in the Plinko machine example above:
 
 ~~~~
+(define (dim) (uniform 5 20))
+(define (staticDim) (uniform 10 50))
+(define (shape) (if (flip) "circle" "rect"))
+(define (xpos) (uniform 100 (- worldWidth 100)))
+(define (ypos) (uniform 100 (- worldHeight 100)))
+
+; an object in the word is a list of two things:
+;  shape properties: a list of SHAPE ("rect" or "circle", IS_STATIC (#t or #f), 
+;                    and dimensions (either (list WIDTH HEIGHT) for a rect or
+;                    (list RADIUS) for a circle
+;  position: (list X Y)
+(define (makeFallingShape) (list (list (shape) #f (list (dim) (dim)))
+                                       (list (xpos) 0)))
+
+(define (makeStaticShape) (list (list (shape) #t (list (staticDim) (staticDim)))
+                                      (list (xpos) (ypos))))
+
+(define (makeGround) (list (list "rect" #t (list worldWidth 10))
+                                       (list (/ worldWidth 2) worldHeight)))
+(define fallingWorld (list (makeGround)
+                           (makeFallingShape) (makeFallingShape) (makeFallingShape)
+                           (makeStaticShape) (makeStaticShape)))
+
+(animatePhysics 1000 fallingWorld)
+~~~~
+
+There are many judgments that you could imagine making with such a physics simulator. @Hamrick2011 have explored human intuitions about the stability of block towers. Look at several different random block towers; first judge whether you think the tower is stable, then simulate to find out if it is:
+
+~~~~
 (define (getWidth worldObj) (first (third (first worldObj))))
 (define (getHeight worldObj) (second (third (first worldObj))))
 (define (getX worldObj) (first (second worldObj)))
@@ -427,12 +456,6 @@ We have included such a 2-dimensional physics simulator, the function `runPhysic
   (define prevY (getY prevBlock))
   (define prevH (getHeight prevBlock))
   (- prevY prevH h))
-
-; an object in the word is a list of two things:
-;  shape properties: a list of SHAPE ("rect" or "circle", IS_STATIC (#t or #f), 
-;                    and dimensions (either (list WIDTH HEIGHT) for a rect or
-;                    (list RADIUS) for a circle
-;  position: (list X Y)
 
 (define ground (list (list "rect" #t (list worldWidth 10))
                      (list (/ worldWidth 2) worldHeight)))
@@ -458,13 +481,6 @@ We have included such a 2-dimensional physics simulator, the function `runPhysic
   (list ground firstBlock secondBlock thirdBlock fourthBlock fifthBlock))
 
 (animatePhysics 1000 (makeTowerWorld))
-~~~~
-
-There are many judgments that you could imagine making with such a physics simulator. @Hamrick2011 have explored human intuitions about the stability of block towers. Look at several different random block towers; first judge whether you think the tower is stable, then simulate to find out if it is:
-
-~~~~
-(define towerWorld (makeTowerWorld))
-(animatePhysics 1000 towerWorld)
 ~~~~
 
 Were you often right? Were there some cases of 'surprisingly stable' towers?  @Hamrick2011 account for these cases by positing that people are not entirely sure where the blocks are initially (perhaps due to noise in visual perception). Thus our intuitions of stability are really stability given noise (or the expected stability marginalizing over slightly different initial configurations). We can realize this measure of stability as:
