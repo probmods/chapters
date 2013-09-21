@@ -297,7 +297,7 @@ float: right;
 margin: 0;
 padding: 0;
 list-style-type: none;
-display: none
+/* display: none */
 }
 
 .code-settings li {
@@ -333,7 +333,7 @@ position: absolute;
 bottom: 0;
 right: 0;
 z-index: 999;
-display: none
+/* display: none */
 }
 
 .CodeMirror-focused {
