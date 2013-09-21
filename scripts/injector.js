@@ -170,37 +170,40 @@ CodeMirror.keyMap.default.Tab = "indentAuto";
 
     handlers.hist = function(json) {
       if (json.data && json.data.hist && _(json.data.hist).keys().length > 0) {
-        var histData = _(json.data.hist).values()[0],
-            title = histData.attributes.title,
-            counts = histData.counts;
 
-        // cosh returns a histogram where counts are probabilities
-        // convert this to an approximate count
-        if (engine == "cosh") {
-          _(histData.counts).each(function(prob, key) {
-            counts[key] = Math.round(prob * 1000);
-          });
-        }
+        var histDatas = _(json.data.hist).values();
+        _(histDatas).each(function(histData) {
+          var title = histData.attributes.title,
+              counts = histData.counts;
 
-        // for compatibility with _hist,
-        // convert summary counts back into
-        // a full data structure
-        var samps = Array.prototype.concat.apply([],
-                                                 _(counts).map(function(count, key) {
-                                                   var arr = [];
-                                                   while (count--) {
-                                                     arr.push(key);
-                                                   }
-                                                   return arr; 
-                                                 })
-                                                ),
-            // convert from array to list (this is convoluted)
-            sampsList = arrayToList(samps);
+          // cosh returns a histogram where counts are probabilities
+          // convert this to an approximate count
+          if (engine == "cosh") {
+            _(histData.counts).each(function(prob, key) {
+              counts[key] = Math.round(prob * 1000);
+            });
+          }
 
+          // for compatibility with _hist,
+          // convert summary counts back into
+          // a full data structure
+          var samps = Array.prototype.concat.apply([],
+                                                   _(counts).map(function(count, key) {
+                                                     var arr = [];
+                                                     while (count--) {
+                                                       arr.push(key);
+                                                     }
+                                                     return arr; 
+                                                   })
+                                                  ),
+              // convert from array to list (this is convoluted)
+              sampsList = arrayToList(samps); 
 
-        var histPlotter = _hist(sampsList, title);
-        histPlotter($results);;
-      } 
+          var histPlotter = _hist(sampsList, title);
+          histPlotter($results);
+        });
+      }
+      
     }; 
     
     $.get("http://forestbase.com/api/query/",
