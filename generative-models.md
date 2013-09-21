@@ -450,15 +450,15 @@ Were you often right? Were there some cases of 'surprisingly stable' towers?  @H
 
 1) Here are three church programs:
 
-	~~~~ {data-exercise="ex1.1"}
+	~~~~ {data-exercise="ex1-1"}
 	(if (flip) (flip 0.7) (flip 0.1))
 	~~~~
 
-	~~~~ {data-exercise="ex1.2"}
+	~~~~ {data-exercise="ex1-2"}
 	(flip (if (flip) 0.7 0.1))
 	~~~~
 
-	~~~~ {data-exercise="ex1.3"}
+	~~~~ {data-exercise="ex1-3"}
 	(flip 0.4) 
 	~~~~
 
