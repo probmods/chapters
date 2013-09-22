@@ -13,10 +13,10 @@ var format_result = require("./format_result").format_result;
 util.openModule(pr);
 util.openModule(church_builtins);
 
+CodeMirror.keyMap.default.Tab = "indentAuto";
+
 // check if user is logged in
 (function() {
-
-
   var runners = {};
   runners['webchurch'] = function(exerciseName, code, editor) {
     var $results = editor.$results;
@@ -250,12 +250,12 @@ util.openModule(church_builtins);
         $(item).replaceWith(el);},
       {
         value: text,
-        lineNumbers: true,
+        lineNumbers: false,
         matchBrackets: true,
         continueComments: "Enter",
         viewportMargin: Infinity
       });
-    editor.engine = selectedEngine || 'webchurch'; 
+    editor.engine = selectedEngine || 'webchurch';
 
     // results div
     var $results = $("<pre class='results'>"); 
