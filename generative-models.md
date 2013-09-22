@@ -641,5 +641,12 @@ Were you often right? Were there some cases of 'surprisingly stable' towers?  @H
 	(define b ...)
 	(list a b)
 	~~~~
+	
+#) In [Example: Intuitive physics] above we modeled stability of a tower as the probability that the tower falls when perturbed, and we modeled "falling" as getting shorter. It would be reasonable to instead measure *how much shorter* the tower gets.
+
+	A) Modify the above stability model to use a continuous measure in place of `doesTowerFall`.
+	
+	B) Design a few towers where your new model makes very different predictions about stability from the original model. How do these predictions fit with your intuition? Which best captures the meaning of "stable"?
+	
 
 # References
