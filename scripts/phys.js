@@ -58,8 +58,8 @@ var world = new b2World(
 // same fixture definition for all objects
 var fixDef = new b2FixtureDef;
 fixDef.density = 1.0;
-fixDef.friction = 0.1;
-fixDef.restitution = 0.2;
+fixDef.friction = 0.2;
+fixDef.restitution = 0.1;
 
 var bodyDef = new b2BodyDef;
 bodyDef.angle = 0;
