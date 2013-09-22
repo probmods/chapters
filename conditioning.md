@@ -181,52 +181,17 @@ Bayes rule simply says that, in special situations where the model decomposes ni
 
 ## Implementations of `query`
 
-Much of the difficulty of implementing the Church language (or probabilistic models in general) is in finding useful ways to do conditional inference --- to implement `query`. The Church implementations that we will use in this tutorial have several different methods for query, each of which has its own limitations.
+Much of the difficulty of implementing the Church language (or probabilistic models in general) is in finding useful ways to do conditional inference---to implement `query`. The Church implementation that we will use in this tutorial has several different methods for query, each of which has its own limitations. We will explore the different algorithms used in these implementations in the section on [Algorithms for inference](inference-process.html), for now we just need to note a few differences in usage.
 
-As we have seen already, the method of rejection sampling is implemented in `rejection-query`. This is a very useful starting point, but is often not efficient: even if we are sure that our model can satisfy the condition, it will often take a very large number of samples to find computations that do so. To see this, try making the probability of `A`, `B`, and `C` very low in the above example (eventually the query will time out and be killed):
+As we have seen already, the method of rejection sampling is implemented in `rejection-query`. This is a very useful starting point, but is often not efficient: even if we are sure that our model can satisfy the condition, it will often take a very long time to find evaluations that do so. 
 
-~~~~ {.mit-church}
-(define baserate 0.1)
+<!-- TODO: put in exact-query once that has been implemented in web church.-->
 
-(define (take-sample)
-  (rejection-query
+The AI literature is replete with other algorithms and techniques for dealing with conditional probabilistic inference, and several of these have been adapted into Church to give implementations of `query` that may be more efficient in various cases. (Though they vary in efficiency, each of these implementations is universal: given enough time it samples from the appropriate conditional distribution for a Church query over any Church model.) 
 
-   (define A (if (flip baserate) 1 0))
-   (define B (if (flip baserate) 1 0))
-   (define C (if (flip baserate) 1 0))
-   (define D (+ A B C))
+One implementation that we will often use is based on the *Metropolis Hastings* (MH) algorithm. This `mh-query` implementation takes two extra arguments and returns a list of many samples:
 
-   A
-
-   (>= D 2)
-   )
-  )
-(hist (repeat 100 take-sample) "Value of A, given that D is greater than or equal to 2, using rejection")
 ~~~~
-Even for this very simple program, lowering the baserate by just one order of magnitude, to 0.01, will make `rejection-query` impractical.
-
-Another option is to use the mathematical definition of conditional probability directly: to *enumerate* all of the execution histories for the query, and then to use the rules of probability to compute the conditional probability (which we can then use to sample if we wish). The **cosh** implementation uses this exact query method (NOTE: this implementation is a bit different-- it returns the exact distribution as a list of pairs and changing the code below too much may cause it to error):
-
-~~~~ {.cosh}
-(define baserate 0.1)
-
-(exact-query
-
- (define A (if (flip baserate) 1 0))
- (define B (if (flip baserate) 1 0))
- (define C (if (flip baserate) 1 0))
- (define D (+ A B C))
-
- A
-
- (>= D 2)
- )
-~~~~
-Notice that the time it takes for this program to run doesn't depend on the baserate. Unfortunately it does depend critically on the number of random choices in an execution history: the number of possible histories that must be considered grows exponentially in the number of random choices. This renders `exact-query` impractical for all but the simplest models.
-
-The AI literature is replete with other algorithms and techniques for dealing with conditional probabilistic inference, and several of these have been adapted into Church to give implementations of `query` that may be more efficient in various cases. (Though they vary in efficiency, each of these implementations is universal: given enough time it samples from the appropriate conditional distribution for a Church query over any Church model.) One implementation that we will often use is based on the *Metropolis Hastings* algorithm, a form of *Markov chain Monte Carlo* inference. For background on MH and MCMC, see the excellent introductions by David MacKay ([Chapter 29](http://www.inference.phy.cam.ac.uk/mackay/itprnn/ps/356.384.pdf) and [30](http://www.inference.phy.cam.ac.uk/mackay/itprnn/ps/387.412.pdf) of Information Theory, Inference, and Learning Algorithms) or [Radford Neal](http://www.cs.utoronto.ca/~radford/review.abstract.html).
-
-~~~~ {.mit-church}
 (define baserate 0.1)
 
 (define samples
@@ -245,9 +210,161 @@ The AI literature is replete with other algorithms and techniques for dealing wi
 (hist samples "Value of A, given that D is greater than or equal to 2")
 ~~~~
 
-The `mh-query` implementation takes two extra arguments and returns a list of many samples. The first extra argument is the number of samples to take, and the second controls the "lag", the number of internal random choices that the algorithm makes in a sequence of iterative steps between samples.  The total number of MH iterations, and hence the running time of the query, is the product of these two parameters.  (The workings of MH are beyond the scope of this section, but very roughly: The algorithm implements a random walk or diffusion process (a *Markov chain*) in the space of possible program evaluations that lead to the conditioner being true.  Each MH iteration is one step of this random walk, and the process is specially designed to visit each program evaluation with a long-run frequency proportional to its conditional probability.)
+The first extra argument is the number of samples to take, and the second controls the "lag" (the number of internal random choices that the algorithm makes in a sequence of iterative steps between samples). The workings of MH will be explored in a later chapter, but very roughly: The algorithm implements a random walk or diffusion process (a *Markov chain*) in the space of possible program evaluations that lead to the conditioner being true.  Each MH iteration is one step of this random walk, and the process is specially designed to visit each program evaluation with a long-run frequency proportional to its conditional probability.
 
-See what happens in the above query as you lower the baserate.  Inference should not slow down appreciably, but it will become less stable and less accurate.  It becomes increasingly difficult for MH to draw independent conditional samples by taking small random steps, so for a fixed lag (100 in the code above), the 100 samples returned will tend to be less representative of the true conditional inference.  In this case, stable and accurate conditional inferences can still be achieved in reasonable time by increasing the number of samples to 500 (while holding the lag at 100).
+<!-- TODO: should talk about levels of analysis, and why we are ignoring the algorithms as much as possible to start with. -->
+
+
+# Reasoning with Arbitrary Propositions: Complex Queries
+
+It is natural to condition a generative model on a value for one of the variables declared in this model. However, one may also wish to ask for more complex hypotheticals: "what if P," where P is a complex proposition composed out of variables declared in the model.
+Consider the following Church `query`:
+
+~~~~
+(define samples
+  (mh-query
+   100 100
+
+   (define A (if (flip) 1 0))
+   (define B (if (flip) 1 0))
+   (define C (if (flip) 1 0))
+
+   A
+
+   (>= (+ A B C) 2)))
+   
+(hist samples "Value of A, given that the sum is greater than or equal to 2")
+~~~~
+
+This query has the same content as an example above but the syntax is importantly different. We have defined a generative model that samples 3 instances of `0`/`1` digits. However, we have conditioned on the complex assumption that the sum of these random variables is greater than or equal to 2. This involves a new random variable, `(>= (+ A B C) 2)`. This latter random variable *did not appear anywhere in the generative model*. In the traditional presentation of conditional probabilities we usually think of conditioning as *observation*: it explicitly enforces random variables to take on certain values. For example, when we say $P(A|B=b)$ it explicitly requires $B = b$. In order to express the above query in this way, we could add the complex variable to the generative model, then condition on it. However this intertwines the hypothetical assumption with the generative model, and this is not what we want: we want a simple model which supports many queries, rather than a complex model in which only a prescribed set of queries is allowed.
+
+Writing models in Church allows the flexibility to build complex random expressions like this as needed, making assumptions that are phrased as complex propositions, rather than simple observations.  Hence the effective number of queries we can construct for most programs will not merely be a large number but countably infinite, much like the sentences in a natural language.  The `query` function (in principle, though with variable efficiency) supports correct conditional inference for this infinite array of situations.
+
+## Example: Reasoning about the Tug of War 
+
+Returning to the earlier example of a series of tug-of-war matches, we can use query to ask a variety of different questions. For instance, how likely is it that Bob is strong, given that he's been in a series of winning teams? (Note that we have written the `winner` function slightly differently here, to return the labels `'team1` or `'team2` rather than the list of team members.  This makes for more compact conditioning statements.)
+
+~~~~
+(define samples
+  (mh-query 100 100
+    (define strength (mem (lambda (person) (gaussian 0 1))))
+    (define lazy (lambda (person) (flip (/ 1 3))))
+
+    (define (total-pulling team)
+      (sum
+         (map (lambda (person) (if (lazy person) (/ (strength person) 2) (strength person)))
+               team)))
+
+    (define (winner team1 team2) (if (< (total-pulling team1) (total-pulling team2)) 'team2 'team1))
+
+    (strength 'bob)
+
+    (and (eq? 'team1 (winner '(bob mary) '(tom sue)))
+         (eq? 'team1 (winner '(bob sue) '(tom jim))))))
+         
+(hist samples "Bob strength")
+~~~~
+
+Try varying the number of different teams and teammates that Bob plays with. How does this change the probability that bob is strong?  Do these changes agree with your intuitions? Can you modify this example to make laziness a continuous quantity? Can you add a person-specific tendency toward laziness?
+
+A model very similar to this was used in @Gerstenberg2012 to predict human judgements about the strength of players in ping-pong tournaments. It achieved very accurate quantitative predictions without many free parameters.
+
+As an exercise, let's go back to the tug-of-war tournament described under [Generative Models](generative-models.html#example-bayesian-tug-of-war) and write a Church program to infer the probability that Alice is stronger than Bob, given a particular tournament outcome:
+
+~~~~
+(define samples
+  (mh-query 100 100
+    (define strength (mem (lambda (person) (if (flip) 10 5))))
+    (define lazy (lambda (person) (flip (/ 1 3))))
+
+    (define (total-pulling team)
+      (sum
+         (map (lambda (person) (if (lazy person) (/ (strength person) 2) (strength person)))
+               team)))
+
+    (define (winner team1 team2) (if (< (total-pulling team1) (total-pulling team2)) 'team2 'team1))
+
+    (> (strength 'alice) (strength 'bob))
+
+    (and (eq? 'team1 (winner '(alice bob) '(sue tom)))
+         (eq? 'team2 (winner '(alice bob) '(sue tom)))
+         (eq? 'team1 (winner '(alice sue) '(bob tom)))
+         (eq? 'team1 (winner '(alice sue) '(bob tom)))
+         (eq? 'team1 (winner '(alice tom) '(bob sue)))
+         (eq? 'team1 (winner '(alice tom) '(bob sue))))))
+         
+(hist samples "Is alice stronger than bob?")
+~~~~
+
+We can form many complex queries from this simple model. We could ask how likely a team of Bob and Mary is to win over a team of Jim and Sue, given that Mary is at least as strong as sue, and Bob was on a team that won against Jim previously:
+
+~~~~
+(define samples
+  (mh-query 100 100
+    (define strength (mem (lambda (person) (gaussian 0 1))))
+    (define lazy (lambda (person) (flip (/ 1 3))))
+
+    (define (total-pulling team)
+      (sum
+         (map (lambda (person) (if (lazy person) (/ (strength person) 2) (strength person)))
+               team)))
+
+    (define (winner team1 team2) (if (< (total-pulling team1) (total-pulling team2)) 'team2 'team1))
+
+    (eq? 'team1 (winner '(bob mary) '(jim sue)))
+
+    (and (>= (strength 'mary) (strength 'sue))
+         (eq? 'team1 (winner '(bob francis) '(tom jim)))))
+)
+(hist samples "Do bob and mary win against jim and sue")
+~~~~
+
+# Example: Inverse intuitive physics
+
+We previously saw how a generative model of physics---a noisy, intuitive version of Newtonian mechanics---could be used to make judgements about the final state of physical worlds from initial conditions. We showed how this forward simulation could be used to models judgements about stability. We can also use a physics model to reason backward: from final to initial states.
+
+Imagine that we drop a block from a random position at the top of a world with two fixed obstacles:
+
+~~~~
+;setup a world with two fixed circles and a floor:
+(define world (addCircle
+               (addCircle
+                (addRect emptyWorld
+                         (/ worldWidth 2) worldHeight worldWidth 10 true)
+                60 200 60 true)
+               300 300 30 true))
+               
+(animatePhysics 1000 (addRect world (uniform 0 worldWidth) 0 10 10))
+~~~~
+
+<!-- TODO: forward hist -->
+
+Assuming that the block comes to rest in the middle of the floor, where did it come from?
+
+~~~~
+;setup a world with two fixed circles and a floor:
+(define world (addCircle
+               (addCircle
+                (addRect emptyWorld
+                         (/ worldWidth 2) worldHeight worldWidth 10 true)
+                60 200 60 true)
+               300 300 30 true))
+
+;helper to get X position of the block:
+(define (getx world) (first (second (first world))))
+  
+(define init-xs
+  (mh-query 100 100
+    (define init-state (addRect world (uniform 0 worldWidth) 0 10 10))
+    (define final-state (runPhysics 1000 init-state))
+    (getx init-state)
+    (= 300 (gaussian (getx final-state) 10))))
+        
+(density init-xs)
+~~~~
+<!-- TODO: this requires the conditioning on a real trick. -->
+
+
 
 # Example: Causal Inference in Medical Diagnosis
 
@@ -376,167 +493,12 @@ Expressing our knowledge as a probabilistic program of this form also makes it e
 
 Under this model, a patient with coughing, chest pain and shortness of breath is likely to have either lung cancer or TB.  Modify the above code to see how these conditional inferences shift if you also know that the patient smokes or works in a hospital (where they could be exposed to various infections, including many worse infections than the typical person encounters).  More generally, the causal structure of knowledge representation in a probabilistic program allows us to model intuitive theories that can grow in complexity continually over a lifetime, adding new knowledge without bound.
 
-<!--
-===Application: Bayesian networks as expert systems in AI===
-
-In AI, causal models of this sort are often called *Bayesian networks*, *Belief networks*, or *Directed graphical models*.  Bayesian networks have revolutionized the field of *expert systems*, which aims to automate the knowledge of human experts in forms that machines can reason about.  Specifically in the context of medical diagnosis, the QMR (or "Quick medical reference") Bayesian network was an early landmark in the field. Just like our examples above, QMR has a two-layer diseases-cause-symptoms structure, with noisy-logical functions relating diseases to symptoms, but it is much bigger in order to capture all the diseases a typical physician has to deal with on a regular basis:
-
-![](qmr.gif)
-
-More recently, much more complex and temporally extended Bayesian networks are starting to play a role in systems biology and personalized genomic medicine, as in these examples from Kenneth Drake, Serologix:
-
-![](Systems_Biology_Solution_fig01.gif‎)
-
--->
-
-<!-- 
-
-![](Systems_Biology_Solution_fig03.gif‎)-->
-
-<!--  Tim: Note that relative probability doesn't change, while absolute prob goes up/down.
-    Josh: I'm not sure how to incorporate this. It's complicated because you can't just compare
-           base rates; the likelihoods matter too. -->
-
-
-
-<!--  OLD STUFF ON BAYES NETS:
-
-One popular formalism for representing hierarchical generative models is the *Bayes net*. A Bayes net, also called a *Bayesian belief network* or a *directed graphical model* is a graph which encodes the structure of a probabilistic model. It displays graphically which random variables depend on which other random variables. We will illustrate this by example. A textbook example of a scenario that can be represented in a Bayes net, due originally to Judea Pearl, is called the *sprinkler problem.*  Imagine there is some grass lawn which you observe as being wet or dry one morning. You know that there are two possible causes if it is wet. First, it may be because it rained the night before, or, second, it may be because there was an automatic sprinkler system that ran the night before.  Notice that while the variable "is the lawn wet" (`wet`) depends causally on both "did it rain" (`rain`) and "did the sprinkler run," (`sprinkler`), `rain` and `sprinkler` are independent (suppose that the sprinkler is automatic and not sensitive to the rain or not).  Suppose that the prior probability of it raining in general is $.1$ and the probability of the automatic sprinkler running is $.9$. Furthermore, let's suppose there is a small chance of the grass being wet by some other cause (say $.1$).
-
-This can be represented with the following Bayes net.
-
-[[image:church-sprinkler2.png|400px]]
-
-This Bayes net shows that the variable `wet` depends on the variables `rain` and `sprinkler`, but that they do not depend on one another. It also shows the distributions over the variables. These distributions are represented as *conditional probability tables* (CPTs). The CPTs for `rain` and `sprinkler` are very simple, they just specify the probabilities of each of the two possible outcomes, since neither of these variables depend on anything else. The CPT for `wet` is more complex. It specifies a *conditional probability distribution* over the state of the grass for each of the two possible values of `rain` and `sprinkler`. Rain or sprinkling cause the grass to be wet with probability 1.0. If neither variable is true then the there is still some small probability that the grass gets wet by other means&mdash; thus injecting *noise* into the model.
-
-This Bayes net can be expressed in Church very compactly.
-
-~~~~
-(define rain (flip .2))
-(define sprinkler (flip .2))
-(define wet (if (or rain sprinkler) true (flip .05)))
-wet
-~~~~
-
-An important observation here is that this Church program actually expresses more knowledge about the generative process than the Bayes net above. In particular, the Bayes net encodes the set of conditional probability distributions as a simple table. The Church program on the other hand gives an explicit formula for sampling the value of `wet` given the value of the other two variables. This formula encodes the intuitive knowledge: "if it rains or the sprinkler runs, then the grass will definitely be wet, but there is some small chance it might be wet even if none of those things happen."
-In general, Bayes nets represent dependencies between random variables while hiding much of the computational detail which is actually necessary to compute the values of one variable given another.
-
-To take another example consider the binomial distribution we studied above. The Bayes net for this distribution would have $N$ nodes, representing the Bernoulli trials all pointing at another node representing the sum. The sum node would have a CPT which gave a probability for each possible total count. However, nowhere in the Bayes net would it be expressed that the *operation* linking the Bernoulli nodes and the sum node is addition. -->
-
-# Reasoning with Arbitrary Propositions: Complex Queries
-
-It is natural to condition a generative model on a value for one of the variables declared in this model. However, one may also wish to ask for more complex hypotheticals: "what if P," where P is a complex proposition composed out of variables declared in the model.
-
-<!-- Another kind of conditioning which is difficult to express in traditional notation is conditioning which involves a "recoding" of random variables into new random variables. -->
-Consider the following Church `query`.
-
-~~~~
-(define samples
-  (mh-query
-   100 100
-
-   (define A (if (flip) 1 0))
-   (define B (if (flip) 1 0))
-   (define C (if (flip) 1 0))
-
-   A
-
-   (>= (+ A B C) 2)
-   )
-  )
-(hist samples "Value of A, given that the sum is greater than or equal to 2")
-~~~~
-
-This query has the same content as an example above but the syntax is importantly different. We have defined a generative model that samples 3 instances of 0/1 digits. However, we have conditioned on the complex assumption that the sum of these random variables is greater than or equal to 2. This involves a new random variable, `(>= (+ A B C) 2)`. This latter random variable *did not appear anywhere in the generative model*. In the traditional presentation of conditional probabilities we usually think of conditioning as *observation*: it explicitly enforces random variables to take on certain values. For example, when we say $P(A|B=b)$ it explicitly require $B = b$. In order to express the above query in this way, we could add the complex variable to the generative model, then condition on it. However this intertwines the hypothetical assumption with the generative model, and this is not what we want: we want a simple model which supports many queries, rather than a complex model in which only a prescribed set of queries is allowed.
-
-Writing models in Church allows the flexibility to build complex random expressions like this as needed, making assumptions that are phrased as complex propositions, rather than simple observations.  Hence the effective number of queries we can construct for most programs will not merely be a large number but countably infinite, much like the sentences in a natural language.  The `query` function in principle supports correct conditional inference for this infinite array of situations.
-
-## Example: Reasoning about the Tug of War 
-
-Returning to the earlier example of a series of tug-of-war matches, we can use query to ask a variety of different questions. For instance, how likely is it that bob is strong, given that he's been in a series of winning teams? (Note that we have written the `winner` function slightly differently here, to return the labels `'team1` or `'team2` rather than the list of team members.  This makes for more compact conditioning statements.)
-
-~~~~
-(define samples
-  (mh-query 100 100
-    (define strength (mem (lambda (person) (if (flip) 10 5))))
-    (define lazy (lambda (person) (flip (/ 1 3))))
-
-    (define (total-pulling team)
-      (sum
-         (map (lambda (person) (if (lazy person) (/ (strength person) 2) (strength person)))
-               team)))
-
-    (define (winner team1 team2) (if (< (total-pulling team1) (total-pulling team2)) 'team2 'team1))
-
-    (strength 'bob)
-
-    (and (eq? 'team1 (winner '(bob mary) '(tom sue)))
-         (eq? 'team1 (winner '(bob sue) '(tom jim)))))
-)
-(hist samples "Bob strength")
-~~~~
-
-Try varying the number of different teams and teammates that bob plays with. How does this change the probability that bob is strong?  Do these changes agree with your intuitions? Can you modify this example to draw `strength` from a uniform distribution, instead of having just two possible values?
-
-We can form many complex queries from this simple model. We could ask how likely a team of bob and mary is to win over a team of jim and sue, given that mary is at least as strong as sue, and bob was on a team that won against jim previously:
-
-~~~~
-(define samples
-  (mh-query 100 100
-    (define strength (mem (lambda (person) (if (flip) 10 5))))
-    (define lazy (lambda (person) (flip (/ 1 3))))
-
-    (define (total-pulling team)
-      (sum
-         (map (lambda (person) (if (lazy person) (/ (strength person) 2) (strength person)))
-               team)))
-
-    (define (winner team1 team2) (if (< (total-pulling team1) (total-pulling team2)) 'team2 'team1))
-
-    (eq? 'team1 (winner '(bob mary) '(jim sue)))
-
-    (and (>= (strength 'mary) (strength 'sue))
-         (eq? 'team1 (winner '(bob francis) '(tom jim)))))
-)
-(hist samples "Do bob and mary win against jim and sue")
-~~~~
-
-As an exercise, let's go back to the tug-of-war tournament described under [[Generative Models]] and write a Church program to infer the probability that alice is stronger than bob, given a particular tournament outcome.
-
-~~~~
-(define samples
-  (mh-query 100 100
-    (define strength (mem (lambda (person) (if (flip) 10 5))))
-    (define lazy (lambda (person) (flip (/ 1 3))))
-
-    (define (total-pulling team)
-      (sum
-         (map (lambda (person) (if (lazy person) (/ (strength person) 2) (strength person)))
-               team)))
-
-    (define (winner team1 team2) (if (< (total-pulling team1) (total-pulling team2)) 'team2 'team1))
-
-    (> (strength 'alice) (strength 'bob))
-
-    (and (eq? 'team1 (winner '(alice bob) '(sue tom)))
-         (eq? 'team2 (winner '(alice bob) '(sue tom)))
-         (eq? 'team1 (winner '(alice sue) '(bob tom)))
-         (eq? 'team1 (winner '(alice sue) '(bob tom)))
-         (eq? 'team1 (winner '(alice tom) '(bob sue)))
-         (eq? 'team1 (winner '(alice tom) '(bob sue))))
-
-  )
-)
-(hist samples "Is alice stronger than bob?")
-~~~~
-
-A model very similar to this was used in Gerstenberg and Goodman (2012)<ref>Ping Pong in Church: Productive use of concepts in human probabilistic inference. T. Gerstenberg, and N. D. Goodman (2012). Proceedings of the Thirty-Fourth Annual Conference of the Cognitive Science Society.</ref> to predict human judgements about the strength of players in ping-pong tournaments. It achieved very accurate quantitative predictions without many free parameters.
 
 
 
 # Exercises
 
-1) Conditioning and intervention: In the example on [[Generative Models#Example: Causal Models in Medical Diagnosis | Medical Diagnosis]] from the [[Generative Models]] section we suggested understanding the patterns of symptoms for a particular disease by changing the program to make that disease always true.
+1) Conditioning and intervention: In the earlier [Medical Diagnosis](generative-models.html#example-causal-models-in-medical-diagnosis) section we suggested understanding the patterns of symptoms for a particular disease by changing the program to make that disease always true.
 
 	A) For this example, does this procedure give the same answers as using `query` to *condition* on the disease being true?
 

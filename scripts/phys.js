@@ -58,8 +58,8 @@ var world = new b2World(
 // same fixture definition for all objects
 var fixDef = new b2FixtureDef;
 fixDef.density = 1.0;
-fixDef.friction = 0.1;
-fixDef.restitution = 0.2;
+fixDef.friction = 0.2;
+fixDef.restitution = 0.1;
 
 var bodyDef = new b2BodyDef;
 bodyDef.angle = 0;
@@ -210,11 +210,12 @@ _addRect = function(churchWorld, x, y, w, h, isStatic) {
   return jsWorld_to_churchWorld(jsWorld);
 }
 
-_plinkoWhichBin = function(finalWorld, ncol) {
+//now in church
+/*_plinkoWhichBin = function(finalWorld, ncol) {
   var positions = getDynamicObjPositions(finalWorld);
   var x = positions[0][0];
   return Math.round(x / (_worldWidth / ncol));
-}
+}*/
 
 _plinkoWorld = function(nrow, ncol) {
   var pegRadius = 3;
@@ -326,6 +327,8 @@ _animatePhysics = function(steps, initialWorld) {
   };
 }
 
+//now in church
+/*
 _makeTowerWorld = function() {
   var wallWidth = 5;
   var tower = [ [ [ "rect", true, [_worldWidth, wallWidth] ],
@@ -371,9 +374,10 @@ _makeTowerWorld = function() {
   }
   console.log(format_result(jsWorld_to_churchWorld(tower)));
   return jsWorld_to_churchWorld(tower);
-}
+}*/
 
-/*_jsDoesTowerFall = function(churchWorlds) {
+//now in church
+/*_doesTowerFall = function(churchWorlds) {
   function worldSort(a,b) {
     return a[1][1] - b[1][1];
   }
