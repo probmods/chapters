@@ -490,7 +490,7 @@ Were you often right? Were there some cases of 'surprisingly stable' towers?  @H
 (define (getHeight worldObj) (second (third (first worldObj))))
 (define (getX worldObj) (first (second worldObj)))
 (define (getY worldObj) (second (second worldObj)))
-(define (getIsStatic worldObj) (second (first (worldObj))))
+(define (getIsStatic worldObj) (second (first worldObj)))
 
 (define ground
   (list (list "rect" #t (list worldWidth 10)) (list (/ worldWidth 2) worldHeight)))
@@ -520,11 +520,11 @@ Were you often right? Were there some cases of 'surprisingly stable' towers?  @H
   (map xNoise world))
 
 (define (runTower)
-  (define initialWorld (makeTowerWorld))
+  (define initialWorld (noisify almostUnstableWorld))
   (define finalWorld (runPhysics 1000 initialWorld))
   (doesTowerFall initialWorld finalWorld))
 
-(hist (repeat 50 runTower))
+(hist (repeat 10 runTower))
 ~~~~
 
 # Exercises
