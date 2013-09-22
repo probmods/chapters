@@ -254,7 +254,7 @@ CodeMirror.keyMap.default.Tab = "indentAuto";
 
   // we can't use Cookies.get('sessionid') because that's an HTTPOnly
   // cookie - it can't be read by client-side javascript
-  var loggedIn = Cookies.get("loggedin") || false;
+  var loggedIn = Cookies.get("gg") || false;
 
   // return a dictionary of DOM element attributes
   var getAttributes = function(x) {
