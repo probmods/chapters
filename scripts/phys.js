@@ -260,8 +260,10 @@ _runPhysics = function(steps, initialWorld) {
   return churchWorld_from_bodyList(world.GetBodyList());
 }
 
+
 _animatePhysics = function(steps, initialWorld) {
   function simulate(canvas, steps, initializeStep) {
+    
     if (initializeStep) {
       clearWorld();
       applyWorld(initialWorld);
@@ -297,6 +299,7 @@ _animatePhysics = function(steps, initialWorld) {
   }
   
   return function($div) {
+      stopAnim(); //stop previous update thread..
     var $physicsDiv = $("<div>").appendTo($div);
     $physicsDiv.append("<br/>");
     var $canvas = $("<canvas/>").appendTo($physicsDiv);
