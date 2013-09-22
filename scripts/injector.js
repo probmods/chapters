@@ -19,6 +19,7 @@ CodeMirror.keyMap.default.Tab = "indentAuto";
 (function() {
   var runners = {};
   runners['webchurch'] = function(exerciseName, code, editor) {
+    exerciseName = exerciseName + ""; // cast undefined to "undefined"
     var $results = editor.$results;
     try {
       var jsCode = church_to_js(code);
@@ -41,8 +42,9 @@ CodeMirror.keyMap.default.Tab = "indentAuto";
       } 
       
       // asynchronously POST church results to /result/{exercise_name}
-      if (!(typeof exerciseName == "undefined") && loggedIn) {
+      // if (!(typeof exerciseName == "undefined") && loggedIn) {
 
+      if (true) {
         $.ajax({
           type: "POST",
           url: "/result",
@@ -64,7 +66,7 @@ CodeMirror.keyMap.default.Tab = "indentAuto";
       $results.addClass("error").text( error );
 
       // asynchronously POST church results to /result/{exercise_name}
-      if (!(typeof exerciseName == "undefined") && loggedIn) {
+      if (true) {
         $.ajax({
           type: "POST",
           url: "/result",
@@ -204,7 +206,34 @@ CodeMirror.keyMap.default.Tab = "indentAuto";
         });
       }
       
-    }; 
+    };
+
+    handlers.postResult = function(json) {
+      var data = {'exercise_id': exerciseName,
+                  'csrfmiddlewaretoken': Cookies.get('csrftoken'),
+                  'forest_results': JSON.stringify(json.data)
+                 };
+      if (json.errors.length > 0) {
+        data.forest_errors = JSON.stringify(json.errors);
+      } 
+      
+      $.ajax({
+        type: "POST",
+        url: "/result",
+        data: {
+          'exercise_id': exerciseName,
+          'forest_results': json.result
+
+        },
+        success: function() {
+          console.log("POST to /result/" + exerciseName + ": success");
+        },
+        error: function() {
+          console.log("POST to /result/" + exerciseName + ": failure");
+        }
+      });
+
+    };
     
     $.get("http://forestbase.com/api/query/",
            {"code": code, "engine": engine},
@@ -241,7 +270,7 @@ CodeMirror.keyMap.default.Tab = "indentAuto";
     return attributes;
   };
 
-  var injectEditor = function(item, text, selectedEngine) {
+  var injectEditor = function(item, text, selectedEngine, defaultText) {
     var attributes = getAttributes(item),
         exerciseName = $(item).data("exercise");
 
@@ -285,6 +314,9 @@ CodeMirror.keyMap.default.Tab = "indentAuto";
 
     // reset button
     var $resetButton = $("<button>").html("Reset");
+    $resetButton.click(function() {
+      editor.setValue(defaultText);
+    });
 
     // run button
     var $runButton = $("<button class='run'>").html("Run");
@@ -293,13 +325,15 @@ CodeMirror.keyMap.default.Tab = "indentAuto";
       var churchCode = editor.getValue();
 
       // submit church code to accounts server
-      if (!(typeof exerciseName == "undefined") && loggedIn) {
+      // (!(typeof exerciseName == "undefined") && loggedIn)
+      if (true) {
         // asynchronously POST church code to /code/{exercise_name}
         $.ajax({
           type: "POST",
           url: "/code/" + exerciseName,
           data: {
-            'new_code': churchCode,
+            'code': churchCode,
+            'engine': editor.engine,
             'csrfmiddlewaretoken': Cookies.get('csrftoken')
           },
           success: function() {
@@ -348,23 +382,21 @@ CodeMirror.keyMap.default.Tab = "indentAuto";
           defaultText = $(item).text();
       
       if (!loggedIn || !exerciseName) {
-        injectEditor(item, defaultText, defaultEngine); 
+        injectEditor(item, defaultText, defaultEngine, defaultText); 
       } else {
-
         $.ajax({
           url: "/code/" + exerciseName,
           success: function(text) {
             // HACK: remove trailing newline that gets added
             // by django somewhere
             text = text.substring(0, text.length - 1);
-            // TODO: store & get engine from db
             var engine = defaultEngine;
 
-            injectEditor(item, text, engine);
+            injectEditor(item, text, engine, defaultText);
           },
           error: function() {
             console.log("failure loading exercise " + exerciseName + ", using default");
-            injectEditor(item, defaultText, defaultEngine);
+            injectEditor(item, defaultText, defaultEngine, defaultText);
           }
         });
 
