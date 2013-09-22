@@ -75,6 +75,7 @@ The following program defines a fair coin, and flips it 20 times:
 
 ~~~~
 (define fair-coin (lambda () (if (flip 0.5) 'h 't))) ;the thunk is a fair coin
+
 (hist (repeat 20 fair-coin) "fair coin")
 ~~~~
 
@@ -83,9 +84,11 @@ This program defines a "trick" coin that comes up heads most of the time (95%), 
 
 ~~~~
 (define trick-coin (lambda () (if (flip 0.95) 'h 't)))
+
 (hist (repeat 20 trick-coin) "trick coin")
 ~~~~
 
+<!-- TODO: do something with this??
 <style classes="bg-yellow">
 <em>Note on Church syntax:</em>
 
@@ -115,6 +118,7 @@ trick-coin-2
 ~~~~
 To Church the last two definitions of `trick-coin-2` are the same -- both output a thunk -- although superficially the last one looks more similar to the variable definition that assigns `trick-coin-1` to a single value of `h` or `t`.
 </style>
+-->
 
 The higher-order function `make-coin` takes in a weight and outputs a function (a thunk) describing a coin with that weight.  Then we can use `make-coin` to make the coins above, or others.
 
@@ -124,14 +128,13 @@ The higher-order function `make-coin` takes in a weight and outputs a function (
 (define trick-coin (make-coin 0.95))
 (define bent-coin (make-coin 0.25))
 
-(hist (repeat 20 fair-coin) "20 fair coin flips")
-(hist (repeat 20 trick-coin) "20 trick coin flips")
-(hist (repeat 20 bent-coin) "20 bent coin flips")
+(multiviz
+ (hist (repeat 20 fair-coin) "20 fair coin flips")
+ (hist (repeat 20 trick-coin) "20 trick coin flips")
+ (hist (repeat 20 bent-coin) "20 bent coin flips") )
 ~~~~
-<!--FIXME: multiple hists... -->
-
-
-We can also define a higher-order function that takes a "coin" and "bends it":
+ 
+ We can also define a higher-order function that takes a "coin" and "bends it":
 
 ~~~~
 (define (make-coin weight) (lambda () (if (flip weight) 'h 't)))

@@ -337,6 +337,8 @@ Imagine that we drop a block from a random position at the top of a world with t
 (animatePhysics 1000 (addRect world (uniform 0 worldWidth) 0 10 10))
 ~~~~
 
+<!-- TODO: forward hist -->
+
 Assuming that the block comes to rest in the middle of the floor, where did it come from?
 
 ~~~~
@@ -349,7 +351,7 @@ Assuming that the block comes to rest in the middle of the floor, where did it c
                300 300 30 true))
 
 ;helper to get X position of the block:
-(define (getx world) (first (second (third world))))
+(define (getx world) (first (second (first world))))
   
 (define init-xs
   (mh-query 100 100
@@ -496,7 +498,7 @@ Under this model, a patient with coughing, chest pain and shortness of breath is
 
 # Exercises
 
-1) Conditioning and intervention: In the example on [[Generative Models#Example: Causal Models in Medical Diagnosis | Medical Diagnosis]] from the [[Generative Models]] section we suggested understanding the patterns of symptoms for a particular disease by changing the program to make that disease always true.
+1) Conditioning and intervention: In the earlier [Medical Diagnosis](generative-models.html#example-causal-models-in-medical-diagnosis) section we suggested understanding the patterns of symptoms for a particular disease by changing the program to make that disease always true.
 
 	A) For this example, does this procedure give the same answers as using `query` to *condition* on the disease being true?
 

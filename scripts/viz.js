@@ -302,3 +302,15 @@ function drawHist(svg, myCounts, myValues, width, height, y, xMax, xMin) {
     .attr("height", function(d) { return height - y(d.freq);})
     .attr("width", histX.rangeBand());
 }
+
+_multiviz = function(vizs) {
+    var vizs = Array.prototype.slice.call(arguments);
+    
+    //TODO: need to rescale the target div to accomodate more items?
+    return function($div) {
+        for (var i = 0; i < vizs.length; i++) {
+            var inserteddivset = $("<div></div>").appendTo($div)
+            vizs[i]($(inserteddivset[0]))
+        }
+      }
+}
