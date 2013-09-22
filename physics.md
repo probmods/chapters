@@ -154,7 +154,45 @@ Same structure, this time with noise:
 Tower Hist (WORKS):
 
 ~~~~
-(define (getY obj) (second (second obj)))
+(define (getWidth worldObj) (first (third (first worldObj))))
+(define (getHeight worldObj) (second (third (first worldObj))))
+(define (getX worldObj) (first (second worldObj)))
+(define (getY worldObj) (second (second worldObj)))
+(define (firstXpos) (uniform 50 (- worldWidth 20)))
+
+(define (dim) (uniform 10 50))
+(define (xpos prevBlock)
+  (define prevW (getWidth prevBlock))
+  (define prevX (getX prevBlock))
+  (uniform (- prevX prevW) (+ prevX prevW)))
+(define (ypos prevBlock h)
+  (define prevY (getY prevBlock))
+  (define prevH (getHeight prevBlock))
+  (- prevY prevH h))
+
+(define ground (list (list "rect" #t (list worldWidth 10))
+                     (list (/ worldWidth 2) worldHeight)))
+
+(define (addFirstBlock prevBlock)
+  (define w (dim))
+  (define h (dim))
+  (list (list "rect" #f (list w h))
+        (list (firstXpos) (ypos prevBlock h))))
+
+(define (addBlock prevBlock)
+  (define w (dim))
+  (define h (dim))
+  (list (list "rect" #f (list w h))
+        (list (xpos prevBlock) (ypos prevBlock h))))
+
+(define (makeTowerWorld)
+  (define firstBlock (addFirstBlock ground) )
+  (define secondBlock (addBlock firstBlock))
+  (define thirdBlock (addBlock secondBlock))
+  (define fourthBlock (addBlock thirdBlock))
+  (define fifthBlock (addBlock fourthBlock))
+  (list ground firstBlock secondBlock thirdBlock fourthBlock fifthBlock))
+
 ;y position is 0 at the TOP of the screen
 (define (highestY world) (min (map getY world)))
 
@@ -162,41 +200,56 @@ Tower Hist (WORKS):
 (define (approxEqual a b) (< (abs (- a b)) 10))
 
 (define (doesTowerFall initialW finalW) (not (approxEqual (highestY initialW)
-                                                          (highestY finalW))))
+                                                     (highestY finalW))))
 
+(define (runTower)
+  (define initialWorld (makeTowerWorld))
+  (define finalWorld (runPhysics 1000 initialWorld))
+  (doesTowerFall initialWorld finalWorld))
 
-
-(define w (addCircle emptyWorld 50 50 (list 4) #f))
-(define (sup) w)
-               
-
-(define initialWorlds (repeat 20 makeTowerWorld))
-(define (towerRun w) (doesTowerFall w (runPhysics 1000 w)))
-(hist (map towerRun initialWorlds) "Does a Random Tower Fall?")
-
+(hist (repeat 10 runTower))
 ~~~~
 
 Tower Noise:
 
 ~~~~
-(define (getY obj) (second (second obj)))
-;y position is 0 at the TOP of the screen
-(define (highestY world) (min (map getY world)))
+(define (getWidth worldObj) (first (third (first worldObj))))
+(define (getHeight worldObj) (second (third (first worldObj))))
+(define (getX worldObj) (first (second worldObj)))
+(define (getY worldObj) (second (second worldObj)))
+(define (getIsStatic worldObj) (second (first (worldObj))))
 
-(define eps 10) ;things might move around a little, but within 10 pixels is close
-(define (approxEqual a b) (< (abs (- a b)) 10))
+(define ground
+  (list (list "rect" #t (list worldWidth 10)) (list (/ worldWidth 2) worldHeight)))
 
-(define (doesTowerFall initialW finalW) (not (approxEqual (highestY initialW)
-                                                          (highestY finalW))))
+(define almostUnstableWorld
+  (list ground (list (list 'rect #f (list 24 22)) (list 175 473))
+        (list (list 'rect #f (list 15 38)) (list 159.97995044874122 413))
+        (list (list 'rect #f (list 11 35)) (list 166.91912737427202 340))
+        (list (list 'rect #f (list 11 29)) (list 177.26195677111082 276))
+        (list (list 'rect #f (list 11 17)) (list 168.51354470809122 230))))
 
+(define (doesTowerFall initialW finalW)
+  ;y position is 0 at the TOP of the screen
+  (define (highestY world) (min (map getY world)))
+  (define eps 10) ;things might move around a little, but within 10 pixels is close
+  (define (approxEqual a b) (< (abs (- a b)) 10))
+  (not (approxEqual (highestY initialW) (highestY finalW))))
 
+(define (noisify world)
+  (define (xNoise worldObj)
+    (define noiseWidth 10) ;how many pixes away from the original xpos can we go?
+    (define (newX x) (uniform (- x noiseWidth) (+ x noiseWidth)))
+    (if (getIsStatic worldObj)
+        worldObj
+        (list (first worldObj)
+              (list (newX (getX worldObj)) (getY worldObj)))))
+  (map xNoise world))
 
-(define w (addCircle emptyWorld 50 50 (list 4) #f))
-(define (sup) w)
-               
+(define (runTower)
+  (define initialWorld (makeTowerWorld))
+  (define finalWorld (runPhysics 1000 initialWorld))
+  (doesTowerFall initialWorld finalWorld))
 
-(define initialWorlds (repeat 20 makeTowerWorld))
-(define (towerRun w) (doesTowerFall w (runPhysics 1000 w)))
-(hist (map towerRun initialWorlds) "Does a Random Tower Fall?")
-
+(hist (repeat 50 runTower))
 ~~~~

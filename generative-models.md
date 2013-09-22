@@ -486,9 +486,45 @@ There are many judgments that you could imagine making with such a physics simul
 Were you often right? Were there some cases of 'surprisingly stable' towers?  @Hamrick2011 account for these cases by positing that people are not entirely sure where the blocks are initially (perhaps due to noise in visual perception). Thus our intuitions of stability are really stability given noise (or the expected stability marginalizing over slightly different initial configurations). We can realize this measure of stability as:
 
 ~~~~
-;not working yet
-(define (runTower) (doesTowerFall (runPhysics 1000 towerWorld)))
-(hist (repeat 10 runTower))
+(define (getWidth worldObj) (first (third (first worldObj))))
+(define (getHeight worldObj) (second (third (first worldObj))))
+(define (getX worldObj) (first (second worldObj)))
+(define (getY worldObj) (second (second worldObj)))
+(define (getIsStatic worldObj) (second (first (worldObj))))
+
+(define ground
+  (list (list "rect" #t (list worldWidth 10)) (list (/ worldWidth 2) worldHeight)))
+
+(define almostUnstableWorld
+  (list ground (list (list 'rect #f (list 24 22)) (list 175 473))
+        (list (list 'rect #f (list 15 38)) (list 159.97995044874122 413))
+        (list (list 'rect #f (list 11 35)) (list 166.91912737427202 340))
+        (list (list 'rect #f (list 11 29)) (list 177.26195677111082 276))
+        (list (list 'rect #f (list 11 17)) (list 168.51354470809122 230))))
+
+(define (doesTowerFall initialW finalW)
+  ;y position is 0 at the TOP of the screen
+  (define (highestY world) (min (map getY world)))
+  (define eps 10) ;things might move around a little, but within 10 pixels is close
+  (define (approxEqual a b) (< (abs (- a b)) 10))
+  (not (approxEqual (highestY initialW) (highestY finalW))))
+
+(define (noisify world)
+  (define (xNoise worldObj)
+    (define noiseWidth 10) ;how many pixes away from the original xpos can we go?
+    (define (newX x) (uniform (- x noiseWidth) (+ x noiseWidth)))
+    (if (getIsStatic worldObj)
+        worldObj
+        (list (first worldObj)
+              (list (newX (getX worldObj)) (getY worldObj)))))
+  (map xNoise world))
+
+(define (runTower)
+  (define initialWorld (makeTowerWorld))
+  (define finalWorld (runPhysics 1000 initialWorld))
+  (doesTowerFall initialWorld finalWorld))
+
+(hist (repeat 50 runTower))
 ~~~~
 
 # Exercises
