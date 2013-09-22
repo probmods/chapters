@@ -714,3 +714,4 @@ condition on effect of observing contour
 	
 	B) Compute $p( \text{cold} \mid \text{death} \wedge \text{cancer} )$ and $p( \text{cold} \mid \text{death} \wedge \text{no cancer} )$. How do these probabilities compare to $p( \text{cold} \mid \text{death} )$ and $p( \text{cold} )$? Using these probabilities, give an example of explaining away.
 	
+# References

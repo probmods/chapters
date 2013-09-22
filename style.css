@@ -177,6 +177,10 @@ p {
     font-weight: bold
 }
 
+#references ~ p {
+text-align: left;
+}
+
 span.citekey {
     display: none
 }
@@ -188,17 +192,17 @@ span.citation {
 
 .citation > .citation-expanded {
     display: block;
-    /* opacity: 0; */
+    opacity: 0;
     position: absolute;
     padding: 1em;
     top: 0px;
     left: 0%;
-    z-index: -999;
+    z-index: -9999;
     min-width: 300px;
     background-color: rgba(255, 204, 102, 0);
     color: rgba(0, 0, 0, 0); /* expanded citation can actually be visible on small screens */
+    text-align: left;
 }
-
 
 
 .citation.hover > .citation-expanded, .citation:hover > .citation-expanded {
@@ -210,6 +214,7 @@ span.citation {
     transition: background-color 0.5s, top 0.25s;
     -webkit-transition: background-color 0.5s, top 0.25s;
     box-shadow: 2px 2px 1px #cccccc;
+    opacity: 1
 }
 
 

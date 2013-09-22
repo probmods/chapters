@@ -578,3 +578,5 @@ Now, we're going to write this model in Church using the `cosh` engine. Here is 
 	F) Which is higher, $p(\text{vowel} \mid d)$ or $p(\text{consonant} \mid d)$? Answer this using the Church code you wrote (hint: use the `vowel?` function)
 	
 	G) What difference do you see between your code and the mathematical notation? What are the advantages and disadvantages of each? Which do you prefer?
+
+# References
