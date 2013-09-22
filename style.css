@@ -297,6 +297,7 @@ float: right;
 margin: 0;
 padding: 0;
 list-style-type: none;
+opacity: 0
 /* display: none */
 }
 
@@ -332,14 +333,18 @@ button.run {
 position: absolute;
 bottom: 0;
 right: 0;
-z-index: 999;
-/* display: none */
+z-index: 1000;
+opacity: 0;
 }
 
 .CodeMirror-focused {
 box-shadow: 3px 3px 3px #99ccff; 
 }
 
-.CodeMirror-focused button.run, .CodeMirror-focused .code-settings {
-display: block
+/* .CodeMirror-focused button.run, .CodeMirror-focused .code-settings { */
+/* display: block */
+/* } */
+
+.CodeMirror:hover button.run, .CodeMirror:hover .code-settings, .CodeMirror-focused button.run, .CodeMirror-focused .code-settings {
+opacity: 1
 }
