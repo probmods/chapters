@@ -453,43 +453,39 @@ We have included such a 2-dimensional physics simulator, the function `runPhysic
 There are many judgments that you could imagine making with such a physics simulator. @Hamrick2011 have explored human intuitions about the stability of block towers. Look at several different random block towers; first judge whether you think the tower is stable, then simulate to find out if it is:
 
 ~~~~
+(define xCenter (/ worldWidth 2))
 (define (getWidth worldObj) (first (third (first worldObj))))
 (define (getHeight worldObj) (second (third (first worldObj))))
 (define (getX worldObj) (first (second worldObj)))
 (define (getY worldObj) (second (second worldObj)))
-(define (firstXpos) (uniform 50 (- worldWidth 20)))
+
+(define ground (list (list "rect" #t (list worldWidth 10))
+                     (list (/ worldWidth 2) worldHeight)))
 
 (define (dim) (uniform 10 50))
+
 (define (xpos prevBlock)
   (define prevW (getWidth prevBlock))
   (define prevX (getX prevBlock))
   (uniform (- prevX prevW) (+ prevX prevW)))
+
 (define (ypos prevBlock h)
   (define prevY (getY prevBlock))
   (define prevH (getHeight prevBlock))
   (- prevY prevH h))
 
-(define ground (list (list "rect" #t (list worldWidth 10))
-                     (list (/ worldWidth 2) worldHeight)))
-
-(define (addFirstBlock prevBlock)
+(define (addBlock prevBlock isFirst)
   (define w (dim))
   (define h (dim))
   (list (list "rect" #f (list w h))
-        (list (firstXpos) (ypos prevBlock h))))
-
-(define (addBlock prevBlock)
-  (define w (dim))
-  (define h (dim))
-  (list (list "rect" #f (list w h))
-        (list (xpos prevBlock) (ypos prevBlock h))))
+        (list (if isFirst xCenter (xpos prevBlock)) (ypos prevBlock h))))
 
 (define (makeTowerWorld)
-  (define firstBlock (addFirstBlock ground) )
-  (define secondBlock (addBlock firstBlock))
-  (define thirdBlock (addBlock secondBlock))
-  (define fourthBlock (addBlock thirdBlock))
-  (define fifthBlock (addBlock fourthBlock))
+  (define firstBlock (addBlock ground #t))
+  (define secondBlock (addBlock firstBlock #f))
+  (define thirdBlock (addBlock secondBlock #f))
+  (define fourthBlock (addBlock thirdBlock #f))
+  (define fifthBlock (addBlock fourthBlock #f))
   (list ground firstBlock secondBlock thirdBlock fourthBlock fifthBlock))
 
 (animatePhysics 1000 (makeTowerWorld))
