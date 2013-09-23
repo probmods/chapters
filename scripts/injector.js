@@ -336,20 +336,25 @@ if (!Cookies.get('csrftoken')) {
     $runButton.click(function() {
       $results.html('');
       $runButton.attr('disabled','disabled');
-      var churchCode = editor.getValue();
 
-      // submit church code to accounts server
-      // (!(typeof exerciseName == "undefined") && loggedIn)
-      if (true) {
+      var newCode = editor.getValue(),
+          newEngine = editor.engine;
+
+      // submit church code to accounts server if the
+      // code has actually changed or we're running
+      // with a different engine
+      if (editor.oldCode != newCode || editor.oldEngine != newEngine) {
+        // unset editor.codeId
+        editor.codeId = false;
+        
         // asynchronously POST church code to /code/{exercise_name}
         $.ajax({
           type: "POST",
           url: "/code/" + exerciseName,
           data: {
-            'code': churchCode,
-            'engine': editor.engine,
+            'code': newCode,
+            'engine': newEngine,
             'isRevert': null,
-            'isRerun': null,
             'csrfmiddlewaretoken': Cookies.get('csrftoken')
           },
           success: function(codeId) {
@@ -361,6 +366,9 @@ if (!Cookies.get('csrftoken')) {
           }
         });
       }
+
+      editor.oldCode = newCode;
+      editor.oldEngine = newEngine;
 
       // use runner on this editor
       // use setTimeout so the run-button disabling actually
