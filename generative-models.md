@@ -18,7 +18,7 @@ There is one more thing to note about our Plinko machine above: we are using a c
 
 We wish to describe in formal terms how to generate states of the world. That is, we wish to describe the causal process, or steps that unfold, leading to some potentially observable states. The key idea of this section is that these generative processes can be described as *computations*---computations that involve random choices to capture uncertainty about the process.
 
-As our formal model of computation we start with the $\lambda$-calculus, and its embodiment in the LISP family of programming languages.  The $\lambda$-calculus is a formal system which was invented by Alonzo Church in the 1920's as a way of formalizing the notion of an effectively computable function [@Church192?]. The $\lambda$-calculus has only two basic operations for computing: creating and applying functions. Despite this simplicity, it is a *universal* model of computation---it is (conjectured to be) equivalent to all other notions of classical computation. (The $\lambda$-calculus was shown to have the same computational power as the Turing machine, and vice versa, by Alan Turing in his famous paper which introduced the Turing machine [@Turing1937]).
+As our formal model of computation we start with the $\lambda$-calculus, and its embodiment in the LISP family of programming languages.  The $\lambda$-calculus is a formal system which was invented by Alonzo Church in 1936 as a way of formalizing the notion of an effectively computable function [@Church1936]. The $\lambda$-calculus has only two basic operations for computing: creating and applying functions. Despite this simplicity, it is a *universal* model of computation---it is (conjectured to be) equivalent to all other notions of classical computation. (The $\lambda$-calculus was shown to have the same computational power as the Turing machine, and vice versa, by Alan Turing in his famous paper which introduced the Turing machine [@Turing1937]).
 
 In 1958 John McCarthy introduced LISP (**LIS**t **P**rocessing), a programming language based on the $\lambda$-calculus. Scheme is a variant of LISP developed by Guy L. Steele and Gerald Jay Sussman with particularly simple syntax and semantics. We will use Scheme-style notation for the $\lambda$-calculus in this tutorial. For a quick introduction to programming in Scheme see [the appendix on Scheme basics](appendix-scheme.html).
 The Church programming language [@Goodman2008], named in honor of Alonzo Church, is a generalization of Scheme which introduces the notion of probabilistic computation to the language. This addition results in a powerful language for describing generative models.
@@ -524,7 +524,7 @@ Were you often right? Were there some cases of 'surprisingly stable' towers?  @H
   (define finalWorld (runPhysics 1000 initialWorld))
   (doesTowerFall initialWorld finalWorld))
 
-(hist (repeat 10 runTower))
+(hist (repeat 10 runTower))hggh
 ~~~~
 
 # Exercises
