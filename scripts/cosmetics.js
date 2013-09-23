@@ -10,12 +10,10 @@ $("#references ~ p > span:first-child")
     var key = el.innerText,
         $sourceNodes = $('span[data-cites="' + key + '"]'); // find spans in the text that reference this
 
-    var targetNode = $(el.parentNode).clone().addClass("citation-expanded");
-    targetNode.find("span").remove();
-
-    //debugger;
     $sourceNodes.map(function(j,y) {
-      var $y = $(y);      
+      var $y = $(y);
+      var targetNode = $(el.parentNode).clone().addClass("citation-expanded");
+      targetNode.find("span").remove(); 
       
       $y.append(targetNode);
 
