@@ -303,7 +303,25 @@ CodeMirror.keyMap.default.Tab = "indentAuto";
     $resetButton.click(function() {
       editor.setValue(defaultText);
       $results.html('');
-      // TODO: ajax with isRevert 
+      $.ajax({
+        type: "POST",
+        url: "/code/" + exerciseName,
+        data: {
+          'code': defaultText,
+          'engine': editor.engine,
+          'isRevert': 1,
+          'csrfmiddlewaretoken': Cookies.get('csrftoken')
+        },
+        success: function(codeId) {
+          console.log("POST to /code/" + exerciseName + ": success");
+          editor.codeId = codeId;
+        },
+        error: function() {
+          console.log("POST to /code/" + exerciseName + ": failure"); 
+        }
+      });
+
+
     });
 
     // run button
