@@ -277,7 +277,8 @@ if (!Cookies.get('csrftoken')) {
         lineNumbers: false,
         matchBrackets: true,
         continueComments: "Enter",
-        viewportMargin: Infinity
+        viewportMargin: Infinity,
+        autoCloseBrackets: true
       });
     editor.engine = selectedEngine || 'webchurch';
     editor.exerciseName = exerciseName + ""; // cast undefined to "undefined"

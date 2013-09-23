@@ -58,12 +58,16 @@ _.templateSettings = {
       paths: ["codemirror/matchbrackets.js"],
       parents: ["cm"]
     },
+    cmclosebrackets: {
+      paths: ["codemirror/closebrackets.js"],
+      parents: ["cm"] 
+    },
     cookies: {
       paths: ["scripts/cookies-0.3.1.min.js"]
     },
     injector: {
       paths: ["scripts/injector.js"],
-      parents: ["webchurch", "cm", "cmscheme", "cmbrackets", "cookies", "periodicalupdater", "viz"]
+      parents: ["webchurch", "cm", "cmscheme", "cmbrackets", "cookies", "periodicalupdater", "viz", "cmclosebrackets"]
     },
     nav: {
       paths: ["scripts/nav.js"]

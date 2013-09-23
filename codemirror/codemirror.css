@@ -110,8 +110,9 @@ display: none;
 .cm-invalidchar {color: #f00;}
 
 div.CodeMirror span.CodeMirror-matchingbracket {
-border: 1px solid #cfcfcf
+border: 1px solid #e0e0e0;
 }
+
 div.CodeMirror span.CodeMirror-nonmatchingbracket {
 color: white;
 background-color: #ECAAB9;
