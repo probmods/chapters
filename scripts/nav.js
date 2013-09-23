@@ -7,7 +7,7 @@ $(document).ready(function() {
 });
 
 (function() {
-  var loggedIn = Cookies.get("loggedin") || false;
+  var loggedIn = Cookies.get("gg") || false;
 
 if (loggedIn) {
   $("#login-link, #register-link").hide();
