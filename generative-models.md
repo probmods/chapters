@@ -40,7 +40,7 @@ In Church, each time you run a program you get a *sample* by simulating the comp
 
 Here we have used the `repeat` procedure which takes a number of repetitions, $K$, and a random distribution (in this case `flip`) and returns a list of $K$ samples from that distribution. We have used the `hist` procedure to display the results of taking 1000 samples from `flip`. As you can see, the result is an approximately uniform distribution over `true` and `false`.
 
-An important idea here is that `flip` can be thought of in two different ways. From one perspective, `flip` is a procedure which returns a sample from a fair coin. That is, it's a *sampler* or *simulator*. From another perspective, `flip` is *itself* a characterization of the distribution over `true` and `false`. When we think about probabilistic programs we will often move back and forth between these two views, emphasizing either the sampling perspective or the distributional perspective. (With suitable restrictions this duality is complete: any Church program implicitly represents a distribution and any distribution can be represented  by a Church program [see e.g. @Ackerman2011 for more details on this duality].) We return to this relationship between probability and simulation below.
+An important idea here is that `flip` can be thought of in two different ways. From one perspective, `flip` is a procedure which returns a sample from a fair coin. That is, it's a *sampler* or *simulator*. From another perspective, `flip` is *itself* a characterization of the distribution over `true` and `false`. When we think about probabilistic programs we will often move back and forth between these two views, emphasizing either the sampling perspective or the distributional perspective. (With suitable restrictions this duality is complete: any Church program implicitly represents a distribution and any distribution can be represented  by a Church program; see e.g. @Ackerman2011 for more details on this duality.) We return to this relationship between probability and simulation below.
 
 The `flip` function is the simplest XRP in Church, but you will find other XRPs corresponding to familiar probability distributions, such as `gaussian`, `gamma`, `dirichlet`, and so on. 
 <!-- TODO: Many but not all of the XRPs and other basic functions implemented in Church can be found on the church reference appendix. -->
@@ -164,7 +164,7 @@ Higher-order functions like `repeat`, `map`, and `apply` can be quite useful.  H
 
 # Example: Causal Models in Medical Diagnosis
 
-Generative knowledge is often *causal* knowledge.  As an example of how causal knowledge can be encoded in Church expressions, consider a simplified medical scenario:
+Generative knowledge is often *causal* knowledge that describes how events or states of the world are related to each other.  As an example of how causal knowledge can be encoded in Church expressions, consider a simplified medical scenario:
 
 ~~~~
 (define lung-cancer (flip 0.01))
@@ -175,7 +175,9 @@ Generative knowledge is often *causal* knowledge.  As an example of how causal k
 cough
 ~~~~
 
-This program generates random conditions for a patient in a doctor's office.  It first specifies the base rates of two diseases the patient could have: lung cancer is rare while a cold is common, and there is an independent chance of having each disease.  The program then specifies a process for generating a common symptom of these diseases -- an effect with two possible causes: The patient coughs if they have a cold or lung cancer (or both).  Here is a slightly more complex causal model:
+This program models the diseases and symptoms of a patient in a doctor's office. It first specifies the base rates of two diseases the patient could have: lung cancer is rare while a cold is common, and there is an independent chance of having each disease.  The program then specifies a process for generating a common symptom of these diseases -- an effect with two possible causes: The patient coughs if they have a cold or lung cancer (or both).  
+
+Here is a more complex version of this causal model:
 
 ~~~~
 (define lung-cancer (flip 0.01))
@@ -184,27 +186,34 @@ This program generates random conditions for a patient in a doctor's office.  It
 (define stomach-flu (flip 0.1))
 (define other (flip 0.1))
 
-(define cough (or (and cold (flip 0.5))
-                  (and lung-cancer (flip 0.3))
-                  (and TB (flip 0.7))
-                  (and other (flip 0.01))))
+(define cough 
+  (or (and cold (flip 0.5))
+      (and lung-cancer (flip 0.3))
+      (and TB (flip 0.7))
+      (and other (flip 0.01))))
 
 
-(define fever (or (and cold (flip 0.3))
-                  (and stomach-flu (flip 0.5))
-                  (and TB (flip 0.1))
-                  (and other (flip 0.01))))
+(define fever 
+  (or (and cold (flip 0.3))
+      (and stomach-flu (flip 0.5))
+      (and TB (flip 0.1))
+      (and other (flip 0.01))))
 
 
-(define chest-pain (or (and lung-cancer (flip 0.5))
-                       (and TB (flip 0.5))
-                       (and other (flip 0.01))))
+(define chest-pain 
+  (or (and lung-cancer (flip 0.5))
+      (and TB (flip 0.5))
+      (and other (flip 0.01))))
 
-(define shortness-of-breath (or (and lung-cancer (flip 0.5))
-                                (and TB (flip 0.2))
-                                (and other (flip 0.01))))
+(define shortness-of-breath 
+  (or (and lung-cancer (flip 0.5))
+      (and TB (flip 0.2))
+      (and other (flip 0.01))))
 
-(list "cough" cough "fever" fever "chest-pain" chest-pain "shortness-of-breath" shortness-of-breath)
+(list "cough" cough 
+      "fever" fever 
+      "chest-pain" chest-pain 
+      "shortness-of-breath" shortness-of-breath)
 ~~~~
 
 Now there are four possible diseases and four symptoms.  Each disease causes a different pattern of symptoms.  The causal relations are now probabilistic: Only some patients with a cold have a cough (50%), or a fever (30%).  There is also a catch-all disease category "other", which has a low probability of causing any symptom.  *Noisy logical* functions, or functions built from `and`, `or`, and `flip`, provide a simple but expressive way to describe probabilistic causal dependencies between Boolean (true-false valued) variables.
