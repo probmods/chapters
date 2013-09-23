@@ -532,7 +532,7 @@ Were you often right? Were there some cases of 'surprisingly stable' towers?  @H
   (define finalWorld (runPhysics 1000 initialWorld))
   (doesTowerFall initialWorld finalWorld))
 
-(hist (repeat 10 runTower))hggh
+(hist (repeat 10 runTower))
 ~~~~
 
 # Exercises

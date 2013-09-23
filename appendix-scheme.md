@@ -139,16 +139,17 @@ If we quote the name of a variable, what we get back is a symbol: a value which 
 The ability to make new symbols as needed is a crucial feature in building models that reason over unbounded worlds, as we'll see below.
 
 Some useful functions on lists:
+
 * `(length lst)` returns the number of items in a list.
 * `(null? lst)` returns true if a list is empty, false otherwise
 * `(first lst)` returns the first item of `lst`, while `(rest lst)` returns everything but the first item of `lst`. For convenience, `second`, `third`, `fourth`, `fifth`, `sixth`, and `seventh` are also defined.
 * `(append lst1 lst2 ...)` will put lists together:
 
-	~~~~
-	(append '(1 2 3) '(4 5) '(6 7))
-	~~~~
+~~~~
+(append '(1 2 3) '(4 5) '(6 7))
+~~~~
 
-	Note that append is a variadic function.
+Note that append is a variadic function.
 
 Lists can contain lists, e.g.:
 
