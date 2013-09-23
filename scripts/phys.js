@@ -1,30 +1,19 @@
-//var intuitivePhysics = {}
-
-/*
-shim layer with setTimeout fallback
-from paul irish:
-http://www.paulirish.com/2011/requestanimationframe-for-smart-animating/
-*/
-window.requestAnimFrame = (function(){
-return  window.requestAnimationFrame       || 
-        window.webkitRequestAnimationFrame || 
-        window.mozRequestAnimationFrame    || 
-        window.oRequestAnimationFrame      || 
-        window.msRequestAnimationFrame     ||
-        function(/* function */ callback,
-                 /* DOMElement */ element){
-          window.setTimeout(callback, 1000 / 60);
-        };
-})();
+var fps = 60;
+var mspf = 1000/fps;
+var lastTime = 0;
+window.requestAnimationFrame = function(callback, element) {
+    var currTime = new Date().getTime();
+    var timeToCall = Math.max(0, mspf/2 - (currTime - lastTime));  //run twice as fast...
+    var id = window.setTimeout(function() { callback(currTime + timeToCall); },
+      timeToCall);
+    lastTime = currTime + timeToCall;
+    return id;
+};
+window.cancelAnimationFrame = function(id) {
+    clearTimeout(id);
+};
 
 var requestId;
-
-/*
-function start() {
-    if (!requestId) {
-       loop();
-    }
-}*/
 
 function stopAnim() {
   if (requestId) {
@@ -252,7 +241,7 @@ _runPhysics = function(steps, initialWorld) {
   applyWorld(initialWorld);
   for (var s=0; s<steps; s++) {
     world.Step(
-         1 / 60   //frame-rate
+         1 / fps   //frame-rate
       ,  10       //velocity iterations
       ,  10       //position iterations
     );
@@ -260,12 +249,11 @@ _runPhysics = function(steps, initialWorld) {
   return churchWorld_from_bodyList(world.GetBodyList());
 }
 
+
 _animatePhysics = function(steps, initialWorld) {
   function simulate(canvas, steps, initializeStep) {
-    if (initializeStep) {
-      clearWorld();
-      applyWorld(initialWorld);
-    }
+    clearWorld();
+    applyWorld(initialWorld);
     //setup debug draw
     var debugDraw = new b2DebugDraw();
     debugDraw.SetSprite(canvas[0].getContext("2d"));
@@ -276,27 +264,30 @@ _animatePhysics = function(steps, initialWorld) {
     world.SetDebugDraw(debugDraw);
 
     function update(stepsSoFar) {
+      stepsSoFar++;
+      var currTime = new Date().getTime();
+      requestId = requestAnimationFrame(function(time) {
+        update(stepsSoFar);}
+      );
+
       if (stepsSoFar < steps) {
         world.Step(
-             1 / 60   //frame-rate
+             1 / fps   //frame-rate
           ,  10       //velocity iterations
           ,  10       //position iterations
         );
-      } //else {
-        //stopAnim();
-      //}
+      }
       
       world.DrawDebugData();
       world.ClearForces();
-      
-      stepsSoFar++;
-      requestId = requestAnimFrame(function() {update(stepsSoFar);});
     };
 
-    requestAnimFrame(function() {update(0);});
+    requestId = requestAnimationFrame(function() {update(0);});
   }
   
   return function($div) {
+    stopAnim(); //stop previous update thread..
+    setTimeout(stopAnim, mspf); //make absolutely sure previous update thread is stopped
     var $physicsDiv = $("<div>").appendTo($div);
     $physicsDiv.append("<br/>");
     var $canvas = $("<canvas/>").appendTo($physicsDiv);
@@ -304,13 +295,17 @@ _animatePhysics = function(steps, initialWorld) {
            .attr("style", "background-color:#333333;")
            .attr("height", _worldHeight);
     $physicsDiv.append("<br/>");
-    var initializeStep = true;
-    simulate($canvas, 0, initializeStep);
-    initializeStep = false;
+    //var initializeStep = true;
+    //simulate($canvas, 0, initializeStep);
+    simulate($canvas, 0);
+    //initializeStep = false;
     var $button = $("<button>Simulate</button>").appendTo($physicsDiv);
     $button.click(function() {
-      simulate($canvas, steps, initializeStep);
-      initializeStep = true;
+      //simulate($canvas, steps, initializeStep);
+      
+      stopAnim(); //stop previous update thread..
+      simulate($canvas, steps);
+      //initializeStep = true;
     });
     var $clearButton = $("<button>Delete Animation Window</button>")
     $clearButton.appendTo($physicsDiv);
@@ -320,85 +315,11 @@ _animatePhysics = function(steps, initialWorld) {
         var body = world.GetBodyList();
         world.DestroyBody(body);
       }
-      stopAnim();
       $physicsDiv.remove();
     });
     return "";
   };
 }
-
-//now in church
-/*
-_makeTowerWorld = function() {
-  var wallWidth = 5;
-  var tower = [ [ [ "rect", true, [_worldWidth, wallWidth] ],
-                   [ _worldWidth / 2, _worldHeight ] ] ];
-  function makeBlock() {
-    var block = Array(2);
-    block[0] = Array(3);
-    block[1] = Array(2);
-    block[0][0] = "rect";
-    block[0][1] = false;
-    return block;
-  }
-  function erinUniform(a,b) {
-    return a + (b-a)*Math.random();
-  }
-  function randDim() {
-    return Math.round(erinUniform(10,50));
-  }
-  function addBlock(prevObj, center) {
-    var block = makeBlock();
-    var w = randDim();
-    var h = randDim();
-    block[0][2] = [w, h];
-    var prevX = prevObj[1][0];
-    var prevY = prevObj[1][1];
-    var prevW = prevObj[0][2][0];
-    var prevH = prevObj[0][2][1];
-    var x;
-    if (center) {
-      x = prevX;
-    } else {
-      x = erinUniform(prevX - (prevW/2) - (w/2), prevX + (prevW/2) + (w/2));
-    }
-    var y = prevY - prevH - h;
-    block[1] = [x, y];
-    tower.push(block);
-  }
-  var center = true;
-  for (var i=0; i<5; i++) {
-    var previous = tower[tower.length - 1];
-    addBlock(previous, center);
-    center = false;
-  }
-  console.log(format_result(jsWorld_to_churchWorld(tower)));
-  return jsWorld_to_churchWorld(tower);
-}*/
-
-//now in church
-/*_doesTowerFall = function(churchWorlds) {
-  function worldSort(a,b) {
-    return a[1][1] - b[1][1];
-  }
-  function approxEqual(a,b) {
-    var eps = 10; //pixels
-    return Math.abs(a - b) < eps;
-  }
-  var arrayWorlds = listToArray(churchWorlds);
-  var finalWorld = churchWorld_to_jsWorld(arrayWorlds[0]).sort(worldSort);
-  var initialWorld = churchWorld_to_jsWorld(arrayWorlds[1]).sort(worldSort);
-  var towerFalls = false;
-  for (var i=0; i<finalWorld.length; i++) {
-    var initialObj = initialWorld[i];
-    var finalObj = finalWorld[i];
-    if (!approxEqual(initialObj[1][1], finalObj[1][1])) {
-      towerFalls = true;
-      return towerFalls;
-    }
-  }
-  return towerFalls;
-}*/
 
 _max = function(listyList) {
   return Math.max.apply(Math, listToArray(listyList));

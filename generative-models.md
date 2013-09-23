@@ -18,7 +18,7 @@ There is one more thing to note about our Plinko machine above: we are using a c
 
 We wish to describe in formal terms how to generate states of the world. That is, we wish to describe the causal process, or steps that unfold, leading to some potentially observable states. The key idea of this section is that these generative processes can be described as *computations*---computations that involve random choices to capture uncertainty about the process.
 
-As our formal model of computation we start with the $\lambda$-calculus, and its embodiment in the LISP family of programming languages.  The $\lambda$-calculus is a formal system which was invented by Alonzo Church in the 1920's as a way of formalizing the notion of an effectively computable function [@Church192?]. The $\lambda$-calculus has only two basic operations for computing: creating and applying functions. Despite this simplicity, it is a *universal* model of computation---it is (conjectured to be) equivalent to all other notions of classical computation. (The $\lambda$-calculus was shown to have the same computational power as the Turing machine, and vice versa, by Alan Turing in his famous paper which introduced the Turing machine [@Turing1937]).
+As our formal model of computation we start with the $\lambda$-calculus, and its embodiment in the LISP family of programming languages.  The $\lambda$-calculus is a formal system which was invented by Alonzo Church in 1936 as a way of formalizing the notion of an effectively computable function [@Church1936]. The $\lambda$-calculus has only two basic operations for computing: creating and applying functions. Despite this simplicity, it is a *universal* model of computation---it is (conjectured to be) equivalent to all other notions of classical computation. (The $\lambda$-calculus was shown to have the same computational power as the Turing machine, and vice versa, by Alan Turing in his famous paper which introduced the Turing machine [@Turing1937]).
 
 In 1958 John McCarthy introduced LISP (**LIS**t **P**rocessing), a programming language based on the $\lambda$-calculus. Scheme is a variant of LISP developed by Guy L. Steele and Gerald Jay Sussman with particularly simple syntax and semantics. We will use Scheme-style notation for the $\lambda$-calculus in this tutorial. For a quick introduction to programming in Scheme see [the appendix on Scheme basics](appendix-scheme.html).
 The Church programming language [@Goodman2008], named in honor of Alonzo Church, is a generalization of Scheme which introduces the notion of probabilistic computation to the language. This addition results in a powerful language for describing generative models.
@@ -40,7 +40,7 @@ In Church, each time you run a program you get a *sample* by simulating the comp
 
 Here we have used the `repeat` procedure which takes a number of repetitions, $K$, and a random distribution (in this case `flip`) and returns a list of $K$ samples from that distribution. We have used the `hist` procedure to display the results of taking 1000 samples from `flip`. As you can see, the result is an approximately uniform distribution over `true` and `false`.
 
-An important idea here is that `flip` can be thought of in two different ways. From one perspective, `flip` is a procedure which returns a sample from a fair coin. That is, it's a *sampler* or *simulator*. From another perspective, `flip` is *itself* a characterization of the distribution over `true` and `false`. When we think about probabilistic programs we will often move back and forth between these two views, emphasizing either the sampling perspective or the distributional perspective. (With suitable restrictions this duality is complete: any Church program implicitly represents a distribution and any distribution can be represented  by a Church program [see e.g. @Ackerman2011 for more details on this duality].) We return to this relationship between probability and simulation below.
+An important idea here is that `flip` can be thought of in two different ways. From one perspective, `flip` is a procedure which returns a sample from a fair coin. That is, it's a *sampler* or *simulator*. From another perspective, `flip` is *itself* a characterization of the distribution over `true` and `false`. When we think about probabilistic programs we will often move back and forth between these two views, emphasizing either the sampling perspective or the distributional perspective. (With suitable restrictions this duality is complete: any Church program implicitly represents a distribution and any distribution can be represented  by a Church program; see e.g. @Ackerman2011 for more details on this duality.) We return to this relationship between probability and simulation below.
 
 The `flip` function is the simplest XRP in Church, but you will find other XRPs corresponding to familiar probability distributions, such as `gaussian`, `gamma`, `dirichlet`, and so on. 
 <!-- TODO: Many but not all of the XRPs and other basic functions implemented in Church can be found on the church reference appendix. -->
@@ -164,7 +164,7 @@ Higher-order functions like `repeat`, `map`, and `apply` can be quite useful.  H
 
 # Example: Causal Models in Medical Diagnosis
 
-Generative knowledge is often *causal* knowledge.  As an example of how causal knowledge can be encoded in Church expressions, consider a simplified medical scenario:
+Generative knowledge is often *causal* knowledge that describes how events or states of the world are related to each other.  As an example of how causal knowledge can be encoded in Church expressions, consider a simplified medical scenario:
 
 ~~~~
 (define lung-cancer (flip 0.01))
@@ -175,7 +175,9 @@ Generative knowledge is often *causal* knowledge.  As an example of how causal k
 cough
 ~~~~
 
-This program generates random conditions for a patient in a doctor's office.  It first specifies the base rates of two diseases the patient could have: lung cancer is rare while a cold is common, and there is an independent chance of having each disease.  The program then specifies a process for generating a common symptom of these diseases -- an effect with two possible causes: The patient coughs if they have a cold or lung cancer (or both).  Here is a slightly more complex causal model:
+This program models the diseases and symptoms of a patient in a doctor's office. It first specifies the base rates of two diseases the patient could have: lung cancer is rare while a cold is common, and there is an independent chance of having each disease.  The program then specifies a process for generating a common symptom of these diseases -- an effect with two possible causes: The patient coughs if they have a cold or lung cancer (or both).  
+
+Here is a more complex version of this causal model:
 
 ~~~~
 (define lung-cancer (flip 0.01))
@@ -184,27 +186,34 @@ This program generates random conditions for a patient in a doctor's office.  It
 (define stomach-flu (flip 0.1))
 (define other (flip 0.1))
 
-(define cough (or (and cold (flip 0.5))
-                  (and lung-cancer (flip 0.3))
-                  (and TB (flip 0.7))
-                  (and other (flip 0.01))))
+(define cough 
+  (or (and cold (flip 0.5))
+      (and lung-cancer (flip 0.3))
+      (and TB (flip 0.7))
+      (and other (flip 0.01))))
 
 
-(define fever (or (and cold (flip 0.3))
-                  (and stomach-flu (flip 0.5))
-                  (and TB (flip 0.1))
-                  (and other (flip 0.01))))
+(define fever 
+  (or (and cold (flip 0.3))
+      (and stomach-flu (flip 0.5))
+      (and TB (flip 0.1))
+      (and other (flip 0.01))))
 
 
-(define chest-pain (or (and lung-cancer (flip 0.5))
-                       (and TB (flip 0.5))
-                       (and other (flip 0.01))))
+(define chest-pain 
+  (or (and lung-cancer (flip 0.5))
+      (and TB (flip 0.5))
+      (and other (flip 0.01))))
 
-(define shortness-of-breath (or (and lung-cancer (flip 0.5))
-                                (and TB (flip 0.2))
-                                (and other (flip 0.01))))
+(define shortness-of-breath 
+  (or (and lung-cancer (flip 0.5))
+      (and TB (flip 0.2))
+      (and other (flip 0.01))))
 
-(list "cough" cough "fever" fever "chest-pain" chest-pain "shortness-of-breath" shortness-of-breath)
+(list "cough" cough 
+      "fever" fever 
+      "chest-pain" chest-pain 
+      "shortness-of-breath" shortness-of-breath)
 ~~~~
 
 Now there are four possible diseases and four symptoms.  Each disease causes a different pattern of symptoms.  The causal relations are now probabilistic: Only some patients with a cold have a cough (50%), or a fever (30%).  There is also a catch-all disease category "other", which has a low probability of causing any symptom.  *Noisy logical* functions, or functions built from `and`, `or`, and `flip`, provide a simple but expressive way to describe probabilistic causal dependencies between Boolean (true-false valued) variables.
@@ -422,7 +431,7 @@ We have included such a 2-dimensional physics simulator, the function `runPhysic
 (define (ypos) (uniform 100 (- worldHeight 100)))
 
 ; an object in the word is a list of two things:
-;  shape properties: a list of SHAPE ("rect" or "circle", IS_STATIC (#t or #f), 
+;  shape properties: a list of SHAPE ("rect" or "circle"), IS_STATIC (#t or #f), 
 ;                    and dimensions (either (list WIDTH HEIGHT) for a rect or
 ;                    (list RADIUS) for a circle
 ;  position: (list X Y)
@@ -432,9 +441,9 @@ We have included such a 2-dimensional physics simulator, the function `runPhysic
 (define (makeStaticShape) (list (list (shape) #t (list (staticDim) (staticDim)))
                                       (list (xpos) (ypos))))
 
-(define (makeGround) (list (list "rect" #t (list worldWidth 10))
-                                       (list (/ worldWidth 2) worldHeight)))
-(define fallingWorld (list (makeGround)
+(define ground (list (list "rect" #t (list worldWidth 10))
+                                     (list (/ worldWidth 2) worldHeight)))
+(define fallingWorld (list ground
                            (makeFallingShape) (makeFallingShape) (makeFallingShape)
                            (makeStaticShape) (makeStaticShape)))
 
@@ -527,7 +536,7 @@ Were you often right? Were there some cases of 'surprisingly stable' towers?  @H
   (define finalWorld (runPhysics 1000 initialWorld))
   (doesTowerFall initialWorld finalWorld))
 
-(hist (repeat 10 runTower))
+(hist (repeat 10 runTower))hggh
 ~~~~
 
 # Exercises
@@ -641,5 +650,12 @@ Were you often right? Were there some cases of 'surprisingly stable' towers?  @H
 	(define b ...)
 	(list a b)
 	~~~~
+	
+#) In [Example: Intuitive physics] above we modeled stability of a tower as the probability that the tower falls when perturbed, and we modeled "falling" as getting shorter. It would be reasonable to instead measure *how much shorter* the tower gets.
+
+	A) Modify the above stability model to use a continuous measure in place of `doesTowerFall`.
+	
+	B) Design a few towers where your new model makes very different predictions about stability from the original model. How do these predictions fit with your intuition? Which best captures the meaning of "stable"?
+	
 
 # References
