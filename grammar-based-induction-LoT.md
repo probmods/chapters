@@ -86,6 +86,7 @@ Goodman, et al, have used to this model to capture a variety of classic categori
 This style of compositional concept induction model, can be naturally extended to more complex hypothesis spaces <ref>For example: Compositionality in rational analysis: Grammar-based induction for concept learning. N. D. Goodman, J. B. Tenenbaum, T. L. Griffiths, and J. Feldman (2008). In M. Oaksford and N. Chater (Eds.). The probabilistic mind: Prospects for Bayesian cognitive science. A Bayesian Model of the Acquisition of Compositional Semantics. S. T. Piantadosi, N. D. Goodman, B. A. Ellis, and J. B. Tenenbaum (2008). Proceedings of the Thirtieth Annual Conference of the Cognitive Science Society.</ref>. It has been used to model theory acquisition, learning natural numbers concepts, etc. Further, there is no reason that the concepts need to be deterministic: in Church stochastic functions can be constructed compositionally and learned by induction <ref>Learning Structured Generative Concepts. A. Stuhlmueller, J. B. Tenenbaum, and N. D. Goodman (2010). Proceedings of the Thirty-Second Annual Conference of the Cognitive Science Society.</ref>.
 
 <collapse name="Uncertainty Over Production Probabilities">
+
 ~~~~
 ;;first set up the training (cat A/B) and test objects:
 (define num-features 4)
@@ -157,4 +158,5 @@ This style of compositional concept induction model, can be naturally extended t
 (scatter (map pair (means samples) (append human-T human-A human-B)) "model vs human")
 'done
 ~~~~
+
 </collapse>

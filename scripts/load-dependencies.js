@@ -45,7 +45,7 @@ _.templateSettings = {
     },
     webchurch: {
       //paths: ["scripts/webchurch.js"]
-      paths: ["http://stanford.edu/~juliusc/webchurch/webchurch.js"]
+      paths: ["webchurch/online/webchurch.js"]
     },
     cm: {
       paths: ["codemirror/codemirror.js"]

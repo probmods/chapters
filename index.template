@@ -16,10 +16,11 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
   </head>
   <body>
-    
+    <div id="chapter-wrapper">
     <div id="chapter">
       <div id="book-title" style='margin-bottom: 1em'>$title$</div> 
       $body$
-    </div> 
+    </div>
+    </div>
   </body>
 </html>

@@ -82,9 +82,9 @@ _hist = function(samps, title) {
     var div = $histDiv[0];
     
     //TODO: make left margin vary depending on how long the names of the elements in the list are
-    var margin = {top: 40, right: 20, bottom: 60, left: 60},
-        width = 0.8 * $div.width() - margin.left - margin.right,
-        height = 300 - margin.top - margin.bottom;
+    var margin = {top: 30, right: 20, bottom: 60, left: 30},
+        width = 0.95 * $div.width() - margin.left - margin.right,
+        height = 100 + (12 * _(myValues).uniq().length) - margin.top - margin.bottom;
 
     var x = d3.scale.linear()
           .domain([0, myMaxFreq])
@@ -98,15 +98,15 @@ _hist = function(samps, title) {
                   .orient("bottom")
                   .tickFormat(formatPercent);
     var yAxis = d3.svg.axis()
-                  .scale(y)
-                  .orient("left");
+          .scale(y)
+          .orient("left");
 
     var svg = d3.select(div).append("svg")
           .attr("class", "chart")
           .attr("width", width + margin.left + margin.right)
           .attr("height", height+ margin.top + margin.bottom)
-          .style('margin-left', '10%')
-          .style('margin-top', '20px')
+          .style('margin-left', '0')
+          .style('margin-top', '10px')
           .append("g")
           .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
@@ -137,6 +137,7 @@ _hist = function(samps, title) {
       .attr("class", "bar")
       .attr("x", 0)
       .attr("y", function(d) {return y(d.value);})
+      .attr("stroke","none")
       .attr("width", function(d) { return x(d.freq); })
       .attr("height", y.rangeBand());
     // });

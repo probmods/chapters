@@ -4,3 +4,4 @@ chapter.template
 *.html
 *.pyhtml
 scripts/mathjax/*
+mediawiki/*

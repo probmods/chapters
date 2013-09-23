@@ -12,16 +12,33 @@ body {
     margin: 0;
 }
 
+#chapter-wrapper {
+width: 55em;
+margin: 0 auto;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 1); 
+}
+
 #chapter {
     width: 45em;
-    margin: 0 auto;
     margin-top: 0;
     margin-bottom: 3em;
     background-color: white;
     padding: 5em;
     padding-top: 2em;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 1); 
+
 }
+
+#header {
+    background-color: #4ECC77;
+    width: 52em;
+    padding-top: 2.5em;
+    padding-bottom: 1.5em;
+    padding-left: 2em;
+    padding-right: 1em;
+    color: white;
+    border-bottom: 1px solid black;
+}
+
 
 #chapter > ul li {
     line-height: 140%;
@@ -29,11 +46,9 @@ body {
 
 ul#nav {
     float: right;
-    margin-top: -1em;
-    font-family: verdana;
-    font-size: 70%;
-    margin-bottom: 4em;
-    margin-right: -5em;
+    margin-top: -0em;
+    font-family: helvetica, arial, sans-serif;
+    font-size: 80%;
 }
 
 
@@ -43,16 +58,25 @@ ul#nav {
     /* font-variant: small-caps; */
     font-weight: bold;
     /* background-color: #cc0066; */
-    background-color: #99ccff;
+    /* background-color: #99ccff; */
     border-radius: 2px;
-    border: 1px solid gray;
+    border: 1px solid white;
+    /* border: 1px solid gray; */
     margin: 5px;
 }
 
+#nav > li:hover {
+background-color: white;
+}
+
+#nav > li:hover a {
+color: black
+}
+
 #nav a {
-    color: black;
+    color: white;
     text-decoration: none;
-width: 100%
+    width: 100%
 }
 
 .clear {
@@ -74,17 +98,23 @@ width: 100%
     position: absolute; 
     list-style-position: inside;
     z-index: 999999;
+    color: black;
 }
 
 #nav ol li {
     display: list-item;
     padding: 5px 10px 5px 10px;
     font-weight: normal;
+color: black
 } 
 
 #nav ol li:hover {
-    background-color: #dd0000;
+    background-color: #4ECC77;
     color: white;
+}
+
+#nav ol a {
+color: black;
 }
 
 #nav ol li:hover a {
@@ -145,7 +175,6 @@ h1 a:visited, h2 a:visited, h3 a:visited, h4 a:visited, h5 a:visited, h6 a:visit
 
 #chapter-title {
     /* font-size: 36px; */
-    margin-top: 2em;
     font-weight: normal
 }
 
@@ -219,7 +248,7 @@ span.citation {
 
 
 .chart {
-    font: 12px sans-serif; 
+    font: 13px Helvetica, Arial, sans-serif;
     fill: steelblue;
     stroke: #333333;
     text-align: right;
@@ -233,10 +262,12 @@ span.citation {
 }
 
 .axis text {
-font-size: 16px;
-font-family: Palatino Linotype, Palatino, Georgia, serif;
-stroke: none;
-fill: black;
+    stroke: none;
+fill: black
+/* font-size: 16px; */
+/* font-family: Palatino Linotype, Palatino, Georgia, serif; */
+/* stroke: none; */
+/* fill: black; */
 }
 
 pre {
@@ -284,7 +315,6 @@ h1 > a > code, h2 > a > code, h3 > a > code, h4 > a > code, h5 > a > code, li > 
 
 .bar { 
   fill: steelblue;
-  stroke: #333333;
   shape-rendering: crispEdges;
 }
 
@@ -352,4 +382,9 @@ box-shadow: 3px 3px 3px #99ccff;
 
 .CodeMirror:hover button.run, .CodeMirror:hover .code-settings, .CodeMirror-focused button.run, .CodeMirror-focused .code-settings {
 opacity: 1
+}
+
+
+pre.results:not(:empty) {
+padding: 2px
 }

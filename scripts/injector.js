@@ -15,12 +15,37 @@ util.openModule(church_builtins);
 
 CodeMirror.keyMap.default.Tab = "indentAuto";
 
+
 // check if user is logged in
 (function() {
+  // wait till server hands us back a code_id and then
+  // submit the result
+  var submitResult = function(data, editor) {
+    if (editor.codeId) {
+      var submitData = _(data).extend({'code_id': editor.codeId});
+
+      // asynchronously POST church results to /result/{exercise_name}
+      $.ajax({
+        type: "POST",
+        url: "/result",
+        data: data,
+        success: function() { console.log("POST to /result/" + editor.exerciseName + ": success");},
+        error: function() { console.log("POST to /result/" + editor.exerciseName + ": failure");}
+      }); 
+    } else {
+      setTimeout(function() { submitResult(data, editor) }, 100);
+    }
+  };
+  
   var runners = {};
-  runners['webchurch'] = function(exerciseName, code, editor) {
-    exerciseName = exerciseName + ""; // cast undefined to "undefined"
-    var $results = editor.$results;
+  runners['webchurch'] = function(editor) {
+    var code = editor.getValue(),
+        exerciseName = editor.exerciseName,
+        $results = editor.$results,
+        resultData = {'exercise_id': editor.exerciseName,
+                      'csrfmiddlewaretoken': Cookies.get('csrftoken')
+                     };
+    
     try {
       var jsCode = church_to_js(code);
       jsCode = transform.probTransform(jsCode);
@@ -40,50 +65,19 @@ CodeMirror.keyMap.default.Tab = "indentAuto";
         //underlyingData = format_result(runResult);
         $results.removeClass("error").text(runResult);
       } 
-      
-      // asynchronously POST church results to /result/{exercise_name}
-      // if (!(typeof exerciseName == "undefined") && loggedIn) {
 
-      if (true) {
-        $.ajax({
-          type: "POST",
-          url: "/result",
-          data: {
-            'exercise_id': exerciseName,
-            'forest_results': JSON.stringify(underlyingData),
-            'csrfmiddlewaretoken': Cookies.get('csrftoken')
-          },
-          success: function() {
-            console.log("POST to /result/" + exerciseName + ": success");
-          },
-          error: function() {
-            console.log("POST to /result/" + exerciseName + ": failure");
-          }
-        });
-      }
+       resultData['forest_results'] =  JSON.stringify(underlyingData); 
+      
     } catch (e) {
       var error = e.message;
       $results.addClass("error").text( error );
 
-      // asynchronously POST church results to /result/{exercise_name}
-      if (true) {
-        $.ajax({
-          type: "POST",
-          url: "/result",
-          data: {
-            'exercise_id': exerciseName,
-            'forest_errors': error,
-            'csrfmiddlewaretoken': Cookies.get('csrftoken')
-          },
-          success: function() {
-            console.log("POST to /result/" + exerciseName + ": success");
-          },
-          error: function() {
-            console.log("POST to /result/" + exerciseName + ": failure");
-          }
-        });
-      }
-    } 
+      resultData['forest_errors'] = error;
+    }
+
+    // start trying to submit results
+    submitResult(resultData, editor);
+
   };
 
   var query_settings = {
@@ -138,9 +132,12 @@ CodeMirror.keyMap.default.Tab = "indentAuto";
     var updater = $.PeriodicalUpdater(query_url(task_id), query_settings, query_receiver);
   };
 
-  var forestRunner = function(exerciseName, code, editor) {
-    var $results = editor.$results,
-        engine = editor.engine;
+  var forestRunner = function(editor) {
+    var exerciseName = editor.exerciseName,
+        code = editor.getValue(),
+        $results = editor.$results,
+        engine = editor.engine,
+        $runButton = editor.$runButton;
 
     var handlers = {};
    
@@ -215,26 +212,15 @@ CodeMirror.keyMap.default.Tab = "indentAuto";
                  };
       if (json.errors.length > 0) {
         data.forest_errors = JSON.stringify(json.errors);
-      } 
-      
-      $.ajax({
-        type: "POST",
-        url: "/result",
-        data: {
-          'exercise_id': exerciseName,
-          'forest_results': json.result
+      }
 
-        },
-        success: function() {
-          console.log("POST to /result/" + exerciseName + ": success");
-        },
-        error: function() {
-          console.log("POST to /result/" + exerciseName + ": failure");
-        }
-      });
-
+      submitResult(data, editor); 
     };
-    
+
+    handlers.reenableRun = function(json) {
+      editor.$runButton.removeAttr('disabled');
+    };
+   
     $.get("http://forestbase.com/api/query/",
            {"code": code, "engine": engine},
            function(json) {
@@ -249,12 +235,11 @@ CodeMirror.keyMap.default.Tab = "indentAuto";
 
   runners['cosh'] = forestRunner;
   runners['mit-church'] = forestRunner;
-  runners['bher'] = forestRunner;
-  
+  runners['bher'] = forestRunner; 
 
   // we can't use Cookies.get('sessionid') because that's an HTTPOnly
   // cookie - it can't be read by client-side javascript
-  var loggedIn = Cookies.get("loggedin") || false;
+  var loggedIn = Cookies.get("gg") || false;
 
   // return a dictionary of DOM element attributes
   var getAttributes = function(x) {
@@ -288,6 +273,7 @@ CodeMirror.keyMap.default.Tab = "indentAuto";
         viewportMargin: Infinity
       });
     editor.engine = selectedEngine || 'webchurch';
+    editor.exerciseName = exerciseName + ""; // cast undefined to "undefined"
 
     // results div
     var $results = $("<pre class='results'>"); 
@@ -316,12 +302,15 @@ CodeMirror.keyMap.default.Tab = "indentAuto";
     var $resetButton = $("<button>").html("Reset");
     $resetButton.click(function() {
       editor.setValue(defaultText);
+      $results.html('');
+      // TODO: ajax with isRevert 
     });
 
     // run button
     var $runButton = $("<button class='run'>").html("Run");
     $runButton.click(function() {
       $results.html('');
+      $runButton.attr('disabled','disabled');
       var churchCode = editor.getValue();
 
       // submit church code to accounts server
@@ -334,19 +323,28 @@ CodeMirror.keyMap.default.Tab = "indentAuto";
           data: {
             'code': churchCode,
             'engine': editor.engine,
+            'isRevert': null,
+            'isRerun': null,
             'csrfmiddlewaretoken': Cookies.get('csrftoken')
           },
-          success: function() {
+          success: function(codeId) {
             console.log("POST to /code/" + exerciseName + ": success");
+            editor.codeId = codeId;
           },
           error: function() {
-            console.log("POST to /code/" + exerciseName + ": failure");
+            console.log("POST to /code/" + exerciseName + ": failure"); 
           }
         });
       }
 
-      // use runner on this editor and code
-      runners[editor.engine](exerciseName, churchCode, editor); 
+      // use runner on this editor
+      // use setTimeout so the run-button disabling actually
+      // shows up on the DOM
+      setTimeout(function() { runners[editor.engine](editor);
+                              if (editor.engine == "webchurch") { 
+                                $runButton.removeAttr('disabled');
+                              }
+                            }, 15);
     });
 
     var $codeControls = $("<div class='code-controls'>");
