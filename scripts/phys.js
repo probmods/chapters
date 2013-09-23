@@ -3,7 +3,7 @@ var mspf = 1000/fps;
 var lastTime = 0;
 window.requestAnimationFrame = function(callback, element) {
     var currTime = new Date().getTime();
-    var timeToCall = Math.max(0, mspf - (currTime - lastTime));
+    var timeToCall = Math.max(0, mspf/2 - (currTime - lastTime));  //run twice as fast...
     var id = window.setTimeout(function() { callback(currTime + timeToCall); },
       timeToCall);
     lastTime = currTime + timeToCall;
@@ -252,11 +252,8 @@ _runPhysics = function(steps, initialWorld) {
 
 _animatePhysics = function(steps, initialWorld) {
   function simulate(canvas, steps, initializeStep) {
-    
-    if (initializeStep) {
-      clearWorld();
-      applyWorld(initialWorld);
-    }
+    clearWorld();
+    applyWorld(initialWorld);
     //setup debug draw
     var debugDraw = new b2DebugDraw();
     debugDraw.SetSprite(canvas[0].getContext("2d"));
@@ -290,7 +287,7 @@ _animatePhysics = function(steps, initialWorld) {
   
   return function($div) {
     stopAnim(); //stop previous update thread..
-    setTimeout(stopAnim, mspf);
+    setTimeout(stopAnim, mspf); //make absolutely sure previous update thread is stopped
     var $physicsDiv = $("<div>").appendTo($div);
     $physicsDiv.append("<br/>");
     var $canvas = $("<canvas/>").appendTo($physicsDiv);
@@ -298,13 +295,17 @@ _animatePhysics = function(steps, initialWorld) {
            .attr("style", "background-color:#333333;")
            .attr("height", _worldHeight);
     $physicsDiv.append("<br/>");
-    var initializeStep = true;
-    simulate($canvas, 0, initializeStep);
-    initializeStep = false;
+    //var initializeStep = true;
+    //simulate($canvas, 0, initializeStep);
+    simulate($canvas, 0);
+    //initializeStep = false;
     var $button = $("<button>Simulate</button>").appendTo($physicsDiv);
     $button.click(function() {
-      simulate($canvas, steps, initializeStep);
-      initializeStep = true;
+      //simulate($canvas, steps, initializeStep);
+      
+      stopAnim(); //stop previous update thread..
+      simulate($canvas, steps);
+      //initializeStep = true;
     });
     var $clearButton = $("<button>Delete Animation Window</button>")
     $clearButton.appendTo($physicsDiv);
