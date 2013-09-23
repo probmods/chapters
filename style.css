@@ -197,6 +197,14 @@ code {
 
 }
 
+li > code {
+    border-radius: 2px;
+    background-color: #fafafa;
+    border: 1px solid #dfdfdf;
+    font-size: 12px;
+    padding: 0 2px 0 2px;
+}
+
 p {
     text-align: justify
 }
