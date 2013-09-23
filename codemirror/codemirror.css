@@ -93,7 +93,7 @@ display: none;
 .cm-s-default .cm-error {color: #f00;}
 .cm-s-default .cm-qualifier {color: #555;}
 .cm-s-default .cm-builtin {color: #30a;}
-.cm-s-default .cm-bracket {color: #997;}
+.cm-s-default .cm-bracket {color: #997; border: 1px solid transparent}
 .cm-s-default .cm-tag {color: #170;}
 .cm-s-default .cm-attribute {color: #00c;}
 .cm-s-default .cm-header {color: blue;}
@@ -109,8 +109,14 @@ display: none;
 
 .cm-invalidchar {color: #f00;}
 
-div.CodeMirror span.CodeMirror-matchingbracket {color: #0f0;}
-div.CodeMirror span.CodeMirror-nonmatchingbracket {color: #f22;}
+div.CodeMirror span.CodeMirror-matchingbracket {
+border: 1px solid gray
+}
+div.CodeMirror span.CodeMirror-nonmatchingbracket {
+color: white;
+background-color: red;
+border: 1px solid black;
+}
 
 /* STOP */
 
