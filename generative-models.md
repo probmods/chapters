@@ -431,7 +431,7 @@ We have included such a 2-dimensional physics simulator, the function `runPhysic
 (define (ypos) (uniform 100 (- worldHeight 100)))
 
 ; an object in the word is a list of two things:
-;  shape properties: a list of SHAPE ("rect" or "circle", IS_STATIC (#t or #f), 
+;  shape properties: a list of SHAPE ("rect" or "circle"), IS_STATIC (#t or #f), 
 ;                    and dimensions (either (list WIDTH HEIGHT) for a rect or
 ;                    (list RADIUS) for a circle
 ;  position: (list X Y)
@@ -441,9 +441,9 @@ We have included such a 2-dimensional physics simulator, the function `runPhysic
 (define (makeStaticShape) (list (list (shape) #t (list (staticDim) (staticDim)))
                                       (list (xpos) (ypos))))
 
-(define (makeGround) (list (list "rect" #t (list worldWidth 10))
-                                       (list (/ worldWidth 2) worldHeight)))
-(define fallingWorld (list (makeGround)
+(define ground (list (list "rect" #t (list worldWidth 10))
+                                     (list (/ worldWidth 2) worldHeight)))
+(define fallingWorld (list ground
                            (makeFallingShape) (makeFallingShape) (makeFallingShape)
                            (makeStaticShape) (makeStaticShape)))
 
