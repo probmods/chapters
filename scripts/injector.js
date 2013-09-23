@@ -16,7 +16,14 @@ util.openModule(church_builtins);
 CodeMirror.keyMap.default.Tab = "indentAuto";
 
 
-// check if user is logged in
+// if not logged in, start an anonymous session
+if (!Cookies.get('csrftoken')) {
+  $.ajax({
+    type: "GET",
+    url: "/session"
+  });
+}
+
 (function() {
   // wait till server hands us back a code_id and then
   // submit the result
