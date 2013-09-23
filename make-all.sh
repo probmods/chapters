@@ -2,9 +2,9 @@
 
 # compile webchurch
 echo "making webchurch"
+git submodule update --init --recursive
+git submodule update --recursive
 cd webchurch
-git submodule init
-git submodule update
 ./compile.sh
 cd ..
 
