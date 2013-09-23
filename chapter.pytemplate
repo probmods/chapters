@@ -9,21 +9,27 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
   </head>
 <body>
-<div id="chapter">
-  <ul id="nav">
-    <li id="all-chapters"><a href="#">All chapters</a>
-      %(chapters)s
-    </li>
-    <li id="register-link"><a href="register">Register</a></li>
-    <li id="login-link"><a href="login">Login</a></li>
-    <li id="profile-link" style='display: none'><a href="profile">Profile</a></li>
-    <li id="logout-link" style='display: none'><a href="logout">Logout</a></li>
-  </ul> 
-  <div class="clear"></div> 
-  <div id="book-title">Probabilistic Models of Cognition</div> 
-  <h1 id="chapter-title">$num$ $title$</h1> 
+<div id="chapter-wrapper">
+  <div id='header'>
+    <div style='font-size: 28px; font-style: italic; float: left'>Probabilistic Models of Cognition</div>
+    <ul id="nav">
+      <li id="all-chapters"><a href="#">All chapters</a>
+        %(chapters)s
+      </li>
+      <li id="register-link"><a href="register">Register</a></li>
+      <li id="login-link"><a href="login">Login</a></li>
+      <li id="profile-link" style='display: none'><a href="profile">Profile</a></li>
+      <li id="logout-link" style='display: none'><a href="logout">Logout</a></li>
+    </ul>
+    <div class="clear"></div> 
+  </div>
+
+  <!-- <div id="book-title">Probabilistic Models of Cognition</div>  -->
+  <div id="chapter">
+    <h1 id="chapter-title">$num$ $title$</h1> 
   $toc$  
 $body$
+   </div>
 </div> 
 </body>
 
