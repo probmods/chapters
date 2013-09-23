@@ -384,11 +384,12 @@ CodeMirror.keyMap.default.Tab = "indentAuto";
       } else {
         $.ajax({
           url: "/code/" + exerciseName,
-          success: function(text) {
+          success: function(json) {
             // HACK: remove trailing newline that gets added
             // by django somewhere
-            text = text.substring(0, text.length - 1);
-            var engine = defaultEngine;
+
+            var text = json.code,
+                engine = json.engine;
 
             injectEditor(item, text, engine, defaultText);
           },
