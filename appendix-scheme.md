@@ -1,5 +1,7 @@
 % Appendix: Scheme basics
 
+# Computing with functions
+
 The $\lambda$-calculus formalizes the notion of computation using *functions*. Computation is performed in the $\lambda$-calculus by applying functions to arguments to compute results.  Function application in Church looks like this:
 
 ~~~~ {.bher}
@@ -55,6 +57,17 @@ This expression is composed of an `if` conditional that evaluates the first expr
 The operator `if` is strictly not a function, because it does not evaluate all of its arguments, but instead *short-circuits* evaluating only the second or third. It has a value like any other function.
 (We have also used comments here: anything after a semicolon is ignored when evaluating.) 
 
+Note the particular indentation style used above (called ''pretty-printing''). To clarify the structure of a function call, the arguments can split up across different lines, but keeping them vertically aligned helps readability:
+
+~~~~
+(+ (* 3
+      (+ (* 2 4)
+         (+ 3 5)))
+   (+ (- 10 7)
+      6))
+~~~~
+
+The online editor will automatically pretty-print for you. You can re-indent according to this style by selecting some lines and pressing the TAB key.
 
 We often want to name objects in our programs so that they can be reused. This can be done with the `define` statement. `define` looks like this:
 
@@ -69,33 +82,6 @@ We often want to name objects in our programs so that they can be reused. This c
 
 some-variable ;when this is evaluated it looks up and returns the value 10
 ~~~~
-
-<!--
-
-There are two ways to define functions in Scheme, the short way and the long way. They look like this:
-
-~~~~
-;; short way
-(define (f1 a b) (expt (+ a b) 3))
-
-;; long way
-(define f2 (lambda (a b) (expt (+ a b) 3)))
-~~~~
-
-The short way has this basic form:
-
-`(define (<name> <argument-name-1> <argument-name-2> ...) <whatever function does to arguments>)`
-
-Note that the short way looks similar to function application, except that we surround it within a `define` statement to give meaning to this ''particular'' function application.
-
-The long way has this basic form:
-
-`(define <name> (lambda (<argument-name-1> <argument-name-2> ...) <whatever function does to arguments>))`
-
-Note that the long way looks like we're defining a variable, except that the value of this variable is given by the special form `(lambda (...) ...)`. This `lambda` object is the actual function and you can in fact use it to define functions that don't have names associated with them, so-called '''anonymous functions''' (you will see an examples of this in the section below on Map and Fold).
-
--->
-
 
 
 # Lists and symbols
@@ -112,8 +98,6 @@ Lists can be built using the `list` function and manipulated using functions suc
 Experiment with different combinations of these functions. What happens when you apply `list` to the result of `list`? (In this program we have used another kind of special value: a string, which is anything between double-quotes.)
 
 
-
-
 Sometimes we wish to treat a piece of Church code "literally", that is, to view it as a value rather than an expression. We can do this using a special `quote` operation (which can also be written with a single quote: `(quote ...)` is the same as `'...`):
 
 ~~~~
@@ -121,6 +105,18 @@ Sometimes we wish to treat a piece of Church code "literally", that is, to view 
 (first quoted-value)
 ~~~~
 What is the value of `quoted-value`? What happens if you remove the quote? Why?
+
+The `quote` operator is not the same as the `list` function. Everything inside a quote is taken literally, with no evaluation, while the arguments to `list` are first evaluated and then made into a list. Compare the value of:
+
+~~~~
+(list (+ 1 2) 2)
+~~~~
+
+to the value of:
+ 
+~~~~ 
+'( (+ 1 2) 3)
+~~~~
 
 If we quote the name of a variable, what we get back is a symbol: a value which is the literal variable, rather than the value it is bound to. A symbol is just an identifier; it will be equal to itself, but to no other symbol:
 
@@ -145,11 +141,11 @@ Some useful functions on lists:
 * `(first lst)` returns the first item of `lst`, while `(rest lst)` returns everything but the first item of `lst`. For convenience, `second`, `third`, `fourth`, `fifth`, `sixth`, and `seventh` are also defined.
 * `(append lst1 lst2 ...)` will put lists together:
 
-~~~~
-(append '(1 2 3) '(4 5) '(6 7))
-~~~~
-
-Note that append is a variadic function.
+	~~~~
+	(append '(1 2 3) '(4 5) '(6 7))
+	~~~~
+	
+	Note that append is a variadic function.
 
 Lists can contain lists, e.g.:
 
@@ -207,7 +203,31 @@ Since we often want to assign names to functions, `(define (foo x) ...)` is shor
 ((twice double) 3)
 ~~~~
 
+<!--
 
+There are two ways to define functions in Scheme, the short way and the long way. They look like this:
+
+~~~~
+;; short way
+(define (f1 a b) (expt (+ a b) 3))
+
+;; long way
+(define f2 (lambda (a b) (expt (+ a b) 3)))
+~~~~
+
+The short way has this basic form:
+
+`(define (<name> <argument-name-1> <argument-name-2> ...) <whatever function does to arguments>)`
+
+Note that the short way looks similar to function application, except that we surround it within a `define` statement to give meaning to this ''particular'' function application.
+
+The long way has this basic form:
+
+`(define <name> (lambda (<argument-name-1> <argument-name-2> ...) <whatever function does to arguments>))`
+
+Note that the long way looks like we're defining a variable, except that the value of this variable is given by the special form `(lambda (...) ...)`. This `lambda` object is the actual function and you can in fact use it to define functions that don't have names associated with them, so-called '''anonymous functions''' (you will see an examples of this in the section below on Map and Fold).
+
+-->
 
 
 # Useful Higher-Order Functions
@@ -252,7 +272,7 @@ Higher-order functions like `repeat`, `map`, or `apply` can be quite useful.  He
 
 
 
-1) Calling functions: Church is a variant of the functional programming language Scheme. You call functions like this: `(function arg1 arg2 arg3)`. For example, `(+ 1 2)` would return 3. Try running it:
+1) In Church you call functions like this: `(function arg1 arg2 arg3)`. For example, `(+ 1 2)` would return 3. Try running it:
 
 	~~~~
 	; comments are preceded by semicolons 
@@ -294,18 +314,6 @@ Higher-order functions like `repeat`, `map`, or `apply` can be quite useful.  He
 		    (- 4 6)))
 		~~~~
 	
-		Note the particular indentation style (called ''pretty-printing''). To clarify the structure of a function call, the arguments can split up across different lines but kept vertically aligned:
-		
-		~~~~
-		(+ (* 3
-		      (+ (* 2 4)
-		         (+ 3 5)))
-		   (+ (- 10 7)
-		      6))
-		~~~~
-		
-		The online editor will automatically pretty-print for you. If for some reason it screws up, you can manually indent according to this style by pressing the TAB key.
-	
 	G) Why doesn't this code work?
 	
 		~~~~
@@ -315,25 +323,27 @@ Higher-order functions like `repeat`, `map`, or `apply` can be quite useful.  He
 
 #) Defining variables and functions:
 
-	A) Using the short way of defining functions, write a function $f(x, y) = (x + y)^{x - y}$ and use it to compute $f(5,3)$:
+	A) Write a function $f(x, y) = (x + y)^{x - y}$ and use it to compute $f(5,3)$. Fill in the blanks for defining $f$ using the short syntax:
 
 		~~~~
-		~~~~
-	
-		Now fill in the blank for defining $f$ the long way; make sure that you get the same answer for $f(5,3)$.
-		
-		~~~~
-		(define f (lambda (...) (...) )
+		(define (f ...) ...)
 		(f 5 3)
 		~~~~
 	
-	B) Below, we have already defined $h(x,y) = x + 2y$. Using the short way, write a function $g(x, y, z) = x - y \times z$ and use it to compute $g(1, 4, h(6,3))$.
+		Now fill in the blank for defining $f$ using the long syntax; make sure that you get the same answer for $f(5,3)$.
+		
+		~~~~
+		(define f (lambda (...) ... ))
+		(f 5 3)
+		~~~~
+	
+	B) Below, we have already defined $h(x,y) = x + 2y$. Using the short syntax, write a function $g(x, y, z) = x - y \times z$ and use it to compute $g(1, 4, h(6,3))$.
 	
 		~~~~
 		(define (h x y) (+ x (* 2 y)))
 		~~~~
 		
-		Now define $g$ using the long way; make sure that you get the same answer for $g(1, 4, h(6, 3))$
+		Now define $g$ using the long syntax; make sure that you get the same answer for $g(1, 4, h(6, 3))$
 		
 		~~~~
 		(define (h x y) (+ x (* 2 y)))
@@ -367,6 +377,7 @@ Higher-order functions like `repeat`, `map`, or `apply` can be quite useful.  He
 		~~~~
 		(define (use-thing1-on-other-things thing1 thing2 thing3)
 		  (thing1 thing2 thing3))
+		  
 		(use-thing1-on-other-things * 3 4)
 		~~~~
 		
@@ -377,7 +388,7 @@ Higher-order functions like `repeat`, `map`, or `apply` can be quite useful.  He
 		~~~~
 	
 	
-	E) In the previous problem, we defined `f` as a function that takes in a function as one of its '''arguments'''. Here, we are going to define a different sort of function, one that takes in normal values as arguments but '''returns''' a function.
+	E) In D we defined `f` as a function that takes in a function as one of its arguments. Here, we are going to define a different sort of function, one that takes in normal values as arguments but *returns* a function.
 	
 		~~~~
 		(define (bigger-than-factory num) (lambda (x) (> x num)))
@@ -387,9 +398,7 @@ Higher-order functions like `repeat`, `map`, or `apply` can be quite useful.  He
 		
 		Without running any code, compute `((bigger-than-factory 5) 4)` and `((bigger-than-factory -1) 7)`.
 		
-		The functions we've defined in parts (D) and (E) are called "higher order functions". A function $f$ is a higher order function if it satisfies at least one of the following:
-		* it take one or more functions as an input 
-		* it outputs a function
+		The functions we've defined in parts D and E are called "higher order functions". A function $f$ is a higher order function if it takes other functions as input or if it outputs a function.
 	
 	F) What does this function do?
 	
@@ -440,7 +449,7 @@ Higher-order functions like `repeat`, `map`, or `apply` can be quite useful.  He
 	
 	C) Using quote syntax, write a list of the odd numbers between 1 and 9 inclusive.
 	
-	D) Without running any code, guess the result of each expression below. Some of these expressions have intentional errors embedded - see if you can spot them.
+	D) Without running any code, guess the result of each expression below. Some of these expressions have intentional errors---see if you can spot them.
 	
 		`(pair 1 (pair 'foo (pair 'bar '() ))`
 		
@@ -462,16 +471,16 @@ Higher-order functions like `repeat`, `map`, or `apply` can be quite useful.  He
 		;; run code here
 		~~~~
 	
-#) Two common patterns for working with lists are called `map` and `fold` (fold also sometimes called `reduce`).
+#) Two common patterns for working with lists are called `map` and `fold` (fold is also sometimes called `reduce`).
 
-	Map takes two arguments, a function, $f$ and a list, $\{x_1, x_2, x_3, \dots , x_n\}$ and returns a list with $f$ applied to every item of the list, or $\{ f(x_1), f(x_2), ..., f(x_n) \}$. In the example below, we map `square` (which squares numbers) over the first five natural numbers:
+	Map takes two arguments, a function, `f`, and a list, `(list a b c ...)`, and returns a list with `f` applied to every item of the list: `(list (f a) (f b) (f c) ...)`. In the example below, we map `square` (which squares numbers) over the first five natural numbers:
 	
 	~~~~
 	(define (square x) (* x x))
 	(map square '(1 2 3 4 5))
 	~~~~
 	
-	Fold takes three arguments, a function $f$, an initial value, $x_0$, and a list, $\{x_1, x_2, \dots, x_n\}$, and returns $f(x_n, \dots, f(x_3,f(x_2, f(x_1, x_0))) $. In the example below, we define a function that computes the product of a list:
+	Fold takes three arguments, a function, `f`, an initial value, `i`, and a list, `(list a b c ...)`, and returns `(f ... (f c (f b (f a i))))`. In the example below, we define a function that computes the product of a list:
 	
 	~~~~
 	(define (my-product lst)
@@ -489,7 +498,7 @@ Higher-order functions like `repeat`, `map`, or `apply` can be quite useful.  He
 	(my-product '(1 2 3 4 5))
 	~~~~
 	
-	Note the use of the anonymous function here - we don't care about using this function outside the context of the fold, so we can just use it anonymously.
+	Note the use of the "anonymous" function here---we don't care about using this function outside the context of the fold, so we don't bother giving it a name with `define`.
 	
 	A) Write `my-sum-squares` using `fold`. This function should take in a list of numbers and return the sum of the squares of all those numbers. Use it on the list `'(1 2 3 4 5)`
 	
@@ -499,7 +508,7 @@ Higher-order functions like `repeat`, `map`, or `apply` can be quite useful.  He
 		(my-sum-squares '(1 2 3 4 5))
 		~~~~
 	
-	B) Write `my-sum` '''without''' using `fold` - use `map` and `apply`:
+	B) Write `my-sum-squares` *without* using `fold`---instead use `map` and `apply`:
 	
 		~~~~
 		(define (square x) (* x x))
@@ -507,7 +516,7 @@ Higher-order functions like `repeat`, `map`, or `apply` can be quite useful.  He
 		(my-sum-squares '(1 2 3 4 5))
 		~~~~
 
-#) One benefit of functional programming languages is that they make it possible to elegantly and concisely write down interesting programs that would complicated and ugly to express in non-functional languages (if you have some time, it is well worth understanding the [change counting example](http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-11.html#%_sec_1.2.1) from SICP). Elegance and concision usually derive from recursion, i.e., expressing a problem in terms of a smaller subproblem.
+#) One benefit of functional programming languages is that they make it possible to elegantly and concisely write down interesting programs that would be complicated and ugly to express in non-functional languages (if you have some time, it is well worth understanding the [change counting example](http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-11.html#%_sec_1.2.1) from SICP). Elegance and concision usually derive from recursion, i.e., expressing a problem in terms of a smaller subproblem.
 
 	Here is a very simple recursive function, one that computes the length of a list:
 	
