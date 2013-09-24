@@ -129,6 +129,10 @@ _.templateSettings = {
             loadedLibName = this.name,
             children = this.children;
 
+        if (this.name != "mathjax") {
+            path += "?" + (new Date()).getTime();
+        }
+
         if (typeof children == "undefined") {
           children = [];
         }
