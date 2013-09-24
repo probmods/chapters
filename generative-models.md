@@ -600,17 +600,28 @@ Were you often right? Were there some cases of 'surprisingly stable' towers?  @H
 
     Directly compute the probability of the bent coin in the example. Check your answer by comparing to the histogram of many samples.
 
-5) Here are four expressions you could evaluate using the model (the set of definitions) from the tug-of-war example:
+5) Here is a modified version of the tug of war game. Instead of drawing strength from the continuous Gaussian distribution, strength is either 5 or 10 with equal probability. Also the probability of laziness is changed from 1/4 to 1/3. Here are four expressions you could evaluate using this modified model:
 
     ~~~~ {data-exercise="ex5"}
-    (winner '(alice) '(bob))
+    (define strength (mem (lambda (person) (if (flip) 5 10))))
 
-    (equal? '(alice) (winner '(alice) '(bob)))
+    (define lazy (lambda (person) (flip (/ 1 3))))
 
-    (and (equal? '(alice) (winner '(alice) '(bob)))
+    (define (total-pulling team)
+      (sum
+       (map (lambda (person) (if (lazy person) (/ (strength person) 2) (strength person)))
+            team)))
+
+    (define (winner team1 team2) (if (< (total-pulling team1) (total-pulling team2)) team2 team1))
+
+    (winner '(alice) '(bob)) ;;Expression 1
+
+    (equal? '(alice) (winner '(alice) '(bob))) ;;Expression 2
+
+    (and (equal? '(alice) (winner '(alice) '(bob))) ;;Expression 3
          (equal? '(alice) (winner '(alice) '(fred))))
 
-    (and (equal? '(alice) (winner '(alice) '(bob)))
+    (and (equal? '(alice) (winner '(alice) '(bob))) ;;Expression 4
          (equal? '(jane) (winner '(jane) '(fred))))
     ~~~~
 
