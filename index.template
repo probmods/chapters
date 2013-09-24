@@ -3,16 +3,14 @@
   <head>
     <title>$title$</title>
     <link rel="stylesheet" type="text/css" href="style.css">
-    <script src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <style>
       ol {
       font-size: 1.5em;
       line-height: 1.75em;
       }
     </style>
-    <script src="scripts/cookies-0.3.1.min.js"></script>
-    <script src="scripts/jquery.js"></script>
-    <script src="scripts/injector.js"></script>
+    <script src="scripts/underscore-min.js"></script> 
+    <script src="scripts/jquery.js"></script> 
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
   </head>
   <body>
@@ -23,4 +21,5 @@
     </div>
     </div>
   </body>
+  <script src="scripts/load-dependencies.js"></script>
 </html>
