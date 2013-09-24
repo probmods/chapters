@@ -11,7 +11,7 @@ This book is best viewed in recent versions of Chrome or Firefox on a laptop or 
 This book contains technical exercises at the end of some chapters. You can create an account to save your progress on these exercises. Creating an account also helps us improve the book by tracking what kinds of programs users run and what kinds of errors they encounter.
 
 <div id="register" style='display: none'>
-<a href="/register">Register an account</a>
+<a href="/login">Login</a> or <a href="/register">register an account</a> 
 </div>
 
 # Prelude
