@@ -326,43 +326,69 @@ We previously saw how a generative model of physics---a noisy, intuitive version
 Imagine that we drop a block from a random position at the top of a world with two fixed obstacles:
 
 ~~~~
-;setup a world with two fixed circles and a floor:
-(define world (addCircle
-               (addCircle
-                (addRect emptyWorld
-                         (/ worldWidth 2) worldHeight worldWidth 10 true)
-                60 200 60 true)
-               300 300 30 true))
-               
-(animatePhysics 1000 (addRect world (uniform 0 worldWidth) 0 10 10))
+;set up some bins on a floor:
+(define (bins xmin xmax width)
+  (if (< xmax (+ xmin width))
+      ;the floor:
+      '( (("rect" #t (400 10)) (175 500)) )
+      ;add a bin, keep going:
+      (pair (list '("rect" #t (1 10)) (list xmin 490))
+            (bins (+ xmin width) xmax width))))
+
+;make a world with two fixed circles and bins:
+(define world (pair '(("circle" #t (60)) (60 200))
+                    (pair '(("circle" #t (30)) (300 300))
+                          (bins -1000 1000 25))))
+
+;make a random block at the top:
+(define (random-block) (list (list "circle" #f '(10)) 
+                             (list (uniform 0 worldWidth) 0)))
+
+;add a random block to world, then animate:
+(animatePhysics 1000 (pair (random-block) world))
 ~~~~
 
-<!-- TODO: forward hist -->
+<!--
+We can use forward simulation to understand where a ball might come to rest if it starts at a particular initial position:
+
+-->
 
 Assuming that the block comes to rest in the middle of the floor, where did it come from?
 
 ~~~~
-;setup a world with two fixed circles and a floor:
-(define world (addCircle
-               (addCircle
-                (addRect emptyWorld
-                         (/ worldWidth 2) worldHeight worldWidth 10 true)
-                60 200 60 true)
-               300 300 30 true))
+;set up some bins on a floor:
+(define (bins xmin xmax width)
+  (if (< xmax (+ xmin width))
+      ;the floor:
+      '( (("rect" #t (400 10)) (175 500)) )
+      ;add a bin, keep going:
+      (pair (list '("rect" #t (1 10)) (list xmin 490))
+            (bins (+ xmin width) xmax width))))
 
-;helper to get X position of the block:
-(define (getx world) (first (second (first world))))
+;make a world with two fixed circles and bins:
+(define world (pair '(("circle" #t (60)) (60 200))
+                    (pair '(("circle" #t (30)) (300 300))
+                          (bins -1000 1000 25))))
+
+;make a random block at the top:
+(define (random-block) (list (list "circle" #f '(10)) 
+                             (list (uniform 0 worldWidth) 0)))
+                             
+;helper to get X position of the movable block:
+(define (getX world) 
+  (if (second (first (first world)))
+      (getX (rest world))
+      (first (second (first world)))))
   
 (define init-xs
-  (mh-query 100 100
-    (define init-state (addRect world (uniform 0 worldWidth) 0 10 10))
+  (mh-query 100 10
+    (define init-state (pair (random-block) world))
     (define final-state (runPhysics 1000 init-state))
-    (getx init-state)
-    (= 300 (gaussian (getx final-state) 10))))
+    (getX init-state)
+    (= 150 (gaussian (getX final-state) 10))))
         
-(density init-xs)
+(density init-xs "init state" true)
 ~~~~
-<!-- TODO: this requires the conditioning on a real trick. -->
 
 
 
