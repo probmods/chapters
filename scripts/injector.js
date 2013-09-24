@@ -411,19 +411,17 @@ if (!Cookies.get('csrftoken')) {
 
   $(document).ready(function() {
     $("pre:not(.norun)").map(function(index, item) {
-      var exerciseName = chapterName + "." + $(item).attr("data-exercise"),
+      var rawExerciseName = $(item).attr("data-exercise"),
+          exerciseName = chapterName + "." + rawExerciseName,
           defaultEngine = $(item).attr("data-engine") || 'webchurch',
           defaultText = $(item).text();
       
-      if (!loggedIn || !exerciseName) {
+      if (!loggedIn || !rawExerciseName) {
         injectEditor(item, defaultText, defaultEngine, defaultText); 
       } else {
         $.ajax({
           url: "/code/" + exerciseName,
           success: function(json) {
-            // HACK: remove trailing newline that gets added
-            // by django somewhere
-
             var text = json.code,
                 engine = json.engine;
 
