@@ -262,9 +262,11 @@ if (!Cookies.get('csrftoken')) {
     return attributes;
   };
 
+  var chapterName = _(location.href.split("/")).last().replace(".html","");
+
   var injectEditor = function(item, text, selectedEngine, defaultText) {
     var attributes = getAttributes(item),
-        exerciseName = $(item).data("exercise");
+        exerciseName = chapterName + "." + $(item).data("exercise");
 
     // editor
     var editor = CodeMirror(
@@ -281,8 +283,8 @@ if (!Cookies.get('csrftoken')) {
         autoCloseBrackets: true
       });
     editor.engine = selectedEngine || 'webchurch';
-    editor.exerciseName = exerciseName + ""; // cast undefined to "undefined"
-
+    editor.exerciseName = exerciseName + ""; // cast undefined to "undefined" 
+    
     // results div
     var $results = $("<pre class='results'>"); 
 
