@@ -4,6 +4,16 @@
 
 ***Contributors***: Timothy J. O'Donnell, Andreas Stuhlmuller, Tomer Ullman, John McCoy, Long Ouyang
 
+# Technical notes
+
+This book is best viewed in recent versions of Chrome or Firefox on a laptop or desktop computer.
+
+This book contains technical exercises at the end of some chapters. You can create an account to save your progress on these exercises. Creating an account also helps us improve the book by tracking what kinds of programs users run and what kinds of errors they encounter.
+
+<div id="register" style='display: none'>
+<a href="/login">Login</a> or <a href="/register">register an account</a> 
+</div>
+
 # Prelude
 
 What is thought? How can we describe the intelligent inferences made in everyday human reasoning and learning? How can we engineer intelligent machines? The computational theory of mind aims to answer these questions starting from the hypothesis that the mind is a computer, mental representations are computer programs, and thinking is a computational process -- running a computer program.
