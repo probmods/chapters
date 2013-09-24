@@ -27,18 +27,15 @@ _.templateSettings = {
   // NB: path is relative to main content directory
   // for simplicity, don't allow // retrievals
 
-  var localView = location.protocol.match(/file/);
-  var _u = function(url) {
-    if (url.substring(0,2) == "//" && localView) {
-      return "http:" + url;
-    } else {
-      return url;
-    }
+  var mathJaxPaths = {
+    file: "http://cdn.mathjax.org/mathjax/latest/MathJax.js",
+    http: "http://cdn.mathjax.org/mathjax/latest/MathJax.js",
+    https: "https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js"
   };
   
   var libs = {
     mathjax: {
-      paths: [_u("//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML")]
+      paths: [mathJaxPaths[location.protocol.replace(":","")] + "?config=TeX-AMS-MML_HTMLorMML"]
     },
     periodicalupdater: {
       paths: ["scripts/jquery.periodicalupdater.js"]
