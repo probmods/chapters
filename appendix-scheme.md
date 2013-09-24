@@ -268,9 +268,7 @@ Higher-order functions like `repeat`, `map`, or `apply` can be quite useful.  He
 -->
 
 
-# Excercises
-
-
+# Exercises 
 
 1) In Church you call functions like this: `(function arg1 arg2 arg3)`. For example, `(+ 1 2)` would return 3. Try running it:
 
@@ -281,33 +279,33 @@ Higher-order functions like `repeat`, `map`, or `apply` can be quite useful.  He
 	
 	A) Write the computation $3 \times 4$ in Church (`*` is the multiplication function).
 	
-		~~~~
+		~~~~ {data-exercise="ex1a"}
 		~~~~
 	
 	B) Write the computation $3 \times (4 + 6)$ in Church (make sure the result is 30).
 	
-		~~~~
+		~~~~ {data-exercise="ex1b"}
 		~~~~
 	
 	C) Write the computation $3 \times [4+ (6/7)]$ in Church (make sure the result is $\approx$ 14.57)
 	
-		~~~~
+		~~~~ {data-exercise="ex1c"}
 		~~~~
 	
 	D) Write the computation $3 \times [4+ (6/7)^2]$ in Church. The Church function `(expt a b)` will give you $a^b$. Make sure the result is $\approx$ 14.20.
 	
-		~~~~
+		~~~~ {data-exercise="ex1d"}
 		~~~~
 	
 	E) Convert this Church expression into an arithmetic expression:
 	
-		~~~~
+		~~~~ {data-exercise="ex1e"}
 		(/ 1 (+ 4 5))
 		~~~~
 	
 	F) Convert this Church expression to an arithmetic expression:
 	
-		~~~~
+		~~~~ {data-exercise="ex1f"}
 		(/ 1
 		   (*
 		    (+ 2 3)
@@ -316,7 +314,7 @@ Higher-order functions like `repeat`, `map`, or `apply` can be quite useful.  He
 	
 	G) Why doesn't this code work?
 	
-		~~~~
+		~~~~ {data-exercise="ex1g"}
 		(4 + 6)
 		~~~~
 	
@@ -325,27 +323,27 @@ Higher-order functions like `repeat`, `map`, or `apply` can be quite useful.  He
 
 	A) Write a function $f(x, y) = (x + y)^{x - y}$ and use it to compute $f(5,3)$. Fill in the blanks for defining $f$ using the short syntax:
 
-		~~~~
+		~~~~ {data-exercise="ex2a-short"}
 		(define (f ...) ...)
 		(f 5 3)
 		~~~~
 	
 		Now fill in the blank for defining $f$ using the long syntax; make sure that you get the same answer for $f(5,3)$.
 		
-		~~~~
+		~~~~ {data-exercise="ex2a-long"}
 		(define f (lambda (...) ... ))
 		(f 5 3)
 		~~~~
 	
 	B) Below, we have already defined $h(x,y) = x + 2y$. Using the short syntax, write a function $g(x, y, z) = x - y \times z$ and use it to compute $g(1, 4, h(6,3))$.
 	
-		~~~~
+		~~~~ {data-exercise="ex2b-short"}
 		(define (h x y) (+ x (* 2 y)))
 		~~~~
 		
 		Now define $g$ using the long syntax; make sure that you get the same answer for $g(1, 4, h(6, 3))$
 		
-		~~~~
+		~~~~ {data-exercise="ex2b-long"}
 		(define (h x y) (+ x (* 2 y)))
 		~~~~
 	
@@ -364,7 +362,7 @@ Higher-order functions like `repeat`, `map`, or `apply` can be quite useful.  He
 		
 		What does the function below do?
 		
-		~~~~
+		~~~~ {data-exercise="ex2c"}
 		(define (f x) (if (> x 5)
 		                  'Z
 		                  (if (> x 2)
@@ -383,14 +381,14 @@ Higher-order functions like `repeat`, `map`, or `apply` can be quite useful.  He
 		
 		Write a function, `f`, that takes three arguments, `g`, `x`, and `y`. Assume that `g` is a function of two variables and define `f` so that it returns `'yes` if $g(x,y) > x + y$, otherwise `'no`. Use it to compute $f(\times, 2.6, 1.2)$.
 		
-		~~~~
+		~~~~ {data-exercise="ex2d"}
 		(define (f g x y) ...)
 		~~~~
 	
 	
 	E) In D we defined `f` as a function that takes in a function as one of its arguments. Here, we are going to define a different sort of function, one that takes in normal values as arguments but *returns* a function.
 	
-		~~~~
+		~~~~ {.norun}
 		(define (bigger-than-factory num) (lambda (x) (> x num)))
 		~~~~
 		
@@ -402,13 +400,13 @@ Higher-order functions like `repeat`, `map`, or `apply` can be quite useful.  He
 	
 	F) What does this function do?
 	
-		~~~~
+		~~~~ {data-exercise="ex2f"}
 		(define (Q f g) (lambda (x y) (> (f x y) (g x y))))
 		~~~~
 
 #) Two important data structures in Scheme/Church are pairs and lists. A pair is just a combination of two things, a head and a tail. In Church, if you already have `x` and `y`, you can combine them into a pair by calling `(pair x y)`:
 
-	~~~~
+	~~~~ 
 	(define x 3)
 	(define y 9)
 	(pair x y)
@@ -446,8 +444,14 @@ Higher-order functions like `repeat`, `map`, or `apply` can be quite useful.  He
 		~~~~
 	
 	B) Using `list` syntax, write a list of the even numbers between 0 and 10 inclusive.
+
+		~~~~ {data-exercise="3b"}
+		~~~~
 	
 	C) Using quote syntax, write a list of the odd numbers between 1 and 9 inclusive.
+
+		~~~~ {data-exercise="3c"}
+		~~~~ 
 	
 	D) Without running any code, guess the result of each expression below. Some of these expressions have intentional errors---see if you can spot them.
 	
@@ -467,7 +471,7 @@ Higher-order functions like `repeat`, `map`, or `apply` can be quite useful.  He
 		
 		Check your guesses by actually running the code. If you made any mistakes, explain why your initial guess was incorrect.
 		
-		~~~~
+		~~~~ {data-exercise="ex3d"}
 		;; run code here
 		~~~~
 	
@@ -475,7 +479,7 @@ Higher-order functions like `repeat`, `map`, or `apply` can be quite useful.  He
 
 	Map takes two arguments, a function, `f`, and a list, `(list a b c ...)`, and returns a list with `f` applied to every item of the list: `(list (f a) (f b) (f c) ...)`. In the example below, we map `square` (which squares numbers) over the first five natural numbers:
 	
-	~~~~
+	~~~~ {data-exercise="ex4square"}
 	(define (square x) (* x x))
 	(map square '(1 2 3 4 5))
 	~~~~
@@ -502,7 +506,7 @@ Higher-order functions like `repeat`, `map`, or `apply` can be quite useful.  He
 	
 	A) Write `my-sum-squares` using `fold`. This function should take in a list of numbers and return the sum of the squares of all those numbers. Use it on the list `'(1 2 3 4 5)`
 	
-		~~~~
+		~~~~ {data-exercise="ex4a"}
 		(define (square x) (* x x))
 		(define (my-sum-squares lst) ...)
 		(my-sum-squares '(1 2 3 4 5))
@@ -510,7 +514,7 @@ Higher-order functions like `repeat`, `map`, or `apply` can be quite useful.  He
 	
 	B) Write `my-sum-squares` *without* using `fold`---instead use `map` and `apply`:
 	
-		~~~~
+		~~~~ {data-exercise="ex4b"}
 		(define (square x) (* x x))
 		(define (my-sum-squares lst) ...)
 		(my-sum-squares '(1 2 3 4 5))
@@ -520,7 +524,7 @@ Higher-order functions like `repeat`, `map`, or `apply` can be quite useful.  He
 
 	Here is a very simple recursive function, one that computes the length of a list:
 	
-	~~~~
+	~~~~ {data-exercise="my-length"}
 	(define (my-length lst)
 	  (if (null? lst)
 	      0
@@ -533,7 +537,7 @@ Higher-order functions like `repeat`, `map`, or `apply` can be quite useful.  He
 	
 	B) Below, `my-max` is intended to be a recursive function that returns the largest item in a list. Finish writing it and use it to compute the largest item in `'(1 2 3 6 7 4 2 9 8 -5 0 12 3)`
 	
-		~~~~
+		~~~~ {data-exercise="5b"}
 		; returns the larger of a and b.
 		(define (bigger a b) (if (> a b) a b))
 		
@@ -547,7 +551,7 @@ Higher-order functions like `repeat`, `map`, or `apply` can be quite useful.  He
 	
 	C) Write a version of `my-max` using `fold`.
 	
-		~~~~
+		~~~~ {data-exercise="5c"}
 		(define (bigger a b) (if (> a b) a b))
 		
 		(define (my-max lst) 
