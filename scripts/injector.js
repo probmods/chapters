@@ -411,7 +411,7 @@ if (!Cookies.get('csrftoken')) {
 
   $(document).ready(function() {
     $("pre:not(.norun)").map(function(index, item) {
-      var exerciseName = $(item).attr("data-exercise"),
+      var exerciseName = chapterName + "." + $(item).attr("data-exercise"),
           defaultEngine = $(item).attr("data-engine") || 'webchurch',
           defaultText = $(item).text();
       
