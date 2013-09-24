@@ -290,7 +290,7 @@ if (!Cookies.get('csrftoken')) {
 
     // engine selector
 
-    var engines = ["webchurch", "cosh", "bher", "mit-church"],
+    var engines = ["webchurch"],// ["webchurch", "cosh", "bher", "mit-church"],
         engineSelectorString = "<select>\n" + _(engines).map(
           function(engine) {
             var tmpl = _.template('<option value="{{ engine }}" {{ selectedString }}> {{ engine }} </option>'),
