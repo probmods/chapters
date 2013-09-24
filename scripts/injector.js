@@ -141,6 +141,7 @@ if (!Cookies.get('csrftoken')) {
 
   var forestRunner = function(editor) {
     alert('Remote engine server not available right now');
+
     var exerciseName = editor.exerciseName,
         code = editor.getValue(),
         $results = editor.$results,
@@ -238,6 +239,8 @@ if (!Cookies.get('csrftoken')) {
              }
            },
            "jsonp");
+    // TEMP
+    handlers.reenableRun();
 
   };
 
