@@ -30,7 +30,7 @@ In Church, in addition to deterministic functions, we have a set of random funct
 ~~~~
 
 Run this program a few times. You will get back a different sample on each execution. Also, notice the parentheses around `flip`. These are meaningful; they tell Church that you are asking for an application of the XRP `flip`---resulting in a sample.
-Without parentheses `flip` is a *procedure* object---a representation of the simulator itself, which can be used to get samples. 
+Without parentheses `flip` is a *procedure* object---a representation of the simulator itself, which can be used to get samples.
 
 In Church, each time you run a program you get a *sample* by simulating the computations and random choices that the program specifies. If you run the program many times, and collect the values in a histogram, you can see what a typical sample looks like:
 
@@ -42,7 +42,7 @@ Here we have used the `repeat` procedure which takes a number of repetitions, $K
 
 An important idea here is that `flip` can be thought of in two different ways. From one perspective, `flip` is a procedure which returns a sample from a fair coin. That is, it's a *sampler* or *simulator*. From another perspective, `flip` is *itself* a characterization of the distribution over `true` and `false`. When we think about probabilistic programs we will often move back and forth between these two views, emphasizing either the sampling perspective or the distributional perspective. (With suitable restrictions this duality is complete: any Church program implicitly represents a distribution and any distribution can be represented  by a Church program; see e.g. @Ackerman2011 for more details on this duality.) We return to this relationship between probability and simulation below.
 
-The `flip` function is the simplest XRP in Church, but you will find other XRPs corresponding to familiar probability distributions, such as `gaussian`, `gamma`, `dirichlet`, and so on. 
+The `flip` function is the simplest XRP in Church, but you will find other XRPs corresponding to familiar probability distributions, such as `gaussian`, `gamma`, `dirichlet`, and so on.
 <!-- TODO: Many but not all of the XRPs and other basic functions implemented in Church can be found on the church reference appendix. -->
 Using these XRPs we can construct more complex expressions that describe more complicated sampling processes. For instance here we describe a process that samples a number by multiplying two samples from a Guassian distribution:
 
@@ -51,14 +51,14 @@ Using these XRPs we can construct more complex expressions that describe more co
 ~~~~
 
 What if we want to invoke this sampling process multiple times? We would like to construct a stochastic function that multiplies two Gaussians each time it is called.
-We can use `lambda` to construct such complex stochastic functions from the primitive ones. 
+We can use `lambda` to construct such complex stochastic functions from the primitive ones.
 
 ~~~~
 (define two-gaussians (lambda () (* (gaussian 0 1) (gaussian 0 1) )))
 (density (repeat 100 two-gaussians))
 ~~~~
 
-A lambda expression with an empty argument list, `(lambda () ...)`, is called a *thunk*: this is a function that takes no input arguments. If we apply a thunk (to no arguments!) we get a return value back, for example `(flip)`. A thunk is an object that represents a whole *probability distribution*.  
+A lambda expression with an empty argument list, `(lambda () ...)`, is called a *thunk*: this is a function that takes no input arguments. If we apply a thunk (to no arguments!) we get a return value back, for example `(flip)`. A thunk is an object that represents a whole *probability distribution*.
 Complex functions can also have arguments. Here is a stochastic function that will only sometimes double its input:
 
 ~~~~
@@ -133,7 +133,7 @@ The higher-order function `make-coin` takes in a weight and outputs a function (
  (hist (repeat 20 trick-coin) "20 trick coin flips")
  (hist (repeat 20 bent-coin) "20 bent coin flips") )
 ~~~~
- 
+
  We can also define a higher-order function that takes a "coin" and "bends it":
 
 ~~~~
@@ -175,7 +175,7 @@ Generative knowledge is often *causal* knowledge that describes how events or st
 cough
 ~~~~
 
-This program models the diseases and symptoms of a patient in a doctor's office. It first specifies the base rates of two diseases the patient could have: lung cancer is rare while a cold is common, and there is an independent chance of having each disease.  The program then specifies a process for generating a common symptom of these diseases -- an effect with two possible causes: The patient coughs if they have a cold or lung cancer (or both).  
+This program models the diseases and symptoms of a patient in a doctor's office. It first specifies the base rates of two diseases the patient could have: lung cancer is rare while a cold is common, and there is an independent chance of having each disease.  The program then specifies a process for generating a common symptom of these diseases -- an effect with two possible causes: The patient coughs if they have a cold or lung cancer (or both).
 
 Here is a more complex version of this causal model:
 
@@ -186,33 +186,33 @@ Here is a more complex version of this causal model:
 (define stomach-flu (flip 0.1))
 (define other (flip 0.1))
 
-(define cough 
+(define cough
   (or (and cold (flip 0.5))
       (and lung-cancer (flip 0.3))
       (and TB (flip 0.7))
       (and other (flip 0.01))))
 
 
-(define fever 
+(define fever
   (or (and cold (flip 0.3))
       (and stomach-flu (flip 0.5))
       (and TB (flip 0.1))
       (and other (flip 0.01))))
 
 
-(define chest-pain 
+(define chest-pain
   (or (and lung-cancer (flip 0.5))
       (and TB (flip 0.5))
       (and other (flip 0.01))))
 
-(define shortness-of-breath 
+(define shortness-of-breath
   (or (and lung-cancer (flip 0.5))
       (and TB (flip 0.2))
       (and other (flip 0.01))))
 
-(list "cough" cough 
-      "fever" fever 
-      "chest-pain" chest-pain 
+(list "cough" cough
+      "fever" fever
+      "chest-pain" chest-pain
       "shortness-of-breath" shortness-of-breath)
 ~~~~
 
@@ -294,15 +294,15 @@ Using the sum rule to compute the probability of a final value is called *margin
 [Recursive functions](appendix-scheme.html#recursion) are a powerful way to structure computation in deterministic systems. In Church it is possible to have a *stochastic* recursion that randomly decides whether to stop. For example, the *geometric distribution* is a probability distribution over the non-negative integers that represents the probability of flipping a coin $N$ times and getting `true` exactly once:
 
 ~~~~
-(define (geometric p) 
-  (if (flip p) 
-      0 
+(define (geometric p)
+  (if (flip p)
+      0
       (+ 1 (geometric p))))
 
 (hist (repeat 1000 (lambda () (geometric 0.6))) "Geometric of 0.6")
 ~~~~
 
-There is no upper bound on how long the computation can go on, although the probability of reaching some number declines quickly as we go. Indeed, stochastic recursions must be constructed to halt eventually (with probability 1). 
+There is no upper bound on how long the computation can go on, although the probability of reaching some number declines quickly as we go. Indeed, stochastic recursions must be constructed to halt eventually (with probability 1).
 
 
 # Persistent Randomness: `mem`
@@ -383,7 +383,7 @@ of the $m$th coin, a doubly infinite set of properties:
 -->
 
 In computer science memoization is an important technique
-for optimizing programs by avoiding repeated work.  
+for optimizing programs by avoiding repeated work.
 In the probabilistic setting, such as in Church, memoization actually affects the meaning of the memoized function.
 
 
@@ -431,7 +431,7 @@ We have included such a 2-dimensional physics simulator, the function `runPhysic
 (define (ypos) (uniform 100 (- worldHeight 100)))
 
 ; an object in the word is a list of two things:
-;  shape properties: a list of SHAPE ("rect" or "circle"), IS_STATIC (#t or #f), 
+;  shape properties: a list of SHAPE ("rect" or "circle"), IS_STATIC (#t or #f),
 ;                    and dimensions (either (list WIDTH HEIGHT) for a rect or
 ;                    (list RADIUS) for a circle
 ;  position: (list X Y)
@@ -514,7 +514,7 @@ Were you often right? Were there some cases of 'surprisingly stable' towers?  @H
   ;y position is 0 at the TOP of the screen
   (define (highestY world) (min (map getY world)))
   (define eps 10) ;things might move around a little, but within 10 pixels is close
-  (define (approxEqual a b) (< (abs (- a b)) 10))
+  (define (approxEqual a b) (< (abs (- a b)) eps))
   (not (approxEqual (highestY initialW) (highestY finalW))))
 
 (define (noisify world)
@@ -539,119 +539,119 @@ Were you often right? Were there some cases of 'surprisingly stable' towers?  @H
 
 1) Here are three church programs:
 
-	~~~~ {data-exercise="ex1-1"}
-	(if (flip) (flip 0.7) (flip 0.1))
-	~~~~
+    ~~~~ {data-exercise="ex1-1"}
+    (if (flip) (flip 0.7) (flip 0.1))
+    ~~~~
 
-	~~~~ {data-exercise="ex1-2"}
-	(flip (if (flip) 0.7 0.1))
-	~~~~
+    ~~~~ {data-exercise="ex1-2"}
+    (flip (if (flip) 0.7 0.1))
+    ~~~~
 
-	~~~~ {data-exercise="ex1-3"}
-	(flip 0.4) 
-	~~~~
+    ~~~~ {data-exercise="ex1-3"}
+    (flip 0.4)
+    ~~~~
 
-	A) Show that the marginal distribution on return values for these three programs is the same by directly computing the probability using the rules of probability (hint: write down each possible history of random choices for each program). Check your answers by sampling from the programs. 
+    A) Show that the marginal distribution on return values for these three programs is the same by directly computing the probability using the rules of probability (hint: write down each possible history of random choices for each program). Check your answers by sampling from the programs.
 
-	B) Explain why these different-looking programs can give the same results.
+    B) Explain why these different-looking programs can give the same results.
 
 
 2) Explain why (in terms of the evaluation process) these two programs give different answers (i.e. have different distributions on return values):
 
-	~~~~ {data-exercise="ex2-1"}
-	(define foo (flip))
-	(list foo foo foo)
-	~~~~
+    ~~~~ {data-exercise="ex2-1"}
+    (define foo (flip))
+    (list foo foo foo)
+    ~~~~
 
-	~~~~ {data-exercise="ex2-2"}
-	(define (foo) (flip))
-	(list (foo) (foo) (foo))
-	~~~~
+    ~~~~ {data-exercise="ex2-2"}
+    (define (foo) (flip))
+    (list (foo) (foo) (foo))
+    ~~~~
 
 
 3) In the simple medical diagnosis example we imagined a generative process for the diseases and symptoms of a single patient. If we wanted to represent the diseases of many patients we might have tried to make each disease and symptom into a ''function'' from a person to whether they have that disease, like this:
 
-	~~~~ {data-exercise="ex3"}
-	(define (lung-cancer person)  (flip 0.01))
-	(define (cold person)  (flip 0.2))
+    ~~~~ {data-exercise="ex3"}
+    (define (lung-cancer person)  (flip 0.01))
+    (define (cold person)  (flip 0.2))
 
-	(define (cough person) (or (cold person) (lung-cancer person)))
+    (define (cough person) (or (cold person) (lung-cancer person)))
 
-	(list  (cough 'bob) (cough 'alice))
-	~~~~
+    (list  (cough 'bob) (cough 'alice))
+    ~~~~
 
-	Why doesn't this work correctly if we try to do the same thing for the more complex medical diagnosis example? How could we fix it?
+    Why doesn't this work correctly if we try to do the same thing for the more complex medical diagnosis example? How could we fix it?
 
 
 4) Work through the evaluation process for the `bend` higher-order function in this example:
 
-	~~~~ {data-exercise="ex4"}
-	(define (make-coin weight) (lambda () (if (flip weight) 'h 't)))
-	(define (bend coin) 
-	  (lambda () (if (equal? (coin) 'h) 
-	                 ( (make-coin 0.7) )
-	                 ( (make-coin 0.1) ) )))
-	
-	(define fair-coin (make-coin 0.5))
-	(define bent-coin (bend fair-coin))
-	
-	(hist (repeat 100 bent-coin) "bent coin")
-	~~~~
+    ~~~~ {data-exercise="ex4"}
+    (define (make-coin weight) (lambda () (if (flip weight) 'h 't)))
+    (define (bend coin)
+      (lambda () (if (equal? (coin) 'h)
+                     ( (make-coin 0.7) )
+                     ( (make-coin 0.1) ) )))
 
-	Directly compute the probability of the bent coin in the example. Check your answer by comparing to the histogram of many samples.
+    (define fair-coin (make-coin 0.5))
+    (define bent-coin (bend fair-coin))
+
+    (hist (repeat 100 bent-coin) "bent coin")
+    ~~~~
+
+    Directly compute the probability of the bent coin in the example. Check your answer by comparing to the histogram of many samples.
 
 5) Here are four expressions you could evaluate using the model (the set of definitions) from the tug-of-war example:
 
-	~~~~ {data-exercise="ex5"}
-	(winner '(alice) '(bob))
+    ~~~~ {data-exercise="ex5"}
+    (winner '(alice) '(bob))
 
-	(equal? '(alice) (winner '(alice) '(bob)))
+    (equal? '(alice) (winner '(alice) '(bob)))
 
-	(and (equal? '(alice) (winner '(alice) '(bob)))  
-	     (equal? '(alice) (winner '(alice) '(fred))))
+    (and (equal? '(alice) (winner '(alice) '(bob)))
+         (equal? '(alice) (winner '(alice) '(fred))))
 
-	(and (equal? '(alice) (winner '(alice) '(bob))) 
-	     (equal? '(jane) (winner '(jane) '(fred))))
-	~~~~
+    (and (equal? '(alice) (winner '(alice) '(bob)))
+         (equal? '(jane) (winner '(jane) '(fred))))
+    ~~~~
 
-	A) Write down the sequence of expression evaluations and random choices that will be made in evaluating each expression.
+    A) Write down the sequence of expression evaluations and random choices that will be made in evaluating each expression.
 
-	B) Directly compute the probability for each possible return value from each expression.
+    B) Directly compute the probability for each possible return value from each expression.
 
-	C) Why are the probabilities different for the last two? Explain both in terms of the probability calculations you did and in terms of the "causal" process of evaluating and making random choices.
+    C) Why are the probabilities different for the last two? Explain both in terms of the probability calculations you did and in terms of the "causal" process of evaluating and making random choices.
 
 #) Use the rules of probability, described above, to compute the probability that the geometric distribution define by the following stochastic recursion returns the number 5.
 
-	~~~~ {data-exercise="ex6"}
-	(define (geometric p) 
-	  (if (flip p) 
-	      0 
-	      (+ 1 (geometric p))))
-	~~~~
+    ~~~~ {data-exercise="ex6"}
+    (define (geometric p)
+      (if (flip p)
+          0
+          (+ 1 (geometric p))))
+    ~~~~
 
 
 #) Convert the following probability table to a compact Church program:
 
-	 A      B     P(A,B)
-	----  ----- -------------
- 	F      F     0.14
- 	F      T     0.96
- 	T      F     0.4
- 	T      T     0.4
- 
-	Hint: fix the probability of A and then define the probability of B to *depend* on whether A is true or not. Run your Church program and build a histogram to check that you get the correct distribution
+     A      B     P(A,B)
+    ----  ----- -------------
+    F      F     0.14
+    F      T     0.96
+    T      F     0.4
+    T      T     0.4
 
-	~~~~ {data-exercise="ex7"}
-	(define a ...)
-	(define b ...)
-	(list a b)
-	~~~~
-	
+    Hint: fix the probability of A and then define the probability of B to *depend* on whether A is true or not. Run your Church program and build a histogram to check that you get the correct distribution
+
+    ~~~~ {data-exercise="ex7"}
+    (define a ...)
+    (define b ...)
+    (list a b)
+    ~~~~
+
 #) In [Example: Intuitive physics] above we modeled stability of a tower as the probability that the tower falls when perturbed, and we modeled "falling" as getting shorter. It would be reasonable to instead measure *how much shorter* the tower gets.
 
-	A) Modify the above stability model to use a continuous measure in place of `doesTowerFall`.
-	
-	B) Design a few towers where your new model makes very different predictions about stability from the original model. How do these predictions fit with your intuition? Which best captures the meaning of "stable"?
-	
+    A) Modify the above stability model to use a continuous measure in place of `doesTowerFall`.
+
+    B) Design a few towers where your new model makes very different predictions about stability from the original model. How do these predictions fit with your intuition? Which best captures the meaning of "stable"?
+
 
 # References
