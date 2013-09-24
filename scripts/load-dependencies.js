@@ -48,7 +48,7 @@ _.templateSettings = {
       paths: ["codemirror/codemirror.js"]
     },
     cmscheme: {
-      paths: ["codemirror/scheme.js"],
+      paths: ["codemirror/church.js"],
       parents: ["cm"]
     },
     cmbrackets: {
