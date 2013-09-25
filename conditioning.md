@@ -274,6 +274,7 @@ Do these changes agree with your intuitions? Can you modify this example to make
 
 A model very similar to this was used in @Gerstenberg2012 to predict human judgements about the strength of players in ping-pong tournaments. It achieved very accurate quantitative predictions without many free parameters.
 
+<!-- [I don't think we need this:
 As an exercise, let's go back to the tug-of-war tournament described under [Generative Models](generative-models.html#example-bayesian-tug-of-war) and write a Church program to infer the probability that Alice is stronger than Bob, given a particular tournament outcome:
 
 ~~~~
@@ -300,6 +301,7 @@ As an exercise, let's go back to the tug-of-war tournament described under [Gene
          
 (hist samples "Is alice stronger than bob?")
 ~~~~
+-->
 
 We can form many complex queries from this simple model. We could ask how likely a team of Bob and Mary is to win over a team of Jim and Sue, given that Mary is at least as strong as sue, and Bob was on a team that won against Jim previously:
 
@@ -395,6 +397,7 @@ Assuming that the block comes to rest in the middle of the floor, where did it c
 (density init-xs "init state" true)
 ~~~~
 
+What if the ball comes to rest at the left side, under the large circle (x about 60)? The right side?
 
 
 # Example: Causal Inference in Medical Diagnosis
@@ -405,7 +408,7 @@ This classic Bayesian inference task is a special case of conditioning. Kahneman
 
 What is your intuition? Many people without training in statistical inference judge the probability to be rather high, typically between 0.7 and 0.9. The correct answer is much lower, less than 0.1, as we can see by evaluating this Church query:
 
-~~~~ {.mit-church}
+~~~~
 (define samples
  (mh-query 100 100
    (define breast-cancer (flip 0.01))
@@ -420,12 +423,12 @@ What is your intuition? Many people without training in statistical inference ju
 (hist samples "breast cancer")
 ~~~~
 
-Kahneman and Tversky<ref>Tversky, A., & Kahneman, "Judgment under uncertainty: Heuristics and biases," *Science*, 1974.</ref> named this kind of judgment error *base rate neglect*, because in order to make the correct judgment, one must realize that the key contrast is between the *base rate* of the disease, 0.01 in this case, and the *false alarm rate* or probability of a positive mammogram given no breast cancer, 0.096.  The false alarm rate (or *FAR* for short) seems low compared to the probability of a positive mammogram given breast cancer (the *likelihood*), but what matters is that it is almost ten times higher than the base rate of the disease.  All three of these quantities are needed to compute the probability of having breast cancer given a positive mammogram using Bayes' rule for posterior conditional probability:
+@Tversky1974 named this kind of judgment error *base rate neglect*, because in order to make the correct judgment, one must realize that the key contrast is between the *base rate* of the disease, 0.01 in this case, and the *false alarm rate* or probability of a positive mammogram given no breast cancer, 0.096.  The false alarm rate (or *FAR* for short) seems low compared to the probability of a positive mammogram given breast cancer (the *likelihood*), but what matters is that it is almost ten times higher than the base rate of the disease.  All three of these quantities are needed to compute the probability of having breast cancer given a positive mammogram using Bayes' rule for posterior conditional probability:
 
 $$P(\textrm{cancer} \mid \textrm{positive mammogram}) = \frac{P(\textrm{positive mammogram} \mid \textrm{cancer} ) \times P(\textrm{cancer})}{P(\textrm{ positive mammogram})} \\
 = \frac{0.8 \times 0.01}{0.8 \times 0.01 + 0.096 \times 0.99} = 0.078$$
 
-Gigerenzer and colleagues<ref>Gigerenzer & Hoffrage, "How to improve Bayesian reason- ing without instruction: Frequency formats," *Psychological Review*, 1995.</ref> showed that this kind of judgment can be made much more intuitive to untrained reasoners if the relevant probabilities are presented as "natural frequencies", or the sizes of subsets of relevant possible outcomes:
+@Gigerenzer1995 showed that this kind of judgment can be made much more intuitive to untrained reasoners if the relevant probabilities are presented as "natural frequencies", or the sizes of subsets of relevant possible outcomes:
 
 > On average, ten out of every 1000 women at age 40 who come in for a routine screen have breast cancer.  Eight out of those ten women will get a positive mammography.  Of the 990 women without breast cancer, 95 will also get a positive mammography. We assembled a sample of 1000 women at age 40 who participated in a routine screening.  How many of those who got a positive mammography do you expect to actually have breast cancer?
 
@@ -440,13 +443,13 @@ However, the basic idea that the mind is good at manipulating frequencies of sit
 Each path from root to leaf of this tree represents a sequence of random choices made in evaluating the above program (the first flip for breast-cancer, the second for positive-mammogram), with the number of traversals and the sampled value labeling each edge. (Because this is 1000 *random* samples, the number are close (but not exactly) those in the Gigerenzer, et al, story.) Selecting just the 106 hypothetical cases of women with a positive mammogram, and computing the fraction of those who also have breast cancer (7/106), corresponds exactly to `rejection-query`. Thus, we have used the causal representation in the above church program to manufacture frequencies which can be used to arrive at the inference that relatively few women with positive mammograms actually have breast cancer.
 
 Yet unlike the rejection sampler people are quite bad at reasoning in this scenario. Why? One answer is that people don't represent their knowledge in quite the form of this simple church program.
-Indeed, Krynski and Tenenbaum<ref>Krynski and Tenenbaum, "The Role of Causality in Judgment Under Uncertainty," *JEP: General*, 2007.</ref> have argued that human statistical judgment is fundamentally based on conditioning more explicit causal models:  they suggested that "base rate neglect" and other judgment errors may occur when people are given statistical information that cannot be easily mapped to the parameters of the causal models they intuitively adopt to describe the situation.  In the above example, they suggested that the notion of a false alarm rate is not intuitive to many people --- particularly when the false alarm rate is ten times higher than the base rate of the disease that the test is intended to diagnose!  They showed that "base rate neglect" could be eliminated by reformulating the breast cancer problem in terms of more intuitive causal models.  For example, consider their version of the breast cancer problem (the exact numbers and wording differed slightly):
+Indeed, @Krynski2007 have argued that human statistical judgment is fundamentally based on conditioning more explicit causal models:  they suggested that "base rate neglect" and other judgment errors may occur when people are given statistical information that cannot be easily mapped to the parameters of the causal models they intuitively adopt to describe the situation.  In the above example, they suggested that the notion of a false alarm rate is not intuitive to many people---particularly when the false alarm rate is ten times higher than the base rate of the disease that the test is intended to diagnose!  They showed that "base rate neglect" could be eliminated by reformulating the breast cancer problem in terms of more intuitive causal models.  For example, consider their version of the breast cancer problem (the exact numbers and wording differed slightly):
 
 > 1% of women at age 40 who participate in a routine screening will have breast cancer.  Of those with breast cancer, 80% will receive a positive mammogram.  20% of women at age 40 who participate in a routine screening will have a benign cyst.  Of those with a benign cyst, 50% will receive a positive mammogram due to unusually dense tissue of the cyst.  All others will receive a negative mammogram.  Suppose that a woman in this age group has a positive mammography in a routine screening. What is the probability that she actually has breast cancer?
 
-This question is easy for people to answer -- empirically, just as easy as the frequency-based formulation given above.  We may conjecture this is because the relevant frequencies can be computed from a simple query on the following more intuitive causal model:
+This question is easy for people to answer---empirically, just as easy as the frequency-based formulation given above.  We may conjecture this is because the relevant frequencies can be computed from a simple query on the following more intuitive causal model:
 
-~~~~ {.mit-church}
+~~~~ 
 (define samples
  (mh-query 100 100
    (define breast-cancer (flip 0.01))
@@ -462,12 +465,12 @@ This question is easy for people to answer -- empirically, just as easy as the f
 (hist samples "breast cancer")
 ~~~~
 
-Because this causal model -- this Church program -- is more intuitive to people, they can imagine the appropriate situations, despite having been given percentages rather than frequencies.
+Because this causal model---this Church program---is more intuitive to people, they can imagine the appropriate situations, despite having been given percentages rather than frequencies.
 What makes this causal model more intuitive than the one above with an explicitly specified false alarm rate?  Essentially we have replaced probabilistic dependencies on the "non-occurrence" of events (e.g., the dependence of a positive mammogram on *not* having breast cancer) with dependencies on explicitly specified alternative causes for observed effects (e.g., the dependence of a positive mammogram on having a benign cyst).
 
 A causal model framed in this way can scale up to significantly more complex situations.  Recall our more elaborate medical diagnosis network from the previous section, which was also framed in this way using noisy-logical functions to describe the dependence of symptoms on disease:
 
-~~~~ {.mit-church}
+~~~~
 (define samples
   (mh-query 1000 100
     (define lung-cancer (flip 0.01))
@@ -489,14 +492,15 @@ A causal model framed in this way can scale up to significantly more complex sit
 )
 (hist samples "Joint inferences for lung cancer and TB")
 ~~~~
+<!-- NOTE: this doesn't initialize well, because the condition is unlikely and it can't push the condition back through the refs. -->
 
 You can use this model to infer conditional probabilities for any subset of diseases conditioned on any pattern of symptoms.  Try varying the symptoms in the conditioning set or the diseases in the query, and see how the model's inferences compare with your intuitions.  For example, what happens to inferences about lung cancer and TB in the above model if you remove chest pain and shortness of breath as symptoms?  (Why?  Consider the alternative explanations.)  More generally, we can condition on any set of events -- any combination of symptoms and diseases -- and query any others.  We can also condition on the negation of an event using `(not ...)`: e.g., how does the probability of lung cancer (versus TB) change if we observe that the patient does *not* have a fever, does *not* have a cough, or does not have either symptom?
 
-A Church program thus effectively encodes the answers to a very large number of possible questions in a very compact form, where each question has the form, "Suppose we observe X, what can we infer about Y?".  In the program above, there are $3^9=19683$ possible simple conditioners (possible X's) corresponding to conjunctions of events or their negations (because the program has 9 stochastic Boolean-valued functions, each of which can be observed true, observed false, or not observed). Then for each of those X's there are a roughly comparable number of Y's, corresponding to all the possible conjunctions of variables that can be in the query set Y, making the total number of simple questions encoded on the order of 100 million. In fact, as we will see below when we describe complex queries, the true number of possibe questions encoded in just a short Church program like this one is very much larger than that; usually the set is infinite. With `query` we can in principle compute the answer to every one of these questions.  We are beginning to see the sense in which probabilistic programming provides the foundations for constructing a *language of thought*, as described in the Introduction: a finite system of knowledge that compactly and efficiently supports an infinite number of inference and decision tasks
+A Church program thus effectively encodes the answers to a very large number of possible questions in a very compact form, where each question has the form, "Suppose we observe X, what can we infer about Y?".  In the program above, there are $3^9=19683$ possible simple conditioners (possible X's) corresponding to conjunctions of events or their negations (because the program has 9 stochastic Boolean-valued functions, each of which can be observed true, observed false, or not observed). Then for each of those X's there are a roughly comparable number of Y's, corresponding to all the possible conjunctions of variables that can be in the query set Y, making the total number of simple questions encoded on the order of 100 million. In fact, as we will see below when we describe complex queries, the true number of possible questions encoded in just a short Church program like this one is very much larger than that; usually the set is infinite. With `query` we can in principle compute the answer to every one of these questions.  We are beginning to see the sense in which probabilistic programming provides the foundations for constructing a *language of thought*, as described in the Introduction: a finite system of knowledge that compactly and efficiently supports an infinite number of inference and decision tasks
 
 Expressing our knowledge as a probabilistic program of this form also makes it easy to add in new relevant knowledge we may acquire, without altering or interfering with what we already know.  For instance, suppose we decide to consider behavioral and demographic factors that might contribute causally to whether a patient has a given disease:
 
-~~~~ {.mit-church}
+~~~~
 (define samples
   (mh-query 1000 100
     (define works-in-hospital (flip 0.01))
