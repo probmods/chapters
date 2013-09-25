@@ -401,3 +401,8 @@ padding: 2px
 margin-left: 0;
 padding-left: 0
 }
+
+pre {
+line-height: 110%;
+padding: 2px
+}
