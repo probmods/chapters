@@ -253,7 +253,8 @@ _density = function(samps, title, withHist) {
 };
 
 function binData(counts, values) {
-  function approxEqual(a, b, eps=0.000001) {
+  function approxEqual(a, b) {
+  	var eps=0.000001;
     return Math.abs(a-b) < eps;
   }
   var maxBins = 20;
