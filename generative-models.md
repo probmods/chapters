@@ -474,11 +474,11 @@ There are many judgments that you could imagine making with such a physics simul
   (define prevH (getHeight prevBlock))
   (- prevY prevH h))
 
-(define (addBlock prevBlock isFirst)
+(define (addBlock prevBlock first?)
   (define w (dim))
   (define h (dim))
   (list (list "rect" #f (list w h))
-        (list (if isFirst xCenter (xpos prevBlock)) (ypos prevBlock h))))
+        (list (if first? xCenter (xpos prevBlock)) (ypos prevBlock h))))
 
 (define (makeTowerWorld)
   (define firstBlock (addBlock ground #t))
@@ -498,7 +498,7 @@ Were you often right? Were there some cases of 'surprisingly stable' towers?  @H
 (define (getHeight worldObj) (second (third (first worldObj))))
 (define (getX worldObj) (first (second worldObj)))
 (define (getY worldObj) (second (second worldObj)))
-(define (getIsStatic worldObj) (second (first worldObj)))
+(define (static? worldObj) (second (first worldObj)))
 
 (define ground
   (list (list "rect" #t (list worldWidth 10)) (list (/ worldWidth 2) (+ worldHeight 6))))
@@ -521,7 +521,7 @@ Were you often right? Were there some cases of 'surprisingly stable' towers?  @H
   (define (xNoise worldObj)
     (define noiseWidth 10) ;how many pixes away from the original xpos can we go?
     (define (newX x) (uniform (- x noiseWidth) (+ x noiseWidth)))
-    (if (getIsStatic worldObj)
+    (if (static? worldObj)
         worldObj
         (list (first worldObj)
               (list (newX (getX worldObj)) (getY worldObj)))))
