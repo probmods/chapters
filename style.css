@@ -396,3 +396,8 @@ opacity: 1
 pre.results:not(:empty) {
 padding: 2px
 }
+
+#exercises ~ ol {
+margin-left: 0;
+padding-left: 0
+}
