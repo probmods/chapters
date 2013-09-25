@@ -3,17 +3,20 @@
 
 # Cognition and conditioning
 
-We have built up a tool set for constructing probabilistic generative models. These can represent knowledge about causal processes in the world: running one of these programs generates a particular outcome by sampling a "causal history" for that outcome. However, the power of a causal model lies in the flexible ways it can be used to reason about the world. In the 
+We have built up a tool set for constructing probabilistic generative models. These can represent knowledge about causal processes in the world: running one of these programs generates a particular outcome by sampling a "history" for that outcome. However, the power of a causal model lies in the flexible ways it can be used to reason about the world. In the 
 [last chapter](generative-models.html) we ran generative models *forward* to reason about outcomes from initial conditions. Generative models also enable reasoning in other directions.
- For instance, if we have a generative model in which X is the output of a process that depends on Y, for example `(define X (F Y))`, we may ask: "assuming I have observed X, how must Y have been?" In this section we describe how a wide variety of inferences can be made from a single generative model by *conditioning* the model on an assumed or observed fact.
+For instance, if we have a generative model in which X is the output of a process that depends on Y (say `(define X (fun Y))`) we may ask: "assuming I have observed X, how must Y have been?" That is we can reason *backward* from outcomes to initial conditions.
+More generally, we can make hypothetical assumptions and reason about the generative history: "assuming *something*, how must
+the generative model have run?" 
+In this section we describe how a wide variety of such hypothetical inferences can be made from a single generative model by *conditioning* the model on an assumed or observed fact.
 
 Much of cognition can be understood in terms of conditional inference.  In its most basic form, *causal attribution* is conditional inference: given some observed effects, what were the likely causes?  *Predictions* are conditional inferences in the opposite direction: given that I have observed some known cause, what are its likely effects?  These inferences can be described by conditioning a probabilistic program that expresses a causal model, or understanding of how effects depend on causes.  The acquisition of that causal model, or *learning*, is also conditional inference at a higher level of abstraction: given our general knowledge of how causal relations operate in the world, and some observed events in which candidate causes and effects co-occur in various ways, what specific causal relations are likely to hold between these observed variables?
 
 To see how the same concepts apply in a domain that is not usually thought of as causal, consider language.  The core questions of interest in the study of natural language are all at heart conditional inference problems.  Given beliefs about the syntactic structure of my language, and an observed sentence, what should I believe about the syntactic structure of that sentence? This is the *parsing* problem.  The complementary problem of *speech production* is related: given some beliefs about the syntactic structure of my language (and beliefs about others' beliefs about that), and a particular thought I want to express, how should I encode the thought syntactically? Finally, the discovery or *acquisition* problem: given general knowledge about universals of grammar and some data from a particular language, what should we believe about that language's structure? This problem is simultaneously the problem facing the linguist and the child trying to learn a language.
 
-Parallel problems of conditional inference arise in visual perception, theory of mind (or intuitive psychology), and virtually every other domain of cognition.  In visual perception, we observe an image or image sequence that is the result of rendering a three-dimensional physical scene onto our two-dimensional retinas.  A probabilistic program can model both the physical processes at work in the world that produce natural scenes, and the imaging processes (the "graphics") that render images from scenes.  *Perception* is then conditioning this program on some observed output image and inferring the scenes most likely to have given rise to it.  
+Parallel problems of conditional inference arise in visual perception, social cognition, and virtually every other domain of cognition.  In visual perception, we observe an image or image sequence that is the result of rendering a three-dimensional physical scene onto our two-dimensional retinas.  A probabilistic program can model both the physical processes at work in the world that produce natural scenes, and the imaging processes (the "graphics") that generate images from scenes.  *Perception* can then be seen as conditioning this program on some observed output image and inferring the scenes most likely to have given rise to it.  
 
-When interacting with other people, we observe their actions, which result from a planning processes, and often want to guess their desires, beliefs, or future actions. Planning can be modeled as a program that take as input an agent's mental states (beliefs and desires) and produce action sequences -- typically, for a rational agent, actions that are likely to produce the agent's desired states as reliably or efficiently as possible, given the agent's beliefs.  A rational agent can *plan* their actions by conditional inference to infer what steps would be most likely to achieve their desired state.  *Action understanding*, or interpreting an agent's observed behavior, can be expressed as conditioning a planning program (a "theory of mind") on the observed actions to infer the mental states that most likely gave rise to those actions, and to predict how the agent is likely to act in the future.
+When interacting with other people, we observe their actions, which result from a planning processes, and often want to guess their desires, beliefs, or future actions. Planning can be modeled as a program that take as input an agent's mental states (beliefs and desires) and produces action sequences---for a rational agent, these will be actions that are likely to produce the agent's desired states as reliably or efficiently as possible, given the agent's beliefs.  A rational agent can *plan* their actions by conditional inference to infer what steps would be most likely to achieve their desired state.  *Action understanding*, or interpreting an agent's observed behavior, can be expressed as conditioning a planning program (a "theory of mind") on observed actions to infer the mental states that most likely gave rise to those actions, and to predict how the agent is likely to act in the future.
 
 
 # Hypothetical Reasoning with `query`
@@ -24,10 +27,11 @@ Suppose that we know some fixed fact, and we wish to consider hypotheses about h
 (query
    generative-model
    what-we-want-to-know
-   what-we-know)
+   (condition what-we-know))
 ~~~~
 
-`query` takes three arguments. The first is some generative model expressed as a series of `define` statements. The second is an expression, called the *query expression*, which represents the aspects of the computation that we are interested in. The last argument is the condition that must be met; this may encode observations, data, or more general assumptions.  It is called the *conditioner.*
+`query` takes three arguments. The first is some generative model expressed as a series of `define` statements. The second is an expression, called the *query expression*, which represents the aspects of the computation that we are interested in. The last argument is the condition that must be met; this may encode observations, data, or more general assumptions.  It is called the *conditioner.* 
+<!-- We call this the distribution of values returned by the query-expression *conditioned on* the conditioner being true. -->
 
 Consider the following simple generative process:
 
@@ -52,7 +56,7 @@ This process samples three digits `0`/`1` and adds the result. The value of the 
 
    A
 
-   (equal? D 3)))
+   (condition (equal? D 3))))
    
 (hist (repeat 100 take-sample) "Value of A, given that D is 3")
 ~~~~
@@ -72,35 +76,27 @@ Now suppose that we condition on `D` being greater than or equal to 2.  Then `A`
 
    A
 
-   (>= D 2)))
+   (condition (>= D 2))))
    
 (hist (repeat 100 take-sample) "Value of A, given that D is greater than or equal to 2")
 ~~~~
 
-Predicting the outcome of a generative process is simply a special case of querying, where we condition on no restrictions (simply `true`) and ask about the outcome:
+Predicting the outcome of a generative process is simply a special case of querying, where we condition on no restrictions and ask about the outcome. Try changing the condition in the above program to `(condition true)`.
 
+When the `condition` operator is the last expression in a query (which is typical) it can be dropped, and we often do this for simplicity:
+
+~~~~ {.norun}
+(query
+   generative-model
+   what-we-want-to-know
+   what-we-know)
 ~~~~
-(define (take-sample)
-  (rejection-query
-
-   (define A (if (flip) 1 0))
-   (define B (if (flip) 1 0))
-   (define C (if (flip) 1 0))
-   (define D (+ A B C))
-
-   D
-
-   true))
-   
-(hist (repeat 100 take-sample) "Value of D")
-~~~~
-
 
 Going beyond the basic intuition of "hypothetical reasoning", the `query` operation can be understood in several, equivalent, ways. We focus on two: the process of *rejection sampling*, and the the mathematical operation of *conditioning* a distribution.
 
 ## Rejection Sampling
 
-How can we imagine answering a hypothetical such as those above? We have already seen how to get a sample from a generative model, without constraint, by simply running the evaluation process "forward"  (i.e. "simulating" the process). We can get conditional samples by forward sampling the entire query, including both the query expression and conditioner, but only keeping the sample if the value returned by the conditioner expression is *true*. For instance, to sample from the above model "A given that D is greater that 1":
+How can we imagine answering a hypothetical such as those above? We have already seen how to get a sample from a generative model, without constraint, by simply running the evaluation process "forward"  (i.e. simulating the process). We can get conditional samples by forward sampling the entire query, including both the query expression and conditioner, but only keeping the sample if the value returned by the conditioner expression is *true*. For instance, to sample from the above model "A given that D is greater that 1" we could:
 
 ~~~~
 (define (take-sample)
@@ -113,7 +109,7 @@ How can we imagine answering a hypothetical such as those above? We have already
 (hist (repeat 100 take-sample) "Value of A, given that D is greater than or equal to 2")
 ~~~~
 
-Notice that we have used a stochastic recursion to sample the definitions repeatedly until we get `(>= D 2)`, and we then return `A`.
+Notice that we have used a stochastic recursion to sample the definitions repeatedly until we get `(>= D 2)`, and we then return `A`: we generate and test until the condition is satisfied.
 This process is known as *rejection sampling*; we can us this technique to make a more general function that implements `query`---called `rejection-query`, schematically defined as:
 
 ~~~~ {.norun}
@@ -127,7 +123,7 @@ This process is known as *rejection sampling*; we can us this technique to make 
 ~~~~
 (This is only schematic because we must avoid evaluating the query-expression and conditioner until *inside* the rejection-query function. The Church implementation does this by *de-sugaring*: transforming the code before evaluation.)
 
-While many implementations of `query` are possible, we can take the `rejection-query` process to *define* the distribution of values returned by a query expression. We call this the distribution of values returned by the query-expression *conditioned on* the conditioner being true. 
+While many implementations of `query` are possible, and others are discussed later, we can take the `rejection-query` process to *define* the distribution of values returned by a query expression.  
 
 ## Conditional Distributions
 
@@ -135,11 +131,14 @@ The formal definition of *conditional probability* in probability theory is
 
 $$ P(A=a \mid B=b)=\frac{ P(A=a,B=b)}{P(B=b)}. $$
 
-Here $P(A=a|B=b)$ is the probability that "event" $A$ has value $a$ given that $B$ has value $b$. (The meaning of events $A$ and $B$ must be given elsewhere, unlike a Church program, which contains the full model specification.) 
+Here $P(A=a \mid B=b)$ is the probability that "event" $A$ has value $a$ given that $B$ has value $b$. (The meaning of events $A$ and $B$ must be given elsewhere in this notation, unlike a Church program, which contains the full model specification within the query.) 
+The *joint probability*, $P(A=a,B=b)$,  is the probability that $A$ has value $a$ and $B$ has value $b$.
 So the conditional probability is simply the ratio of the joint probability to the probability of the condition.
-In the case of a Church query, $A=a$ is the "event" of the query expression returning value $a$, while $B=b$ will be the conditioner returning true (so $b$ will be *True*). The definition of conditional distribution in terms of rejection sampling is equivalent to this mathematical definition, when both are well-defined. (There are special cases when continuous random choices are used: here it is possible to find situations where rejection sampling almost never returns a sample but the conditional distribution is still well defined.) 
+In the case of a Church query, $A=a$ is the "event" of the query expression returning value $a$, while $B=b$ will be the conditioner returning true (so $b$ will be *True*). 
 
-We can use the process of rejection sampling to understand this alternative definition of the conditional probability $P(A=a|B=b)$. We imagine sampling many times, but only keeping those samples in which the condition is true, i.e. $B=True$. The frequency of the query expression returning a particular value $a$ (i.e. $A=a$) *given* that the condition is true, will be the number of times that $A=a$ *and* $B=True$ divided by the number of times that $B=True$. Since the frequency of the conditioner returning true will be $P(B=True)$ in the long run, and the frequency that the condition returns true *and* the query expression returns a given value $a$ will be $P(A=a, B=True)$, we get the above formula for the conditional probability.
+The above definition of conditional distribution in terms of rejection sampling is equivalent to this mathematical definition, when both are well-defined. (There are special cases when only one definition makes sense. For instance, when continuous random choices are used it is possible to find situations where rejection sampling almost never returns a sample but the conditional distribution is still well defined. Why?) 
+Indeed, we can use the process of rejection sampling to understand this alternative definition of the conditional probability $P(A=a|B=b)$. We imagine sampling many times, but only keeping those samples in which the condition is true. The frequency of the query expression returning a particular value $a$ (i.e. $A=a$) *given* that the condition is true, will be the number of times that $A=a$ *and* $B=True$ divided by the number of times that $B=True$. Since the frequency of the conditioner returning true will be $P(B=True)$ in the long run, and the frequency that the condition returns true *and* the query expression returns a given value $a$ will be $P(A=a, B=True)$, we get the above formula for the conditional probability.
+<!-- FIXME: clarify this last argument? -->
 
 Try using the above formula for conditional probability to compute the probability of the different return values in the above query examples. Check that you get the same probability that you observe when using rejection sampling.
 
@@ -170,13 +169,13 @@ Next we can ask what this rule means in terms of sampling processes. Consider th
  (equal? data observed-data))
 ~~~~
 
-We have generated a value, the *hypothesis*, from some distribution called the *prior*, then used an observation function which generates data given this hypothesis, the probability of such an observation function is called the *likelihood*. Finally we have queried the hypothesis conditioned on the observation being equal to some observed data---this conditional distribution is called the *posterior*. This is a typical setup in which Bayes' rule is used. Notice that in this case the conditional distribution $P(data | hypothesis)$ is just the probability distribution on return values from the `observe` function given an input value.
+We have generated a value, the *hypothesis*, from some distribution called the *prior*, then used an observation function which generates data given this hypothesis, the probability of such an observation function is called the *likelihood*. Finally we have queried the hypothesis conditioned on the observation being equal to some observed data---this conditional distribution is called the *posterior*. This is a typical setup in which Bayes' rule is used. Notice that in this case the conditional distribution $P(data \mid hypothesis)$ is just the probability distribution on return values from the `observe` function given an input value.
 
 <!--
 If we replace the conditioner with `true` in the code above, that is equivalent to observing no data.  Then query draws samples from the prior distribution, rather than the posterior.
 -->
 
-Bayes rule simply says that, in special situations where the model decomposes nicely into a part "before" the query-expression and a part "after" the query expression, then the conditional probability can be simply expressed in terms of these components of the model. This is often a useful way to think about conditional inference in simple setting. However, we will see examples as we go along where Bayes' rule doesn't apply in a simple way, but the conditional distribution is equally well understood in terms of sampling.
+Bayes rule simply says that, in special situations where the model decomposes nicely into a part "before" the query-expression and a part "after" the query expression, then the conditional probability can be expressed in terms of these components of the model. This is often a useful way to think about conditional inference in simple settings. However, we will see examples as we go along where Bayes' rule doesn't apply in a simple way, but the conditional distribution is equally well understood in terms of sampling.
 
 
 ## Implementations of `query`
@@ -184,18 +183,19 @@ Bayes rule simply says that, in special situations where the model decomposes ni
 Much of the difficulty of implementing the Church language (or probabilistic models in general) is in finding useful ways to do conditional inference---to implement `query`. The Church implementation that we will use in this tutorial has several different methods for query, each of which has its own limitations. We will explore the different algorithms used in these implementations in the section on [Algorithms for inference](inference-process.html), for now we just need to note a few differences in usage.
 
 As we have seen already, the method of rejection sampling is implemented in `rejection-query`. This is a very useful starting point, but is often not efficient: even if we are sure that our model can satisfy the condition, it will often take a very long time to find evaluations that do so. 
+The AI literature is replete with other algorithms and techniques for dealing with conditional probabilistic inference. 
+Several of these have been adapted into Church to give implementations of `query` that may be more efficient in various cases. 
 
 <!-- TODO: put in exact-query once that has been implemented in web church.-->
 
-The AI literature is replete with other algorithms and techniques for dealing with conditional probabilistic inference, and several of these have been adapted into Church to give implementations of `query` that may be more efficient in various cases. (Though they vary in efficiency, each of these implementations is universal: given enough time it samples from the appropriate conditional distribution for a Church query over any Church model.) 
-
-One implementation that we will often use is based on the *Metropolis Hastings* (MH) algorithm. This `mh-query` implementation takes two extra arguments and returns a list of many samples:
+One implementation that we will often use is based on the *Metropolis Hastings* (MH) algorithm. This `mh-query` implementation takes two extra arguments and returns a list of samples (not just one sample):
 
 ~~~~
 (define baserate 0.1)
 
 (define samples
-  (mh-query 100 100
+  (mh-query 100 ;number of samples
+            100 ;lag
 
    (define A (if (flip baserate) 1 0))
    (define B (if (flip baserate) 1 0))
@@ -204,9 +204,8 @@ One implementation that we will often use is based on the *Metropolis Hastings* 
 
    A
 
-   (>= D 2)
-   )
-  )
+   (condition (>= D 2))))
+   
 (hist samples "Value of A, given that D is greater than or equal to 2")
 ~~~~
 
@@ -215,7 +214,7 @@ The first extra argument is the number of samples to take, and the second contro
 <!-- TODO: should talk about levels of analysis, and why we are ignoring the algorithms as much as possible to start with. -->
 
 
-# Reasoning with Arbitrary Propositions: Complex Queries
+# Reasoning with Arbitrary Propositions
 
 It is natural to condition a generative model on a value for one of the variables declared in this model. However, one may also wish to ask for more complex hypotheticals: "what if P," where P is a complex proposition composed out of variables declared in the model.
 Consider the following Church `query`:
@@ -231,12 +230,12 @@ Consider the following Church `query`:
 
    A
 
-   (>= (+ A B C) 2)))
+   (condition (>= (+ A B C) 2))))
    
 (hist samples "Value of A, given that the sum is greater than or equal to 2")
 ~~~~
 
-This query has the same content as an example above but the syntax is importantly different. We have defined a generative model that samples 3 instances of `0`/`1` digits. However, we have conditioned on the complex assumption that the sum of these random variables is greater than or equal to 2. This involves a new random variable, `(>= (+ A B C) 2)`. This latter random variable *did not appear anywhere in the generative model*. In the traditional presentation of conditional probabilities we usually think of conditioning as *observation*: it explicitly enforces random variables to take on certain values. For example, when we say $P(A|B=b)$ it explicitly requires $B = b$. In order to express the above query in this way, we could add the complex variable to the generative model, then condition on it. However this intertwines the hypothetical assumption with the generative model, and this is not what we want: we want a simple model which supports many queries, rather than a complex model in which only a prescribed set of queries is allowed.
+This query has the same meaning as the example above, but the formulation is importantly different. We have defined a generative model that samples 3 instances of `0`/`1` digits, then we have directly conditioned on the complex assumption that the sum of these random variables is greater than or equal to 2. This involves a new random variable, `(>= (+ A B C) 2)`. This latter random variable *did not appear* anywhere in the generative model (the definitions). In the traditional presentation of conditional probabilities we usually think of conditioning as *observation*: it explicitly enforces random variables to take on certain values. For example, when we say $P(A|B=b)$ we explicitly require $B = b$. In order to express the above query in this way, we could add the complex variable to the generative model, then condition on it. However this intertwines the hypothetical assumption (condition) with the generative model knowledge (definitions), and this is not what we want: we want a simple model which supports many queries, rather than a complex model in which only a prescribed set of queries is allowed.
 
 Writing models in Church allows the flexibility to build complex random expressions like this as needed, making assumptions that are phrased as complex propositions, rather than simple observations.  Hence the effective number of queries we can construct for most programs will not merely be a large number but countably infinite, much like the sentences in a natural language.  The `query` function (in principle, though with variable efficiency) supports correct conditional inference for this infinite array of situations.
 
@@ -247,15 +246,19 @@ Returning to the earlier example of a series of tug-of-war matches, we can use q
 ~~~~
 (define samples
   (mh-query 100 100
+            
     (define strength (mem (lambda (person) (gaussian 0 1))))
+            
     (define lazy (lambda (person) (flip (/ 1 3))))
 
     (define (total-pulling team)
       (sum
-         (map (lambda (person) (if (lazy person) (/ (strength person) 2) (strength person)))
-               team)))
+         (map 
+          (lambda (person) (if (lazy person) (/ (strength person) 2) (strength person)))
+          team)))
 
-    (define (winner team1 team2) (if (< (total-pulling team1) (total-pulling team2)) 'team2 'team1))
+    (define (winner team1 team2) 
+      (if (> (total-pulling team1) (total-pulling team2)) 'team1 'team2))
 
     (strength 'bob)
 
@@ -265,7 +268,9 @@ Returning to the earlier example of a series of tug-of-war matches, we can use q
 (hist samples "Bob strength")
 ~~~~
 
-Try varying the number of different teams and teammates that Bob plays with. How does this change the probability that bob is strong?  Do these changes agree with your intuitions? Can you modify this example to make laziness a continuous quantity? Can you add a person-specific tendency toward laziness?
+Try varying the number of different teams and teammates that Bob plays with. How does this change the estimate ob Bob's strength?
+(To summarize and just look at Bob's expected strength you can replace the `hist` with `(mean samples)`.)
+Do these changes agree with your intuitions? Can you modify this example to make laziness a continuous quantity? Can you add a person-specific tendency toward laziness?
 
 A model very similar to this was used in @Gerstenberg2012 to predict human judgements about the strength of players in ping-pong tournaments. It achieved very accurate quantitative predictions without many free parameters.
 
