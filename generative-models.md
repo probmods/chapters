@@ -501,7 +501,7 @@ Were you often right? Were there some cases of 'surprisingly stable' towers?  @H
 (define (getIsStatic worldObj) (second (first worldObj)))
 
 (define ground
-  (list (list "rect" #t (list worldWidth 10)) (list (/ worldWidth 2) worldHeight)))
+  (list (list "rect" #t (list worldWidth 10)) (list (/ worldWidth 2) (+ worldHeight 6))))
 
 (define almostUnstableWorld
   (list ground (list (list 'rect #f (list 24 22)) (list 175 473))
@@ -513,7 +513,7 @@ Were you often right? Were there some cases of 'surprisingly stable' towers?  @H
 (define (doesTowerFall initialW finalW)
   ;y position is 0 at the TOP of the screen
   (define (highestY world) (min (map getY world)))
-  (define eps 10) ;things might move around a little, but within 10 pixels is close
+  (define eps 1) ;things might move around a little, but within 1 pixel is close
   (define (approxEqual a b) (< (abs (- a b)) eps))
   (not (approxEqual (highestY initialW) (highestY finalW))))
 
@@ -537,132 +537,199 @@ Were you often right? Were there some cases of 'surprisingly stable' towers?  @H
 
 # Exercises
 
-1) Here are three church programs:
+1) Here are three Church programs:
 
     ~~~~ {data-exercise="ex1-1"}
     (if (flip) (flip 0.7) (flip 0.1))
     ~~~~
-
+    
     ~~~~ {data-exercise="ex1-2"}
     (flip (if (flip) 0.7 0.1))
     ~~~~
-
+    
     ~~~~ {data-exercise="ex1-3"}
     (flip 0.4)
     ~~~~
+    
+    a) Show that the marginal distribution on return values for these three programs is the same by directly computing the probability using the rules of probability (hint: write down each possible history of random choices for each program). Check your answers by sampling from the programs.
 
-    A) Show that the marginal distribution on return values for these three programs is the same by directly computing the probability using the rules of probability (hint: write down each possible history of random choices for each program). Check your answers by sampling from the programs.
-
-    B) Explain why these different-looking programs can give the same results.
-
+    b) Explain why these different-looking programs can give the same results.
 
 2) Explain why (in terms of the evaluation process) these two programs give different answers (i.e. have different distributions on return values):
 
-    ~~~~ {data-exercise="ex2-1"}
-    (define foo (flip))
-    (list foo foo foo)
-    ~~~~
+~~~~ {data-exercise="ex2-1"}
+(define foo (flip))
+(list foo foo foo)
+~~~~
 
-    ~~~~ {data-exercise="ex2-2"}
-    (define (foo) (flip))
-    (list (foo) (foo) (foo))
-    ~~~~
-
+~~~~ {data-exercise="ex2-2"}
+(define (foo) (flip))
+(list (foo) (foo) (foo))
+~~~~
 
 3) In the simple medical diagnosis example we imagined a generative process for the diseases and symptoms of a single patient. If we wanted to represent the diseases of many patients we might have tried to make each disease and symptom into a ''function'' from a person to whether they have that disease, like this:
 
-    ~~~~ {data-exercise="ex3"}
-    (define (lung-cancer person)  (flip 0.01))
-    (define (cold person)  (flip 0.2))
+~~~~ {data-exercise="ex3"}
+(define (lung-cancer person)  (flip 0.01))
+(define (cold person)  (flip 0.2))
 
-    (define (cough person) (or (cold person) (lung-cancer person)))
+(define (cough person) (or (cold person) (lung-cancer person)))
 
-    (list  (cough 'bob) (cough 'alice))
-    ~~~~
+(list  (cough 'bob) (cough 'alice))
+~~~~
 
-    Why doesn't this work correctly if we try to do the same thing for the more complex medical diagnosis example? How could we fix it?
-
+Why doesn't this work correctly if we try to do the same thing for the more complex medical diagnosis example? How could we fix it?
 
 4) Work through the evaluation process for the `bend` higher-order function in this example:
 
-    ~~~~ {data-exercise="ex4"}
-    (define (make-coin weight) (lambda () (if (flip weight) 'h 't)))
-    (define (bend coin)
-      (lambda () (if (equal? (coin) 'h)
-                     ( (make-coin 0.7) )
-                     ( (make-coin 0.1) ) )))
+~~~~ {data-exercise="ex4"}
+(define (make-coin weight) (lambda () (if (flip weight) 'h 't)))
+(define (bend coin)
+  (lambda () (if (equal? (coin) 'h)
+                 ( (make-coin 0.7) )
+                 ( (make-coin 0.1) ) )))
 
-    (define fair-coin (make-coin 0.5))
-    (define bent-coin (bend fair-coin))
+(define fair-coin (make-coin 0.5))
+(define bent-coin (bend fair-coin))
 
-    (hist (repeat 100 bent-coin) "bent coin")
-    ~~~~
+(hist (repeat 100 bent-coin) "bent coin")
+~~~~
 
-    Directly compute the probability of the bent coin in the example. Check your answer by comparing to the histogram of many samples.
+Directly compute the probability of the bent coin in the example. Check your answer by comparing to the histogram of many samples.
 
 5) Here is a modified version of the tug of war game. Instead of drawing strength from the continuous Gaussian distribution, strength is either 5 or 10 with equal probability. Also the probability of laziness is changed from 1/4 to 1/3. Here are four expressions you could evaluate using this modified model:
 
     ~~~~ {data-exercise="ex5"}
     (define strength (mem (lambda (person) (if (flip) 5 10))))
-
+    
     (define lazy (lambda (person) (flip (/ 1 3))))
-
+    
     (define (total-pulling team)
       (sum
        (map (lambda (person) (if (lazy person) (/ (strength person) 2) (strength person)))
             team)))
-
+    
     (define (winner team1 team2) (if (< (total-pulling team1) (total-pulling team2)) team2 team1))
-
-    (winner '(alice) '(bob)) ;;Expression 1
-
-    (equal? '(alice) (winner '(alice) '(bob))) ;;Expression 2
-
-    (and (equal? '(alice) (winner '(alice) '(bob))) ;;Expression 3
+    
+    (winner '(alice) '(bob))                        ;; expression 1
+    
+    (equal? '(alice) (winner '(alice) '(bob)))      ;; expression 2
+    
+    (and (equal? '(alice) (winner '(alice) '(bob))) ;; expression 3
          (equal? '(alice) (winner '(alice) '(fred))))
-
-    (and (equal? '(alice) (winner '(alice) '(bob))) ;;Expression 4
+    
+    (and (equal? '(alice) (winner '(alice) '(bob))) ;; expression 4
          (equal? '(jane) (winner '(jane) '(fred))))
     ~~~~
 
-    A) Write down the sequence of expression evaluations and random choices that will be made in evaluating each expression.
+    a) Write down the sequence of expression evaluations and random choices that will be made in evaluating each expression.
 
-    B) Directly compute the probability for each possible return value from each expression.
+    b) Directly compute the probability for each possible return value from each expression.
 
-    C) Why are the probabilities different for the last two? Explain both in terms of the probability calculations you did and in terms of the "causal" process of evaluating and making random choices.
+    c) Why are the probabilities different for the last two? Explain both in terms of the probability calculations you did and in terms of the "causal" process of evaluating and making random choices.
 
 #) Use the rules of probability, described above, to compute the probability that the geometric distribution define by the following stochastic recursion returns the number 5.
 
-    ~~~~ {data-exercise="ex6"}
-    (define (geometric p)
-      (if (flip p)
-          0
-          (+ 1 (geometric p))))
-    ~~~~
-
+~~~~ {data-exercise="ex6"}
+(define (geometric p)
+  (if (flip p)
+      0
+      (+ 1 (geometric p))))
+~~~~
 
 #) Convert the following probability table to a compact Church program:
 
-     A      B     P(A,B)
-    ----  ----- -------------
-    F      F     0.14
-    F      T     0.96
-    T      F     0.4
-    T      T     0.4
+A      B     P(A,B)
+----  ----- -------------
+F      F     0.14
+F      T     0.96
+T      F     0.4
+T      T     0.4
 
-    Hint: fix the probability of A and then define the probability of B to *depend* on whether A is true or not. Run your Church program and build a histogram to check that you get the correct distribution
+Hint: fix the probability of A and then define the probability of B to *depend* on whether A is true or not. Run your Church program and build a histogram to check that you get the correct distribution
 
-    ~~~~ {data-exercise="ex7"}
-    (define a ...)
-    (define b ...)
-    (list a b)
-    ~~~~
+~~~~ {data-exercise="ex7"}
+(define a ...)
+(define b ...)
+(list a b)
+~~~~
 
 #) In [Example: Intuitive physics] above we modeled stability of a tower as the probability that the tower falls when perturbed, and we modeled "falling" as getting shorter. It would be reasonable to instead measure *how much shorter* the tower gets.
 
-    A) Modify the above stability model to use a continuous measure in place of `doesTowerFall`.
-
-    B) Design a few towers where your new model makes very different predictions about stability from the original model. How do these predictions fit with your intuition? Which best captures the meaning of "stable"?
+    a) Below, modify the stability model by writing a continuous measure, `towerFallDegree`. Make sure that your continuous measure is in some way numerically comparable to the discrete measure, `doesTowerFall` (defined here as either 0 or 1). Mathematically, what is your continuous measure?
+    
+    ~~~~ {data-exercise="ex8a"}
+    (define (getWidth worldObj) (first (third (first worldObj))))
+    (define (getHeight worldObj) (second (third (first worldObj))))
+    (define (getX worldObj) (first (second worldObj)))
+    (define (getY worldObj) (second (second worldObj)))
+    (define (getIsStatic worldObj) (second (first worldObj)))
+    
+    (define ground
+      (list (list "rect" #t (list worldWidth 10)) (list (/ worldWidth 2) (+ worldHeight 6))))
+    
+    (define almostUnstableWorld
+      (list ground (list (list 'rect #f (list 24 22)) (list 175 473))
+            (list (list 'rect #f (list 15 38)) (list 159.97995044874122 413))
+            (list (list 'rect #f (list 11 35)) (list 166.91912737427202 340))
+            (list (list 'rect #f (list 11 29)) (list 177.26195677111082 276))
+            (list (list 'rect #f (list 11 17)) (list 168.51354470809122 230))))
+    
+    (define (noisify world)
+      (define (xNoise worldObj)
+        (define noiseWidth 10) ;how many pixes away from the original xpos can we go?
+        (define (newX x) (uniform (- x noiseWidth) (+ x noiseWidth)))
+        (if (getIsStatic worldObj)
+            worldObj
+            (list (first worldObj)
+                  (list (newX (getX worldObj)) (getY worldObj)))))
+      (map xNoise world))
+    
+    (define (boolean->number x) (if x 1 0))
+    
+    ;; round a number, x, to n decimal places
+    (define (decimals x n)
+      (define a (expt 10 n))
+      (/ (round (* x a)) a))
+    
+    (define (highestY world) (min (map getY world))) ;; y = 0 is at the TOP of the screen
+    
+    ;; get the height of the tower in a world
+    (define (getTowerHeight world) (- worldHeight (highestY world)))
+    
+    ;; 0 if tower falls, 1 if it stands
+    (define (doesTowerFall initialW finalW)
+      (define eps 1) ;things might move around a little, but within 1 pixel is close
+      (define (approxEqual a b) (< (abs (- a b)) eps))
+      (boolean->number (approxEqual (highestY initialW) (highestY finalW))))
+    
+    
+    (define (towerFallDegree initialW finalW)
+      ;; FILL THIS PART IN
+      -999)
+    
+    ;; visualize stability measure value and animation
+    (define (visualizeStabilityMeasure measureFunction)
+      (define initialWorld (noisify almostUnstableWorld))
+      (define finalWorld (runPhysics 1000 initialWorld))
+      (define measureValue (measureFunction initialWorld finalWorld))
+      
+      (animatePhysics 1000 initialWorld
+                      (stringAppend "Stability measure: "
+                                    (decimals measureValue 2) "<br />"
+                                    "Initial height: "
+                                    (decimals (getTowerHeight initialWorld) 2) "<br />"
+                                    "Final height: " 
+                                    (decimals (getTowerHeight finalWorld) 2))))
+    
+    ;; visualize doesTowerFall measure
+    ;;(visualizeStabilityMeasure doesTowerFall)
+    
+    ;; visualize towerFallDegree measure
+    (visualizeStabilityMeasure towerFallDegree)
+    ~~~~
+    
+    b) Are there worlds where your new model makes very different predictions about stability from the original model? Which best captures the meaning of "stable"? (it might be useful to actually code up your worlds and test them).
 
 
 # References
