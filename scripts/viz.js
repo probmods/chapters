@@ -311,7 +311,15 @@ _multiviz = function(vizs) {
     return function($div) {
         for (var i = 0; i < vizs.length; i++) {
             var inserteddivset = $("<div></div>").appendTo($div)
-            vizs[i]($(inserteddivset[0]))
+            if (typeof vizs[i] == "function") {
+                vizs[i]($(inserteddivset[0]))
+            }
+            else {
+                runResult = format_result(vizs[i]);
+                $(inserteddivset[0]).text(runResult);
+            }
+            
+            
         }
       }
 }
