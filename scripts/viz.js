@@ -51,7 +51,6 @@ _hist = function(samps, title) {
         }),
       maxFreq = _(counts).chain().map(function(x) { return x.freq}).max().value();
 
-  var maxBins = 20;
   var binnedData = binData(counts, values);
 
   return function($div) {
@@ -108,7 +107,7 @@ _hist = function(samps, title) {
       .attr("class", "y axis")
       .call(yAxis);
 
-    drawHist(svg, binnedData.counts, binnedData.values, width, height, x, y, false);
+    drawHist(svg, binnedData.counts, binnedData.values, width, height, x, y, false, yMax);
     
     svg.append("text")
         .attr("x", (width / 2))             
@@ -214,7 +213,9 @@ _density = function(samps, title, withHist) {
         .tickFormat(d3.format("%"));
 
     if (withHist) {
-      drawHist(svg, binnedData.counts, binnedData.values, width, height, x, y, true);
+      console.log(yMax);
+      console.log(binnedData.maxFreq);
+      drawHist(svg, binnedData.counts, binnedData.values, width, height, x, y, true, (yMax/binnedData.maxFreq));
     }
 
     //density curve
@@ -252,32 +253,52 @@ _density = function(samps, title, withHist) {
 };
 
 function binData(counts, values) {
+  function approxEqual(a, b, eps=0.000001) {
+    return Math.abs(a-b) < eps;
+  }
   var maxBins = 20;
   var binnedValues;
   var binnedCounts;
   var xMin = Math.min.apply(Math, values);
   var xMax = Math.max.apply(Math, values);
+  function getBinValue(binNumber) {
+    return ((binNumber + 0.5) * (xMax - xMin) / maxBins) + xMin;
+  }
   if (counts.length > maxBins) {
-    var range = xMax - xMin;
     binnedValues = values.map(function(val) {
-      var fractionOfRange = (val - xMin) / range;
-      var binNumber = Math.round(fractionOfRange * maxBins);
-      var binValue = (binNumber * range / 20) + xMin;
-      return binValue;
+      if (approxEqual(val, xMax)) {
+        binNumber = maxBins - 1;
+      } else {
+        var fractionOfRange = (val - xMin) / (xMax - xMin);
+        var binNumber = Math.floor(fractionOfRange * maxBins);
+      }
+      return getBinValue(binNumber);
     });
     var n = binnedValues.length;
     var binnedCounts = _(binnedValues)
-    .uniq()
-    .map(function(val) {
-      return {
-        value: val,
-        freq: _(binnedValues).filter(function(x) {return x == val;}).length / n
-      };
-    });
+                        .uniq()
+                        .map(function(val) {
+                          return {
+                            value: val,
+                            freq: _(binnedValues).filter(function(x) {
+                              return x == val;
+                            }).length / n
+                          };
+                        });
+    for (var i=0; i<maxBins; i++) {
+      var binValue = getBinValue(i);
+      if ((binnedValues).filter(function(x) {return approxEqual(x, binValue);}).length == 0) {
+        binnedCounts.push({value: binValue, freq: 0});
+      }
+    }
+    console.log(binnedCounts.length);
   } else {
     binnedValues = values;
     binnedCounts = counts;
   }
+  binnedCounts = binnedCounts.sort(function(a, b) {
+    return a.value - b.value;
+  })
   var frequencies = binnedCounts.map(function(x) {return x.freq;});
   var maxFreq = Math.max.apply(Math, frequencies);
   var minVal = Math.min.apply(Math, binnedValues);
@@ -286,31 +307,44 @@ function binData(counts, values) {
           minVal: minVal, maxVal: maxVal};
 }
 
-function drawHist(svg, binnedCounts, binnedValues, width, height, x, y, vertical) {
+function drawHist(svg, binnedCounts, binnedValues, width, height, x, y, vertical, scale) {
 
   if (vertical) {
+    function getFreq(d) {
+      if (d.freq) {
+        return d.freq;
+      } else {
+        return 0;
+      }
+    }
     var histX = d3.scale.ordinal()
-                .domain(binnedValues)
+                .domain(binnedCounts.map(function(x) {return x.value;}))
                 .rangeRoundBands([0, width], .1);
     svg.selectAll(".bar")
       .data(binnedCounts)
       .enter().append("rect")
       .attr("class", "bar")
       .attr("fill", "none")
-      .attr("y", function(d) { return y(d.freq);})
+      //.attr("y", getY)
+      .attr("y", function(d) {return y(getFreq(d)*scale);})
       .attr("x", function(d) {return histX(d.value);})
-      .attr("height", function(d) { return height - y(d.freq);})
+      //.attr("height", function(d) { console.log(d.freq); console.log(getY(d)); return height - getY(d);})
+      //.attr("height", function(d) { return height - y(getFreq(d)*scale);})
+      .attr("height", function(d) { return height - y(getFreq(d));})
       .attr("width", histX.rangeBand());
   } else {
+    var histY = d3.scale.ordinal()
+                .domain(binnedCounts.map(function(x) {return x.value;}))
+                .rangeRoundBands([height, 0], .1);
     svg.selectAll(".bar")
     .data(binnedCounts)
     .enter().append("rect")
     .attr("class", "bar")
     .attr("x", 0)
-    .attr("y", function(d) {return y(d.value);})
+    .attr("y", function(d) {return histY(d.value);})
     .attr("stroke","none")
     .attr("width", function(d) { return x(d.freq); })
-    .attr("height", y.rangeBand());
+    .attr("height", histY.rangeBand());
   }
 }
 
