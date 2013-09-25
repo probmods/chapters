@@ -1,6 +1,7 @@
 /* global _ */
 
 var format_result = require("./format_result").format_result;
+var maxBins = 20;
 
 var listToArray = function(xs) {
   var pair = xs;
@@ -24,7 +25,7 @@ var formatPercent = d3.format(".0%");
 function erinSort(array) {
   var firstElem = array[0];
   if (typeof(firstElem) == "number") {
-    return array.sort(function(a,b) {return a-b});
+    return array.sort(function(a,b) {return b-a});
   }
   if (typeof(firstElem) == "string") {
     return array.sort();
@@ -38,8 +39,8 @@ function erinSort(array) {
 _hist = function(samps, title) {
 
   // TODO: this is a hack. we want proper conversion of data types
-  var values = erinSort(listToArray(samps)).map(function(x) {return format_result(x);}),
-      strvalues = values,//values.map(function(x) {return format_result(x);}),
+  var values = erinSort(listToArray(samps)),
+      strvalues = values.map(function(x) {return format_result(x);}),
       n = values.length,
       counts = _(strvalues)
         .uniq()
@@ -48,10 +49,18 @@ _hist = function(samps, title) {
             value: val,
             freq: _(strvalues).filter(function(x) {return x == val;}).length / n
           };
-        }),
-      maxFreq = _(counts).chain().map(function(x) { return x.freq}).max().value();
-
-  var binnedData = binData(counts, values);
+        });
+  var maxFreq = Math.max.apply(Math, counts.map(function(x) {return x.freq;}));
+  var continuous;
+  if (counts.length > maxBins) {
+  	var binnedData = binData(counts, values, maxBins);
+  	counts = binnedData.counts;
+  	values = binnedData.values;
+  	maxFreq = binnedData.maxFreq;
+  	continuous = true;
+  } else {
+  	continuous = false;
+  }
 
   return function($div) {
 
@@ -61,23 +70,30 @@ _hist = function(samps, title) {
     //TODO: make left margin vary depending on how long the names of the elements in the list are
     var margin = {top: 40, right: 20, bottom: 60, left: 60},
         width = 0.85 * $div.width() - margin.left - margin.right,
-        height = 100 + (14 * _(binnedData.values).uniq().length) - margin.top - margin.bottom;
+        height = 100 + (20 * _(values).uniq().length) - margin.top - margin.bottom;
 
     var x = d3.scale.linear()
-          .domain([0, binnedData.maxFreq])
+          .domain([0, maxFreq])
           .range([0, width]);
-        
-    var y = d3.scale.ordinal()
-            .domain(binnedData.values)
+    if (continuous) {
+	    var yMin = Math.min.apply(Math, values);
+	    var yMax = Math.max.apply(Math, values);
+	    var y = d3.scale.ordinal()
+            .domain(values)
             .rangeRoundBands([height, 0], .1);
-    var yMin = Math.min.apply(Math, values);
-    var yMax = Math.max.apply(Math, values);
-    var yAxis = d3.svg.axis()
-        .scale(d3.scale.linear()
-                       .domain([yMin, yMax])
-                       .range([height, 0]))
-          //.scale(y)
-          .orient("left");
+	    var yAxis = d3.svg.axis()
+	        .scale(d3.scale.linear()
+	                       .domain([yMin, yMax])
+	                       .range([height, 0]))
+	          .orient("left");
+    } else {
+	    var y = d3.scale.ordinal()
+            .domain(strvalues)
+            .rangeRoundBands([0, height], 0.1);
+	    var yAxis = d3.svg.axis()
+	        .scale(y)
+	        .orient("left");
+    }
 
     var xAxis = d3.svg.axis()
                   .scale(x)
@@ -107,7 +123,7 @@ _hist = function(samps, title) {
       .attr("class", "y axis")
       .call(yAxis);
 
-    drawHist(svg, binnedData.counts, binnedData.values, width, height, x, y, false, yMax);
+    drawHist(svg, counts, values, width, height, x, y, false);
     
     svg.append("text")
         .attr("x", (width / 2))             
@@ -118,7 +134,7 @@ _hist = function(samps, title) {
         .attr("fill", "black")
         .text(title);
         
-    return binnedData.counts;
+    return counts;
 
   };
 
@@ -197,7 +213,7 @@ _density = function(samps, title, withHist) {
 
     var yMax = Math.max.apply(Math, densities);
     if (withHist) {
-      var binnedData = binData(counts, values);
+      var binnedData = binData(counts, values, maxBins);
       if (binnedData.maxFreq > yMax) {
         yMax = Math.max(yMax, binnedData.maxFreq);
       }
@@ -213,9 +229,7 @@ _density = function(samps, title, withHist) {
         .tickFormat(d3.format("%"));
 
     if (withHist) {
-      console.log(yMax);
-      console.log(binnedData.maxFreq);
-      drawHist(svg, binnedData.counts, binnedData.values, width, height, x, y, true, (yMax/binnedData.maxFreq));
+      drawHist(svg, binnedData.counts, binnedData.values, width, height, x, y, true, yMax/binnedData.maxFreq);
     }
 
     //density curve
@@ -252,12 +266,11 @@ _density = function(samps, title, withHist) {
 
 };
 
-function binData(counts, values) {
+function binData(counts, values, maxBins) {
   function approxEqual(a, b) {
   	var eps=0.000001;
     return Math.abs(a-b) < eps;
   }
-  var maxBins = 20;
   var binnedValues;
   var binnedCounts;
   var xMin = Math.min.apply(Math, values);
@@ -292,7 +305,6 @@ function binData(counts, values) {
         binnedCounts.push({value: binValue, freq: 0});
       }
     }
-    console.log(binnedCounts.length);
   } else {
     binnedValues = values;
     binnedCounts = counts;
@@ -326,26 +338,20 @@ function drawHist(svg, binnedCounts, binnedValues, width, height, x, y, vertical
       .enter().append("rect")
       .attr("class", "bar")
       .attr("fill", "none")
-      //.attr("y", getY)
       .attr("y", function(d) {return y(getFreq(d)*scale);})
       .attr("x", function(d) {return histX(d.value);})
-      //.attr("height", function(d) { console.log(d.freq); console.log(getY(d)); return height - getY(d);})
-      //.attr("height", function(d) { return height - y(getFreq(d)*scale);})
       .attr("height", function(d) { return height - y(getFreq(d));})
       .attr("width", histX.rangeBand());
   } else {
-    var histY = d3.scale.ordinal()
-                .domain(binnedCounts.map(function(x) {return x.value;}))
-                .rangeRoundBands([height, 0], .1);
     svg.selectAll(".bar")
     .data(binnedCounts)
     .enter().append("rect")
     .attr("class", "bar")
     .attr("x", 0)
-    .attr("y", function(d) {return histY(d.value);})
+    .attr("y", function(d) {return y(d.value);})
     .attr("stroke","none")
     .attr("width", function(d) { return x(d.freq); })
-    .attr("height", histY.rangeBand());
+    .attr("height", y.rangeBand());
   }
 }
 
