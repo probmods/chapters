@@ -24,6 +24,8 @@ if (!Cookies.get('csrftoken')) {
   });
 }
 
+var forest_protocol = location.protocol.match(/file/) ? "http://" : "//";
+
 (function() {
   // wait till server hands us back a code_id and then
   // submit the result
@@ -99,11 +101,11 @@ if (!Cookies.get('csrftoken')) {
   };
 
   function query_url(task_id){
-    return 'http://forestbase.com/api/query/' + task_id + '/';
+    return forest_protocol + 'forestbase.com/api/query/' + task_id + '/';
   };
 
   function query_stop_url(task_id){
-    return 'http://forestbase.com/api/query/stop/' + task_id + '/';
+    return forest_protocol + 'forestbase.com/api/query/stop/' + task_id + '/';
   };
 
   function query_update(task_id, handlers){
@@ -229,8 +231,7 @@ if (!Cookies.get('csrftoken')) {
       editor.$runButton.removeAttr('disabled');
     };
 
-    var protocol = location.protocol.match(/file/) ? "http://" : "//";
-    $.get(protocol + "forestbase.com/api/query/",
+    $.get(forest_protocol + "forestbase.com/api/query/",
            {"code": code, "engine": engine},
            function(json) {
              if (json.status == "submitted") {
