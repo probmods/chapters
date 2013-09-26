@@ -11,7 +11,7 @@ var js_outmirror = null,
 var format_result = require("./format_result").format_result;
 
 util.openModule(pr);
-util.openModule(church_builtins);
+//util.openModule(church_builtins);
 
 CodeMirror.keyMap.default.Tab = "indentAuto";
 
