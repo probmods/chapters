@@ -62,9 +62,12 @@ _.templateSettings = {
     cookies: {
       paths: ["scripts/cookies-0.3.1.min.js"]
     },
+    md5: {
+      paths: ["scripts/md5.js"]
+    },
     injector: {
       paths: ["scripts/injector.js"],
-      parents: ["webchurch", "cm", "cmscheme", "cmbrackets", "cookies", "periodicalupdater", "viz", "cmclosebrackets"]
+      parents: ["webchurch", "cm", "cmscheme", "cmbrackets", "cookies", "periodicalupdater", "viz", "cmclosebrackets", "md5"]
     },
     nav: {
       paths: ["scripts/nav.js"]

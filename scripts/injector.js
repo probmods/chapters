@@ -268,16 +268,19 @@ if (!Cookies.get('csrftoken')) {
 
   var chapterName = _(location.href.split("/")).last().replace(".html","");
 
-  var injectEditor = function(item, text, selectedEngine, defaultText) {
-    var attributes = getAttributes(item),
-        exerciseName = chapterName + "." + $(item).data("exercise");
-
+  var injectEditor = function(domEl, options) {
+    var attributes = getAttributes(domEl),
+        text = options.text,
+        defaultText = options.defaultText,
+        selectedEngine = options.engine,
+        exerciseName = options.exerciseName;
+    
     // editor
     var editor = CodeMirror(
       function(el) {
-        var $ioContainer = $("<div class='io'></div");
-//        $ioContainer.append(el);
-        $(item).replaceWith(el);},
+        // var $ioContainer = $("<div class='io'></div");
+        $(domEl).replaceWith(el);
+      },
       {
         value: text,
         lineNumbers: false,
@@ -286,8 +289,8 @@ if (!Cookies.get('csrftoken')) {
         viewportMargin: Infinity,
         autoCloseBrackets: true
       });
-    editor.engine = selectedEngine || 'webchurch';
-    editor.exerciseName = exerciseName + ""; // cast undefined to "undefined" 
+
+    _(editor).extend(options);
     
     // results div
     var $results = $("<pre class='results'>"); 
@@ -412,28 +415,48 @@ if (!Cookies.get('csrftoken')) {
     
   };
 
-
   $(document).ready(function() {
     $("pre:not(.norun)").map(function(index, item) {
       var rawExerciseName = $(item).attr("data-exercise"),
-          exerciseName = chapterName + "." + rawExerciseName,
           defaultEngine = $(item).attr("data-engine") || 'webchurch',
-          defaultText = $(item).text();
+          defaultText = $(item).text(),
+          exerciseName;
+
+      if (typeof rawExerciseName == "undefined") {
+        exerciseName = [chapterName, index, md5(defaultEngine + defaultText)].join(".");
+      } else {
+        exerciseName = [chapterName, rawExerciseName].join(".");
+      }
+      
+
+      // default options which get over-ridden
+      // if this box has an exerciseName
+      var editorOptions = {
+        exerciseName: exerciseName,
+        defaultText: defaultText,
+        boxNum: index,
+        text: defaultText,
+        engine: defaultEngine
+      };
       
       if (!loggedIn || !rawExerciseName) {
-        injectEditor(item, defaultText, defaultEngine, defaultText); 
+        injectEditor(item, editorOptions); 
       } else {
+        
         $.ajax({
           url: "/code/" + exerciseName,
           success: function(json) {
-            var text = json.code,
-                engine = json.engine;
+            // overwrite defaults
+            _(editorOptions).extend({
+              text: json.code,
+              engine: json.engine
+            });
 
-            injectEditor(item, text, engine, defaultText);
+            injectEditor(item, editorOptions);
           },
           error: function() {
             console.log("failure loading exercise " + exerciseName + ", using default");
-            injectEditor(item, defaultText, defaultEngine, defaultText);
+            injectEditor(item, editorOptions);
           }
         });
 
