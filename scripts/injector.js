@@ -265,7 +265,7 @@ var forest_protocol = location.protocol.match(/file/) ? "http://" : "//";
     return attributes;
   };
 
-  var chapterName = _(location.href.split("/")).last().replace(".html","");
+  var chapterName = _(location.href.split("/")).last().replace(".html","").split("#")[0];
 
   var injectEditor = function(domEl, options) {
     var attributes = getAttributes(domEl),
