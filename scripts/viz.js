@@ -70,7 +70,7 @@ _hist = function(samps, title) {
     //TODO: make left margin vary depending on how long the names of the elements in the list are
     var margin = {top: 40, right: 20, bottom: 60, left: 60},
         width = 0.85 * $div.width() - margin.left - margin.right,
-        height = 100 + (20 * _(values).uniq().length) - margin.top - margin.bottom;
+        height = 100 + (20 * _(strvalues).uniq().length) - margin.top - margin.bottom;
 
     var x = d3.scale.linear()
           .domain([0, maxFreq])
