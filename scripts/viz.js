@@ -95,11 +95,6 @@ _hist = function(samps, title) {
 	        .orient("left");
     }
 
-    var xAxis = d3.svg.axis()
-                  .scale(x)
-                  .orient("bottom")
-                  .tickFormat(formatPercent);
-
     var svg = d3.select(div).append("svg")
           .attr("class", "chart")
           .attr("width", width + margin.left + margin.right)
@@ -108,6 +103,13 @@ _hist = function(samps, title) {
           .style('margin-top', '10px')
           .append("g")
           .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    drawHist(svg, counts, values, width, height, x, y, false);
+
+    var xAxis = d3.svg.axis()
+                  .scale(x)
+                  .orient("bottom")
+                  .tickFormat(formatPercent);
 
     svg.append("g")
       .attr("class", "x axis")
@@ -122,8 +124,6 @@ _hist = function(samps, title) {
     svg.append("g")
       .attr("class", "y axis")
       .call(yAxis);
-
-    drawHist(svg, counts, values, width, height, x, y, false);
     
     svg.append("text")
         .attr("x", (width / 2))             
