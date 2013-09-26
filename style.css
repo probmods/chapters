@@ -52,28 +52,27 @@ ul#nav {
     font-size: 80%;
 }
 
+.nav0 {
+    color: white;
+    text-decoration: none;
+    width: 100%
+}
 
-#nav > .nav0 > li {
+/* top level nav items */
+.nav0 > li {
     display: inline;
     padding: 5px 10px 5px 10px;
     font-weight: bold;
     border-radius: 2px;
     border: 1px solid white;
     margin: 5px;
-}
-
-#nav > .nav0:hover {
-    color: black;
-}
-
-#nav > .nav0:hover li {
-    background-color: white;
-}
-
-.nav0 {
     color: white;
-    text-decoration: none;
-    width: 100%
+}
+
+/* hover for top level items */
+.nav0:hover li {
+    background-color: white;
+    color: black
 }
 
 #nav ol {
@@ -106,7 +105,7 @@ ul#nav {
     color: white
 }
 
-.all-chapters ol li:hover a {
+.all-chapters ol li:hover a, .all-chapters ol li:hover a:visited {
     color: white
 }
 
