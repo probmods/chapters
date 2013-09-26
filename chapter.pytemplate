@@ -16,13 +16,11 @@
   <div id='header'>
     <div style='font-size: 28px; font-style: italic; float: left'>Probabilistic Models of Cognition</div>
     <ul id="nav">
-      <li id="all-chapters"><a href="#">All chapters</a>
-        %(chapters)s
-      </li>
-      <li id="register-link"><a href="/register">Register</a></li>
-      <li id="login-link"><a href="/login">Login</a></li>
-      <!-- <li id="profile-link" style='display: none'><a href="profile">Profile</a></li> -->
-      <li id="logout-link" style='display: none'><a href="/logout">Logout</a></li>
+      <span class="nav0"><li class="all-chapters">All chapters %(chapters)s</li></span>
+      <a class="nav0" href="/register"><li id="register-link">Register</li></a>
+      <a class="nav0" href="/login"><li id="login-link">Login</li></a>
+      <!-- <a class="nav0" href="/profile"><li id="profile-link" style='display: none'>Profile</li></a>  -->
+      <a class="nav0" href="/logout"><li id="logout-link" style='display: none'>Logout</li></a>
     </ul>
     <div class="clear"></div> 
   </div>

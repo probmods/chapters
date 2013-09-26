@@ -53,35 +53,27 @@ ul#nav {
 }
 
 
-#nav > li {
+#nav > .nav0 > li {
     display: inline;
     padding: 5px 10px 5px 10px;
-    /* font-variant: small-caps; */
     font-weight: bold;
-    /* background-color: #cc0066; */
-    /* background-color: #99ccff; */
     border-radius: 2px;
     border: 1px solid white;
-    /* border: 1px solid gray; */
     margin: 5px;
 }
 
-#nav > li:hover {
-background-color: white;
+#nav > .nav0:hover {
+    color: black;
 }
 
-#nav > li:hover a {
-color: black
+#nav > .nav0:hover li {
+    background-color: white;
 }
 
-#nav a {
+.nav0 {
     color: white;
     text-decoration: none;
     width: 100%
-}
-
-.clear {
-    clear: both
 }
 
 #nav ol {
@@ -106,30 +98,32 @@ color: black
     display: list-item;
     padding: 5px 10px 5px 10px;
     font-weight: normal;
-color: black
+    color: black
 } 
 
-#nav ol li:hover {
-    background-color: #4ECC77;
-    color: white;
+.all-chapters ol li:hover {
+    background-color: #12858C !important;
+    color: white
 }
 
-#nav ol a {
+.all-chapters ol li:hover a {
+    color: white
+}
+
+.nav0 ol li a {
 color: black;
-}
-
-#nav ol li:hover a {
-    color: white;
 }
 
 
 /* show the list of all chapters when the show class is
    applied */
-li.show ol, #nav ol:hover {
+li.show ol, .nav0:hover ol {
     display: block !important;
 }
 
-
+.clear {
+    clear: both
+}
 
 h1, h2, h3, h4, h5, h6 {
     font-weight: normal;
