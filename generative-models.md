@@ -396,10 +396,11 @@ Imagine a game of tug of war, where each person may be strong or weak, and may b
 
 (define lazy (lambda (person) (flip 0.25)))
 
+(define (pulling person)
+  (if (lazy person) (/ (strength person) 2) (strength person)))
+
 (define (total-pulling team)
-  (sum
-         (map (lambda (person) (if (lazy person) (/ (strength person) 2) (strength person)))
-              team)))
+  (sum (map pulling team)))
 
 (define (winner team1 team2) (if (< (total-pulling team1) (total-pulling team2)) team2 team1))
 
