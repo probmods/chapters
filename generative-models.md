@@ -503,12 +503,26 @@ Were you often right? Were there some cases of 'surprisingly stable' towers?  @H
 (define ground
   (list (list "rect" #t (list worldWidth 10)) (list (/ worldWidth 2) (+ worldHeight 6))))
 
+(define stableWorld
+  (list ground (list (list 'rect #f (list 60 22)) (list 175 473))
+        (list (list 'rect #f (list 50 38)) (list 159.97995044874122 413))
+        (list (list 'rect #f (list 40 35)) (list 166.91912737427202 340))
+        (list (list 'rect #f (list 30 29)) (list 177.26195677111082 276))
+        (list (list 'rect #f (list 11 17)) (list 168.51354470809122 230))))
+
 (define almostUnstableWorld
   (list ground (list (list 'rect #f (list 24 22)) (list 175 473))
         (list (list 'rect #f (list 15 38)) (list 159.97995044874122 413))
         (list (list 'rect #f (list 11 35)) (list 166.91912737427202 340))
         (list (list 'rect #f (list 11 29)) (list 177.26195677111082 276))
         (list (list 'rect #f (list 11 17)) (list 168.51354470809122 230))))
+
+(define unstableWorld
+  (list ground (list (list 'rect #f (list 60 22)) (list 175 473))
+        (list (list 'rect #f (list 50 38)) (list 90 413))
+        (list (list 'rect #f (list 40 35)) (list 140 340))
+        (list (list 'rect #f (list 10 29)) (list 177.26195677111082 276))
+        (list (list 'rect #f (list 50 17)) (list 140 230))))
 
 (define (doesTowerFall initialW finalW)
   ;y position is 0 at the TOP of the screen
@@ -527,12 +541,31 @@ Were you often right? Were there some cases of 'surprisingly stable' towers?  @H
               (list (newX (getX worldObj)) (getY worldObj)))))
   (map xNoise world))
 
-(define (runTower)
+(define (runStableTower)
+  (define initialWorld (noisify stableWorld))
+  (define finalWorld (runPhysics 1000 initialWorld))
+  (doesTowerFall initialWorld finalWorld))
+
+(define (runAlmostUnstableTower)
   (define initialWorld (noisify almostUnstableWorld))
   (define finalWorld (runPhysics 1000 initialWorld))
   (doesTowerFall initialWorld finalWorld))
 
-(hist (repeat 10 runTower))
+(define (runUnstableTower)
+  (define initialWorld (noisify unstableWorld))
+  (define finalWorld (runPhysics 1000 initialWorld))
+  (doesTowerFall initialWorld finalWorld))
+
+(multiviz
+ (hist (repeat 10 runStableTower) "stable")
+ (hist (repeat 10 runAlmostUnstableTower) "almost unstable")
+ (hist (repeat 10 runUnstableTower) "unstable")
+)
+
+;uncomment any of these that you'd like to see for yourself
+;(animatePhysics 1000 stableWorld)
+;(animatePhysics 1000 almostUnstableWorld)
+;(animatePhysics 1000 unstableWorld)
 ~~~~
 
 # Exercises

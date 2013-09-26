@@ -382,7 +382,7 @@ opacity: 0;
 }
 
 .CodeMirror-focused {
-box-shadow: 3px 3px 3px #99ccff; 
+box-shadow: 3px 3px 3px #4ECC77; /* #99ccff; */
 }
 
 /* .CodeMirror-focused button.run, .CodeMirror-focused .code-settings { */
