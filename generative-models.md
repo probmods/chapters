@@ -629,31 +629,31 @@ Directly compute the probability of the bent coin in the example. Check your ans
     c) Why are the probabilities different for the last two? Explain both in terms of the probability calculations you did and in terms of the "causal" process of evaluating and making random choices.
 
 #) Use the rules of probability, described above, to compute the probability that the geometric distribution define by the following stochastic recursion returns the number 5.
-
-~~~~ {data-exercise="ex6"}
-(define (geometric p)
-  (if (flip p)
-      0
-      (+ 1 (geometric p))))
-~~~~
-
+    
+    ~~~~ {data-exercise="ex6"}
+    (define (geometric p)
+      (if (flip p)
+          0
+          (+ 1 (geometric p))))
+    ~~~~
+    
 #) Convert the following probability table to a compact Church program:
 
-A      B     P(A,B)
-----  ----- -------------
-F      F     0.14
-F      T     0.96
-T      F     0.4
-T      T     0.4
-
-Hint: fix the probability of A and then define the probability of B to *depend* on whether A is true or not. Run your Church program and build a histogram to check that you get the correct distribution
-
-~~~~ {data-exercise="ex7"}
-(define a ...)
-(define b ...)
-(list a b)
-~~~~
-
+    A      B     P(A,B)
+    ----  ----- -------------
+    F      F     0.14
+    F      T     0.96
+    T      F     0.4
+    T      T     0.4
+    
+    Hint: fix the probability of A and then define the probability of B to *depend* on whether A is true or not. Run your Church program and build a histogram to check that you get the correct distribution
+    
+    ~~~~ {data-exercise="ex7"}
+    (define a ...)
+    (define b ...)
+    (list a b)
+    ~~~~
+    
 #) In [Example: Intuitive physics] above we modeled stability of a tower as the probability that the tower falls when perturbed, and we modeled "falling" as getting shorter. It would be reasonable to instead measure *how much shorter* the tower gets.
 
     a) Below, modify the stability model by writing a continuous measure, `towerFallDegree`. Make sure that your continuous measure is in some way numerically comparable to the discrete measure, `doesTowerFall` (defined here as either 0 or 1). Mathematically, what is your continuous measure?
@@ -713,14 +713,15 @@ Hint: fix the probability of A and then define the probability of B to *depend* 
       (define initialWorld (noisify almostUnstableWorld))
       (define finalWorld (runPhysics 1000 initialWorld))
       (define measureValue (measureFunction initialWorld finalWorld))
-      
-      (animatePhysics 1000 initialWorld
-                      (stringAppend "Stability measure: "
-                                    (decimals measureValue 2) "<br />"
+    
+      (multiviz 
+       (list "Stability measure: "
+                                    (decimals measureValue 2) "//"
                                     "Initial height: "
-                                    (decimals (getTowerHeight initialWorld) 2) "<br />"
+                                    (decimals (getTowerHeight initialWorld) 2) "//"
                                     "Final height: " 
-                                    (decimals (getTowerHeight finalWorld) 2))))
+                                    (decimals (getTowerHeight finalWorld) 2))
+       (animatePhysics 1000 initialWorld)))
     
     ;; visualize doesTowerFall measure
     ;;(visualizeStabilityMeasure doesTowerFall)
