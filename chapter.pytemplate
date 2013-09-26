@@ -37,16 +37,19 @@ $body$
 </body>
 
 <script>
-  (function() {
-  var scr = "<script src='scripts/load-dependencies.js?" + (new Date().getTime()) + "'>";
-    jQuery(document.head).append( jQuery(scr) );
-    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+(function() {
+var scriptSrc = 'scripts/load-dependencies.js?' + (new Date()).getTime(); 
+var scriptEl = document.createElement('script');
+scriptEl.src = scriptSrc;
+document.getElementsByTagName('head')[0].appendChild(scriptEl);
 
-    ga('create', 'UA-44328902-1', 'probmods.org');
-    ga('send', 'pageview');
-    })();
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-44328902-1', 'probmods.org');
+ga('send', 'pageview');
+})();
 </script>
 </html>
