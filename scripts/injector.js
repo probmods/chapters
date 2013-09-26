@@ -140,7 +140,6 @@ if (!Cookies.get('csrftoken')) {
   };
 
   var forestRunner = function(editor) {
-    alert('Remote engine server not available right now');
 
     var exerciseName = editor.exerciseName,
         code = editor.getValue(),
@@ -229,8 +228,9 @@ if (!Cookies.get('csrftoken')) {
     handlers.reenableRun = function(json) {
       editor.$runButton.removeAttr('disabled');
     };
-   
-    $.get("http://forestbase.com/api/query/",
+
+    var protocol = location.protocol.match(/file/) ? "http://" : "//";
+    $.get(protocol + "forestbase.com/api/query/",
            {"code": code, "engine": engine},
            function(json) {
              if (json.status == "submitted") {
@@ -239,8 +239,6 @@ if (!Cookies.get('csrftoken')) {
              }
            },
            "jsonp");
-    // TEMP
-    handlers.reenableRun();
 
   };
 
