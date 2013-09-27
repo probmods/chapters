@@ -13,7 +13,8 @@ var format_result = require("./format_result").format_result;
 util.openModule(pr);
 //util.openModule(church_builtins);
 
-CodeMirror.keyMap.default.Tab = "indentAuto";
+CodeMirror.keyMap.default["Tab"] = "indentAuto";
+CodeMirror.keyMap.default["Cmd-/"] = "toggleComment";
 
 
 // if not logged in, start an anonymous session

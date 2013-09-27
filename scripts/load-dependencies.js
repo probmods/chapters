@@ -59,6 +59,10 @@ _.templateSettings = {
       paths: ["codemirror/closebrackets.js"],
       parents: ["cm"] 
     },
+    cmcomments: {
+        paths: ["codemirror/comments.js"],
+        parents: ["cm"]
+    },
     cookies: {
       paths: ["scripts/cookies-0.3.1.min.js"]
     },
