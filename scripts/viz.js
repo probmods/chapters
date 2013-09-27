@@ -52,7 +52,7 @@ _hist = function(samps, title) {
         });
   var maxFreq = Math.max.apply(Math, counts.map(function(x) {return x.freq;}));
   var continuous;
-  if (counts.length > maxBins) {
+  if (counts.length > maxBins  &&  counts.filter(isNaN).length == 0) {
   	var binnedData = binData(counts, values, maxBins);
   	counts = binnedData.counts;
   	values = binnedData.values;
