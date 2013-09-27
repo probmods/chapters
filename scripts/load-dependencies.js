@@ -63,6 +63,10 @@ _.templateSettings = {
         paths: ["codemirror/comments.js"],
         parents: ["cm"]
     },
+    cmfoldcode: {
+        paths: ["codemirror/foldcode.js"],
+        parents: ["cm"]
+    },
     cookies: {
       paths: ["scripts/cookies-0.3.1.min.js"]
     },

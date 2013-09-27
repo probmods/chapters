@@ -13,8 +13,15 @@ var format_result = require("./format_result").format_result;
 util.openModule(pr);
 //util.openModule(church_builtins);
 
+//var myRangeFinder = function(cm,pos) {
+//    
+//    return {from: CodeMirror.Pos(pos.line, 0),
+//        to: CodeMirror.Pos(pos.line+2, 0)};
+//}
+
 CodeMirror.keyMap.default["Tab"] = "indentAuto";
 CodeMirror.keyMap.default["Cmd-/"] = "toggleComment";
+CodeMirror.keyMap.default["Cmd-F"] = function(cm){cm.foldCode(cm.getCursor(), myRangeFinder); }
 
 
 // if not logged in, start an anonymous session
@@ -291,9 +298,17 @@ var forest_protocol = location.protocol.match(/file/) ? "http://" : "//";
       });
 
     _(editor).extend(options);
-    
+ 
+ //fold ";;;fold:" parts:
+ var lastLine = editor.lastLine()
+ for(i=0;i<=lastLine;i++) {
+    var text = editor.getLine(i)
+    pos = text.indexOf(";;;fold:")
+    if (pos==0) {editor.foldCode(CodeMirror.Pos(i,pos),trippleCommentRangeFinder)}
+ }
+ 
     // results div
-    var $results = $("<pre class='results'>"); 
+    var $results = $("<pre class='results'>");
 
     // engine selector
 
