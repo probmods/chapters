@@ -182,6 +182,7 @@ Here is a more complex version of this causal model:
 ~~~~
 (define lung-cancer (flip 0.01))
 (define TB (flip 0.005))
+(define stomach-flu (flip 0.1))
 (define cold (flip 0.2))
 (define other (flip 0.1))
 
