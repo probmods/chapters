@@ -62,7 +62,8 @@ var forest_protocol = location.protocol.match(/file/) ? "http://" : "//";
         resultData = {'exercise_id': editor.exerciseName,
                       'csrfmiddlewaretoken': Cookies.get('csrftoken')
                      };
-    
+
+    $results.show();
     try {
       var jsCode = church_to_js(code);
       jsCode = transform.probTransform(jsCode);
@@ -180,7 +181,7 @@ var forest_protocol = location.protocol.match(/file/) ? "http://" : "//";
         resultString += json.text;
       }
 
-      $results.html(resultString);
+      $results.html(resultString).show();
       
     }; 
 
@@ -309,6 +310,7 @@ var forest_protocol = location.protocol.match(/file/) ? "http://" : "//";
  
     // results div
     var $results = $("<pre class='results'>");
+    $results.css('display', 'none');
 
     // engine selector
 
@@ -334,7 +336,7 @@ var forest_protocol = location.protocol.match(/file/) ? "http://" : "//";
     var $resetButton = $("<button>").html("Reset");
     $resetButton.click(function() {
       editor.setValue(defaultText);
-      $results.html('');
+      $results.hide().html('');
       $.ajax({
         type: "POST",
         url: "/code/" + exerciseName,

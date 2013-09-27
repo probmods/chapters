@@ -10,8 +10,8 @@
       }
       #header {
       width: 55em;
-      padding: 3em 0em 2em 0em;
-      text-align: center
+      padding: 1.5em 0em 1.5em 0em;
+      text-align: center;
       }
     </style>
     <script src="scripts/underscore-min.js"></script> 
@@ -23,8 +23,8 @@
   </head>
   <body>
     <div id="chapter-wrapper">
-      <div id='header'>
-        <span style='font-size: 40px'</span>$title$</span>
+      <div id='header' >
+        <span style='font-family: Baskerville, Palatino Linotype, Palatino; font-size: 50px'</span>$title$</span>
       </div>
       <div id="chapter"> 
 $body$

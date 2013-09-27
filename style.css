@@ -6,33 +6,14 @@ html {
 }
 
 body {
-    font-family: Palatino Linotype, Palatino, Georgia, serif;
-    font-size: 14px;
-    line-height: 125%;
     padding: 0;
     margin: 0;
-}
-
-#chapter-wrapper {
-width: 55em;
-margin: 0 auto;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 1); 
-}
-
-#chapter {
-    width: 45em;
-    margin-top: 0;
-    margin-bottom: 3em;
-    background-color: white;
-    padding: 5em;
-    padding-top: 2em;
-
 }
 
 #header {
     background-color: #4ECC77;
     width: 52em;
-    padding-top: 2.5em;
+    padding-top: 2em;
     padding-bottom: 1.5em;
     padding-left: 2em;
     padding-right: 1em;
@@ -40,22 +21,25 @@ margin: 0 auto;
     border-bottom: 1px solid black;
 }
 
-
-#chapter > ul li {
-    line-height: 140%;
+#logotype {
+    font-size: 28px;
+    font-family: Palatino;
+    font-style: italic;
+    float: left;
 }
+
+/* navigation links */
 
 ul#nav {
     float: right;
-    margin-top: -0em;
+    margin-top: 0.6em;
     font-family: helvetica, arial, sans-serif;
     font-size: 80%;
 }
 
-.nav0 {
+.nav0, .nav0:visited {
     color: white;
     text-decoration: none;
-    width: 100%
 }
 
 /* top level nav items */
@@ -84,8 +68,6 @@ ul#nav {
     margin-top: 3px;
     margin-left: -5em;
     width: 20em;
-    /* font-size: 80%; */
-    /* margin-left: 3em; */
     display: none;
     position: absolute; 
     list-style-position: inside;
@@ -100,18 +82,20 @@ ul#nav {
     color: black
 } 
 
-.all-chapters ol li:hover {
+#nav ol li:hover {
     background-color: #12858C !important;
     color: white
 }
 
-.all-chapters ol li:hover a, .all-chapters ol li:hover a:visited {
+#nav ol li a {
+    color: black;
+    text-decoration: none
+}
+
+#nav ol li:hover a, #nav ol li:hover a:visited {
     color: white
 }
 
-.nav0 ol li a {
-color: black;
-}
 
 
 /* show the list of all chapters when the show class is
@@ -119,6 +103,30 @@ color: black;
 li.show ol, .nav0:hover ol {
     display: block !important;
 }
+
+
+#chapter-wrapper {
+    width: 55em;
+    margin: 0 auto;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 1); 
+}
+
+#chapter {
+    width: 45em;
+    margin-top: 0;
+    margin-bottom: 3em;
+    background-color: white;
+    padding: 5em;
+    padding-top: 2em;
+    font-family: Baskerville, Times;
+    font-size: 16px;
+    line-height: 125%; 
+}
+
+#chapter > ul li {
+    line-height: 130%;
+}
+
 
 .clear {
     clear: both
@@ -160,35 +168,8 @@ h1 a:visited, h2 a:visited, h3 a:visited, h4 a:visited, h5 a:visited, h6 a:visit
     text-decoration: none
 }
 
-
-#book-title {
-    font-size: 40px;
-    font-style: italic;
-    text-align: center
-}
-
 #chapter-title {
-    /* font-size: 36px; */
-    font-weight: normal
-}
-
-/* textarea { */
-/*     font-family: courier new; */
-/*     width: 100%; */
-/*     font-size: 14px; */
-/*     font-weight: 700; */
-/*     color: #333; */
-/* } */
-
-code {
-/* background-color: #ffeeff; */
-/* border: 1px solid #ffccff; */
-/* font-size: 90%; */
-/* padding: 3px; */
-/* padding-top: 0; */
-/* padding-bottom: 0; */
-/* border-radius: 2px; */
-
+    font-weight: 600;
 }
 
 li > code {
@@ -199,19 +180,26 @@ li > code {
     padding: 0 2px 0 2px;
 }
 
-p {
+#chapter p {
     text-align: justify
 }
 
-.error {
-    color: red;
-    font-weight: bold
+/* baskerville bold is a bit too bold */
+strong {
+    font-weight: 600
 }
+
+#exercises ~ ol {
+    margin-left: 0;
+    padding-left: 0
+}
+
 
 #references ~ p {
-text-align: left;
+    text-align: left;
 }
 
+/* citation hovercards */
 span.citekey {
     display: none
 }
@@ -222,19 +210,17 @@ span.citation {
 }
 
 .citation > .citation-expanded {
-    display: block;
+    /* display: block; */
     opacity: 0;
     position: absolute;
     padding: 1em;
     top: 0px;
     left: 0%;
     z-index: -9999;
-    min-width: 300px;
     background-color: rgba(255, 204, 102, 0);
     color: rgba(0, 0, 0, 0); /* expanded citation can actually be visible on small screens */
     text-align: left;
 }
-
 
 .citation.hover > .citation-expanded, .citation:hover > .citation-expanded {
     top: -30px;
@@ -248,38 +234,7 @@ span.citation {
     opacity: 1
 }
 
-
-.chart {
-    font: 13px Helvetica, Arial, sans-serif;
-    fill: steelblue;
-    stroke: #333333;
-    text-align: right;
-    padding: 3px;
-    margin: 1px;
-    color: white;
-}
-
-.axis path, .axis line {
-    fill: none;
-}
-
-.axis text {
-    stroke: none;
-fill: black
-/* font-size: 16px; */
-/* font-family: Palatino Linotype, Palatino, Georgia, serif; */
-/* stroke: none; */
-/* fill: black; */
-}
-
-pre {
-    font-size: 12px;
-    border: 1px solid #afafaf;
-}
-
-pre:empty {
-    border: none
-}
+/* code settings */
 
 p > code {
     border-radius: 2px;
@@ -293,110 +248,117 @@ h1 > a > code, h2 > a > code, h3 > a > code, h4 > a > code, h5 > a > code, li > 
     border-radius: 2px;
     background-color: #fafafa;
     border: 1px solid #dfdfdf;
-    padding: 0 2px 0 2px;
+    font-size: 85%;
+    padding: 0 0.2em 0 0.2em;
 }
 
+/* yellow backgrounds */
 .bg-yellow {
     background-color: #f2efc2;
     padding: 5px;
     border: 1px solid #f3ce00;
-}
+} 
 
-.line {
-  fill: none;
-  stroke: #000;
-  stroke-width: 1.5px;
-}
-
-.axis path,
-.axis line {
-  fill: none;
-  stroke: #000;
-  shape-rendering: crispEdges;
-}
-
-.bar { 
-  fill: steelblue;
-  shape-rendering: crispEdges;
-}
+/* codeboxes */
 
 .code-controls {
-position: absolute;
-top: 0px;
-right: 1px;
-margin: 0;
-padding: 0;
-z-index: 999;
+    position: absolute;
+    top: 0px;
+    right: 1px;
+    margin: 0;
+    padding: 0;
+    z-index: 999;
 }
 
 .code-settings {
-float: right;
-margin: 0;
-padding: 0;
-list-style-type: none;
-opacity: 0
-/* display: none */
+    float: right;
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+    opacity: 0
 }
 
-.code-settings li {
-display: none;
+.code-settings > li {
+    display: none;
 } 
 
 .code-settings li.cog {
-display: inline;
+    display: inline;
 }
 
 .code-settings li.cog button {
-background: none;
-border: none;
-padding-right: 0;
+    background: none;
+    border: none;
+    padding-right: 0;
 }
 
 .code-settings li.cog img {
-opacity: 0.3;
+    opacity: 0.3;
 }
 
-
 .code-settings:hover .cog img {
-opacity: 1;
-
+    opacity: 1;
 }
 
 .code-settings:hover li {
-display: inline;
+    display: inline;
 }
 
 button.run {
-position: absolute;
-bottom: 0;
-right: 0;
-z-index: 1000;
-opacity: 0;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    z-index: 1000;
+    opacity: 0;
 }
 
 .CodeMirror-focused {
-box-shadow: 3px 3px 3px #99ccff;
+    box-shadow: 3px 3px 3px #99ccff;
 }
-
-/* .CodeMirror-focused button.run, .CodeMirror-focused .code-settings { */
-/* display: block */
-/* } */
 
 .CodeMirror:hover button.run, .CodeMirror:hover .code-settings, .CodeMirror-focused button.run, .CodeMirror-focused .code-settings {
-opacity: 1
+    opacity: 1
+}
+
+.error {
+    color: red;
+    font-weight: bold
+}
+
+/* d3 */
+
+
+.line {
+    fill: none;
+    stroke: #000;
+    stroke-width: 1.5px;
+}
+
+.chart {
+    font: 13px Helvetica, Arial, sans-serif;
+    fill: steelblue;
+    stroke: #333333;
+    text-align: right;
+    padding: 3px;
+    margin: 1px;
+    color: white;
+}
+
+.axis text {
+    stroke: none;
+    fill: black;
 }
 
 
-pre.results:not(:empty) {
-padding: 2px
+.axis path,
+.axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
 }
 
-#exercises ~ ol {
-margin-left: 0;
-padding-left: 0
+.bar { 
+    fill: steelblue;
+    shape-rendering: crispEdges;
 }
 
-pre {
-line-height: 110%;
-padding: 2px
-}
