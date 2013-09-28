@@ -21,7 +21,7 @@ util.openModule(pr);
 
 CodeMirror.keyMap.default["Tab"] = "indentAuto";
 CodeMirror.keyMap.default["Cmd-/"] = "toggleComment";
-CodeMirror.keyMap.default["Cmd-F"] = function(cm){cm.foldCode(cm.getCursor(), myRangeFinder); }
+CodeMirror.keyMap.default["Cmd-."] = function(cm){cm.foldCode(cm.getCursor(), myRangeFinder); }
 
 
 // if not logged in, start an anonymous session

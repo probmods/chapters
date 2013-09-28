@@ -73,7 +73,13 @@
  })();
  
  var myRangeFinder = function(cm, start) {
+    
     var line = start.line, lineText = cm.getLine(line);
+    
+    //if the line has a comment fold, then do that:
+    if (lineText.indexOf(";;;fold:") != -1) return trippleCommentRangeFinder(cm, start)
+    
+    
     var startCh, tokenType;
     
 //    function findOpening(openCh) {
