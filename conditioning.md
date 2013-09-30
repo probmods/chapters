@@ -543,11 +543,18 @@ Under this model, a patient with coughing, chest pain and shortness of breath is
 
 # Exercises
 
-1) Conditioning and intervention: In the earlier [Medical Diagnosis](generative-models.html#example-causal-models-in-medical-diagnosis) section we suggested understanding the patterns of symptoms for a particular disease by changing the program to make that disease always true.
+1) Conditioning and prior manipulation: In the earlier
+[Medical Diagnosis](generative-models.html#example-causal-models-in-medical-diagnosis)
+section we suggested understanding the patterns of symptoms for a particular
+disease by changing the prior probability of the disease such that it is always true.
 
     A) For this example, does this procedure give the same answers as using `query` to *condition* on the disease being true?
 
-    B) Why would this procedure give different answers than conditioning for more general hypotheticals? Construct an example where these are different. Then translate this into a Church model and show that intervening and observation give different answers. Hint: think about intervening versus observing on a variable that has a causal parent.
+    B) Why would this procedure give different answers than conditioning for
+    more general hypotheticals? Construct an example where these are
+    different. Then translate this into a Church model and show that
+    manipulating the prior gives different answers than manipulating the observation. Hint: think
+    about changing the prior versus observing a variable that has a causal parent.
 
 2) Computing marginals: Use the rules for computing probabilities to compute the marginal distribution on return values from these Church programs.
 
@@ -618,9 +625,9 @@ Now, we're going to write this model in Church using the `cosh` engine. Here is 
 
     D) What does the `multinomial` function do? Use `multinomial` to express this distribution:
 
-        x	  P(x)
+        x     P(x)
         ----  -----
-        red	  0.5
+        red   0.5
         blue  0.05
         green 0.4
         black 0.05
@@ -628,7 +635,7 @@ Now, we're going to write this model in Church using the `cosh` engine. Here is 
         ~~~~ {data-exercise="casino-multinomial"}
         (define x ...)
         ~~~~
-        
+
     E) Fill in the `...`'s in the code to compute $p(h \mid d)$. Include a screenshot of the resulting graph. What letter has the highest posterior probability? In English, what does it mean that this letter has the highest posterior? Make sure that your Church answers and hand-computed answers agree - note that this demonstrates the equivalence between the program view of conditional probability and the distributional view.
 
     F) Which is higher, $p(\text{vowel} \mid d)$ or $p(\text{consonant} \mid d)$? Answer this using the Church code you wrote (hint: use the `vowel?` function)
