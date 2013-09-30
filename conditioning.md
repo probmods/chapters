@@ -129,7 +129,7 @@ While many implementations of `query` are possible, and others are discussed lat
 
 The formal definition of *conditional probability* in probability theory is
 
-$$ P(A=a \mid B=b)=\frac{ P(A=a,B=b)}{P(B=b)}. $$
+$$ P(A=a \mid B=b)=\frac{ P(A=a,B=b)}{P(B=b)} $$
 
 Here $P(A=a \mid B=b)$ is the probability that "event" $A$ has value $a$ given that $B$ has value $b$. (The meaning of events $A$ and $B$ must be given elsewhere in this notation, unlike a Church program, which contains the full model specification within the query.)
 The *joint probability*, $P(A=a,B=b)$,  is the probability that $A$ has value $a$ and $B$ has value $b$.
@@ -137,7 +137,7 @@ So the conditional probability is simply the ratio of the joint probability to t
 In the case of a Church query, $A=a$ is the "event" of the query expression returning value $a$, while $B=b$ will be the conditioner returning true (so $b$ will be *True*).
 
 The above definition of conditional distribution in terms of rejection sampling is equivalent to this mathematical definition, when both are well-defined. (There are special cases when only one definition makes sense. For instance, when continuous random choices are used it is possible to find situations where rejection sampling almost never returns a sample but the conditional distribution is still well defined. Why?)
-Indeed, we can use the process of rejection sampling to understand this alternative definition of the conditional probability $P(A=a|B=b)$. We imagine sampling many times, but only keeping those samples in which the condition is true. The frequency of the query expression returning a particular value $a$ (i.e. $A=a$) *given* that the condition is true, will be the number of times that $A=a$ *and* $B=True$ divided by the number of times that $B=True$. Since the frequency of the conditioner returning true will be $P(B=True)$ in the long run, and the frequency that the condition returns true *and* the query expression returns a given value $a$ will be $P(A=a, B=True)$, we get the above formula for the conditional probability.
+Indeed, we can use the process of rejection sampling to understand this alternative definition of the conditional probability $P(A=a \mid B=b)$. We imagine sampling many times, but only keeping those samples in which the condition is true. The frequency of the query expression returning a particular value $a$ (i.e. $A=a$) *given* that the condition is true, will be the number of times that $A=a$ **and** $B=True$ divided by the number of times that $B=True$. Since the frequency of the conditioner returning true will be $P(B=True)$ in the long run, and the frequency that the condition returns true *and* the query expression returns a given value $a$ will be $P(A=a, B=True)$, we get the above formula for the conditional probability.
 <!-- FIXME: clarify this last argument? -->
 
 Try using the above formula for conditional probability to compute the probability of the different return values in the above query examples. Check that you get the same probability that you observe when using rejection sampling.
@@ -616,7 +616,14 @@ Now, we're going to write this model in Church using the `cosh` engine. Here is 
 
     C) What does the `my-list-index` function do? What would happen if you ran `(my-list-index 'mango '(apple banana) 1)`?
 
-    D) What does the `multinomial` function do? Use `multinomial` to express this distribution: TODO
+    D) What does the `multinomial` function do? Use `multinomial` to express this distribution:
+
+        x	  P(x)
+        ----  -----
+        red	  0.5
+        blue  0.05
+        green 0.4
+        black 0.05
 
     E) Fill in the `...`'s in the code to compute $p(h \mid d)$. Include a screenshot of the resulting graph. What letter has the highest posterior probability? In English, what does it mean that this letter has the highest posterior? Make sure that your Church answers and hand-computed answers agree - note that this demonstrates the equivalence between the program view of conditional probability and the distributional view.
 
