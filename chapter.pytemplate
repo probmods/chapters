@@ -14,7 +14,7 @@
 <body>
 <div id="chapter-wrapper">
   <div id='header'>
-    <div style='font-size: 28px; font-style: italic; float: left'>Probabilistic Models of Cognition</div>
+    <div id='logotype'>Probabilistic Models of Cognition</div>
     <ul id="nav">
       <span class="nav0"><li class="all-chapters">All chapters %(chapters)s</li></span>
       <a class="nav0" href="/register"><li id="register-link">Register</li></a>
@@ -25,10 +25,9 @@
     <div class="clear"></div> 
   </div>
 
-  <!-- <div id="book-title">Probabilistic Models of Cognition</div>  -->
   <div id="chapter">
     <h1 id="chapter-title">$num$ $title$</h1> 
-  $toc$  
+  $toc$
 $body$
    </div>
 </div> 

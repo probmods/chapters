@@ -59,15 +59,19 @@ _.templateSettings = {
       paths: ["codemirror/closebrackets.js"],
       parents: ["cm"] 
     },
+    cmcomments: {
+        paths: ["codemirror/comments.js"],
+        parents: ["cm"]
+    },
+    cmfoldcode: {
+        paths: ["codemirror/foldcode.js"],
+        parents: ["cm"]
+    },
     cookies: {
       paths: ["scripts/cookies-0.3.1.min.js"]
     },
     md5: {
       paths: ["scripts/md5.js"]
-    },
-    injector: {
-      paths: ["scripts/injector.js"],
-      parents: ["webchurch", "cm", "cmscheme", "cmbrackets", "cookies", "periodicalupdater", "viz", "cmclosebrackets", "md5"]
     },
     nav: {
       paths: ["scripts/nav.js"]
@@ -92,6 +96,10 @@ _.templateSettings = {
     plinko: {
       paths: ["scripts/plinko.js"],
       parents: ["box2dweb"]
+    },
+    injector: {
+      paths: ["scripts/injector.js"],
+      parents: ["webchurch", "cm", "cmscheme", "cmbrackets", "cookies", "periodicalupdater", "viz", "cmclosebrackets", "md5"]
     }
   };
 
@@ -123,6 +131,9 @@ _.templateSettings = {
     // unloadedParents for all its children
     // if, afterward, any children don't have
     // any unloadedParents
+
+    var isLocal = location.protocol.match(/file/) || true,
+        loadStrategy = isLocal ? "head" : "ajax";
     
     props.load = _.bind(
       function() {
@@ -141,7 +152,11 @@ _.templateSettings = {
         }
 
         var success = function(script, textStatus) {
-          console.log("success loading " + loadedLibName);
+          if (loadedLibName == "injector") {
+            console.log((new Date()).getTime() - startTime);
+          }
+
+          console.log("("+ loadStrategy + ") OKAY loading " + loadedLibName);
           _(children).each(function(childName) {
             var childLib = libs[childName];
             childLib.unloadedParents = _(childLib.unloadedParents).without(loadedLibName);
@@ -151,29 +166,58 @@ _.templateSettings = {
             }
           });
         };
-        
-        $.getScript(path)
-          .done( success )
-          .fail(function() {
-            console.log('FAIL loading ' + loadedLibName, "via ajax, try writing to head");
-            var script = document.createElement('script'); 
-            script.src = path;
-            script.async = true;
-            script.onload = function(f) {
-              console.log('loaded ' + loadedLibName + ' from head');
-              success();
-            };
-            document.getElementsByTagName('head')[0].appendChild(script);
+
+        var failure = function() {
+          var failString = '(' + loadStrategy + ') FAIL loading ' + loadedLibName + '. Try refreshing';
+          alert(failString);
+        };
+
+        if (isLocal) {
+          var script = document.createElement('script'); 
+          script.src = path;
+          script.async = true;
+          // not quite IE-ready
+          // see http://blog.lexspoon.org/2009/12/detecting-download-failures-with-script.html
+          // for guidance
+          script.onerror = function() {
+            failure();
+          };
           
-        }); 
+          script.onload = function() {
+            success();
+          };
+          document.getElementsByTagName('head')[0].appendChild(script); 
+        } else {
+          // try loading three times and then give up
+          var ajaxLoader = function() {
+            $.getScript(path)
+              .done( success )
+              .fail(function() {
+                if (!props.tries) {
+                  props.tries = 0;
+                }
+                props.tries++;
+
+                if (props.tries < 3) { 
+                  console.log('(ajax) RETRY loading ' + loadedLibName);
+                  setTimeout(ajaxLoader, 100);
+                } else {
+                  failure();
+                }
+              });
+            };
+          ajaxLoader();
+        }
           
       },
       props); 
   }
 
-  $.ajaxSetup({cache: true});
+  // doesn't matter; we do it manually
+  $.ajaxSetup({cache: false});
 
   window.libs = libs;
+  var startTime = (new Date()).getTime();
   // load all the parentless libraries
   _(libs).each(function(props, names) {
     if (props.parents.length == 0) {

@@ -52,7 +52,7 @@ _hist = function(samps, title) {
         });
   var maxFreq = Math.max.apply(Math, counts.map(function(x) {return x.freq;}));
   var continuous;
-  if (counts.length > maxBins) {
+  if (counts.length > maxBins  &&  counts.filter(function(x){return isNaN(x.value)}).length == 0) {
   	var binnedData = binData(counts, values, maxBins);
   	counts = binnedData.counts;
   	values = binnedData.values;
@@ -340,7 +340,7 @@ function drawHist(svg, binnedCounts, binnedValues, width, height, x, y, vertical
       .attr("fill", "none")
       .attr("y", function(d) {return y(getFreq(d)*scale);})
       .attr("x", function(d) {return histX(d.value);})
-      .attr("height", function(d) { return height - y(getFreq(d));})
+      .attr("height", function(d) { return height - y(getFreq(d)*scale);})
       .attr("width", histX.rangeBand());
   } else {
     svg.selectAll(".bar")

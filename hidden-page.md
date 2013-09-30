@@ -15,6 +15,16 @@ Here are three church programs.
 ~~~~ {.bher}
 (flip 0.4)
 ~~~~
+
+~~~~ 
+;;;fold: this should start folded..
+(flip 0.4)
+
+;;;
+
+;this shouldn't:
+(flip)
+~~~~
     
 1. Show that the marginal distribution on return values for these three programs is the same by directly computing the probability using the rules of probability (hint: write down each possible history of random choices for each program). Check your answers by sampling from the programs.
 2. Explain why these different-looking programs can give the same results.

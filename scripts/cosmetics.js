@@ -7,7 +7,7 @@
 $("#references ~ p > span:first-child")
   .addClass("citekey")
   .map(function(index, el) {
-    var key = el.innerText,
+    var key = $(el).text(),
         $sourceNodes = $('span[data-cites="' + key + '"]'); // find spans in the text that reference this
 
     $sourceNodes.map(function(j,y) {
