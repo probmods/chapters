@@ -70,7 +70,7 @@ _hist = function(samps, title) {
     //TODO: make left margin vary depending on how long the names of the elements in the list are
     var margin = {top: 40, right: 20, bottom: 60, left: 60},
         width = 0.85 * $div.width() - margin.left - margin.right,
-        height = 100 + (20 * _(strvalues).uniq().length) - margin.top - margin.bottom;
+        height = 100 + (20 * counts.length) - margin.top - margin.bottom;
 
     var x = d3.scale.linear()
           .domain([0, maxFreq])
@@ -89,7 +89,7 @@ _hist = function(samps, title) {
     } else {
 	    var y = d3.scale.ordinal()
             .domain(strvalues)
-            .rangeRoundBands([0, height], 0.1);
+            .rangeRoundBands([height, 0], .1);
 	    var yAxis = d3.svg.axis()
 	        .scale(y)
 	        .orient("left");
@@ -373,4 +373,26 @@ _multiviz = function(vizs) {
             
         }
       }
-}
+};
+
+/*_scatter = function(samples, title) {
+
+  return function($div) {
+    var div = $densDiv[0];
+    
+    var margin = {top: 40, right: 20, bottom: 30, left: 40},
+        width = 0.8 * $div.width() - margin.left - margin.right,
+        height = 300 - margin.top - margin.bottom;
+        
+    var svg = d3.select(div).append("svg")
+          .attr("width", width + margin.left + margin.right)
+          .attr("height", height+ margin.top + margin.bottom)
+          .style('margin-left', '10%')
+          .style('margin-top', '20px')
+          .append("g")
+          .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    // var data = counts;
+    // return data;
+
+  };
+};*/
