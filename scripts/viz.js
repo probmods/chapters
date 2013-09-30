@@ -375,24 +375,97 @@ _multiviz = function(vizs) {
       }
 };
 
-/*_scatter = function(samples, title) {
+_scatter = function(samples, title) {
+  //samples is a list of pairs
+  data = listToArray(samples);
+  xVals = data.map(function(x) {return x[0];});
+  yVals = data.map(function(x) {return x[1];});
+  maxX = Math.max.apply(Math, xVals)
+  maxY = Math.max.apply(Math, yVals)
+  minX = Math.min.apply(Math, xVals)
+  minY = Math.min.apply(Math, yVals)
 
   return function($div) {
-    var div = $densDiv[0];
+    var div = $div[0];
     
     var margin = {top: 40, right: 20, bottom: 30, left: 40},
         width = 0.8 * $div.width() - margin.left - margin.right,
         height = 300 - margin.top - margin.bottom;
+
+    function pixel(x, isX) {
+      if (isX) {
+        return (x-minX)/(maxX - minX)*width
+      } else {
+        return height - ((x-minY)/(maxY - minY)*height)
+      }
+    }
         
     var svg = d3.select(div).append("svg")
           .attr("width", width + margin.left + margin.right)
           .attr("height", height+ margin.top + margin.bottom)
-          .style('margin-left', '10%')
-          .style('margin-top', '20px')
+          .style('margin-left', margin.left)
+          .style('margin-top', margin.top / 2)
           .append("g")
           .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-    // var data = counts;
-    // return data;
+
+    var x = d3.scale.linear()
+        .domain([minX, maxX])
+        .range([0, width]);
+    var xAxis = d3.svg.axis()
+        .scale(x)
+        .orient("bottom");
+
+    var y = d3.scale.linear()
+        .domain([minY, maxY])
+        .range([height, 0]);
+    var yAxis = d3.svg.axis()
+        .scale(y)
+        .orient("left");
+
+    if (0 < maxY && 0 > minY) {
+      var xAxisHeight = maxY / (maxY - minY) * height;
+    } else if (0 > maxY) {
+      var xAxisHeight = 0;
+    } else {
+      var xAxisHeight = height;
+    }
+
+    if (0 < maxX && 0 > minX) {
+      var yAxisWidth = maxX / (maxX - minX) * width;
+    } else if (0 > maxX) {
+      var yAxisWidth = width;
+    } else {
+      var yAxisWidth = 0;
+    }
+
+    svg.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + xAxisHeight + ")")
+        .call(xAxis);
+    
+    svg.append("g")
+        .attr("class", "y axis")
+        .attr("transform", "translate(" + yAxisWidth + ",0)")
+        .call(yAxis);
+    
+    svg.append("text")
+        .attr("x", (width / 2) + margin.left)             
+        .attr("y", 0 - (margin.top / 2))
+        .attr("text-anchor", "middle")  
+        .style("font-size", "24px") 
+        .attr("stroke", "none") 
+        .attr("fill", "black")
+        .text(title);
+
+    svg.selectAll("circle").data(data)
+      .enter()
+      .append("circle")
+      .attr("class", "point")
+      .attr("cx", function(d) {return pixel(d[0], true);})
+      .attr("cy", function(d) {return pixel(d[1], false);})
+      .attr("r", 3);
+
+    return data;
 
   };
-};*/
+};
