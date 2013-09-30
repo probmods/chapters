@@ -245,7 +245,7 @@ Returning to the earlier example of a series of tug-of-war matches, we can use q
 
 ~~~~
 (define samples
-  (mh-query 100 100
+  (mh-query 1000 10
             
     (define strength (mem (lambda (person) (gaussian 0 1))))
             
@@ -265,7 +265,9 @@ Returning to the earlier example of a series of tug-of-war matches, we can use q
     (and (eq? 'team1 (winner '(bob mary) '(tom sue)))
          (eq? 'team1 (winner '(bob sue) '(tom jim))))))
          
-(hist samples "Bob strength")
+(multiviz
+ "Expected strength: " (mean samples)
+ (density samples "Bob strength" true))
 ~~~~
 
 Try varying the number of different teams and teammates that Bob plays with. How does this change the estimate ob Bob's strength?
@@ -363,6 +365,7 @@ We can use forward simulation to understand where a ball might come to rest if i
 Assuming that the block comes to rest in the middle of the floor, where did it come from?
 
 ~~~~
+;;;fold: Set up the world, as above:
 ;set up some bins on a floor:
 (define (bins xmin xmax width)
   (if (< xmax (+ xmin width))
@@ -380,6 +383,7 @@ Assuming that the block comes to rest in the middle of the floor, where did it c
 ;make a random block at the top:
 (define (random-block) (list (list "circle" #f '(10)) 
                              (list (uniform 0 worldWidth) 0)))
+;;;              
                              
 ;helper to get X position of the movable block:
 (define (getX world) 
@@ -387,17 +391,23 @@ Assuming that the block comes to rest in the middle of the floor, where did it c
       (getX (rest world))
       (first (second (first world)))))
   
+;given an observed final position, where did the block come from?
+(define observed-x 160)  
+
 (define init-xs
   (mh-query 100 10
     (define init-state (pair (random-block) world))
     (define final-state (runPhysics 1000 init-state))
     (getX init-state)
-    (= 150 (gaussian (getX final-state) 10))))
+    (= (gaussian (getX final-state) 10) observed-x)))
+        
         
 (density init-xs "init state" true)
 ~~~~
 
 What if the ball comes to rest at the left side, under the large circle (x about 60)? The right side?
+
+<!-- TODO: the model here is too certain about the physics: it knows just how the ball will bounce off the pegs... should add collision noise? anyhow discuss this? -->
 
 
 # Example: Causal Inference in Medical Diagnosis
