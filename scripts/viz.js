@@ -340,7 +340,7 @@ function drawHist(svg, binnedCounts, binnedValues, width, height, x, y, vertical
       .attr("fill", "none")
       .attr("y", function(d) {return y(getFreq(d)*scale);})
       .attr("x", function(d) {return histX(d.value);})
-      .attr("height", function(d) { return height - y(getFreq(d));})
+      .attr("height", function(d) { return height - y(getFreq(d)*scale);})
       .attr("width", histX.rangeBand());
   } else {
     svg.selectAll(".bar")
