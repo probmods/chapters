@@ -3,6 +3,11 @@
 
 <!--   iid, exchangeable, (definetti,) n-gram, hmm, PCFG -->
 
+<!-- put in zenith radio / representativeness as an example -->
+
+<!-- Josh's HMM switching HW problem for this section? -->
+
+
 # I.I.D. and exchangeable sequences
 
 

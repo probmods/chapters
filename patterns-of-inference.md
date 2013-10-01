@@ -574,9 +574,9 @@ Try to explain the dynamics of inference that result at each stage.  What does e
 
 # Example: Of Blickets and Blocking
 
-A number of researchers have explored children's causal learning abilities by using the "blicket detector": a toy box that will light up when certain blocks, the blickets, are put on top of it. Children are shown a set of evidence and then asked which blocks are blickets. For instance, if block A makes the detector go off, it is probably a blicket. Ambiguous patterns are particularly interesting. Imagine that blocks A and B are put on the detector together, making the detector go off; it is likely that A is a blicket. Now B is put on the detector alone, making the detector go off; it is now less plausible that A is a blocket. This is called "backward blocking", and it is an example of explaining away.
+A number of researchers have explored children's causal learning abilities by using the "blicket detector" [@Gopnik2000]: a toy box that will light up when certain blocks, the blickets, are put on top of it. Children are shown a set of evidence and then asked which blocks are blickets. For instance, if block A makes the detector go off, it is probably a blicket. Ambiguous patterns are particularly interesting. Imagine that blocks A and B are put on the detector together, making the detector go off; it is likely that A is a blicket. Now B is put on the detector alone, making the detector go off; it is now less plausible that A is a blicket. This is called "backward blocking", and it is an example of explaining away.
 
-We can capture this set up with a model in which each block has a persistent "blicket-ness" property, and the causal power of the block to make the machine go off depends on whether it is a blicket. Finally, the machine goes off if any of the blocks on it is a blicket (noisily).
+We can capture this set up with a model in which each block has a persistent "blicket-ness" property, and the causal power of the block to make the machine go off depends on its blicketness. Finally, the machine goes off if any of the blocks on it is a blicket (but noisily).
 
 ~~~~
 (define samples
@@ -597,33 +597,31 @@ We can capture this set up with a model in which each block has a persistent "bl
 
 (hist samples "Is A a blicket?")
 ~~~~
-Try the backward blocking scenario described above. Sobel, Tenenbaum, and Gopnik (2004) tried this with children, finding that four year-olds perform similarly to the model: evidence that B is a blicket explains away the evidence that A and B made the detector go away.
+Try the backward blocking scenario described above. @Sobel2004 tried this with children, finding that four year-olds perform similarly to the model: evidence that B is a blicket explains away the evidence that A and B made the detector go away.
+
 
 # A Case Study in Modularity: Visual Perception of Surface Lightness and Color
 
 Visual perception is full of rich conditional inference phenomena, including both screening off and explaining away.
 Some very impressive demonstrations have been constructed using the perception of surface structure by mid-level vision researchers; see the work of Dan Kersten, David Knill, Ted Adelson, Bart Anderson, Ken Nakayama, among others.
-Most striking is when conditional inference appears to violate or alter the apparently "modular" structure of visual processing.  Neuroscientists have developed an understanding of the primate visual system in which processing for different aspects of visual stimuli -- color, shape, motion, stereo -- appears to be at least somewhat localized in different brain regions.  This view is consistent with findings by cognitive psychologists that at least in early vision, these different stimulus dimensions are not integrated but processed in a somewhat modular fashion.  Yet vision is at heart about constructing a unified and coherent percept of a three-dimensional scene from the patterns of light falling on our retinas.  That is, vision is causal inference on a grand scale.  Its output is a rich description of the objects, surface properties and relations in the world that are not themselves directly grasped by the brain but that are the true causes of the retinal stimulus.  Solving this problem requires integration of many appearance features across an image, and this results in the potential for massive effects of explaining away and screening off.
+Most striking is when conditional inference appears to violate or alter the apparently "modular" structure of visual processing.  Neuroscientists have developed an understanding of the primate visual system in which processing for different aspects of visual stimuli---color, shape, motion, stereo---appears to be at least somewhat localized in different brain regions.  This view is consistent with findings by cognitive psychologists that at least in early vision, these different stimulus dimensions are not integrated but processed in a sequential, modular fashion.  Yet vision is at heart about constructing a unified and coherent percept of a three-dimensional scene from the patterns of light falling on our retinas.  That is, vision is causal inference on a grand scale.  Its output is a rich description of the objects, surface properties and relations in the world that are not themselves directly grasped by the brain but that are the true causes of the input---low-level stimulation of the retinal.  Solving this problem requires integration of many appearance features across an image, and this results in the potential for massive effects of explaining away and screening off.
 
 In vision, the luminance of a surface depends on two factors, the illumination of the surface (how much light is hitting it) and its reflectance. The actual luminance is the product of the two factors. Thus luminance is inherently ambiguous. The visual system has to determine what proportion of the luminance is due to reflectance and what proportion is due to the illumination of the scene. This has led to a famous illusion known as the *checker shadow illusion* discovered by Ted Adelson.
 
-<img src='images/Checkershadow_illusion_small.png' width='400' />
+![Are the two squares the same shade of grey?](images/Checkershadow_illusion_small.png)
 
-The illusion results from the fact that in the image above both the square labeled A and the square labeled B are actually the same shade of gray. This can be seen in the figure below where they are connected by solid gray bars on either side.
+Despite appearances, in the image above both the square labeled A and the square labeled B are actually the same shade of gray. This can be seen in the figure below where they are connected by solid gray bars on either side.
 
-<img src='images/Checkershadow_proof_small.png' width='400' />
+![](images/Checkershadow_proof_small.png)
 
-What is happening here is that the presence of the cylinder is providing evidence that the illumination of square B is actually less than that of square A. Thus we perceive square B as having higher reflectance since its luminance is identical to square A and we believe there is less light hitting it. The following program implements a simple version of this scenario "before" we see the shadow cast by the cylinder.
+The presence of the cylinder is providing evidence that the illumination of square B is actually less than that of square A (because it is expected to cast a shadow). Thus we perceive square B as having higher reflectance since its luminance is identical to square A and we believe there is less light hitting it. The following program implements a simple version of this scenario "before" we see the shadow cast by the cylinder.
 
-~~~~ {.mit-church}
- (define noisy=
-   (lambda (target value variance)
-     (= 0 (gaussian (- target value) variance))))
+~~~~
+(define observed-luminance 3.0)
 
-
- (define samples
+(define samples
    (mh-query
-    100 100
+    1000 10
 
     (define reflectance (gaussian 1 1))
     (define illumination (gaussian 3 0.5))
@@ -631,30 +629,20 @@ What is happening here is that the presence of the cylinder is providing evidenc
 
     reflectance
 
-    (noisy= 3.0 luminance 0.1)
-   ))
+    (= luminance (gaussian observed-luminance 0.1))))
 
- (truehist samples 10 "Reflectance")
+(multiviz "Mean reflectance: " (mean samples)
+          (hist samples "Reflectance"))
 ~~~~
 
-Here we have introduced a third kind of primitive random procedure, `gaussian` which outputs real numbers, in addition to `flip` (which outputs binary truth values) and `beta` (which outputs numbers in the interval [0,1]).  `gaussian` implements the well-known Gaussian or normal distribution. It takes two parameters: a mean, $\mu$, and a variance, $\sigma^2$.
+Now let's condition on the presence of the cylinder, by conditioning on the presence of it's "shadow" (i.e. lower illumination than expected *a priori*):
 
-<img src='images/Normal_distribution_pdf.png' width='400' />
+~~~~
+(define observed-luminance 3.0)
 
-The probability density function for the normal distribution is:
-$$ P(x \mid \mu,\sigma) = \frac{1}{\sqrt{2\pi\sigma^2}}\; \exp{\Big[ \frac{-(x-\mu)^2}{2\sigma^2} \Big] } $$
-
-Now let's condition on the presence of the cylinder.
-
-~~~~ {.mit-church}
- (define noisy=
-   (lambda (target value variance)
-     (= 0 (gaussian (- target value) variance))))
-
-
- (define samples
+(define samples
    (mh-query
-    100 100
+    1000 10
 
     (define reflectance (gaussian 1 1))
     (define illumination (gaussian 3 0.5))
@@ -662,30 +650,29 @@ Now let's condition on the presence of the cylinder.
 
     reflectance
 
-    (and (noisy= 3.0 luminance 0.1) (noisy= 0.5 illumination 0.1))
-   ))
+    (condition (= luminance (gaussian observed-luminance 0.1)))
+    (condition (= illumination (gaussian 0.5  0.1)))))
 
- (truehist samples 10 "Reflectance")
+(multiviz "Mean reflectance: " (mean samples)
+          (hist samples "Reflectance"))
 ~~~~
+<!-- FIXME: need webchurch to recognize `and` and commute with condition... otherwise have to write these two conditions explicitly. -->
 
-Conditional inference takes into account all the different paths through the generative process that could have generated the data. Two variables on different causal paths can thus become dependent once we condition on the way the data came out. The important point is that the variables `reflectance` and `illumination` are conditionally independent in the generative model, but after we condition on `luminance` they become dependent: changing one of them affects the probability of the other. This phenomenon has important consequences for cognitive science modeling.  Although our model of our knowledge of the world and language have a certain kind of modularity implied by conditional independence, as soon as we start using the model to do conditional inference on some data (e.g. parsing, or learning the language), formerly modularly isolated variables can become dependent.
+The variables `reflectance` and `illumination` are conditionally independent in the generative model, but after we condition on `luminance` they become dependent: changing one of them affects the probability of the other. This phenomenon has important consequences for cognitive science.  Although the model of (our knowledge of) the world has a certain kind of modularity implied by conditional independence, as soon as we start using the model to do conditional inference on some data, formerly modularly isolated variables can become dependent.
 
-### Other vision examples (to be developed)
-Kersten's "colored Mach card" illusion is a beautiful example of both explaining away and screening off in visual surface perception, as well as a switch between these two patterns of inference conditioned on an auxiliary variable.
-
-http://vision.psych.umn.edu/users/kersten/kersten-lab/Mutual_illumination/BlojKerstenHurlbertDemo99.pdf
-
+## Other vision examples (to be developed)
+Kersten's [colored Mach card](http://vision.psych.umn.edu/users/kersten/kersten-lab/Mutual_illumination/BlojKerstenHurlbertDemo99.pdf) illusion is a beautiful example of both explaining away and screening off in visual surface perception, as well as a switch between these two patterns of inference conditioned on an auxiliary variable.
 Depending on how we perceive the geometry of a surface folded down the middle -- whether it is concave so that the two halves face each other or convex so that they face away -- the perceived colors of the faces will change as the visual system either discounts (explains away) or ignores (screens off) the effects of inter-reflections between the surfaces.
 
-The two cylinders illusion of Kersten is another nice example of explaining away.  The gray shading patterns are identical in the left and right images, but on the left the shading is perceived as reflectance difference, while on the right (the "two cylinders") the same shading is perceived as due to shape variation on surfaces with uniform reflectance.
+The [two cylinders illusion](http://vision.psych.umn.edu/users/kersten/kersten-lab/images/twocylinders.gif) of Kersten is another nice example of explaining away.  The gray shading patterns are identical in the left and right images, but on the left the shading is perceived as reflectance difference, while on the right (the "two cylinders") the same shading is perceived as due to shape variation on surfaces with uniform reflectance.
 
-<!-- http://vision.psych.umn.edu/users/kersten/kersten-lab/images/twocylinders.gif -->
+<!-- 
 
 <img src='images/Kersten_et_al_explaining_away.png' width='400' />
 
 (This image is from Kersten, Mamassian and Yuille, Annual Review of Psychology 2004)
 
-<!-- model this using simple 1-dim procedural graphics:
+model this using simple 1-dim procedural graphics:
    1-dim reflectance (assuming all changes are sharp discrete
    1-dim shape assuming all changes are gradual
    1-dim lighting assuming a gradient with some slope (1 param) falling off across the image, pos
@@ -707,7 +694,9 @@ compute simple discrete derivatives of shape for angle of surface normal
 
 condition on effect of observing contour
 
-  -->
+-->
+
+
 
 # Exercises
 
