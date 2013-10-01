@@ -132,7 +132,7 @@ _.templateSettings = {
     // if, afterward, any children don't have
     // any unloadedParents
 
-    var isLocal = location.protocol.match(/file/) || true,
+    var isLocal = location.protocol.match(/file/) || false,
         loadStrategy = isLocal ? "head" : "ajax";
     
     props.load = _.bind(

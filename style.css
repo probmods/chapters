@@ -357,7 +357,8 @@ button.run {
     shape-rendering: crispEdges;
 }
 
-.bar { 
+.bar,
+.point { 
     fill: steelblue;
     shape-rendering: crispEdges;
 }
