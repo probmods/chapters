@@ -495,8 +495,8 @@ A familiar example comes from reasoning about the causes of students' success an
    (define does-homework (flip .8))
 
    (define pass? (flip (if exam-fair
-                           (if does-homework 0.9 0.6)
-                           (if does-homework 0.4 0.2))))
+                           (if does-homework 0.9 0.4)
+                           (if does-homework 0.6 0.2))))
 
    (list does-homework exam-fair)
 
@@ -520,8 +520,8 @@ Now what if you have evidence from several students and several exams? We first 
    (define does-homework? (mem (lambda (student) (flip does-homework-prior))))
 
    (define (pass? student exam) (flip (if (exam-fair? exam)
-                                          (if (does-homework? student) 0.9 0.6)
-                                          (if (does-homework? student) 0.4 0.2))))
+                                          (if (does-homework? student) 0.9 0.4)
+                                          (if (does-homework? student) 0.6 0.2))))
 
    (list (does-homework? 'bill) (exam-fair? 'exam1))
 
@@ -535,7 +535,9 @@ Now what if you have evidence from several students and several exams? We first 
 
 Initially we observe that Bill failed exam 1.  A priori, we assume that most students do their homework and most exams are fair, but given this one observation it becomes somewhat likely that either the student didn't study or the exam was unfair.
 
-See how conditional inferences about Bill and exam 1 change as you add in more data about this student or this exam, or additional students and exams. Try using each of these expressions as the condition for the above inference:
+Notice that we have set the probabilities in the `pass?` function to be asymmetric: whether a student does homework has a greater influence on passing the test than whether the exam is fair. This in turns means that when inferring the *cause* of a failed exam, the model tends to attribute it to the person property (not doing homework) over the situation property (exam being unfair). This is asymmetry is an example of the *fundamental attribution bias* [@Ross1977]: we tend to attribute outcomes to personal traits rather than situations. However there are many interacting tendencies (for instance the direction of this bias switches for members of some east-asian cultures). How could you extend the model to account for these interactions?
+
+See how conditional inferences about Bill and exam 1 change as you add in more data about this student or this exam, or additional students and exams. Try using each of the below expressions as the condition for the above inference. Try to explain the different inferences that result at each stage.  What does each new piece of the larger data set contribute to your intuition about Bill  and exam 1?
 
 ~~~~
 (and (not (pass? 'bill 'exam1)) (not (pass? 'bill 'exam2)))
@@ -569,7 +571,11 @@ See how conditional inferences about Bill and exam 1 change as you add in more d
        (not (pass? 'tim 'exam1)) (not (pass? 'tim 'exam2)) (not (pass? 'tim 'exam3)) (not (pass? 'tim 'exam4)) (not (pass? 'tim 'exam5)))
 ~~~~
 
-Try to explain the dynamics of inference that result at each stage.  What does each new piece of the larger data set contribute to your intuition about Bill  and exam 1?
+This example is inspired by the work of Harold Kelley (and many others) on causal attribution in social settings [@Kelley1973]. Kelley identified three important dimensions of variation in the evidence, which affect the attributions people make of the cause of an outcome. These three dimensions are: Persons---is the outcome consistent across different people in the situation?; Entities---is the outcome consistent for different entities in the situation?; Time---is the outcome consistent over different episodes? These dimensions map onto the different sets of evidence we have just seen---how?
+
+<!--- wikipedia:
+1) Consistency: "Is the behavior consistent across most people in the given situation?" 2) Distinctiveness: "Does the behavior vary across different situations?" and 3) Consensus: "Do most people engage in this behavior in this situation?"
+--->
 
 
 # Example: Of Blickets and Blocking
