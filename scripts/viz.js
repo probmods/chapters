@@ -111,28 +111,8 @@ _hist = function(samps, title) {
                   .orient("bottom")
                   .tickFormat(formatPercent);
 
-    svg.append("g")
-      .attr("class", "x axis")
-      .attr("transform", "translate(0," + height + ")")
-      .call(xAxis)
-      .append("text")
-      .text("Frequency")
-      .attr("dy", "3em")
-      .attr("x", (width/2))
-      .attr("text-anchor", "middle");
-
-    svg.append("g")
-      .attr("class", "y axis")
-      .call(yAxis);
-    
-    svg.append("text")
-        .attr("x", (width / 2))             
-        .attr("y", 0 - (margin.top / 2))
-        .attr("text-anchor", "middle")  
-        .style("font-size", "24px") 
-        .attr("stroke", "none") 
-        .attr("fill", "black")
-        .text(title);
+    drawAxes(svg, xAxis, yAxis, height, 0, width, "hist");
+    drawTitle(svg, title, width, margin)
         
     return counts;
 
@@ -241,24 +221,8 @@ _density = function(samps, title, withHist) {
         .attr("class", "line")
         .attr("d", line);
 
-    svg.append("g")
-        .attr("class", "x axis")
-        .attr("transform", "translate(0," + height + ")")
-        .call(xAxis);
-    
-    svg.append("g")
-        .attr("class", "y axis")
-        .call(yAxis);
-    
-    svg.append("text")
-        .attr("x", (width / 2))             
-        .attr("y", 0 - (margin.top / 2))
-        .attr("text-anchor", "middle")  
-        .style("font-size", "24px") 
-        .attr("stroke", "none") 
-        .attr("fill", "black")
-        .text(title);
- 
+    drawAxes(svg, xAxis, yAxis, height, 0, width, "density");
+    drawTitle(svg, title, width, margin)
     var data = counts;
     return data;
 
@@ -266,9 +230,123 @@ _density = function(samps, title, withHist) {
 
 };
 
+_multiviz = function(vizs) {
+    var vizs = Array.prototype.slice.call(arguments);
+    
+    //TODO: need to rescale the target div to accomodate more items?
+    return function($div) {
+        for (var i = 0; i < vizs.length; i++) {
+            var inserteddivset = $("<div></div>").appendTo($div)
+            if (typeof vizs[i] == "function") {
+                vizs[i]($(inserteddivset[0]))
+            }
+            else {
+                runResult = format_result(vizs[i]);
+                $(inserteddivset[0]).text(runResult);
+            }
+            
+            
+        }
+      }
+};
+
+_scatter = function(samples, title) {
+  return plot(samples, title, false)
+};
+
+_lineplot = function(samples, title) {
+  return plot(samples, title, true);
+};
+
+function plot(samples, title, lines) {
+  //samples is a list of pairs
+  data = listToArray(samples);
+  xVals = data.map(function(x) {return x[0];});
+  yVals = data.map(function(x) {return x[1];});
+  maxX = Math.max.apply(Math, xVals)
+  maxY = Math.max.apply(Math, yVals)
+  minX = Math.min.apply(Math, xVals)
+  minY = Math.min.apply(Math, yVals)
+
+  return function($div) {
+    var div = $div[0];
+    
+    var margin = {top: 40, right: 20, bottom: 30, left: 40},
+        width = 0.8 * $div.width() - margin.left - margin.right,
+        height = 300 - margin.top - margin.bottom;
+        
+    var svg = d3.select(div).append("svg")
+          .attr("width", width + margin.left + margin.right)
+          .attr("height", height+ margin.top + margin.bottom)
+          .style('margin-left', margin.left)
+          .style('margin-top', margin.top / 2)
+          .append("g")
+          .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    var x = d3.scale.linear()
+        .domain([minX, maxX])
+        .range([0, width]);
+    var xAxis = d3.svg.axis()
+        .scale(x)
+        .orient("bottom");
+
+    var y = d3.scale.linear()
+        .domain([minY, maxY])
+        .range([height, 0]);
+    var yAxis = d3.svg.axis()
+        .scale(y)
+        .orient("left");
+
+    if (0 < maxY && 0 > minY) {
+      var xAxisPos = maxY / (maxY - minY) * height;
+    } else if (0 > maxY) {
+      var xAxisPos = 0;
+    } else {
+      var xAxisPos = height;
+    }
+
+    if (0 < maxX && 0 > minX) {
+      var yAxisPos = width - (maxX / (maxX - minX) * width);
+    } else if (0 > maxX) {
+      var yAxisPos = width;
+    } else {
+      var yAxisPos = 0;
+    }
+
+    drawAxes(svg, xAxis, yAxis, xAxisPos, yAxisPos, width, "plot");
+
+    if (lines) {
+      var sortedData = data.sort(function(a,b) {return a[0] - b[0];})
+      var previous = sortedData[0];
+      for (var i=1; i<sortedData.length; i++) {
+        var d = sortedData[i];
+        svg.append("line")
+           .attr("class", "lineplot")
+           .attr("x1", x(previous[0]))
+           .attr("x2", x(d[0]))
+           .attr("y1", y(previous[1]))
+           .attr("y2", y(d[1]));
+        previous = d;
+      }
+    }
+
+    svg.selectAll("circle").data(data)
+      .enter()
+      .append("circle")
+      .attr("class", "point")
+      .attr("cx", function(d) {return x(d[0]);})
+      .attr("cy", function(d) {return y(d[1]);})
+      .attr("r", 3);
+
+    drawTitle(svg, title, width, margin);
+    return data;
+
+  };
+}
+
 function binData(counts, values, maxBins) {
   function approxEqual(a, b) {
-  	var eps=0.000001;
+    var eps=0.000001;
     return Math.abs(a-b) < eps;
   }
   var binnedValues;
@@ -355,117 +433,34 @@ function drawHist(svg, binnedCounts, binnedValues, width, height, x, y, vertical
   }
 }
 
-_multiviz = function(vizs) {
-    var vizs = Array.prototype.slice.call(arguments);
-    
-    //TODO: need to rescale the target div to accomodate more items?
-    return function($div) {
-        for (var i = 0; i < vizs.length; i++) {
-            var inserteddivset = $("<div></div>").appendTo($div)
-            if (typeof vizs[i] == "function") {
-                vizs[i]($(inserteddivset[0]))
-            }
-            else {
-                runResult = format_result(vizs[i]);
-                $(inserteddivset[0]).text(runResult);
-            }
-            
-            
-        }
-      }
-};
+function drawTitle(svg, title, width, margin) {
+  svg.append("text")
+      .attr("x", width / 2)             
+      .attr("y", 0 - (margin.top / 2))
+      .attr("text-anchor", "middle")  
+      .style("font-size", "24px") 
+      .attr("stroke", "none") 
+      .attr("fill", "black")
+      .text(title);
+}
 
-_scatter = function(samples, title) {
-  //samples is a list of pairs
-  data = listToArray(samples);
-  xVals = data.map(function(x) {return x[0];});
-  yVals = data.map(function(x) {return x[1];});
-  maxX = Math.max.apply(Math, xVals)
-  maxY = Math.max.apply(Math, yVals)
-  minX = Math.min.apply(Math, xVals)
-  minY = Math.min.apply(Math, yVals)
+function drawAxes(svg, xAxis, yAxis, xAxisPos, yAxisPos, width, type) {
+  var xAxisGroup = svg.append("g")
+    .attr("class", "x axis")
+    .attr("transform", "translate(0," + xAxisPos + ")")
+    .call(xAxis);
 
-  return function($div) {
-    var div = $div[0];
-    
-    var margin = {top: 40, right: 20, bottom: 30, left: 40},
-        width = 0.8 * $div.width() - margin.left - margin.right,
-        height = 300 - margin.top - margin.bottom;
+  if (type == "hist") {
+    xAxisGroup.attr("class", "x axis")
+      .append("text")
+      .text("Frequency")
+      .attr("dy", "3em")
+      .attr("x", (width/2))
+      .attr("text-anchor", "middle");
+  }
 
-    function pixel(x, isX) {
-      if (isX) {
-        return (x-minX)/(maxX - minX)*width
-      } else {
-        return height - ((x-minY)/(maxY - minY)*height)
-      }
-    }
-        
-    var svg = d3.select(div).append("svg")
-          .attr("width", width + margin.left + margin.right)
-          .attr("height", height+ margin.top + margin.bottom)
-          .style('margin-left', margin.left)
-          .style('margin-top', margin.top / 2)
-          .append("g")
-          .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-    var x = d3.scale.linear()
-        .domain([minX, maxX])
-        .range([0, width]);
-    var xAxis = d3.svg.axis()
-        .scale(x)
-        .orient("bottom");
-
-    var y = d3.scale.linear()
-        .domain([minY, maxY])
-        .range([height, 0]);
-    var yAxis = d3.svg.axis()
-        .scale(y)
-        .orient("left");
-
-    if (0 < maxY && 0 > minY) {
-      var xAxisHeight = maxY / (maxY - minY) * height;
-    } else if (0 > maxY) {
-      var xAxisHeight = 0;
-    } else {
-      var xAxisHeight = height;
-    }
-
-    if (0 < maxX && 0 > minX) {
-      var yAxisWidth = maxX / (maxX - minX) * width;
-    } else if (0 > maxX) {
-      var yAxisWidth = width;
-    } else {
-      var yAxisWidth = 0;
-    }
-
-    svg.append("g")
-        .attr("class", "x axis")
-        .attr("transform", "translate(0," + xAxisHeight + ")")
-        .call(xAxis);
-    
-    svg.append("g")
-        .attr("class", "y axis")
-        .attr("transform", "translate(" + yAxisWidth + ",0)")
-        .call(yAxis);
-    
-    svg.append("text")
-        .attr("x", (width / 2) + margin.left)             
-        .attr("y", 0 - (margin.top / 2))
-        .attr("text-anchor", "middle")  
-        .style("font-size", "24px") 
-        .attr("stroke", "none") 
-        .attr("fill", "black")
-        .text(title);
-
-    svg.selectAll("circle").data(data)
-      .enter()
-      .append("circle")
-      .attr("class", "point")
-      .attr("cx", function(d) {return pixel(d[0], true);})
-      .attr("cy", function(d) {return pixel(d[1], false);})
-      .attr("r", 3);
-
-    return data;
-
-  };
-};
+  svg.append("g")
+      .attr("class", "y axis")
+      .attr("transform", "translate(" + yAxisPos + ",0)")
+      .call(yAxis);
+}
