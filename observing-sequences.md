@@ -8,14 +8,102 @@
 <!-- Josh's HMM switching HW problem for this section? -->
 
 
-# I.I.D. and exchangeable sequences
+In the last chapter we learned about common [patterns of inference](patterns-of-inference.html) that can result from a few observations, given the right model structure. 
+There are also many common patterns of *data* that arise from certain model structures. 
+It is common, for instance, to have a sequence of observations that we believe was each generated from the same causal process: a sequence of coin flips, a series of temperature readings from a weather station, the words in a sentence. 
+In this chapter we explore models for sequences of observations, moving from simple models to those with increasingly complex statistical dependence between the observations.
 
+
+# Independent and Exchangeable Sequences
+
+If the observations have *nothing* to do with each other, except that they have the same distribution, they are called *identically, independently distributed* (usually abbreviated to i.i.d.). For instance the values that come from calling `flip` are i.i.d. To verify this, let's first check whether the distribution of two flips in the sequence look the same (are "identical"):
+
+~~~~
+(define (sequence) (repeat 10 flip))
+
+(define sequences (repeat 1000 sequence))
+
+(multiviz 
+ (hist (map first sequences) "first flip")
+ (hist (map second sequences) "second flip"))
+~~~~
+
+Now let's check that the first and second flips are independent, by conditioning on the first and seeing that the distribution of the second is (approximately) unchanged:
+
+~~~~
+(define (sequences first-val)
+  (mh-query
+   1000 10
+   (define s (repeat 10 flip))
+   (second s)
+   (equal? (first s) first-val)))
+
+(multiviz 
+ (hist (sequences true)  "second if first is true")
+ (hist (sequences false) "second if first is false"))
+~~~~
+
+It is easy to build other i.i.d. sequences in Church, we simply construct a stochastic thunk (which, recall, represents a distribution) and evaluate it several times. For instance, here is an extremely simple model for the words in a sentence:
+
+~~~~
+(define (thunk) (multinomial '(chef omelet soup eat work bake stop)
+                             '(0.0032 0.4863 0.0789 0.0675 0.1974 0.1387 0.0277)))
+
+(repeat 10 thunk)
+~~~~
+
+In this example the different words are indeed independent: you can show as above (by conditioning) that the first word tells you nothing about the second word.
+However, constructing sequences in this way it is easy to accidentally create a sequence that is not entirely independent. For instance:
+
+~~~~
+(define word-probs (if (flip)
+'(0.0032 0.4863 0.0789 0.0675 0.1974 0.1387 0.0277)
+'(0.0699 0.1296 0.0278 0.4131 0.1239 0.2159 0.0194)))
+
+(define (thunk) (multinomial '(chef omelet soup eat work bake stop)
+                             word-probs))
+
+(repeat 10 thunk)
+~~~~
+
+While the sequence looks very similar, the words are not independent: learning about the first word tells us something about the `word-probs`, which in turn tells us about the second word. Let's show this in a slightly simpler example:
+
+~~~~
+(define (sequences first-val)
+  (mh-query
+   1000 10
+   (define prob (if (flip) 0.2 0.7))
+   (define (myflip) (flip prob))
+   (define s (repeat 10 myflip))
+   (second s)
+   (equal? (first s) first-val)))
+
+(multiviz 
+ (hist (sequences true)  "second if first is true")
+ (hist (sequences false) "second if first is false"))
+~~~~
+
+Conditioning on the first value tells us something about the second. This model is thus not i.i.d., but it does have a slightly weaker property: it is [exchangeable](http://en.wikipedia.org/wiki/Exchangeable_random_variables), meaning that the probability of a sequence is the same in any order.
+
+It turns out that exchangeable sequences can always be modeled in the form used for the last example: 
+[de Finetti's theorem](http://en.wikipedia.org/wiki/De_Finetti\'s_theorem) says that, under certain technical conditions, any exchangeable sequence can be represented as follows, for some `latent-prior` and `observe` functions:
+
+~~~~
+(define latent (latent-prior))
+
+(define (thunk) (observe latent))
+
+(repeat 10 thunk)
+~~~~
+
+
+## Example: Subjective Randomness
 
 [TODO]
 
-The goal in these models is to capture the statistical structure in sequences of words. In the next few sections we will explore a series of increasingly complex models for such data.
 
-# N-gram and Hierarchical N-gram Models
+
+# Markov Models
 
 Many systems in computational linguistics make use of ''n-gram models''. An n-gram model is a drastically simplified model of sentence structure where the distribution over words in a particular position depends on the last $(N-1)$ words. N-gram models are a simple example of an unbounded model where the structure of the computation itself depends on probabilistic choices. Here is the Church code for a simple bigram model, also called a ''Markov model'', where the next word depends on the last.
 
@@ -43,7 +131,7 @@ Many systems in computational linguistics make use of ''n-gram models''. An n-gr
 ~~~~
 
 Here we have used a `case` statement, which is another Church branching construct (a short form for nested `if`s, see [[the case statement]]).
-`sample-words` is a recursion which builds up a list of words by sampling the next word conditional on the last. Each word is sampled from a multinomial distribution whose parameters are fixed. We start the recursion by sampling conditional on the special symbol `start`.  When we sample the symbol `stop` we end the recursion. Like the geometric distribution defined above, this stochastic recursion can produce unbounded structures&mdash;in this case lists of words of arbitrary length. 
+`sample-words` is a recursion which builds up a list of words by sampling the next word conditional on the last. Each word is sampled from a multinomial distribution whose parameters are fixed. We start the recursion by sampling conditional on the special symbol `start`.  When we sample the symbol `stop` we end the recursion. Like the geometric distribution defined above, this stochastic recursion can produce unbounded structures---in this case lists of words of arbitrary length. 
 
 The above code may seem unnecessarily complex because it explicitly lists every transition probability. Suppose that we put a prior distribution on the multinomial transitions in the n-gram model. Using `mem` this is very straightforward:
 
@@ -65,6 +153,7 @@ The above code may seem unnecessarily complex because it explicitly lists every 
 ~~~~
 
 We now have a ''hierarchical'' n-gram model, which is both simpler to write and more powerful in the sense that it can learn the transition probabilities (rather than requiring them to be given).
+
 
 # Hidden Markov Models
 
@@ -102,7 +191,7 @@ Another popular model in computational linguistics is the hidden Markov model (H
 
 The models above generate sequences of words, but lack constituent structure (or "hierarchical structure" in the linguistic sense). 
 
-Probabilistic context-free grammars (PCFGs) are a straightforward (and canonical) way to generate sequences of words with constituent structure. There are many ways to write a PCFG in Church. One especially direct way (inspired by Prolog programming) is to let each non-terminal be represented by a Church procedure; here constituency is embodied by one procedure calling another&mdash;that is by causal dependence.
+Probabilistic context-free grammars (PCFGs) are a straightforward (and canonical) way to generate sequences of words with constituent structure. There are many ways to write a PCFG in Church. One especially direct way (inspired by Prolog programming) is to let each non-terminal be represented by a Church procedure; here constituency is embodied by one procedure calling another---that is by causal dependence.
 
 ~~~~
 (define (terminal t) (lambda () t))
@@ -155,7 +244,7 @@ Probabilistic context-free grammars (PCFGs) are a straightforward (and canonical
 (S)
 ~~~~
 
-We have used the procedure `sample`, which applies a thunk (to no arguments), resulting in a sample. `sample` is in fact trivial&mdash;it can be defined by:
+We have used the procedure `sample`, which applies a thunk (to no arguments), resulting in a sample. `sample` is in fact trivial---it can be defined by:
 `(define (sample distribution) (apply distribution '()))`.
 
 Now, let's look at one of the procedures defining our PCFG in detail.
@@ -169,7 +258,7 @@ Now, let's look at one of the procedures defining our PCFG in detail.
 
 When `VP` is called it `map`s `sample` across a list which is sampled from a multinomial distribution: in this case either `(V AP)` or `(V NP)`. These two lists correspond to the ''right-hand sides'' (RHSs) of the rules $VP \longrightarrow V AP$ and $VP \longrightarrow V NP$ in the standard representation of PCFGs. These are lists that consist of symbols which are actually the names of other procedures. Therefore when `sample` is applied to them, they themselves recursively sample their RHSs until no more recursion can take place.  Note that we have wrapped our terminal symbols up as thunks so that when they are sampled they deterministically return the terminal symbol.
 
-While it is most common to use PCFGs as models of strings (for linguistic applications), they can be useful as components of any probabilistic model where constituent structure is required. For instance, if you examine the Rational Rules model above, you will note that the hypothesis space of rules is generated from a PCFG&mdash;here the constituent structure is used to ensure that the parts of rules combine together into meaningful rules, that is, to provide a compositional semantics.
+While it is most common to use PCFGs as models of strings (for linguistic applications), they can be useful as components of any probabilistic model where constituent structure is required. For instance, if you examine the Rational Rules model above, you will note that the hypothesis space of rules is generated from a PCFG---here the constituent structure is used to ensure that the parts of rules combine together into meaningful rules, that is, to provide a compositional semantics.
 
 # Unfold
 
