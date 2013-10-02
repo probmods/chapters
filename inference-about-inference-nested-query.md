@@ -279,7 +279,7 @@ In the above models of goal and preference inference, we have assumed that the s
  ))
 
 (define samples (repeat 500 sample))
-(truehist samples 10 "Probability that b gives cookie")
+(hist samples 10 "Probability that b gives cookie")
 ~~~~
 
 Here we have conditioned on Sally wanting the cookie and Sally choosing to press button b. Thus, we have no *direct* evidence of the effects of pressing the buttons on the machine. What happens if you condition instead on the action and outcome, but not the intentional choice of this outcome (that is, change the condition to `(equal? (vending-machine 'state 'b) 'cookie)`)?
@@ -313,8 +313,8 @@ Now imagine a vending machine that has only one button, but it can be pressed ma
  ))
 
 (define samples (repeat 500 sample))
-(truehist (map first samples) 10 "Probability that (a a) gives cookie")
-(truehist (map second samples) 10 "Probability that (a) gives cookie")
+(hist (map first samples) 10 "Probability that (a a) gives cookie")
+(hist (map second samples) 10 "Probability that (a) gives cookie")
 ~~~~
 
 Compare the inferences that result if Sally presses the button twice to those if she only presses the button once. Why can we draw much stronger inferences about the machine when Sally chooses to press the button twice? When Sally does press the button twice, she could have done the "easier" (or rather, a priori more likely) action of pressing the button just once. Since she doesn't, a single press must have been unlikely to result in a cookie. This is an example of the *principle of efficiency*&mdash;all other things being equal, an agent will take the actions that require least effort (and hence, when an agent expends more effort all other things must not be equal). Indeed, this example shows that the principle of efficiency emerges from inference about inference via the Bayesian Occam's razor.
@@ -354,8 +354,8 @@ In social cognition, we often make joint inferences about two kinds of mental st
  ))
 
 (define samples (repeat 500 sample))
-(truehist (map first samples) 10 "Probability that (a a) gives cookie")
-(truehist (map second samples) 10 "Probability that (a) gives cookie")
+(hist (map first samples) 10 "Probability that (a a) gives cookie")
+(hist (map second samples) 10 "Probability that (a) gives cookie")
 (hist (map third samples) "Goal probabilities")
 ~~~~
 

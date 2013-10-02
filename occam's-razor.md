@@ -362,8 +362,8 @@ This example shows how our inferences about coin flipping can be explained in te
 )
 
 (hist (map first samples) "Fair coin?")
-(truehist (append '(0) '(1) prior-samples) 10 "Coin weight, prior to observing data")
-(truehist (append '(0) '(1) (map second samples)) 10 "Coin weight, conditioned on observed data")
+(hist (append '(0) '(1) prior-samples) 10 "Coin weight, prior to observing data")
+(hist (append '(0) '(1) (map second samples)) 10 "Coin weight, conditioned on observed data")
 ~~~~
 
 Try these cases and see if the inferences accord with your intuitions:

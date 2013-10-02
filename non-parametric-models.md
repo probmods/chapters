@@ -112,7 +112,7 @@ The above construction of the Dirichlet process defines a distribution over the 
 
 
 (define memoized-gaussian (DPthunk 1.0 (lambda () (gaussian 0.0 1.0))))
-(truehist (repeat 1000 (lambda () (gaussian 0.0 1.0))) 100 "Base Distribution")
+(hist (repeat 1000 (lambda () (gaussian 0.0 1.0))) 100 "Base Distribution")
 (hist (repeat 1000 memoized-gaussian) "Dirichlet Process")
 ~~~~
 
@@ -142,7 +142,7 @@ We can do a similar transformation to *any* church procedure: we associate to ev
 
 (define memoized-gaussian (DPmem 1.0 gaussian))
 
-(truehist (repeat 1000 (lambda () (gaussian 0.0 1.0))) 100 "Base Distribution")
+(hist (repeat 1000 (lambda () (gaussian 0.0 1.0))) 100 "Base Distribution")
 (hist (repeat 1000 (lambda () (memoized-gaussian 0.0 1.0))) "Dirichlet Process")
 ~~~~
 
@@ -171,7 +171,7 @@ The DP is said to *concentrate* the base measure.  Draws from a normal distribut
 ~~~~ {.mit-church}
 (define memoized-gaussian (DPmem 1.0 gaussian))
 
-(truehist (repeat 1000 (lambda () (gaussian 0.0 1.0))) 100 "Base Distribution")
+(hist (repeat 1000 (lambda () (gaussian 0.0 1.0))) 100 "Base Distribution")
 (hist (repeat 1000 (lambda () (memoized-gaussian 0.0 1.0))) "Dirichlet Process")
 ~~~~
 

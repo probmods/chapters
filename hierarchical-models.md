@@ -296,7 +296,7 @@ There are several things to vary in this setup: how many samples are observed ov
 (hist (repeat 1000 (lambda () (multinomial colors bag-2-prototype))) "bag two prototype")
 (hist (repeat 1000 (lambda () (multinomial colors bag-3-prototype))) "bag three prototype")
 (hist (repeat 1000 (lambda () (multinomial colors overall-prototype))) "overall prototype")
-(truehist (fold append '() (map fourth samples)) "log alpha")
+(hist (fold append '() (map fourth samples)) "log alpha")
 ~~~~
 You should see that the overall prototype learned is reasonably close to the true distribution in the world (black, blue, green in proportions 5:4:3), as reflected in the distribution of colors across all the bags.  This is also what the prototype for each bag should be, yet what the learner can infer about each individual bag's prototype may be far from this, because it is based mostly on the two draws she happens to see from that particular bag.
 
@@ -379,7 +379,7 @@ We can study a simple version of this phenomenon by modifying our bags of marble
 (hist (map third samples) "bag three posterior predictive")
 (hist (map fourth samples) "bag four posterior predictive")
 (hist (map fifth samples) "bag n posterior predictive")
-(truehist (map sixth samples) 10 "consistency across bags (log alpha)")
+(hist (map sixth samples) 10 "consistency across bags (log alpha)")
 'done
 ~~~~
 
