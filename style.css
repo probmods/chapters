@@ -363,3 +363,9 @@ button.run {
     shape-rendering: crispEdges;
 }
 
+.lineplot { 
+    stroke: steelblue;
+    stroke-width: 2px;
+    shape-rendering: crispEdges;
+}
+
