@@ -87,11 +87,11 @@ We can explore a basic case of learning with continuous hypothesis spaces by sli
    )
 )
 
-(truehist (append '(0) '(1) prior-samples) 10 "Coin weight, prior to observing data")
-(truehist (append '(0) '(1) samples) 10 "Coin weight, conditioned on observed data")
+(hist (append '(0) '(1) prior-samples) 10 "Coin weight, prior to observing data")
+(hist (append '(0) '(1) samples) 10 "Coin weight, conditioned on observed data")
 ~~~~
 
-Because the output of inference is a set of conditional samples, and each sample is drawn from the uncountable interval $[0,1]$, we cannot expect that any of these samples will correspond exactly to the true coin weight or the single most likely value.  By binning the samples as `truehist` does, however, we can get a meaningful estimate of how likely the coin weight is to fall in any subinterval of $[0,1]$.  We call the distribution of samples produced by conditional inference on data the *conditional distribution*, or sometimes the *posterior distribution*, to contrast with the prior distribution expressing our a priori beliefs.   The code above illustrates both prior and conditional distributions, each with a histogram of 1000 samples.  (We append a single 0 and 1 to each set of samples in order to force the histograms to cover the whole range $[0,1]$.)
+Because the output of inference is a set of conditional samples, and each sample is drawn from the uncountable interval $[0,1]$, we cannot expect that any of these samples will correspond exactly to the true coin weight or the single most likely value.  By binning the samples, however, we can get a meaningful estimate of how likely the coin weight is to fall in any subinterval of $[0,1]$.  We call the distribution of samples produced by conditional inference on data the *conditional distribution*, or sometimes the *posterior distribution*, to contrast with the prior distribution expressing our a priori beliefs.   The code above illustrates both prior and conditional distributions, each with a histogram of 1000 samples.  (We append a single 0 and 1 to each set of samples in order to force the histograms to cover the whole range $[0,1]$.)
 
 Experiment with different data sets, varying both the number of flips and the relative proportion of heads and tails.  How does the shape of the conditional distribution change?  The location of its peak reflects a reasonable "best guess" about the underlying coin weight.  It will be roughly equal to the proportion of heads observed, reflecting the fact that our prior knowledge is basically uninformative; a priori, any value of `coin-weight` is equally likely.  The spread of the conditional distribution reflects a notion of confidence in our beliefs about the coin weight.  The distribution becomes more sharply peaked as we observe more data, because each flip, as an independent sample of the process we are learning about, provides additional evidence the process's unknown parameters.
 
@@ -142,7 +142,7 @@ Get a feeling for the beta distribution by sampling from it with different psued
 
 ~~~~
 (define (beta-dist) (first (beta 10 1)))
-(truehist (append '(0) '(1) (repeat 1000 beta-dist)) 20 "beta distribution")
+(hist (append '(0) '(1) (repeat 1000 beta-dist)) 20 "beta distribution")
 ~~~~
 To understand how the pseudo-counts work notice that as the proportion of pseudo-counts favors either heads or tails, then the beta distribution becomes more skewed towards coin weights which are biased in that direction. When the pseudo-counts are symmetric, then the distribution is peaked at .5. As the **total** number of pseudo-counts becomes greater then the distribution becomes more and more steeply peaked. For instance, $Beta(2,2)$ and $Beta(10,10)$ both have their mean at .5, but the latter is much more tightly peaked. Note that $Beta(1,1)$ is the uniform distribution on the (0,1) interval. When the pseudo-counts are less than 1 then the distribution becomes more steeply peaked close to 0 and 1 (this is also where our interpretation of pseudo-counts as previous flips starts to break down).
 
@@ -172,8 +172,8 @@ The following Church program computes conditional inferences for an observed seq
    )
 )
 
-(truehist (append '(0) '(1) prior-samples) 10 "Coin weight, prior to observing data")
-(truehist (append '(0) '(1) samples) 10 "Coin weight, conditioned on observed data")
+(hist (append '(0) '(1) prior-samples) 10 "Coin weight, prior to observing data")
+(hist (append '(0) '(1) samples) 10 "Coin weight, conditioned on observed data")
 ~~~~
 
 Contrast both the prior distribution and the conditional distribution that this program produces with those produced above using a uniform prior on coin weight.  The prior distribution expresses much more confidence that the weight is near 0.5, and the peak moves away from 0.5 only slightly after seeing 7 out of 10 heads.  The peak of the conditional distribution is located roughly at $(7+10)/(7+3+10+10) = 17/30 \approx 0.567$, which we estimate by adding the actual observed heads and tails with the imagined heads and tails encoded in the $beta(10,10)$ prior.
@@ -189,7 +189,7 @@ We will see later on how to explain this kind of belief trajectory -- and we wil
 
 # Exercises
 
-1. Write a church program that reproduces approximately the model from Griffiths and Tenenbaum (2006), "Optimal predictions in everyday cognition", Psychological Science.  Specifically, make a version of Figure 1, for Gaussian and Gamma priors (the Erlang is a special case of a Gamma distribution).  Your version of this figure can be discrete and approximate, using the church functions for drawing histograms of samples `(truehist ...)` and line plots with discrete data points `(lineplot-value ...)` that are introduced in the churchserv examples on the [[Learning as Conditional Inference]] page.
+1. Write a church program that reproduces approximately the model from Griffiths and Tenenbaum (2006), "Optimal predictions in everyday cognition", Psychological Science.  Specifically, make a version of Figure 1, for Gaussian and Gamma priors (the Erlang is a special case of a Gamma distribution).  Your version of this figure can be discrete and approximate, using the church functions for drawing histograms of samples `(hist and density)` and line plots with discrete data points `(lineplot ...)` that are introduced in the churchserv examples on the [[Learning as Conditional Inference]] page.
 
 (a) Your basic programs should do two things: (1) Draw samples from the priors for various parameter settings (e.g., mean and variance of the Gaussian), which should approximate the top panels of Fig 1; (2) Compute the prediction function, the median of the posterior for $t_{total}$ conditioned on observing one value of $t$ sampled from between 0 and $t_{total}$, which should approximate the bottom panels of Fig 1. Plot the median posterior prediction as a function of the observed sample of $t$ for approximately 7-10 different values, enough to give a good sense of the shape of the function.
 
