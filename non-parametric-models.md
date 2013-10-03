@@ -1,5 +1,7 @@
 % Non-parametric models
 
+>***Note: This chapter has not been revised for the new format and Church engine. Some content may be incomplete! Some example may not work!***
+
 In the section on [[Mixture models]] we saw a simple way to construct a model with an unbounded number of categories---simply place uncertainty over the number of categories that are 'actually' in the world. In this section we describe another approach which instead posits an infinite number of (mostly unused) categories actually in the world. The *non-parametric*, or *infinite*, models have a number of useful mathematical properties.
 
 # Prelude: sampling from a discrete distribution

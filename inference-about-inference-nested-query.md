@@ -1,5 +1,7 @@
 % Inference about Inference: Nested Query
 
+>***Note: This chapter has not been revised for the new format and Church engine. Some content may be incomplete! Some example may not work!***
+
 The `query` operator is an ordinary Church function, in the sense that it can occur anywhere that any other function can occur. In particular, we can construct a query with another query inside of it: this represents hypothetical inference *about* a hypothetical inference. (There are some implementation-specific restrictions on this. In MIT-Church the `mh-query` operator cannot be nested inside itself, though the `rejection-query` operator can.)
 
 Nested queries are particularly useful in modeling social cognition: reasoning about another agent, who is herself reasoning.

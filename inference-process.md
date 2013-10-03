@@ -1,5 +1,8 @@
 % Algorithms for inference
 
+>***Note: This chapter has not been revised for the new format and Church engine. Some content may be incomplete! Some example may not work!***
+
+
 # The performance characteristics of different algorithms
 
 As we have seen already, the method of rejection sampling is implemented in `rejection-query`. This is a very useful starting point, but is often not efficient: even if we are sure that our model can satisfy the condition, it will often take a very large number of samples to find computations that do so. To see this, try making the probability of `A`, `B`, and `C` very low in the above example (eventually the query will time out and be killed):

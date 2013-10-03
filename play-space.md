@@ -77,3 +77,5 @@ Currently saved as: <kbd id="displayname">scratch</kbd>
 <button type="button" onclick="saveAs();">Save as...</button>
 <button type="button" onclick="loadFrom();">Load from...</button>
 
+<!-- would be nice to have list of previously saved code names... -->
+

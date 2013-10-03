@@ -1,5 +1,7 @@
 % Occam's Razor
 
+>***Note: This chapter has not been revised for the new format and Church engine. Some content may be incomplete! Some example may not work!***
+
 > Entities should not be multiplied without necessity. -- William of Ockham
 
 

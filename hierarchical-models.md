@@ -1,5 +1,7 @@
 % Hierarchical Models
 
+>***Note: This chapter has not been revised for the new format and Church engine. Some content may be incomplete! Some example may not work!***
+
 <!-- NEED TO BREAK THIS DOWN INTO TWO KINDS OF POINTS:
 
 Learn about basic level from subordinates.  Extract the common prototype.  This isn't transfer learning.

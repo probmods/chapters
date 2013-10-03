@@ -1,5 +1,8 @@
 % Learning as Conditional Inference
 
+>***Note: This chapter has not been revised for the new format and Church engine. Some content may be incomplete! Some example may not work!***
+
+
 <!--
 -revise learning as induction section:
   -be more explicit about learning curves, trajectories.
