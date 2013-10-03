@@ -229,8 +229,38 @@ Note that the long way looks like we're defining a variable, except that the val
 
 -->
 
+# Useful Syntax
 
-# Useful Higher-Order Functions
+Scheme comes with some syntax to make it more pleasant to build programs. (All of this syntax, however, can be quickly converted to the basic syntax, such as `lambda` and function application.) The `let` construct is a way to bind values to names (much like `define`), and it can be used as an ordinary expression: 
+
+~~~~
+(let ((a (+ 1 1)))
+  (+ a 1))
+~~~~
+
+The `case` construct is an alternative to writing a long list of `if` statement. For instance:
+
+~~~~
+(define a 1)
+(case a
+      ((1) "hi")
+      ((2) "bye")
+      (else "error"))
+~~~~
+
+This is equivalent to:
+
+~~~~
+(define a 1)
+(if (equal? a 1)
+    "hi"
+    (if (equal? a 2)
+        "bye"
+        "error"))
+~~~~
+
+
+# Higher-Order Functions
 
 Higher-order functions can be used to represent common patterns of computation. Several such higher-order functions are provided in Church. 
 
