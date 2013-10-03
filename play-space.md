@@ -2,8 +2,8 @@
 
 <script>
     saveAs = function() {
-        var name = prompt("Please enter a name","scratch")
         var editor = $(".CodeMirror")[0].CodeMirror
+        var name = prompt("Please enter a name", editor.exerciseName.split('.').pop())
         
         var chapterName = _(location.href.split("/")).last().replace(".html","").split("#")[0];
         var exerciseName = [chapterName, name].join(".")
@@ -29,18 +29,18 @@
                success: function(codeId) {
                console.log("POST to /code/" + exerciseName + ": success");
                editor.codeId = codeId;
+               $("#displayname").text(exerciseName.split('.').pop());
                },
                error: function() {
                console.log("POST to /code/" + exerciseName + ": failure");
+               $("#displayname").text(exerciseName.split('.').pop());
                }
                });
-               <!-- send to server... Need to prepend "Scratch"? -->
     }
 
 loadFrom = function() {
-    
-    var name = prompt("Please enter the saved name","scratch")
     var editor = $(".CodeMirror")[0].CodeMirror
+    var name = prompt("Please enter the saved name", editor.exerciseName.split('.').pop())
     
     var chapterName = _(location.href.split("/")).last().replace(".html","").split("#")[0];
     var exerciseName = [chapterName, name].join(".")
@@ -54,6 +54,7 @@ loadFrom = function() {
 //                                   engine: json.engine
 //                                   });
            editor.setValue(json.code)
+           $("#displayname").text(exerciseName.split('.').pop());
            },
            error: function() {
            console.log("failure loading exercise " + exerciseName + ", using default");
@@ -63,12 +64,15 @@ loadFrom = function() {
 }
 </script>
 
-Enter you own code here:
+
+
+Enter your code here:
 
 ~~~~{data-exercise="scratch"}
 
 ~~~~
 
+Currently saved as: <kbd id="displayname">scratch</kbd>
 <button type="button" onclick="saveAs();">Save as...</button>
 <button type="button" onclick="loadFrom();">Load from...</button>
 
