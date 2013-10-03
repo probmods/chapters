@@ -339,7 +339,7 @@ var forest_protocol = location.protocol.match(/file/) ? "http://" : "//";
       $results.hide().html('');
       $.ajax({
         type: "POST",
-        url: "/code/" + exerciseName,
+        url: "/code/" + editor.exerciseName,
         data: {
           'code': defaultText,
           'engine': editor.engine,
@@ -347,11 +347,11 @@ var forest_protocol = location.protocol.match(/file/) ? "http://" : "//";
           'csrfmiddlewaretoken': Cookies.get('csrftoken')
         },
         success: function(codeId) {
-          console.log("POST to /code/" + exerciseName + ": success");
+          console.log("POST to /code/" + editor.exerciseName + ": success");
           editor.codeId = codeId;
         },
         error: function() {
-          console.log("POST to /code/" + exerciseName + ": failure"); 
+          console.log("POST to /code/" + editor.exerciseName + ": failure");
         }
       });
 
@@ -377,7 +377,7 @@ var forest_protocol = location.protocol.match(/file/) ? "http://" : "//";
         // asynchronously POST church code to /code/{exercise_name}
         $.ajax({
           type: "POST",
-          url: "/code/" + exerciseName,
+          url: "/code/" + editor.exerciseName,
           data: {
             'code': newCode,
             'engine': newEngine,
@@ -385,11 +385,11 @@ var forest_protocol = location.protocol.match(/file/) ? "http://" : "//";
             'csrfmiddlewaretoken': Cookies.get('csrftoken')
           },
           success: function(codeId) {
-            console.log("POST to /code/" + exerciseName + ": success");
+            console.log("POST to /code/" + editor.exerciseName + ": success");
             editor.codeId = codeId;
           },
           error: function() {
-            console.log("POST to /code/" + exerciseName + ": failure"); 
+            console.log("POST to /code/" + editor.exerciseName + ": failure");
           }
         });
       }
