@@ -158,22 +158,6 @@ The above code may seem unnecessarily complex because it explicitly lists every 
 This is very much like the way we created an exchangeable model above, except instead of one unknown probability list, we have one for each previous word. Models like this are often called ''hierarchical'' n-gram models. We consider [hierarchical models](hierarchical-models.html) in more detail in a later chapter.
 
 
-# Example: Subjective Randomness
-
-[TODO]
-<!-- put in zenith radio / representativeness as an example -->
-What does a random sequence look like? Is 00101 more random than 00000? Is the former a better example of a sequence coming from a fair coin than the latter? Most people say so, but notice that if you flip a fair coin, these two sequences are equally probable. Yet these intuitions about randomness are pervasive and often misunderstood: In 1936 the Zenith corporation attempted to test the hypothesis the people are sensitive to psychic transmissions. During a radio program, a group of psychics would attempt to transmit a randomly drawn sequence of ones and zeros to the listeners. Listeners were asked to write down and then mail in the sequence they perceived. The data thus generative showed no systematic effect of the transmitted sequence---but it did show a strong preference for certain sequences [@Goodfellow1938]. 
-The preferred sequences included 00101, 00110, 01100, and 01101.
-
-@Griffiths2001 suggested that we can explain this bias if people are considering not the probability of the sequence under a fair-coin process, but the probability that the sequence would have come from a fair process as opposed to a non-uniform (trick) process.
-
-~~~~
-(define samples
-
-~~~~
-
-
-
 # Hidden Markov Models
 
 Another popular model in computational linguistics is the hidden Markov model (HMM). The HMM extends the Markov model by assuming that the "actual" states aren't observable. Instead there is an ''observation model'' that generates an observation from each "hidden state". We use the same construction as above to generate an unknown observation model.
