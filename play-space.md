@@ -48,17 +48,15 @@ loadFrom = function() {
     $.ajax({
            url: "/code/" + exerciseName,
            success: function(json) {
-           // overwrite defaults
-           _(editor.options).extend({
-                                   text: json.code,
-                                   engine: json.engine
-                                   });
-           
-           //injectEditor(item, editorOptions);
+//           // overwrite defaults
+//           _(editor.options).extend({
+//                                   text: json.code,
+//                                   engine: json.engine
+//                                   });
+           editor.setValue(json.code)
            },
            error: function() {
            console.log("failure loading exercise " + exerciseName + ", using default");
-           //injectEditor(item, editorOptions);
            }
            });
            
