@@ -12,22 +12,6 @@
 -->
 
 
-<!-- 
-
-# Example: Subjective Randomness
-
-<!-- put in zenith radio / representativeness as an example -->
-What does a random sequence look like? Is 00101 more random than 00000? Is the former a better example of a sequence coming from a fair coin than the latter? Most people say so, but notice that if you flip a fair coin, these two sequences are equally probable. Yet these intuitions about randomness are pervasive and often misunderstood: In 1936 the Zenith corporation attempted to test the hypothesis the people are sensitive to psychic transmissions. During a radio program, a group of psychics would attempt to transmit a randomly drawn sequence of ones and zeros to the listeners. Listeners were asked to write down and then mail in the sequence they perceived. The data thus generative showed no systematic effect of the transmitted sequence---but it did show a strong preference for certain sequences [@Goodfellow1938]. 
-The preferred sequences included 00101, 00110, 01100, and 01101.
-
-@Griffiths2001 suggested that we can explain this bias if people are considering not the probability of the sequence under a fair-coin process, but the probability that the sequence would have come from a fair process as opposed to a non-uniform (trick) process.
-
-~~~~
-(define samples
-
-~~~~
--->
-
 
 Just as causal reasoning is a form of conditional inference, so is causal learning: discovering the persistent causal processes or causal properties of objects in the world. The line between "reasoning" and "learning" is unclear in cognition. We often think of learning as conditional inference about some object or process that can produce a potentially infinite sequence or set of outcomes, or *data points*, only some of which are observed at any time. What can be inferred about the object or process given a certain subset of the observed data? How much more can we learn as the size of the observed data set increases -- what is the *learning curve*?
 

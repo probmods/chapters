@@ -158,6 +158,68 @@ The above code may seem unnecessarily complex because it explicitly lists every 
 This is very much like the way we created an exchangeable model above, except instead of one unknown probability list, we have one for each previous word. Models like this are often called ''hierarchical'' n-gram models. We consider [hierarchical models](hierarchical-models.html) in more detail in a later chapter.
 
 
+# Example: Subjective Randomness
+
+<!-- put in zenith radio / representativeness as an example -->
+What does a random sequence look like? Is 00101 more random than 00000? Is the former a better example of a sequence coming from a fair coin than the latter? Most people say so, but notice that if you flip a fair coin, these two sequences are equally probable. Yet these intuitions about randomness are pervasive and often misunderstood: In 1936 the Zenith corporation attempted to test the hypothesis the people are sensitive to psychic transmissions. During a radio program, a group of psychics would attempt to transmit a randomly drawn sequence of ones and zeros to the listeners. Listeners were asked to write down and then mail in the sequence they perceived. The data thus generative showed no systematic effect of the transmitted sequence---but it did show a strong preference for certain sequences [@Goodfellow1938]. 
+The preferred sequences included 00101, 00110, 01100, and 01101.
+
+@Griffiths2001 suggested that we can explain this bias if people are considering not the probability of the sequence under a fair-coin process, but the probability that the sequence would have come from a fair process as opposed to a non-uniform (trick) process:
+
+~~~~
+(define (samples sequence)
+  (mh-query
+   100 10
+   
+   (define isfair (flip))
+   
+   (define (coin) (flip (if isfair 0.5 0.2)))
+   
+   
+   isfair
+   
+   (condition (equal? sequence (repeat 5 coin)))))
+
+
+(multiviz
+ (hist (samples (list false false true false true)) "00101 is fair?")
+ (hist (samples (list false false false false false)) "00000 is fair?"))
+~~~~
+
+This model posits that when considering randomness, as well as when imagining random sequences, people are more concerned with distinguishing a "truly random" generative process from a trick process. This version of the model doesn't think 01010 looks any less random than 01100 (try it), because even its "trick process" is i.i.d. and hence does not distinguish order.
+We could extend the model to consider a Markov model as the alternative (trick) generative process:
+
+~~~~
+(define (samples sequence)
+  (mh-query
+   100 10
+   
+   (define isfair (flip))
+   
+   (define (transition prev) (flip (if isfair 
+                                       0.5 
+                                       (if prev 0.1 0.9))))
+   
+   (define (markov prev n)
+     (if (= 0 n)
+         '()
+         (let ((next (transition prev)))
+           (pair next (markov next (- n 1))))))
+   
+   
+   isfair
+   
+   (condition (equal? sequence (markov (flip) 5)))))
+
+
+(multiviz
+ (hist (samples (list false true false true false)) "01010 is fair?")
+ (hist (samples (list true false false true false)) "01100 is fair?"))
+~~~~
+
+This version thinks that alternating sequences are non-random, but there are other non-uniform generative processes (such as all-true) that it doesn't detect. How could we extend this model to detect more non-random sequences?
+
+
 # Hidden Markov Models
 
 Another popular model in computational linguistics is the hidden Markov model (HMM). The HMM extends the Markov model by assuming that the "actual" states aren't observable. Instead there is an ''observation model'' that generates an observation from each "hidden state". We use the same construction as above to generate an unknown observation model.
