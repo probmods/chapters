@@ -4,7 +4,9 @@
     saveAs = function() {
         var name = prompt("Please enter a name","scratch")
         var editor = $(".CodeMirror")[0].CodeMirror
-        var exerciseName = ["scratch", name].join(".")
+        
+        var chapterName = _(location.href.split("/")).last().replace(".html","").split("#")[0];
+        var exerciseName = [chapterName, name].join(".")
         editor.id = exerciseName
         editor.exerciseName = exerciseName
         
@@ -40,7 +42,8 @@ loadFrom = function() {
     var name = prompt("Please enter the saved name","scratch")
     var editor = $(".CodeMirror")[0].CodeMirror
     
-    var exerciseName = ["scratch", name].join(".")
+    var chapterName = _(location.href.split("/")).last().replace(".html","").split("#")[0];
+    var exerciseName = [chapterName, name].join(".")
     
     $.ajax({
            url: "/code/" + exerciseName,
