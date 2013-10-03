@@ -29,11 +29,11 @@
                success: function(codeId) {
                console.log("POST to /code/" + exerciseName + ": success");
                editor.codeId = codeId;
+               editor.exerciseName = exerciseName
                $("#displayname").text(exerciseName.split('.').pop());
                },
                error: function() {
                console.log("POST to /code/" + exerciseName + ": failure");
-               $("#displayname").text(exerciseName.split('.').pop());
                }
                });
     }
@@ -54,6 +54,7 @@ loadFrom = function() {
 //                                   engine: json.engine
 //                                   });
            editor.setValue(json.code)
+           editor.exerciseName = exerciseName
            $("#displayname").text(exerciseName.split('.').pop());
            },
            error: function() {
