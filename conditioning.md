@@ -628,6 +628,8 @@ Now, we're going to write this model in Church using the `cosh` engine. Here is 
         )
         ~~~~
 
+        Note that you don't need to explicitly use `hist` or `repeat` here. In cosh, function calls directly correspond to *distributions* and histograms are built for you automatically (whereas in webchurch, function calls correspond only to *samples* and you have to build the data for histograms manually.)
+
     C) What does the `my-list-index` function do? What would happen if you ran `(my-list-index 'mango '(apple banana) 1)`?
 
     D) What does the `multinomial` function do? Use `multinomial` to express this distribution:
