@@ -291,7 +291,7 @@ Using the sum rule to compute the probability of a final value is called *margin
 
 # Stochastic recursion
 
-[Recursive functions](appendix-scheme.html#recursion) are a powerful way to structure computation in deterministic systems. In Church it is possible to have a *stochastic* recursion that randomly decides whether to stop. For example, the *geometric distribution* is a probability distribution over the non-negative integers that represents the probability of flipping a coin $N$ times and getting `true` exactly once:
+[Recursive functions](appendix-scheme.html#recursion) are a powerful way to structure computation in deterministic systems. In Church it is possible to have a *stochastic* recursion that randomly decides whether to stop. For example, the *geometric distribution* is a probability distribution over the non-negative integers. We imagine flipping a (weighted) coin, returning $N-1$ if the first `true` is on the Nth flip (that is, we return the number of times we get `false` before our first `true`):
 
 ~~~~
 (define (geometric p)
