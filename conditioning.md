@@ -578,9 +578,16 @@ disease by changing the prior probability of the disease such that it is always 
 
     A) Describe (using ordinary English) what the second Church program above means.
 
-    B) How would you change it if you thought people are more likely to smile if they want something? If you think some people are more likely to want something than others? If you think nice people are less likely to want something?
+    B) Write a version of the model that captures these two intuitions: (1) people are more likely to smile if they want something and (2) *nice* people are less likely to want something.
 
-    C) Given your extended model, how would you ask whether someone wants something from you, given that they are smiling and have rarely smiled before? Show the Church program and a histogram of the answers -- in what ways do these answers make intuitive sense or fail to?
+        ~~~~ {data-exercise="ex3-b"}
+        ~~~~
+
+    C) Given your extended model, how would you ask whether someone wants something from you, given that they are smiling and have rarely smiled before? In your answer, show the Church query and a histogram of the answers -- in what ways do these answers make intuitive sense or fail to?
+
+        ~~~~ {data-exercise="ex3-c"}
+        ~~~~
+
 
 4) Casino game: Suppose that you are playing the following game at a casino. In this game, a machine randomly gives you a letter of the alphabet and the probability of winning depends on which letter you receive. The machine gives the letters a, e, i, o, u, y (the vowels) with probability 0.01 each and the remaining letters (i.e., the consonants) with probability 0.047 each. Let's use the variable $h$ to denote the letter that you receive; the probability of winning for a given $h$ is $1/Q(h)^2$, where $Q(h)$ denotes the numeric position of the letter (e.g., $Q(\textrm{a}) = 1, Q(\textrm{b}) = 2$, and so on).
 Let's express this in formal terms. The hypothesis space, $H$, is the set of letters $\{a, b, c, d, \dots, y, z\}$ and the prior probability of a hypothesis $h$ is   0.01 for vowels (a, e, i, o, u, y) and 0.047 for consonants. The likelihood, $p(d \mid h) = 1/Q(h)^2$, is the probability of winning given that you drew some letter $h$.
@@ -620,6 +627,8 @@ Now, we're going to write this model in Church using the `cosh` engine. Here is 
          ...
         )
         ~~~~
+
+        Note that you don't need to explicitly use `hist` or `repeat` here. In cosh, function calls directly correspond to *distributions* and histograms are built for you automatically (whereas in webchurch, function calls correspond only to *samples* and you have to build the data for histograms manually.)
 
     C) What does the `my-list-index` function do? What would happen if you ran `(my-list-index 'mango '(apple banana) 1)`?
 
