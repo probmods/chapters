@@ -5,9 +5,11 @@
 
 # The performance characteristics of different algorithms
 
-As we have seen already, the method of rejection sampling is implemented in `rejection-query`. This is a very useful starting point, but is often not efficient: even if we are sure that our model can satisfy the condition, it will often take a very large number of samples to find computations that do so. To see this, try making the probability of `A`, `B`, and `C` very low in the above example (eventually the query will time out and be killed):
+When we introduced [conditioning](conditioning.html#hypothetical-reasoning-with-query) we pointed out that the rejection sampling and mathematical definitions are equivalent---we could take either one as the definition of `query`, showing that the other specifies the same distribution. There are many different ways to compute the same distribution, it is thus useful to separately think about the distributions we are building (including conditional distributions) and how we will compute them. Indeed, in the last few chapters we have explored the dynamics of inference without worrying about the details of inference algorithms. The efficiency characteristics of different implementations of `query` can be very different, however, and this is important both practically and for motivating cognitive hypotheses at the level of algorithms (or psychological processes).
 
-~~~~ {.mit-church}
+The "guess and check" method of rejection sampling, implemented in `rejection-query`, is conceptually useful but is often not efficient: even if we are sure that our model can satisfy the condition, it will often take a very large number of samples to find computations that do so. To see this, try making the `baserate` probability of `A`, `B`, and `C` lower in this example:
+
+~~~~
 (define baserate 0.1)
 
 (define (take-sample)
@@ -20,16 +22,18 @@ As we have seen already, the method of rejection sampling is implemented in `rej
 
    A
 
-   (>= D 2)
-   )
-  )
-(hist (repeat 100 take-sample) "Value of A, given that D is greater than or equal to 2, using rejection")
+   (>= D 2)))
+   
+(hist (repeat 100 take-sample) "Value of A, given D >= 2, using rejection")
 ~~~~
-Even for this very simple program, lowering the baserate by just one order of magnitude, to 0.01, will make `rejection-query` impractical.
 
-Another option is to use the mathematical definition of conditional probability directly: to *enumerate* all of the execution histories for the query, and then to use the rules of probability to compute the conditional probability (which we can then use to sample if we wish). The **cosh** implementation uses this exact query method (NOTE: this implementation is a bit different-- it returns the exact distribution as a list of pairs and changing the code below too much may cause it to error):
+Even for this simple program, lowering the baserate by just one order of magnitude, to 0.01, will make `rejection-query` impractical.
 
-~~~~ {.cosh}
+Another option is to use the mathematical definition of conditional probability directly: to *enumerate* all of the execution histories for the query, and then to use the rules of probability to compute the conditional probability (which we can then use to sample if we wish):
+<!-- FIXME: implement enumerate in webchurch? -->
+(NOTE: The **cosh** implementation uses this exact query method. Try setting engine to "cosh". This implementation is a bit different-- it returns the exact distribution as a list of pairs and changing the code below too much may cause it to error)
+
+~~~~
 (define baserate 0.1)
 
 (exact-query
@@ -44,7 +48,8 @@ Another option is to use the mathematical definition of conditional probability 
  (>= D 2)
  )
 ~~~~
-Notice that the time it takes for this program to run doesn't depend on the baserate. Unfortunately it does depend critically on the number of random choices in an execution history: the number of possible histories that must be considered grows exponentially in the number of random choices. This renders `exact-query` impractical for all but the simplest models.
+
+Notice that the time it takes for this program to run doesn't depend on the baserate. Unfortunately it does depend critically on the number of random choices in an execution history: the number of possible histories that must be considered grows exponentially in the number of random choices. To see this try adding more random choices to the sum (following the pattern of `A`). The dependence on size of the execution space renders `exact-query` impractical for all but the simplest models.
 
 The AI literature is replete with other algorithms and techniques for dealing with conditional probabilistic inference, and several of these have been adapted into Church to give implementations of `query` that may be more efficient in various cases. (Though they vary in efficiency, each of these implementations is universal: given enough time it samples from the appropriate conditional distribution for a Church query over any Church model.) One implementation that we will often use is based on the *Metropolis Hastings* algorithm, a form of *Markov chain Monte Carlo* inference. For background on MH and MCMC, see the excellent introductions by David MacKay ([Chapter 29](http://www.inference.phy.cam.ac.uk/mackay/itprnn/ps/356.384.pdf) and [30](http://www.inference.phy.cam.ac.uk/mackay/itprnn/ps/387.412.pdf) of Information Theory, Inference, and Learning Algorithms) or [Radford Neal](http://www.cs.utoronto.ca/~radford/review.abstract.html).
 
