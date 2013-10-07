@@ -30,13 +30,12 @@ The "guess and check" method of rejection sampling, implemented in `rejection-qu
 Even for this simple program, lowering the baserate by just one order of magnitude, to 0.01, will make `rejection-query` impractical.
 
 Another option is to use the mathematical definition of conditional probability directly: to *enumerate* all of the execution histories for the query, and then to use the rules of probability to compute the conditional probability (which we can then use to sample if we wish):
-<!-- FIXME: implement enumerate in webchurch? -->
-(NOTE: The **cosh** implementation uses this exact query method. Try setting engine to "cosh". This implementation is a bit different-- it returns the exact distribution as a list of pairs and changing the code below too much may cause it to error)
+(NOTE: The `enumeration-query` implementation returns the exact distribution as a list of values and a list of probabilities, rather than a sample.)
 
 ~~~~
 (define baserate 0.1)
 
-(exact-query
+(enumeration-query
 
  (define A (if (flip baserate) 1 0))
  (define B (if (flip baserate) 1 0))
@@ -45,15 +44,14 @@ Another option is to use the mathematical definition of conditional probability 
 
  A
 
- (>= D 2)
- )
+ (>= D 2))
 ~~~~
 
-Notice that the time it takes for this program to run doesn't depend on the baserate. Unfortunately it does depend critically on the number of random choices in an execution history: the number of possible histories that must be considered grows exponentially in the number of random choices. To see this try adding more random choices to the sum (following the pattern of `A`). The dependence on size of the execution space renders `exact-query` impractical for all but the simplest models.
+Notice that the time it takes for this program to run doesn't depend on the baserate. Unfortunately it does depend critically on the number of random choices in an execution history: the number of possible histories that must be considered grows exponentially in the number of random choices. To see this try adding more random choices to the sum (following the pattern of `A`). The dependence on size of the execution space renders `enumeration-query` impractical for all but the simplest models.
 
-The AI literature is replete with other algorithms and techniques for dealing with conditional probabilistic inference, and several of these have been adapted into Church to give implementations of `query` that may be more efficient in various cases. (Though they vary in efficiency, each of these implementations is universal: given enough time it samples from the appropriate conditional distribution for a Church query over any Church model.) One implementation that we will often use is based on the *Metropolis Hastings* algorithm, a form of *Markov chain Monte Carlo* inference. For background on MH and MCMC, see the excellent introductions by David MacKay ([Chapter 29](http://www.inference.phy.cam.ac.uk/mackay/itprnn/ps/356.384.pdf) and [30](http://www.inference.phy.cam.ac.uk/mackay/itprnn/ps/387.412.pdf) of Information Theory, Inference, and Learning Algorithms) or [Radford Neal](http://www.cs.utoronto.ca/~radford/review.abstract.html).
+The AI statistics literatures contain many other algorithms and techniques for dealing with conditional probabilistic inference, and several of these have been adapted into Church to give implementations of `query` that may be more efficient in various cases. One implementation that we have uses already is based on the *Metropolis Hastings* algorithm, a form of *Markov chain Monte Carlo* inference. 
 
-~~~~ {.mit-church}
+~~~~
 (define baserate 0.1)
 
 (define samples
@@ -66,13 +64,10 @@ The AI literature is replete with other algorithms and techniques for dealing wi
 
    A
 
-   (>= D 2)
-   )
-  )
+   (>= D 2)))
+   
 (hist samples "Value of A, given that D is greater than or equal to 2")
 ~~~~
-
-The `mh-query` implementation takes two extra arguments and returns a list of many samples. The first extra argument is the number of samples to take, and the second controls the "lag", the number of internal random choices that the algorithm makes in a sequence of iterative steps between samples.  The total number of MH iterations, and hence the running time of the query, is the product of these two parameters.  (The workings of MH are beyond the scope of this section, but very roughly: The algorithm implements a random walk or diffusion process (a *Markov chain*) in the space of possible program evaluations that lead to the conditioner being true.  Each MH iteration is one step of this random walk, and the process is specially designed to visit each program evaluation with a long-run frequency proportional to its conditional probability.)
 
 See what happens in the above query as you lower the baserate.  Inference should not slow down appreciably, but it will become less stable and less accurate.  It becomes increasingly difficult for MH to draw independent conditional samples by taking small random steps, so for a fixed lag (100 in the code above), the 100 samples returned will tend to be less representative of the true conditional inference.  In this case, stable and accurate conditional inferences can still be achieved in reasonable time by increasing the number of samples to 500 (while holding the lag at 100).
 
@@ -204,6 +199,10 @@ Note that this stationarity equation holds for the distribution as a whole&mdash
 There is another condition, called ''detailed balance'', that is sufficient (but not necessary) to give the above stationarity condition, and is often easier to work with:
 :$p(x)\pi(x \rightarrow x') = p(x')\pi(x' \rightarrow x)$
 To show that detailed balance implies stationarity, substitute the right-hand side of the detailed balance equation into the stationarity equation (replacing the summand), then simplify.
+
+
+For background on MH and MCMC, see the excellent introductions by David MacKay ([Chapter 29](http://www.inference.phy.cam.ac.uk/mackay/itprnn/ps/356.384.pdf) and [30](http://www.inference.phy.cam.ac.uk/mackay/itprnn/ps/387.412.pdf) of Information Theory, Inference, and Learning Algorithms) or [Radford Neal](http://www.cs.utoronto.ca/~radford/review.abstract.html).
+
 
 
 ## Satisfying detailed balance: MH
