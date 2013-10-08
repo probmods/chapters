@@ -101,7 +101,7 @@ Here is a Markov chain:
  (hist (repeat 2000 (lambda () (chain 'c 30))) "30 steps, starting at c."))
 ~~~~
 
-Notice that the distribution of states after only a few steps is highly influence by the starting state. In the long run the distribution looks the same from any starting state: this long-run distribution is the called the *stable distribution*. For the chain above, the stable distribution is uniform---we have another (fairly baroque!) way to sample from the uniform distribution on `'(a b c d)`!
+Notice that the distribution of states after only a few steps is highly influenced by the starting state. In the long run the distribution looks the same from any starting state: this long-run distribution is the called the *stable distribution*. For the chain above, the stable distribution is uniform---we have another (fairly baroque!) way to sample from the uniform distribution on `'(a b c d)`!
 
 Of course we could have sampled from the uniform distribution using other Markov chains. For instance the following chain is more natural, since it transitions uniformly:
 
@@ -212,9 +212,8 @@ To show that detailed balance implies balance, substitute the right-hand side of
 
 How can we come up with a `transition` function, $\pi$, that satisfies detailed balance? One way it the *Metropolis-Hastings* recipe.
 
-We start with a *proposal distribution*, $q(x\rightarrow x')$, which does not need to have the target distribution as its stationary distribution, but should be easy to sample from. We correct this into a transition function with the right stationary distribution by either accepting or rejecting each proposed transition. We accept with probability:
-
->$\min\left(1, \frac{p(x')q(x'\rightarrow x)}{p(x)q(x\rightarrow x')}\right).$ 
+We start with a *proposal distribution*, $q(x\rightarrow x')$, which does not need to have the target distribution as its stationary distribution, but should be easy to sample from. We correct this into a transition function with the right stationary distribution by either accepting or rejecting each proposed transition. We accept with probability: $\min\left(1, \frac{p(x')q(x'\rightarrow x)}{p(x)q(x\rightarrow x')}\right).$ 
+That is, we flip a coin with that probability: if it comes up heads our next state is $x'$, otherwise our next state is still $x$.
 
 As an exercise, try to show that this rule gives an actual transition probability (i.e. $\pi(x\rightarrow x')$) that satisfied detailed balance. (Hint: the probability of transitioning depends on first proposing a given new state, then accepting it; if you don't accept the proposal you "transition" to the original state.)
 
@@ -292,10 +291,17 @@ Church MH takes as the state space the space of all executions of the code insid
 
 Proposals are made by changing a single random choice, then updating the execution (which may result in choices being created or deleted).
 
-To get this all to work we need a way to identify random choices across different executions of the program. We can do this by augmenting the program with ''call names''.
+To get this all to work we need a way to identify random choices across different executions of the program. We can do this by augmenting the program with "call names".
 
 
-## States with structure and Gibbs sampling
+## Biases of MCMC
+
+An MCMC sampler is guaranteed to take unbiased samples from its stationary distribution ''in the limit'' of arbitrary time between samples. In practice MCMC will have characteristic biases in the form of long burn-in and slow mixing. 
+
+We already saw an example of slow mixing above: the first Markov chain we used to sample from the uniform distribution would take (on average) several iterations to switch from `a` or `b` to `c` or `d`. In order to get approximately independent samples, we needed to wait longer than this time between taking iterations. In contrast, the more efficient Markov chain (with uniform transition function) let us take sample with little lag. In this case poor mixing was the result of a poorly chosen transition function. Poor mixing is often associated with multimodal distributions.
+
+
+# States with structure and Gibbs sampling
 
 Above the states were single entities (letters or numbers), but of course we may have probabilistic models where the state is more complex. In this case, element-wise proposals (that change a single part of the state at a time) can be very convenient.
 
@@ -320,13 +326,8 @@ Here the state is a list of Boolean values. We can use the MH recipe with propos
 ~~~~
 
 
-# Biases of MCMC
 
-An MCMC sampler is guaranteed to take unbiased samples from its stationary distribution ''in the limit'' of arbitrary time between samples. In practice MCMC will have characteristic biases in the form of long burn-in and slow mixing. 
-
-We already saw an example of slow mixing above: the first Markov chain we used to sample from the uniform distribution would take (on average) several iterations to switch from `a` or `b` to `c` or `d`. In order to get approximately independent samples, we needed to wait longer than this time between taking iterations. In contrast, the more efficient Markov chain (with uniform transition function) let us take sample with little lag. In this case poor mixing was the result of a poorly chosen transition function. Poor mixing is often associated with multimodal distributions.
-
-
+<!--
 
 # Importance sampling 
 
@@ -353,3 +354,5 @@ where $x_i$ are N samples drawn from the distribution `q`. This is called '''imp
 If we want samples from distribution `p`, rather than an expectation, we can take N importance samples then ''resample'' N times from the discrete distribution on these samples with probabilities proportional to the importance weights. In the limit of many samples this resampling gives samples from the desired distribution. (Why?)
 
 ## Sequential Importance Resampling
+
+-->
