@@ -2,7 +2,7 @@ generative-models
 conditioning
 patterns-of-inference
 observing-sequences
-inference-about-inference-nested-query
+inference-about-inference
 inference-process
 learning-as-conditional-inference
 grammar-based-induction-LoT
