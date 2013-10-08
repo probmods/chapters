@@ -49,7 +49,7 @@ Another option is to use the mathematical definition of conditional probability 
 
 Notice that the time it takes for this program to run doesn't depend on the baserate. Unfortunately it does depend critically on the number of random choices in an execution history: the number of possible histories that must be considered grows exponentially in the number of random choices. To see this try adding more random choices to the sum (following the pattern of `A`). The dependence on size of the execution space renders `enumeration-query` impractical for all but the simplest models.
 
-The AI statistics literatures contain many other algorithms and techniques for dealing with conditional probabilistic inference, and several of these have been adapted into Church to give implementations of `query` that may be more efficient in various cases. One implementation that we have uses already is based on the *Metropolis Hastings* algorithm, a form of *Markov chain Monte Carlo* inference. 
+There are many other algorithms and techniques for dealing with conditional probabilistic inference, and several of these have been adapted into Church to give implementations of `query` that may be more efficient in various cases. One implementation that we have uses already is based on the *Metropolis Hastings* algorithm, a form of *Markov chain Monte Carlo* inference. 
 
 ~~~~
 (define baserate 0.1)
@@ -69,11 +69,15 @@ The AI statistics literatures contain many other algorithms and techniques for d
 (hist samples "Value of A, given that D is greater than or equal to 2")
 ~~~~
 
-See what happens in the above query as you lower the baserate.  Inference should not slow down appreciably, but it will become less stable and less accurate.  It becomes increasingly difficult for MH to draw independent conditional samples by taking small random steps, so for a fixed lag (100 in the code above), the 100 samples returned will tend to be less representative of the true conditional inference.  In this case, stable and accurate conditional inferences can still be achieved in reasonable time by increasing the number of samples to 500 (while holding the lag at 100).
+See what happens in the above query as you lower the baserate.  Inference should not slow down appreciably, but it will become less stable and less accurate.  
+<!-- FIXME: because init is by rejection this does slow down appreciably!! -->
+It becomes increasingly difficult for MH to draw independent conditional samples by taking small random steps, so for a fixed lag (100 in the code above), the 100 samples returned will tend to be less representative of the true conditional inference.  In this case, stable and accurate conditional inferences can still be achieved in reasonable time by increasing the number of samples to 500 (while holding the lag at 100).
 
 
 # Markov chains as samplers
 
+We have already seen [Markov models](observing-sequences.html#markov-models) used to describe sequences of observations. 
+A Markov model (or Markov *chain*, as it is often called in the context of inference algorithms) is a discrete dynamical system that unfolds over "time".
 Here is a markov chain:
 
 ~~~~
@@ -90,37 +94,37 @@ Here is a markov chain:
       state
       (chain (transition state) (- n 1))))
 
-(hist (repeat 2000 (lambda () (chain 'a 10))) "a 10")
-(hist (repeat 2000 (lambda () (chain 'c 10))) "c 10")
-(hist (repeat 2000 (lambda () (chain 'a 30))) "a 30")
-(hist (repeat 2000 (lambda () (chain 'c 30))) "c 30")
-'done
+(multiviz
+ (hist (repeat 2000 (lambda () (chain 'a 10))) "10 steps, starting at a.")
+ (hist (repeat 2000 (lambda () (chain 'c 10))) "10 steps, starting at c.")
+ (hist (repeat 2000 (lambda () (chain 'a 30))) "30 steps, starting at a.")
+ (hist (repeat 2000 (lambda () (chain 'c 30))) "30 steps, starting at c."))
 ~~~~
 
-After only a few steps the distribution is highly influence by the starting state. In the long run the distribution looks the same from any starting state. This is the '''stable distribution'''. In this case it is uniform&mdash;we have another (fairly baroque!) way to sample from the uniform distribution on `'(a b c d)`!
+Notice that the distribution of states after only a few steps is highly influence by the starting state. In the long run the distribution looks the same from any starting state. This is the called the *stable distribution*. In this case the stable distirbution is uniform---we have another (fairly baroque!) way to sample from the uniform distribution on `'(a b c d)`!
 
 Of course we could have sampled from the uniform distribution using other Markov chains. For instance the following chain is more natural, since it transitions uniformly:
 
 ~~~~
 (define (transition state)
   (uniform-draw '(a b c d)))
-       
+
 (define (chain state n)
   (if (= n 0)
       state
       (chain (transition state) (- n 1))))
 
-(hist (repeat 2000 (lambda () (chain 'a 2))) "a 2")
-(hist (repeat 2000 (lambda () (chain 'c 2))) "c 2")
-(hist (repeat 2000 (lambda () (chain 'a 10))) "a 10")
-(hist (repeat 2000 (lambda () (chain 'c 10))) "c 10")
-'done
+(multiviz 
+ (hist (repeat 2000 (lambda () (chain 'a 2))) "a 2")
+ (hist (repeat 2000 (lambda () (chain 'c 2))) "c 2")
+ (hist (repeat 2000 (lambda () (chain 'a 10))) "a 10")
+ (hist (repeat 2000 (lambda () (chain 'c 10))) "c 10"))
 ~~~~
 
 Notice that this chain converges much more quickly to the uniform distribution---this is called the ''burn-in time''. 
 
 
-
+<!--
 ## Markov chains with lag
 
 We get the same distribution from samples from a single run, if we wait long enough between samples:
@@ -149,8 +153,9 @@ We get the same distribution from samples from a single run, if we wait long eno
 'done
 ~~~~
 
+-->
 
-## Markov chains with infinite state space
+# Markov chains with infinite state space
 
 This can also work over infinite state spaces. Here's a markov chain whose stationary distribution is geometric conditioned to be greater than 2:
 
@@ -170,7 +175,6 @@ This can also work over infinite state spaces. Here's a markov chain whose stati
       (chain (transition state) (- n 1))))
 
 (hist (repeat 2000 (lambda () (chain 3 20))) "markov chain")
-'done
 ~~~~
 
 This Markov chain samples (in the long run) from the distribution specified by the Church query:
@@ -184,17 +188,17 @@ This Markov chain samples (in the long run) from the distribution specified by t
   (> x 2))
 ~~~~
 
-That is, the Markov chain ''implements'' the query.
+That is, the Markov chain "implements" the query.
 
 
 
 # Getting the right chain: MCMC
 
-It turns out that for any (conditional) distribution there is a Markov chain with that stationary distribution. How can we find one when we need it? There are several methods for constructing them&mdash;they go by the name ''Markov chain Monte Carlo''.
+It turns out that for any (conditional) distribution there is a Markov chain with that stationary distribution. How can we find one when we need it? There are several methods for constructing them---they go by the name ''Markov chain Monte Carlo''.
 
 First, if we have a target distribution, how can we tell if a Markov chain has this target distribution as it's stationary distribution? Let $p(x)$ be the target distribution, and let $\pi(x \rightarrow x')$ be the transition distribution (i.e. the `transition` function in the above programs). Since the stationary distribution is characterized by not changing when the transition is applied to it we have:
 :$p(x') = \sum_x p(x)\pi(x \rightarrow x')$
-Note that this stationarity equation holds for the distribution as a whole&mdash;a single state can of course be moved by the transition.
+Note that this stationarity equation holds for the distribution as a whole---a single state can of course be moved by the transition.
 
 There is another condition, called ''detailed balance'', that is sufficient (but not necessary) to give the above stationarity condition, and is often easier to work with:
 :$p(x)\pi(x \rightarrow x') = p(x')\pi(x' \rightarrow x)$
