@@ -77,8 +77,8 @@ It becomes increasingly difficult for MH to draw independent conditional samples
 # Markov chains as samplers
 
 We have already seen [Markov models](observing-sequences.html#markov-models) used to describe sequences of observations. 
-A Markov model (or Markov *chain*, as it is often called in the context of inference algorithms) is a discrete dynamical system that unfolds over "time".
-Here is a markov chain:
+A Markov model (or Markov *chain*, as it is often called in the context of inference algorithms) is a discrete dynamical system that unfolds over iterations of the `transition` function.
+Here is a Markov chain:
 
 ~~~~
 (define (transition state)
@@ -101,7 +101,7 @@ Here is a markov chain:
  (hist (repeat 2000 (lambda () (chain 'c 30))) "30 steps, starting at c."))
 ~~~~
 
-Notice that the distribution of states after only a few steps is highly influence by the starting state. In the long run the distribution looks the same from any starting state. This is the called the *stable distribution*. In this case the stable distirbution is uniform---we have another (fairly baroque!) way to sample from the uniform distribution on `'(a b c d)`!
+Notice that the distribution of states after only a few steps is highly influence by the starting state. In the long run the distribution looks the same from any starting state: this long-run distribution is the called the *stable distribution*. For the chain above, the stable distribution is uniform---we have another (fairly baroque!) way to sample from the uniform distribution on `'(a b c d)`!
 
 Of course we could have sampled from the uniform distribution using other Markov chains. For instance the following chain is more natural, since it transitions uniformly:
 
@@ -121,8 +121,10 @@ Of course we could have sampled from the uniform distribution using other Markov
  (hist (repeat 2000 (lambda () (chain 'c 10))) "c 10"))
 ~~~~
 
-Notice that this chain converges much more quickly to the uniform distribution---this is called the ''burn-in time''. 
-
+Notice that this chain converges much more quickly to the uniform distribution---after only one step.
+The number of steps it takes for the distribution on states to reach the stable distribution (and hence lose traces of the starting state) is called the *burn-in time*. 
+We can use a Markov chain as a way to (approximately) sample from its stable distribution, but the efficiency depends on burn-in time.
+While many Markov chains have the same stable distribution they can have very different burn-in times, and hence different efficiency.
 
 <!--
 ## Markov chains with lag
@@ -157,7 +159,7 @@ We get the same distribution from samples from a single run, if we wait long eno
 
 # Markov chains with infinite state space
 
-This can also work over infinite state spaces. Here's a markov chain whose stationary distribution is geometric conditioned to be greater than 2:
+Markov chains can also be constructed over infinite state spaces. Here's a chain over the integers:
 
 ~~~~
 (define theta 0.7)
@@ -177,48 +179,48 @@ This can also work over infinite state spaces. Here's a markov chain whose stati
 (hist (repeat 2000 (lambda () (chain 3 20))) "markov chain")
 ~~~~
 
-This Markov chain samples (in the long run) from the distribution specified by the Church query:
+As we can see, this Markov chain has as its stationary distribution a geometric distribution conditioned to be greater than 2. We can also write it using `query` syntax:
 
 ~~~~
 (define (geometric theta) (if (flip theta) (+ 1 (geometric theta)) 1))
 
-(query
-  (define x (geometric 0.7))
-  x
-  (> x 2))
+(define samples
+  (mh-query 2000 20
+   (define x (geometric 0.7))
+   x
+   (> x 2)))
+
+(hist samples "geometric > 2.")
 ~~~~
 
-That is, the Markov chain "implements" the query.
+The Markov chain above *implements* the query below, in the sense that it specifies a way to sample from the required conditional distribution.
 
 
 
 # Getting the right chain: MCMC
 
-It turns out that for any (conditional) distribution there is a Markov chain with that stationary distribution. How can we find one when we need it? There are several methods for constructing them---they go by the name ''Markov chain Monte Carlo''.
+It turns out that for any (conditional) distribution there is a Markov chain with that stationary distribution. How can we find one when we need it? There are several methods for constructing them---they go by the name "Markov chain Monte Carlo".
 
-First, if we have a target distribution, how can we tell if a Markov chain has this target distribution as it's stationary distribution? Let $p(x)$ be the target distribution, and let $\pi(x \rightarrow x')$ be the transition distribution (i.e. the `transition` function in the above programs). Since the stationary distribution is characterized by not changing when the transition is applied to it we have:
-:$p(x') = \sum_x p(x)\pi(x \rightarrow x')$
-Note that this stationarity equation holds for the distribution as a whole---a single state can of course be moved by the transition.
+First, if we have a target distribution, how can we tell if a Markov chain has this target distribution as it's stationary distribution? Let $p(x)$ be the target distribution, and let $\pi(x \rightarrow x')$ be the transition distribution (i.e. the `transition` function in the above programs). Since the stationary distribution is characterized by not changing when the transition is applied we have a *balance condition*:
+$p(x') = \sum_x p(x)\pi(x \rightarrow x')$.
+Note that the balance condition holds for the distribution as a whole---a single state can of course be moved by the transition.
 
-There is another condition, called ''detailed balance'', that is sufficient (but not necessary) to give the above stationarity condition, and is often easier to work with:
-:$p(x)\pi(x \rightarrow x') = p(x')\pi(x' \rightarrow x)$
-To show that detailed balance implies stationarity, substitute the right-hand side of the detailed balance equation into the stationarity equation (replacing the summand), then simplify.
-
-
-For background on MH and MCMC, see the excellent introductions by David MacKay ([Chapter 29](http://www.inference.phy.cam.ac.uk/mackay/itprnn/ps/356.384.pdf) and [30](http://www.inference.phy.cam.ac.uk/mackay/itprnn/ps/387.412.pdf) of Information Theory, Inference, and Learning Algorithms) or [Radford Neal](http://www.cs.utoronto.ca/~radford/review.abstract.html).
-
-
+There is another condition, called *detailed balance*, that is sufficient (but not necessary) to give the balance condition, and is often easier to work with: $p(x)\pi(x \rightarrow x') = p(x')\pi(x' \rightarrow x)$.
+To show that detailed balance implies balance, substitute the right-hand side of the detailed balance equation into the baance equation (replacing the summand), then simplify.
 
 ## Satisfying detailed balance: MH
 
-The math is fine, but how do we come up with a $q$ that satisfies detailed balance? One way it the '''Metropolis-Hastings''' recipe.
+How can we come up with a `transition` function, $\pi$, that satisfies detailed balance? One way it the *Metropolis-Hastings* recipe.
 
-We start with a proposal distribution $q(x\rightarrow x')$ (which does not have the target distribution as its stationary distribution). We correct this into a transition function with the right stationary distribution by either accepting or rejecting each proposed transition. We accept with probability:
-:$\min\left(1, \frac{p(x')q(x'\rightarrow x)}{p(x)q(x\rightarrow x')}\right).$ 
-Exercise: show that this gives an actual transition probability (i.e. $\pi(x\rightarrow x')$) that satisfied detailed balance (Hint: the probability of transitioning comes from proposing a given new state, then accepting it; if you don't accept the proposal you "transition" to the original state).
+We start with a *proposal distribution*, $q(x\rightarrow x')$, which does not need to have the target distribution as its stationary distribution, but should be easy to sample from. We correct this into a transition function with the right stationary distribution by either accepting or rejecting each proposed transition. We accept with probability:
+
+>$\min\left(1, \frac{p(x')q(x'\rightarrow x)}{p(x)q(x\rightarrow x')}\right).$ 
+
+As an exercise, try to show that this rule gives an actual transition probability (i.e. $\pi(x\rightarrow x')$) that satisfied detailed balance. (Hint: the probability of transitioning depends on first proposing a given new state, then accepting it; if you don't accept the proposal you "transition" to the original state.)
 
 In Church the MH recipe looks like:
-<pre>
+
+~~~~{.norun}
 (define (target-distr x) ...)
 (define (proposal-fn x) ...)
 (define (proposal-distr x1 x2) ...)
@@ -235,33 +237,7 @@ In Church the MH recipe looks like:
   (if (= iterations 0)
       '()
     (pair state (mcmc (transition state) (- iterations 1)))))
-</pre>
-
-<collapse title="mcmc with lag">
-
 ~~~~
-(define (target-distr x) ...)
-(define (proposal-fn x) ...)
-(define (proposal-distr x1 x2) ...)
-
-(define (accept? x1 x2) 
-  (flip (min 1 (/ (* (target-distr x2) (proposal-distr x2 x1)) 
-                  (* (target-distr x1) (proposal-distr x1 x2))))))
-
-(define (transition x)
-  (let ((proposed-x (proposal-fn x)))
-    (if (accept? x proposed-x) proposed-x x)))
-
-(define (mcmc state iterations lag)
-  (if (= iterations 0)
-      '()
-      (let ((rest-chain (mcmc (transition state) (- iterations 1) lag)))
-        (if (= 0 (mod iterations lag))
-            (pair state rest-chain)
-            rest-chain))))
-~~~~
-
-</collapse>
 
 Note that in order to use this recipe we need to have a function that computes the target probability (not just one that samples from it) and the transition probability, but they need not be normalized (since the normalization terms will cancel).
 
@@ -277,7 +253,7 @@ We can use this recipe to construct a Markov chain for the conditioned geometric
       (* (- 1 theta) (expt theta x)))) ;;otherwise prob is (proportional to) geometric distrib.
 
 ;;the proposal function and distribution,
-;;here we're equally likely to propose up or down one.
+;;here we're equally likely to propose x+1 or x-1.
 (define (proposal-fn x) (if (flip) (- x 1) (+ x 1))) 
 (define (proposal-distr x1 x2) 0.5)
 
@@ -298,11 +274,14 @@ We can use this recipe to construct a Markov chain for the conditioned geometric
 
 
 (hist (mcmc 3 1000) "mcmc for conditioned geometric")
-'done
 ~~~~
 
 The transition function that is automatically derived using the MH recipe is equivalent to the one we wrote by hand above.
 
+
+<!--
+For background on MH and MCMC, see the excellent introductions by David MacKay ([Chapter 29](http://www.inference.phy.cam.ac.uk/mackay/itprnn/ps/356.384.pdf) and [30](http://www.inference.phy.cam.ac.uk/mackay/itprnn/ps/387.412.pdf) of Information Theory, Inference, and Learning Algorithms) or [Radford Neal](http://www.cs.utoronto.ca/~radford/review.abstract.html).
+-->
 
 
 ## MH on program executions
