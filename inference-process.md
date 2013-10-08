@@ -1,7 +1,5 @@
 % Algorithms for inference
 
->***Note: This chapter has not been revised for the new format and Church engine. Some content may be incomplete! Some example may not work!***
-
 
 # The performance characteristics of different algorithms
 
@@ -306,10 +304,12 @@ We already saw an example of slow mixing above: the first Markov chain we used t
 Above the states were single entities (letters or numbers), but of course we may have probabilistic models where the state is more complex. In this case, element-wise proposals (that change a single part of the state at a time) can be very convenient.
 
 For instance, consider the Ising model:
+
 ~~~~
 ~~~~
 
 Here the state is a list of Boolean values. We can use the MH recipe with proposals that change a single element of this list at a time:
+
 ~~~~
 ~~~~
 
@@ -322,7 +322,6 @@ Here the state is a list of Boolean values. We can use the MH recipe with propos
                  v)
           
           (all (map (lambda (a b) (flip (if (equal? a b) 1.0 0.2))) (rest v) (drop-right v 1))))
-'done
 ~~~~
 
 
