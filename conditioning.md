@@ -589,46 +589,47 @@ disease by changing the prior probability of the disease such that it is always 
         ~~~~
 
 
-4) Casino game: Suppose that you are playing the following game at a casino. In this game, a machine randomly gives you a letter of the alphabet and the probability of winning depends on which letter you receive. The machine gives the letters a, e, i, o, u, y (the vowels) with probability 0.01 each and the remaining letters (i.e., the consonants) with probability 0.047 each. Let's use the variable $h$ to denote the letter that you receive; the probability of winning for a given $h$ is $1/Q(h)^2$, where $Q(h)$ denotes the numeric position of the letter (e.g., $Q(\textrm{a}) = 1, Q(\textrm{b}) = 2$, and so on).
-Let's express this in formal terms. The hypothesis space, $H$, is the set of letters $\{a, b, c, d, \dots, y, z\}$ and the prior probability of a hypothesis $h$ is   0.01 for vowels (a, e, i, o, u, y) and 0.047 for consonants. The likelihood, $p(d \mid h) = 1/Q(h)^2$, is the probability of winning given that you drew some letter $h$.
+4) **Casino game**. Consider the following game. A machine randomly gives Bob a letter of the alphabet; it gives a, e, i, o, u, y (the vowels) with probability 0.01 each and the remaining letters (i.e., the consonants) with probability 0.047 each. The probability that Bob wins depends on which letter he got. Letting $h$ denote the letter and letting $Q(h)$ denote the numeric position of that letter (e.g., $Q(\textrm{a}) = 1, Q(\textrm{b}) = 2$, and so on), the probability of winning is $1/Q(h)^2$. Suppose that we observe Bob winning but we don't know what letter he got. How can we use the observation that he won to update our beliefs about which letter he got? Let's express this formally. Before we begin, a bit of terminology: the set of letters that Bob could have gotten, $\{a, b, c, d, \dots, y, z\}$, is called the *hypothesis space* -- it's our set of hypotheses about the letter.
 
-    A) (Here, give your answers in English, not math) What does the $d$ in $p(d \mid h)$ represent? What does the posterior $p(h \mid d)$ represent?
+    A) In English, what does the posterior probability $p(h \mid \textrm{Bob won})$ represent?
 
     B) Manually compute $p(h \mid d)$ for each hypothesis (Excel or something like it is helpful here). Remember to normalize - make sure that summing all your $p(h \mid d)$ values gives you 1.
-Now, we're going to write this model in Church using the `cosh` engine. Here is some starter code for you:
 
-        ~~~~ {data-engine="cosh" data-exercise="ex5"}
-        ;; define some variables and utility functions
-        (define letters '(a b c d e f g h i j k l m n o p q r s t u v w x y z) )
-        (define (vowel? letter) (if (member letter '(a e i o u y)) #t #f))
-        (define letter-probabilities (map (lambda (letter) (if (vowel? letter) 0.01 0.047)) letters))
+    Now, we're going to write this model in Church using the `cosh` engine. Here is some starter code for you:
 
-        (define (my-list-index needle haystack counter)
-          (if (null? haystack)
-              'error
-              (if (equal? needle (first haystack))
-                  counter
-                  (my-list-index needle (rest haystack) (+ 1 counter)))))
+    ~~~~ {data-engine="cosh" data-exercise="ex5"}
+    ;; define some variables and utility functions
+    (define letters '(a b c d e f g h i j k l m n o p q r s t u v w x y z) )
+    (define (vowel? letter) (if (member letter '(a e i o u y)) #t #f))
+    (define letter-probabilities (map (lambda (letter) (if (vowel? letter) 0.01 0.047)) letters))
+    
+    (define (my-list-index needle haystack counter)
+      (if (null? haystack)
+          'error
+          (if (equal? needle (first haystack))
+              counter
+              (my-list-index needle (rest haystack) (+ 1 counter)))))
+    
+    (define (get-position letter) (my-list-index letter letters 1))
+    
+    ;; actually compute p(h | d)
+    (rejection-query
+     (define my-letter (multinomial letters letter-probabilities))
+    
+     (define my-position (get-position my-letter))
+     (define my-win-probability (/ 1.0 (* my-position my-position)))
+     (define win? ...)
+    
+     ;; query
+     ...
+    
+     ;; condition
+     ...
+    )
+    ~~~~
 
-        (define (get-position letter) (my-list-index letter letters 1))
+    Note that you don't need to explicitly use `hist` or `repeat` here. In cosh, function calls directly correspond to *distributions* and histograms are built for you automatically (whereas in webchurch, function calls correspond only to *samples* and you have to build the data for histograms manually.)
 
-        ;; actually compute p(h | d)
-        (rejection-query
-         (define my-letter (multinomial letters letter-probabilities))
-
-         (define my-position (get-position my-letter))
-         (define my-win-probability (/ 1.0 (* my-position my-position)))
-         (define win? ...)
-
-         ;; query
-         ...
-
-         ;; condition
-         ...
-        )
-        ~~~~
-
-        Note that you don't need to explicitly use `hist` or `repeat` here. In cosh, function calls directly correspond to *distributions* and histograms are built for you automatically (whereas in webchurch, function calls correspond only to *samples* and you have to build the data for histograms manually.)
 
     C) What does the `my-list-index` function do? What would happen if you ran `(my-list-index 'mango '(apple banana) 1)`?
 
@@ -645,10 +646,11 @@ Now, we're going to write this model in Church using the `cosh` engine. Here is 
         (define x ...)
         ~~~~
 
-    E) Fill in the `...`'s in the code to compute $p(h \mid d)$. Include a screenshot of the resulting graph. What letter has the highest posterior probability? In English, what does it mean that this letter has the highest posterior? Make sure that your Church answers and hand-computed answers agree - note that this demonstrates the equivalence between the program view of conditional probability and the distributional view.
+    E) Fill in the `...`'s in the code to compute $p(h \mid \textrm{Bob won})$. Include a screenshot of the resulting graph. What letter has the highest posterior probability? In English, what does it mean that this letter has the highest posterior? Make sure that your Church answers and hand-computed answers agree -- note that this demonstrates the equivalence between the program view of conditional probability and the distributional view.
 
-    F) Which is higher, $p(\text{vowel} \mid d)$ or $p(\text{consonant} \mid d)$? Answer this using the Church code you wrote (hint: use the `vowel?` function)
+    F) Which is higher, $p(\text{vowel} \mid \textrm{Bob won})$ or $p(\text{consonant} \mid \textrm{Bob won})$? Answer this using the Church code you wrote (hint: use the `vowel?` function)
 
     G) What difference do you see between your code and the mathematical notation? What are the advantages and disadvantages of each? Which do you prefer?
+
 
 # References
