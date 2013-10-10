@@ -591,9 +591,8 @@ disease by changing the prior probability of the disease such that it is always 
 
 4) **Casino game**. Consider the following game. A machine randomly gives Bob a letter of the alphabet; it gives a, e, i, o, u, y (the vowels) with probability 0.01 each and the remaining letters (i.e., the consonants) with probability 0.047 each. The probability that Bob wins depends on which letter he got. Letting $h$ denote the letter and letting $Q(h)$ denote the numeric position of that letter (e.g., $Q(\textrm{a}) = 1, Q(\textrm{b}) = 2$, and so on), the probability of winning is $1/Q(h)^2$. Suppose that we observe Bob winning but we don't know what letter he got. How can we use the observation that he won to update our beliefs about which letter he got? Let's express this formally. Before we begin, a bit of terminology: the set of letters that Bob could have gotten, $\{a, b, c, d, \dots, y, z\}$, is called the *hypothesis space* -- it's our set of hypotheses about the letter.
 
-    A) In English, what does the posterior probability $p(h \mid \textrm{Bob won})$ represent?
-
-    B) Manually compute $p(h \mid d)$ for each hypothesis (Excel or something like it is helpful here). Remember to normalize - make sure that summing all your $p(h \mid d)$ values gives you 1.
+    A) In English, what does the posterior probability $p(h \mid \textrm{win})$ represent?
+    B) Manually compute $p(h \mid \textrm{win})$ for each hypothesis (Excel or something like it is helpful here). Remember to normalize - make sure that summing all your $p(h \mid \textrm{win})$ values gives you 1.
 
     Now, we're going to write this model in Church using the `cosh` engine. Here is some starter code for you:
 
@@ -612,7 +611,7 @@ disease by changing the prior probability of the disease such that it is always 
     
     (define (get-position letter) (my-list-index letter letters 1))
     
-    ;; actually compute p(h | d)
+    ;; actually compute p(h | win)
     (rejection-query
      (define my-letter (multinomial letters letter-probabilities))
     
@@ -646,9 +645,9 @@ disease by changing the prior probability of the disease such that it is always 
         (define x ...)
         ~~~~
 
-    E) Fill in the `...`'s in the code to compute $p(h \mid \textrm{Bob won})$. Include a screenshot of the resulting graph. What letter has the highest posterior probability? In English, what does it mean that this letter has the highest posterior? Make sure that your Church answers and hand-computed answers agree -- note that this demonstrates the equivalence between the program view of conditional probability and the distributional view.
+    E) Fill in the `...`'s in the code to compute $p(h \mid \textrm{win})$. Include a screenshot of the resulting graph. What letter has the highest posterior probability? In English, what does it mean that this letter has the highest posterior? Make sure that your Church answers and hand-computed answers agree -- note that this demonstrates the equivalence between the program view of conditional probability and the distributional view.
 
-    F) Which is higher, $p(\text{vowel} \mid \textrm{Bob won})$ or $p(\text{consonant} \mid \textrm{Bob won})$? Answer this using the Church code you wrote (hint: use the `vowel?` function)
+    F) Which is higher, $p(\text{vowel} \mid \textrm{win})$ or $p(\text{consonant} \mid \textrm{win})$? Answer this using the Church code you wrote (hint: use the `vowel?` function)
 
     G) What difference do you see between your code and the mathematical notation? What are the advantages and disadvantages of each? Which do you prefer?
 
