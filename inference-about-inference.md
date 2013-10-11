@@ -11,10 +11,26 @@ Nested queries are particularly useful in modeling social cognition: reasoning a
 Imagine where the widget-maker makes a stream of widgets, and the widget tester tests them and removes the faulty widgets. You don't know what tolerance the widget tester is set to, and whish to infer it. We can represent this as:
 
 ~~~~
-(query
+(define (equivalent l1 l2) (if (and (null? l1) (null? l2))
+                               true
+                               (if (or (null? l1) (null? l2)) ;; are the lists the same size?
+                                   false
+                                   (if (member (first l1) l2)
+                                       (equivalent (rest l1) (remove-from-list (first l1) l2))
+                                       false))))
+
+
+(define (remove-from-list item lst)
+  (if (null? lst)
+      'error
+      (if (equal? item (first lst))
+          (rest lst)
+          (pair (first lst) (remove-from-list item (rest lst))))))
+
+(rejection-query
 
  ;;this machine makes a widget -- which we'll just represent with a real number:
- (define (widget-maker) (gaussian 0.0 1.0))
+ (define (widget-maker)  (multinomial '(.2 .3 .4 .5 .6 .7 .8) '(.05 .1 .2 .3 .2 .1 .05)))
 
  ;;this machine tests widgets as they come out of the widget-maker, letting through only those that pass threshold:
  (define (next-good-widget)
@@ -24,40 +40,60 @@ Imagine where the widget-maker makes a stream of widgets, and the widget tester 
          (next-good-widget))))
 
  ;;but we don't know what threshold the widget tester is set to:
- (define threshold (gausian 0.5 0.1))
+
+ (define threshold  (multinomial '(.3 .4 .5 .6 .7) '(.1 .2 .4 .2 .1)))
 
  ;;what is the threshold?
  threshold
 
  ;;if we see this sequence of good widgets:
- (equal? (repeat 5 next-good-widget)
-         '(0.6 0.7 0.9 0.65 0.7)))
+ (equivalent (repeat 5 next-good-widget)
+         '(0.6 0.7 0.8 .7 .8)))
 ~~~~
 
 But notice that the definition of next-good-widget is exactly like the definition of rejection sampling! We can re-write this as a nested-query model:
 
 ~~~~
-(query
+(define (equivalent l1 l2) (if (and (null? l1) (null? l2))
+                               true
+                               (if (or (null? l1) (null? l2)) ;; are the lists the same size?
+                                   false
+                                   (if (member (first l1) l2)
+                                       (equivalent (rest l1) (remove-from-list (first l1) l2))
+                                       false))))
+
+
+(define (remove-from-list item lst)
+  (if (null? lst)
+      'error
+      (if (equal? item (first lst))
+          (rest lst)
+          (pair (first lst) (remove-from-list item (rest lst))))))
+
+(rejection-query
 
  ;;this machine makes a widget -- which we'll just represent with a real number:
- (define (widget-maker) (gaussian 0.0 1.0))
+ (define (widget-maker)  (multinomial '(.2 .3 .4 .5 .6 .7 .8) '(.05 .1 .2 .3 .2 .1 .05)))
 
- ;;this machine tests widgets as they come out of the widget-maker, letting through only those that pass threshold:
- (define (next-good-widget)
-   (query
+ ;;this machine tests widgets as they come out of the widget-maker, letting
+ ;; through only those that pass threshold:
+   (define (next-good-widget)
+   (embedded-mh-query 100 10
     (define widget (widget-maker))
     widget
     (> widget threshold)))
 
  ;;but we don't know what threshold the widget tester is set to:
- (define threshold (gausian 0.5 0.1))
+
+ (define threshold  (multinomial '(.3 .4 .5 .6 .7) '(.1 .2 .4 .2 .1)))
 
  ;;what is the threshold?
  threshold
 
  ;;if we see this sequence of good widgets:
- (equal? (repeat 5 next-good-widget)
-         '(0.6 0.7 0.9 0.65 0.7)))
+ (equivalent (repeat 2 next-good-widget)
+         '(.6 .8 )))
+
 ~~~~
 Rather than thinking about the details inside the widget tester, we are now abstracting to represent that the machine correctly chooses a good widget (by some means).
 
