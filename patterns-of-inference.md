@@ -406,7 +406,7 @@ To illustrate, observe how the probabilities of `cold` and `lung-disease` change
   (hist samples "cold, lung-disease"))
 ~~~~
 
-Both cold and lung disease are now far more likely that their baseline probability: the probability of having a cold increases from 2% to around 40%; the probability of having lung disease increases from 1 in a 1000 to a few percent.  Given a cough, `cold` is the much more likely explanation simply because it was much more probable a priori.
+Both cold and lung disease are now far more likely that their baseline probability: the probability of having a cold increases from 2% to around 50%; the probability of having lung disease also increases from 1 in a 1000 to around 50%.
 
 Now suppose we learn that the patient does *not* have a cold.
 
@@ -458,7 +458,7 @@ The probability of having lung disease increases dramatically.  If instead we ha
   (hist samples "cold, lung-disease"))
 ~~~~
 
-This is the conditional statistical dependence between lung disease and cold, given cough: Learning that the patient does in fact have a cold "explains away" the observed cough, so the alternative of lung disease decreases to a much lower value---roughly back to its 1 in a 1000 rate in the general population.
+This is the conditional statistical dependence between lung disease and cold, given cough: Learning that the patient does in fact have a cold "explains away" the observed cough, so the alternative of lung disease decreases to a much lower value --- roughly back to its 1 in a 1000 rate in the general population.
 If on the other hand, we had learned that the patient does not have a cold, so the most likely alternative to lung disease is *not* in fact available to "explain away" the observed cough, that raises the conditional probability of lung disease dramatically.  As an exercise, check that if we remove the observation of coughing, the observation of having a cold or not has no influence on our belief about lung disease; this effect is purely conditional on the observation of a common effect of these two causes.
 
 <!--
