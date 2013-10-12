@@ -336,6 +336,8 @@ var forest_protocol = location.protocol.match(/file/) ? "http://" : "//";
     var $resetButton = $("<button>").html("Reset");
     $resetButton.click(function() {
       editor.setValue(defaultText);
+      editor.$engineSelector.val(editor.defaultEngine);
+      
       $results.hide().html('');
       $.ajax({
         type: "POST",
@@ -453,6 +455,7 @@ var forest_protocol = location.protocol.match(/file/) ? "http://" : "//";
         defaultText: defaultText,
         boxNum: index,
         text: defaultText,
+        defaultEngine: defaultEngine,
         engine: defaultEngine
       };
       
