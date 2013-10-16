@@ -204,7 +204,7 @@ $p(x') = \sum_x p(x)\pi(x \rightarrow x')$.
 Note that the balance condition holds for the distribution as a whole---a single state can of course be moved by the transition.
 
 There is another condition, called *detailed balance*, that is sufficient (but not necessary) to give the balance condition, and is often easier to work with: $p(x)\pi(x \rightarrow x') = p(x')\pi(x' \rightarrow x)$.
-To show that detailed balance implies balance, substitute the right-hand side of the detailed balance equation into the baance equation (replacing the summand), then simplify.
+To show that detailed balance implies balance, substitute the right-hand side of the detailed balance equation into the balance equation (replacing the summand), then simplify.
 
 ## Satisfying detailed balance: MH
 
@@ -285,7 +285,7 @@ For background on MH and MCMC, see the excellent introductions by David MacKay (
 
 How could we use the MH recipe for arbitrary Church programs? What's the state space? What are the proposals?
 
-Church MH takes as the state space the space of all executions of the code inside a query. Equivalently this is the space of all random choices that may be used in to execute this code (unused choices can be ignored withut loss of generality by marginalizing). The un-normalized score is just the product of the probabilities of all the random choices, or zero if the conditioner doesn't evaluate to true.
+Church MH takes as the state space the space of all executions of the code inside a query. Equivalently this is the space of all random choices that may be used in to execute this code (unused choices can be ignored without loss of generality by marginalizing). The un-normalized score is just the product of the probabilities of all the random choices, or zero if the conditioner doesn't evaluate to true.
 
 Proposals are made by changing a single random choice, then updating the execution (which may result in choices being created or deleted).
 
