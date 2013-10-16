@@ -47,7 +47,7 @@ Another option is to use the mathematical definition of conditional probability 
 
 Notice that the time it takes for this program to run doesn't depend on the baserate. Unfortunately it does depend critically on the number of random choices in an execution history: the number of possible histories that must be considered grows exponentially in the number of random choices. To see this try adding more random choices to the sum (following the pattern of `A`). The dependence on size of the execution space renders `enumeration-query` impractical for all but the simplest models.
 
-There are many other algorithms and techniques for dealing with conditional probabilistic inference, and several of these have been adapted into Church to give implementations of `query` that may be more efficient in various cases. One implementation that we have uses already is based on the *Metropolis Hastings* algorithm, a form of *Markov chain Monte Carlo* inference. 
+There are many other algorithms and techniques for dealing with conditional probabilistic inference, and several of these have been adapted into Church to give implementations of `query` that may be more efficient in various cases. One implementation that we have used already is based on the *Metropolis Hastings* algorithm, a form of *Markov chain Monte Carlo* inference. 
 
 ~~~~
 (define baserate 0.1)
