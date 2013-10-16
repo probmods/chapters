@@ -212,7 +212,7 @@ To construct a Markov chain that converges to a stationary distribution of inter
 
 ## Satisfying detailed balance: MH
 
-How can we come up with a `transition` function, $\pi$, that satisfies detailed balance? One way it the *Metropolis-Hastings* recipe.
+How can we come up with a `transition` function, $\pi$, that satisfies detailed balance? One way is the *Metropolis-Hastings* recipe.
 
 We start with a *proposal distribution*, $q(x\rightarrow x')$, which does not need to have the target distribution as its stationary distribution, but should be easy to sample from. We correct this into a transition function with the right stationary distribution by either accepting or rejecting each proposed transition. We accept with probability: $\min\left(1, \frac{p(x')q(x'\rightarrow x)}{p(x)q(x\rightarrow x')}\right).$ 
 That is, we flip a coin with that probability: if it comes up heads our next state is $x'$, otherwise our next state is still $x$.
