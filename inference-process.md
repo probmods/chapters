@@ -68,7 +68,7 @@ There are many other algorithms and techniques for dealing with conditional prob
 ~~~~
 
 See what happens in the above query as you lower the baserate.  Inference should not slow down appreciably, but it will become less stable and less accurate.  
-<!-- FIXME: because init is by rejection this does slow down appreciably!! -->
+
 It becomes increasingly difficult for MH to draw independent conditional samples by taking small random steps, so for a fixed lag (100 in the code above), the 100 samples returned will tend to be less representative of the true conditional inference.  In this case, stable and accurate conditional inferences can still be achieved in reasonable time by increasing the number of samples to 500 (while holding the lag at 100).
 
 
