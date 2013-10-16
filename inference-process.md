@@ -237,7 +237,7 @@ In Church the MH recipe looks like:
 (define (mcmc state iterations)
   (if (= iterations 0)
       '()
-    (pair state (mcmc (transition state) (- iterations 1)))))
+      (pair state (mcmc (transition state) (- iterations 1)))))
 ~~~~
 
 Note that in order to use this recipe we need to have a function that computes the target probability (not just one that samples from it) and the transition probability, but they need not be normalized (since the normalization terms will cancel).
