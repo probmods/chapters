@@ -206,6 +206,9 @@ Note that the balance condition holds for the distribution as a whole---a single
 There is another condition, called *detailed balance*, that is sufficient (but not necessary) to give the balance condition, and is often easier to work with: $p(x)\pi(x \rightarrow x') = p(x')\pi(x' \rightarrow x)$.
 To show that detailed balance implies balance, substitute the right-hand side of the detailed balance equation into the balance equation (replacing the summand), then simplify.
 
+In addition to the balance (or detailed balance) condition, we need to ensure that any state can be reached from any other state in a finite number of steps. This requirement is called *ergodicity*. If a chain is not ergodic, it may still leave the stationary distribution unchanged when the transition operator is applied, but the chain may not converge to the stationary distribution when initialized with a state sampled from an arbitrary distribution.
+
+
 ## Satisfying detailed balance: MH
 
 How can we come up with a `transition` function, $\pi$, that satisfies detailed balance? One way it the *Metropolis-Hastings* recipe.
