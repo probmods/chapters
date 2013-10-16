@@ -325,10 +325,13 @@ For instance, consider the one-dimensional Ising model:
 (define (noisy-equal? a b)
   (flip (if (equal? a b) 1.0 0.2)))
 
-(mh-query 100 1
-          (define bits (repeat 10 (lambda () (if (flip) 1 0))))
-          bits
-          (all (map noisy-equal? (rest bits) (all-but-last bits))))
+(define samples
+  (mh-query 30 1
+            (define bits (repeat 10 (lambda () (if (flip) 1 0))))
+            bits
+            (all (map noisy-equal? (rest bits) (all-but-last bits)))))
+
+(apply multiviz samples)
 ~~~~
 
 Here the state is a list of Boolean values (shown as 0/1 for readability). We can use an MH recipe with proposals that change a single element of this list at a time--indeed, if you look at the list of samples returned, you will notice that this is what the Church MH algorithm does.
