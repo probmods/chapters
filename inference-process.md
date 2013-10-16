@@ -199,7 +199,7 @@ The Markov chain above *implements* the query below, in the sense that it specif
 
 It turns out that for any (conditional) distribution there is a Markov chain with that stationary distribution. How can we find one when we need it? There are several methods for constructing them---they go by the name "Markov chain Monte Carlo".
 
-First, if we have a target distribution, how can we tell if a Markov chain has this target distribution as it's stationary distribution? Let $p(x)$ be the target distribution, and let $\pi(x \rightarrow x')$ be the transition distribution (i.e. the `transition` function in the above programs). Since the stationary distribution is characterized by not changing when the transition is applied we have a *balance condition*:
+First, if we have a target distribution, how can we tell if a Markov chain has this target distribution as its stationary distribution? Let $p(x)$ be the target distribution, and let $\pi(x \rightarrow x')$ be the transition distribution (i.e. the `transition` function in the above programs). Since the stationary distribution is characterized by not changing when the transition is applied we have a *balance condition*:
 $p(x') = \sum_x p(x)\pi(x \rightarrow x')$.
 Note that the balance condition holds for the distribution as a whole---a single state can of course be moved by the transition.
 
