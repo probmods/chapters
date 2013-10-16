@@ -289,7 +289,7 @@ For background on MH and MCMC, see the excellent introductions by David MacKay (
 
 How could we use the MH recipe for arbitrary Church programs? What's the state space? What are the proposals?
 
-Church MH takes as the state space the space of all executions of the code inside a query. Equivalently this is the space of all random choices that may be used in to execute this code (unused choices can be ignored without loss of generality by marginalizing). The un-normalized score is just the product of the probabilities of all the random choices, or zero if the conditioner doesn't evaluate to true.
+Church MH takes as the state space the space of all executions of the code inside a query. Equivalently this is the space of all random choices that may be used in the process of executing this code (unused choices can be ignored without loss of generality by marginalizing). The un-normalized score is just the product of the probabilities of all the random choices, or zero if the conditioner doesn't evaluate to true.
 
 Proposals are made by changing a single random choice, then updating the execution (which may result in choices being created or deleted).
 
@@ -303,32 +303,35 @@ An MCMC sampler is guaranteed to take unbiased samples from its stationary distr
 We already saw an example of slow mixing above: the first Markov chain we used to sample from the uniform distribution would take (on average) several iterations to switch from `a` or `b` to `c` or `d`. In order to get approximately independent samples, we needed to wait longer than this time between taking iterations. In contrast, the more efficient Markov chain (with uniform transition function) let us take sample with little lag. In this case poor mixing was the result of a poorly chosen transition function. Poor mixing is often associated with multimodal distributions.
 
 
-# States with structure and Gibbs sampling
+# States with structure 
+<!-- and Gibbs sampling -->
 
 Above the states were single entities (letters or numbers), but of course we may have probabilistic models where the state is more complex. In this case, element-wise proposals (that change a single part of the state at a time) can be very convenient.
 
-For instance, consider the Ising model:
+For instance, consider the one-dimensional Ising model:
 
 ~~~~
+(define (all-but-last xs)
+  (cond ((null? xs) (error "all-but-last got empty list!"))
+        ((null? (rest xs)) '())
+        (else (pair (first xs) (all-but-last (rest xs))))))
+
+(define (all xs)
+  (if (null? xs)
+      #t
+      (and (first xs)
+           (all (rest xs)))))
+
+(define (noisy-equal? a b)
+  (flip (if (equal? a b) 1.0 0.2)))
+
+(mh-query 100 1
+          (define bits (repeat 10 (lambda () (if (flip) 1 0))))
+          bits
+          (all (map noisy-equal? (rest bits) (all-but-last bits))))
 ~~~~
 
-Here the state is a list of Boolean values. We can use the MH recipe with proposals that change a single element of this list at a time:
-
-~~~~
-~~~~
-
-~~~~
-(mh-query 1000 1
-          (define v (repeat 10 (lambda () (if (flip) 1 0))))
-          
-          (begin (repeat 100000 (lambda () (+ 100 100)))
-                 (barplot (map pair (iota 10) v) "bar") 
-                 v)
-          
-          (all (map (lambda (a b) (flip (if (equal? a b) 1.0 0.2))) (rest v) (drop-right v 1))))
-~~~~
-
-
+Here the state is a list of Boolean values (shown as 0/1 for readability). We can use an MH recipe with proposals that change a single element of this list at a time--indeed, if you look at the list of samples returned, you will notice that this is what the Church MH algorithm does.
 
 <!--
 
