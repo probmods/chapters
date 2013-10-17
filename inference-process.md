@@ -285,7 +285,7 @@ For background on MH and MCMC, see the excellent introductions by David MacKay (
 -->
 
 
-# States with structure 
+## States with structure 
 
 Above the states were single entities (letters or numbers), but of course we may have probabilistic models where the state is more complex. In this case, element-wise proposals (that change a single part of the state at a time) can be very convenient.
 
@@ -318,7 +318,7 @@ For instance, consider the one-dimensional Ising model:
 Here the state is a list of Boolean values (shown as 0/1 for readability). We can use an MH recipe with proposals that change a single element of this list at a time--indeed, if you look at the list of samples returned, you will notice that this is what the Church MH algorithm does.
 
 
-# MH on program executions
+## MH on program executions
 
 How could we use the MH recipe for arbitrary Church programs? What's the state space? What are the proposals?
 
