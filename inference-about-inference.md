@@ -607,7 +607,12 @@ Single step, utility-based decision problem.
 
 ~~~~ {.mit-church}
 ;;;fold:
-(define (sample-discrete weights) (multinomial (iota (length weights) weights)))
+(define (iota count start step)
+  (if (equal? count 0)
+      '()
+      (pair start (iota (- count 1) (+ start step) step))))
+
+(define (sample-discrete weights) (multinomial (iota (length weights) 0 1) weights))
 ;;;
 
 (define (match utility)
@@ -621,11 +626,10 @@ Single step, utility-based decision problem.
     (map (lambda (x) (/ x lst-sum)) lst)))
 
 (define utility-function '(1 2 3 4 5))
-
-(hist (repeat 1000 (lambda () (match utility-function))) "matching")
-
 (define b 1)
-(hist (repeat 1000 (lambda () (softmax utility-function b))) "softmax")
+(multiviz
+(hist (repeat 1000 (lambda () (match utility-function))) "matching")
+(hist (repeat 1000 (lambda () (softmax utility-function 1))) "softmax"))
 ~~~~
 
 Multi-step, suboptimal planning as inference
