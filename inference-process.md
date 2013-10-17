@@ -336,6 +336,29 @@ For instance, consider the one-dimensional Ising model:
 
 Here the state is a list of Boolean values (shown as 0/1 for readability). We can use an MH recipe with proposals that change a single element of this list at a time--indeed, if you look at the list of samples returned, you will notice that this is what the Church MH algorithm does.
 
+
+# Exercises
+
+1) Why does the Church MH algorithm return less stable estimates when you lower the baserate for the following program?
+
+~~~~ {data-exercise="ex1"}
+(define baserate 0.1)
+
+(define samples
+  (mh-query 100 100
+
+   (define A (if (flip baserate) 1 0))
+   (define B (if (flip baserate) 1 0))
+   (define C (if (flip baserate) 1 0))
+   (define D (+ A B C))
+
+   A
+
+   (>= D 2)))
+   
+(hist samples "Value of A, given that D is greater than or equal to 2")
+~~~~
+
 <!--
 
 # Importance sampling 
