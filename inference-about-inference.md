@@ -11,6 +11,8 @@ Nested queries are particularly useful in modeling social cognition: reasoning a
 Imagine where the widget-maker makes a stream of widgets, and the widget tester tests them and removes the faulty widgets. You don't know what tolerance the widget tester is set to, and whish to infer it. We can represent this as:
 
 ~~~~
+;;;fold: helper functions
+
 (define (equivalent l1 l2) (if (and (null? l1) (null? l2))
                                true
                                (if (or (null? l1) (null? l2)) ;; are the lists the same size?
@@ -26,6 +28,7 @@ Imagine where the widget-maker makes a stream of widgets, and the widget tester 
       (if (equal? item (first lst))
           (rest lst)
           (pair (first lst) (remove-from-list item (rest lst))))))
+;;;
 
 (rejection-query
 
@@ -54,6 +57,9 @@ Imagine where the widget-maker makes a stream of widgets, and the widget tester 
 But notice that the definition of next-good-widget is exactly like the definition of rejection sampling! We can re-write this as a nested-query model:
 
 ~~~~
+
+;;;fold: helper functions
+
 (define (equivalent l1 l2) (if (and (null? l1) (null? l2))
                                true
                                (if (or (null? l1) (null? l2)) ;; are the lists the same size?
@@ -69,6 +75,7 @@ But notice that the definition of next-good-widget is exactly like the definitio
       (if (equal? item (first lst))
           (rest lst)
           (pair (first lst) (remove-from-list item (rest lst))))))
+;;;
 
 (rejection-query
 
@@ -209,13 +216,15 @@ Now let's imagine a more ambiguous case: button b is "broken" and will (uniforml
    (equal? (choose-action goal? vending-machine 'state) 'b))
 ~~~~
 
-Despite the fact that button bis equally likely to result in either bagel or cookie, we have inferred that sally probably wants a cookie. Why would this be? (Hint: if she had wanted a bagel, what would she have done?) This effect follows, though indirectly, from the law of conservation of belief in this inference about inference setting.
+Despite the fact that button b is equally likely to result in either bagel or cookie, we have inferred that sally probably wants a cookie. Why would this be? (Hint: if she had wanted a bagel, what would she have done?) This effect follows, though indirectly, from the law of conservation of belief in this inference about inference setting.
 
 ## Preferences
 
 If we have some prior knowledge about Sally's preferences (which goals she is likely to have) we can incorporate this immediately into the prior over goals (which above was uniform).
 
-A more interesting situation is when we believe that Sally has *some* preferences, but we don't know what they are. We capture this by adding a higher level prior (a Dirichlet) over preferences. Using this we can learn about Sally's preferences from her actions: after seeing Sally press button b several times, what will we expect her to want the next time?
+A more interesting situation is when we believe that Sally has *some*
+preferences, but we don't know what they are. We capture this by adding a higher
+level prior (a uniform-draw) over preferences. Using this we can learn about Sally's preferences from her actions: after seeing Sally press button b several times, what will we expect her to want the next time?
 
 ~~~~ {.cosh}
 (define (choose-action goal? transition state)
@@ -248,7 +257,9 @@ A more interesting situation is when we believe that Sally has *some* preference
 
 Try varying the amount and kind of evidence. For instance, if Sally one time says "I want a cookie" (so you have directly observed her goal that time) how much evidence does that give you about her preferences, relative to observing her actions?
 
-In the above preference inference, it is extremely important that sally *could have* taken a different action if she had a different preference (i.e. she could have pressed button *a* if she preferred to have a bagel). In the below program we have set up a situation in which both actions lead to cookie most of the time:
+In the above preference inference, it is extremely important that sally *could
+have* taken a different action if she had a different preference (i.e. she could
+have pressed button *a* if she preferred to have a bagel). In the program below we have set up a situation in which both actions lead to cookie most of the time:
 
 ~~~~ {.cosh}
 (define (choose-action goal? transition state)
@@ -665,3 +676,6 @@ Multi-step, suboptimal planning as inference
 Recursively optimal planning.
 
 Gergely and Csibra principle of efficiency and equifinality come from Bayes Occam.
+
+
+# References
