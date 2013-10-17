@@ -80,7 +80,7 @@ _hist = function(samps, title) {
 	    var yMax = Math.max.apply(Math, values);
 	    var y = d3.scale.ordinal()
             .domain(values)
-            .rangeRoundBands([height, 0], .1);
+            .rangeRoundBands([0, height], .1);
 	    var yAxis = d3.svg.axis()
 	        .scale(d3.scale.linear()
 	                       .domain([yMin, yMax])
