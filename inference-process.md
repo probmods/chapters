@@ -285,26 +285,7 @@ For background on MH and MCMC, see the excellent introductions by David MacKay (
 -->
 
 
-## MH on program executions
-
-How could we use the MH recipe for arbitrary Church programs? What's the state space? What are the proposals?
-
-Church MH takes as the state space the space of all executions of the code inside a query. Equivalently this is the space of all random choices that may be used in the process of executing this code (unused choices can be ignored without loss of generality by marginalizing). The un-normalized score is just the product of the probabilities of all the random choices, or zero if the conditioner doesn't evaluate to true.
-
-Proposals are made by changing a single random choice, then updating the execution (which may result in choices being created or deleted).
-
-To get this all to work we need a way to identify random choices across different executions of the program. We can do this by augmenting the program with "call names".
-
-
-## Biases of MCMC
-
-An MCMC sampler is guaranteed to take unbiased samples from its stationary distribution ''in the limit'' of arbitrary time between samples. In practice MCMC will have characteristic biases in the form of long burn-in and slow mixing. 
-
-We already saw an example of slow mixing above: the first Markov chain we used to sample from the uniform distribution would take (on average) several iterations to switch from `a` or `b` to `c` or `d`. In order to get approximately independent samples, we needed to wait longer than this time between taking iterations. In contrast, the more efficient Markov chain (with uniform transition function) let us take sample with little lag. In this case poor mixing was the result of a poorly chosen transition function. Poor mixing is often associated with multimodal distributions.
-
-
 # States with structure 
-<!-- and Gibbs sampling -->
 
 Above the states were single entities (letters or numbers), but of course we may have probabilistic models where the state is more complex. In this case, element-wise proposals (that change a single part of the state at a time) can be very convenient.
 
@@ -335,6 +316,24 @@ For instance, consider the one-dimensional Ising model:
 ~~~~
 
 Here the state is a list of Boolean values (shown as 0/1 for readability). We can use an MH recipe with proposals that change a single element of this list at a time--indeed, if you look at the list of samples returned, you will notice that this is what the Church MH algorithm does.
+
+
+# MH on program executions
+
+How could we use the MH recipe for arbitrary Church programs? What's the state space? What are the proposals?
+
+Church MH takes as the state space the space of all executions of the code inside a query. Equivalently this is the space of all random choices that may be used in the process of executing this code (unused choices can be ignored without loss of generality by marginalizing). The un-normalized score is just the product of the probabilities of all the random choices, or zero if the conditioner doesn't evaluate to true.
+
+Proposals are made by changing a single random choice, then updating the execution (which may result in choices being created or deleted).
+
+To get this all to work we need a way to identify random choices across different executions of the program. We can do this by augmenting the program with "call names".
+
+
+# Biases of MCMC
+
+An MCMC sampler is guaranteed to take unbiased samples from its stationary distribution ''in the limit'' of arbitrary time between samples. In practice MCMC will have characteristic biases in the form of long burn-in and slow mixing. 
+
+We already saw an example of slow mixing above: the first Markov chain we used to sample from the uniform distribution would take (on average) several iterations to switch from `a` or `b` to `c` or `d`. In order to get approximately independent samples, we needed to wait longer than this time between taking iterations. In contrast, the more efficient Markov chain (with uniform transition function) let us take sample with little lag. In this case poor mixing was the result of a poorly chosen transition function. Poor mixing is often associated with multimodal distributions.
 
 
 # Exercises
