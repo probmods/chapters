@@ -106,7 +106,10 @@ Rather than thinking about the details inside the widget tester, we are now abst
 
 # Social Cognition
 
-How can we capture our intuitive theory of other people? Central to our understanding is the principle of rationality: an agent will choose actions that she expects to lead to outcomes that satisfy her goals. (This is a slight restatement of the principle as discussed in Baker, Saxe, and Tenenbaum, 2009, building on earlier work by Dennett, 1987, and Gergely and Csibra, among others.) We can represent this in Church by an inner query&mdash;an agent infers an action which will lead to their goal being satisfied:
+How can we capture our intuitive theory of other people? Central to our
+understanding is the principle of rationality: an agent will choose actions that
+she expects to lead to outcomes that satisfy her goals. (This is a slight
+restatement of the principle as discussed in @Baker:2009ti, building on earlier work by @Dennett:1989wh, among others.) We can represent this in Church by an inner query&mdash;an agent infers an action which will lead to their goal being satisfied:
 <pre>
 (define (choose-action goal? transition state)
   (query
@@ -289,7 +292,10 @@ have pressed button *a* if she preferred to have a bagel). In the program below 
       (equal? (choose-action (goal-prior) vending-machine 'state) 'b)
       (equal? (choose-action (goal-prior) vending-machine 'state) 'b)))
 ~~~~
-Now we can draw no conclusion about Sally's preferences. Try varying the machine probabilities, how does the preference inference change? This effect, that the strength of a preference inference depends on the context of alternative actions, has been demonstrated in young infants by Kushnir, Xu, and Wellman (2010).
+Now we can draw no conclusion about Sally's preferences. Try varying the machine
+      probabilities, how does the preference inference change? This effect, that
+      the strength of a preference inference depends on the context of
+      alternative actions, has been demonstrated in young infants by @Kushnir:2010wx.
 
 ## Epistemic States
 
@@ -370,7 +376,7 @@ Now imagine a vending machine that has only one button, but it can be pressed ma
 Compare the inferences that result if Sally presses the button twice to those if she only presses the button once. Why can we draw much stronger inferences about the machine when Sally chooses to press the button twice? When Sally does press the button twice, she could have done the "easier" (or rather, a priori more likely) action of pressing the button just once. Since she doesn't, a single press must have been unlikely to result in a cookie. This is an example of the *principle of efficiency*&mdash;all other things being equal, an agent will take the actions that require least effort (and hence, when an agent expends more effort all other things must not be equal). Indeed, this example shows that the principle of efficiency emerges from inference about inference via the Bayesian Occam's razor.
 Sally has an infinite space of possible actions. Because these actions are constructed by a recursive generative process, simpler actions are a priori more likely.
 
-In these examples we have seen two important assumptions combining to allow us to infer something about the world from the indirect evidence of an agents actions. The first assumption is the principle of rational action, the second is an assumption of *knowledgeability*&mdash;we assumed that Sally knows how the machine works, though we don't. Thus inference about inference, can be a powerful way to learn what others already know, by observing their actions. (This example was inspired by Goodman, Baker, Tenenbaum, 2009.)
+In these examples we have seen two important assumptions combining to allow us to infer something about the world from the indirect evidence of an agents actions. The first assumption is the principle of rational action, the second is an assumption of *knowledgeability*&mdash;we assumed that Sally knows how the machine works, though we don't. Thus inference about inference, can be a powerful way to learn what others already know, by observing their actions. (This example was inspired by @Goodman:2009uy)
 
 ### Joint inference about beliefs and desires
 
@@ -500,7 +506,7 @@ Which hypothesis will the learner infer if the teacher shows the green side?
 
 If we run this with recursion depth 0&mdash;that is a learner that does probabilistic inference without thinking about the teacher thinking&mdash;we find the learner infers hypothesis B most of the time (about 60% of the time). This is the same as using the "strong sampling" assumption: the learner infers B because B is more likely to have landed on side 2. However, if we increase the recursion depth we find this reverses: the learner infers B only about 40% of the time. Now die A becomes the better inference, because "if the teacher had meant to communicate B, they would have shown the red side because that can never come from A."
 
-This model, has been proposed by Shafto and Goodman (2008) as a model of natural pedagogy. They describe several experimental tests of this model in the setting of simple "teaching games," showing that people make inferences as above when they think the examples come from a helpful teacher, but not otherwise.
+This model, has been proposed by @Shafto:2012by as a model of natural pedagogy. They describe several experimental tests of this model in the setting of simple "teaching games," showing that people make inferences as above when they think the examples come from a helpful teacher, but not otherwise.
 
 ## Communicating with Words
 
@@ -536,7 +542,11 @@ Here the probability <code>literal-prob</code> controls the expected depth of re
 
 ### Example: Scalar Implicature
 
-Let us imagine a situation in which there are three plants which may or may not have sprouted. We imagine that there are three sentences that the speaker could say, "All of the plants have sprouted", "Some of the plants have sprouted", or "None of the plants have sprouted". For simplicity we represent the worlds by the number of sprouted plants (0,1,2, or 3) and take a uniform prior over worlds. Using the above representation for communicating with words:
+Let us imagine a situation in which there are three plants which may or may not
+have sprouted. We imagine that there are three sentences that the speaker could
+say, "All of the plants have sprouted", "Some of the plants have sprouted", or
+"None of the plants have sprouted". For simplicity we represent the worlds by
+the number of sprouted plants (0, 1, 2, or 3) and take a uniform prior over worlds. Using the above representation for communicating with words:
 
 ~~~~ {.cosh}
 (define (state-prior) (uniform-draw '(0 1 2 3)))
