@@ -1,6 +1,6 @@
 /* global _ */
 
-var format_result = require("./format_result").format_result;
+//var format_result = require("./format_result").format_result;
 var maxBins = 20;
 
 var listToArray = function(xs) {
