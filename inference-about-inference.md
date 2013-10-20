@@ -85,7 +85,7 @@ But notice that the definition of next-good-widget is exactly like the definitio
  ;;this machine tests widgets as they come out of the widget-maker, letting
  ;; through only those that pass threshold:
    (define (next-good-widget)
-   (embedded-mh-query 100 10
+   (rejection-query
     (define widget (widget-maker))
     widget
     (> widget threshold)))
@@ -369,8 +369,8 @@ Now imagine a vending machine that has only one button, but it can be pressed ma
 
 (define samples (repeat 500 sample))
 (multiviz
-(hist (map first samples) 10 "Probability that (a a) gives cookie")
-(hist (map second samples) 10 "Probability that (a) gives cookie"))
+(hist (map first samples) "Probability that (a a) gives cookie")
+(hist (map second samples) "Probability that (a) gives cookie"))
 ~~~~
 
 Compare the inferences that result if Sally presses the button twice to those if she only presses the button once. Why can we draw much stronger inferences about the machine when Sally chooses to press the button twice? When Sally does press the button twice, she could have done the "easier" (or rather, a priori more likely) action of pressing the button just once. Since she doesn't, a single press must have been unlikely to result in a cookie. This is an example of the *principle of efficiency*&mdash;all other things being equal, an agent will take the actions that require least effort (and hence, when an agent expends more effort all other things must not be equal). Indeed, this example shows that the principle of efficiency emerges from inference about inference via the Bayesian Occam's razor.
@@ -411,8 +411,8 @@ In social cognition, we often make joint inferences about two kinds of mental st
 
 (define samples (repeat 500 sample))
 (multiviz
-(hist (map first samples) 10 "Probability that (a a) gives cookie")
-(hist (map second samples) 10 "Probability that (a) gives cookie")
+(hist (map first samples) "Probability that (a a) gives cookie")
+(hist (map second samples) "Probability that (a) gives cookie")
 (hist (map third samples) "Goal probabilities"))
 ~~~~
 
