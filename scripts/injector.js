@@ -96,6 +96,7 @@ var forest_protocol = location.protocol.match(/file/) ? "http://" : "//";
  
     if (e.stackarray != undefined) {
         $results.append("\nStack trace: " + e.stack );
+ 
         var errorlocation = e.stackarray[0]
         var start=errorlocation.start.split(":"), end=errorlocation.end.split(":")
         var mark = editor.markText({line: Number(start[0])-1, ch: Number(start[1])-1},
