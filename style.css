@@ -326,7 +326,7 @@ button.run {
 }
 
 .CodeMirrorError {
-    background-color: red;
+    background-color: #FFA500;
     font-weight: bold
 }
 
