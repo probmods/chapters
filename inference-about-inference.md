@@ -706,7 +706,7 @@ to deceive you?
 
 	A) Complete the code below so that choose-action chooses a misdirection if Sally is deceptive. Then describe and show what happens if you knew Sally was deceptive and chose action "b".
 
-	~~~
+	~~~~ {data-exercise="ex1a"}
 	(define (choose-action goal? transition state deceive)
 	  (rejection-query
 	   (define action (action-prior))
