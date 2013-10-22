@@ -741,7 +741,7 @@ to deceive you?
 	))
 	
 	 (hist (repeat 100 sample) "Sally's goal")
-	~~~
+	~~~~
 
 	B) What happens if you don't know Sally is deceptive and she chooses "b" and then "b". What if she chooses "a" and then "b." Show the models and describe the difference in behavior. Is she deceptive in each case?
 
