@@ -18,7 +18,9 @@
       }
     },
     error: function() {
-      alert('accounts server appears to be down. saving/loading code won\'t work');
+      if (!location.protocol.match(/file/)) {
+        alert('accounts server appears to be down. saving/loading code won\'t work');
+      }
     }
   });
 
