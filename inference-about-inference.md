@@ -1,7 +1,5 @@
 % Inference about Inference
 
->***Note: This chapter has not been revised for the new format and Church engine. Some content may be incomplete! Some example may not work!***
-
 The `query` operator is an ordinary Church function, in the sense that it can occur anywhere that any other function can occur. In particular, we can construct a query with another query inside of it: this represents hypothetical inference *about* a hypothetical inference. Nested queries are particularly useful in modeling social cognition: reasoning about another agent, who is herself reasoning.
 
 (There are some implementation-specific restrictions on nesting queries: the `rejection-query` operator can always be nested, while nesting `mh-query` requires special syntax.)
@@ -11,94 +9,63 @@ The `query` operator is an ordinary Church function, in the sense that it can oc
 Imagine a factory where the widget-maker makes a stream of widgets, and the widget-tester removes the faulty ones. You don't know what tolerance the widget tester is set to, and wish to infer it. We can represent this as:
 
 ~~~~
-;;;fold: helper functions
+(define (sample)
+ (rejection-query
+  
+  ;;this machine makes a widget -- which we'll just represent with a real number:
+  (define (widget-maker)  (multinomial '(.2 .3 .4 .5 .6 .7 .8) '(.05 .1 .2 .3 .2 .1 .05)))
+  
+  ;;this machine tests widgets as they come out of the widget-maker, letting
+  ;; through only those that pass threshold:
+  (define (next-good-widget)
+    (define widget (widget-maker))
+    (if (> widget threshold)
+        widget
+        (next-good-widget)))
+  
+  ;;but we don't know what threshold the widget tester is set to:
+  
+  (define threshold  (multinomial '(.3 .4 .5 .6 .7) '(.1 .2 .4 .2 .1)))
+  
+  ;;what is the threshold?
+  threshold
+  
+  ;;if we see this sequence of good widgets:
+  (equal? (repeat 3 next-good-widget)
+          '(0.6 0.7 0.8))))
 
-(define (equivalent l1 l2) (if (and (null? l1) (null? l2))
-                               true
-                               (if (or (null? l1) (null? l2)) ;; are the lists the same size?
-                                   false
-                                   (if (member (first l1) l2)
-                                       (equivalent (rest l1) (remove-from-list (first l1) l2))
-                                       false))))
-
-
-(define (remove-from-list item lst)
-  (if (null? lst)
-      'error
-      (if (equal? item (first lst))
-          (rest lst)
-          (pair (first lst) (remove-from-list item (rest lst))))))
-;;;
-
-(rejection-query
- 
- ;;this machine makes a widget -- which we'll just represent with a real number:
- (define (widget-maker)  (multinomial '(.2 .3 .4 .5 .6 .7 .8) '(.05 .1 .2 .3 .2 .1 .05)))
- 
- ;;this machine tests widgets as they come out of the widget-maker, letting through only those that pass threshold:
- (define (next-good-widget)
-   (define widget (widget-maker))
-   (if (> widget threshold)
-       widget
-       (next-good-widget)))
- 
- ;;but we don't know what threshold the widget tester is set to:
- 
- (define threshold  (multinomial '(.3 .4 .5 .6 .7) '(.1 .2 .4 .2 .1)))
- 
- ;;what is the threshold?
- threshold
- 
- ;;if we see this sequence of good widgets:
- (equivalent (repeat 5 next-good-widget)
-             '(0.6 0.7 0.8 .7 .8)))
+(hist (repeat 20 sample))
 ~~~~
 
 But notice that the definition of next-good-widget is exactly like the definition of rejection sampling! We can re-write this as a nested-query model:
 
 ~~~~
-;;;fold: helper functions
-
-(define (equivalent l1 l2) (if (and (null? l1) (null? l2))
-                               true
-                               (if (or (null? l1) (null? l2)) ;; are the lists the same size?
-                                   false
-                                   (if (member (first l1) l2)
-                                       (equivalent (rest l1) (remove-from-list (first l1) l2))
-                                       false))))
-
-
-(define (remove-from-list item lst)
-  (if (null? lst)
-      'error
-      (if (equal? item (first lst))
-          (rest lst)
-          (pair (first lst) (remove-from-list item (rest lst))))))
-;;;
-
-(rejection-query
- 
- ;;this machine makes a widget -- which we'll just represent with a real number:
- (define (widget-maker)  (multinomial '(.2 .3 .4 .5 .6 .7 .8) '(.05 .1 .2 .3 .2 .1 .05)))
- 
- ;;this machine tests widgets as they come out of the widget-maker, letting
- ;; through only those that pass threshold:
- (define (next-good-widget)
-   (rejection-query
-    (define widget (widget-maker))
-    widget
-    (> widget threshold)))
- 
- ;;but we don't know what threshold the widget tester is set to:
- 
- (define threshold  (multinomial '(.3 .4 .5 .6 .7) '(.1 .2 .4 .2 .1)))
- 
- ;;what is the threshold?
- threshold
- 
- ;;if we see this sequence of good widgets:
- (equivalent (repeat 2 next-good-widget)
-             '(.6 .8 )))
+(define (sample)
+ (rejection-query
+  
+  ;;this machine makes a widget -- which we'll just represent with a real number:
+  (define (widget-maker)  (multinomial '(.2 .3 .4 .5 .6 .7 .8) '(.05 .1 .2 .3 .2 .1 .05)))
+  
+  ;;this machine tests widgets as they come out of the widget-maker, letting
+  ;; through only those that pass threshold:
+  (define (next-good-widget)
+    (rejection-query
+     (define widget (widget-maker))
+     widget
+     (> widget threshold)))
+  
+  ;;but we don't know what threshold the widget tester is set to:
+  
+  (define threshold  (multinomial '(.3 .4 .5 .6 .7) '(.1 .2 .4 .2 .1)))
+  
+  ;;what is the threshold?
+  threshold
+  
+  ;;if we see this sequence of good widgets:
+  (equal? (repeat 3 next-good-widget)
+          '(0.6 0.7 0.8))))
+  
+(hist (repeat 20 sample))
 ~~~~
 
 Rather than thinking about the details inside the widget tester, we are now abstracting to represent that the machine correctly chooses a good widget (by some means).
@@ -106,21 +73,23 @@ Rather than thinking about the details inside the widget tester, we are now abst
 # Social Cognition
 
 How can we capture our intuitive theory of other people? Central to our
-understanding is the principle of rationality: an agent will choose actions that
+understanding is the principle of rationality: an agent tends to choose actions that
 she expects to lead to outcomes that satisfy her goals. (This is a slight
-restatement of the principle as discussed in @Baker:2009ti, building on earlier work by @Dennett:1989wh, among others.) We can represent this in Church by an inner query&mdash;an agent infers an action which will lead to their goal being satisfied:
-<pre>
+restatement of the principle as discussed in @Baker:2009ti, building on earlier work by @Dennett:1989wh, among others.) We can represent this in Church by a query---an agent infers an action which will lead to their goal being satisfied:
+
+~~~~
 (define (choose-action goal? transition state)
   (query
    (define action (action-prior))
    action
    (goal? (transition state action))))
-</pre>
+~~~~
+
 The function `transition` describes the outcome of taking a particular action in a particular state, the predicate `goal?` determines whether or not a state accomplishes the goal, the input `state` represents the current state of the world. The function `action-prior` used within `choose-action` represents an a-priori tendency towards certain actions.
 
 For instance, imagine that Sally walks up to a vending machine wishing to have a cookie. Imagine also that we know the mapping between buttons (potential actions) and foods (outcomes). We can then predict Sally's action:
 
-~~~~ {.cosh}
+~~~~
 (define (choose-action goal? transition state)
   (rejection-query
    (define action (action-prior))
@@ -137,18 +106,22 @@ For instance, imagine that Sally walks up to a vending machine wishing to have a
 
 (define (have-cookie? object) (equal? object 'cookie))
 
-(choose-action have-cookie? vending-machine 'state)
+(define (sample)
+ (choose-action have-cookie? vending-machine 'state))
+
+(hist (repeat 100 sample))
 ~~~~
 
-We see, unsurprisingly, that if Sally wants a cookie, she will always press button b. (In defining the vending machine we have used [[the case statement]] instead of a long set of `if`s.) In a world that is not quite so deterministic Sally's actions will be more stochastic:
+We see, unsurprisingly, that if Sally wants a cookie, she will always press button b. (In defining the vending machine we have used a [case statement](appendix-scheme.html#useful-syntax) instead of a long set of `if`s.) In a world that is not quite so deterministic Sally's actions will be more stochastic:
 
-~~~~ {.cosh}
+~~~~
+;;;fold: choose-action
 (define (choose-action goal? transition state)
   (rejection-query
    (define action (action-prior))
    action
    (goal? (transition state action))))
-
+;;;
 (define (action-prior) (uniform-draw '(a b)))
 
 (define (vending-machine state action)
@@ -159,7 +132,10 @@ We see, unsurprisingly, that if Sally wants a cookie, she will always press butt
 
 (define (have-cookie? object) (equal? object 'cookie))
 
-(choose-action have-cookie? vending-machine 'state)
+(define (sample)
+ (choose-action have-cookie? vending-machine 'state))
+
+(hist (repeat 100 sample))
 ~~~~
 
 Technically, this method of making a choices is not optimal, but rather it is *soft-max* optimal (also known as following the "Boltzmann policy").
@@ -168,57 +144,65 @@ Technically, this method of making a choices is not optimal, but rather it is *s
 
 Now imagine that we don't know Sally's goal (which food she wants), but we observe her pressing button b. We can use a query to infer her goal (this is sometimes called "inverse planning", since the outer query "inverts" the query inside `choose-action`).
 
-~~~~ {.cosh}
+~~~~
+;;;fold: choose-action
 (define (choose-action goal? transition state)
   (rejection-query
    (define action (action-prior))
    action
    (goal? (transition state action))))
-
+;;;
 (define (action-prior) (uniform-draw '(a b)))
 
 (define (vending-machine state action)
   (case action
-    (('a) (multinomial '(bagel cookie) '(0.9 0.1)))
-    (('b) (multinomial '(bagel cookie) '(0.1 0.9)))
-    (else 'nothing)))
-
+        (('a) (multinomial '(bagel cookie) '(0.9 0.1)))
+        (('b) (multinomial '(bagel cookie) '(0.1 0.9)))
+        (else 'nothing)))
+(define (sample)
  (rejection-query
-   (define goal-food (uniform-draw '(bagel cookie)))
-   (define goal? (lambda (outcome) (equal? outcome goal-food)))
+  (define goal-food (uniform-draw '(bagel cookie)))
+  (define goal? (lambda (outcome) (equal? outcome goal-food)))
+  
+  goal-food
+  
+  (equal? (choose-action goal? vending-machine 'state) 'b)))
 
-   goal-food
-
-   (equal? (choose-action goal? vending-machine 'state) 'b))
+(hist (repeat 100 sample))
 ~~~~
 
 Now let's imagine a more ambiguous case: button b is "broken" and will (uniformly) randomly result in a food from the machine. If we see Sally press button b, what goal is she most likely to have?
 
-~~~~ {.cosh}
+~~~~ 
+;;;fold: choose-action
 (define (choose-action goal? transition state)
   (rejection-query
    (define action (action-prior))
    action
    (goal? (transition state action))))
-
+;;;
 (define (action-prior) (uniform-draw '(a b)))
 
 (define (vending-machine state action)
   (case action
-    (('a) (multinomial '(bagel cookie) '(0.9 0.1)))
-    (('b) (multinomial '(bagel cookie) '(0.5 0.5)))
-    (else 'nothing)))
+        (('a) (multinomial '(bagel cookie) '(0.9 0.1)))
+        (('b) (multinomial '(bagel cookie) '(0.5 0.5)))
+        (else 'nothing)))
 
- (rejection-query
+(define (sample)
+  (rejection-query
    (define goal-food (uniform-draw '(bagel cookie)))
    (define goal? (lambda (outcome) (equal? outcome goal-food)))
-
+   
    goal-food
+   
+   (equal? (choose-action goal? vending-machine 'state) 'b)))
 
-   (equal? (choose-action goal? vending-machine 'state) 'b))
+(hist (repeat 100 sample)) 
 ~~~~
 
-Despite the fact that button b is equally likely to result in either bagel or cookie, we have inferred that sally probably wants a cookie. Why would this be? (Hint: if she had wanted a bagel, what would she have done?) This effect follows, though indirectly, from the law of conservation of belief in this inference about inference setting.
+Despite the fact that button b is equally likely to result in either bagel or cookie, we have inferred that sally probably wants a cookie. This is a result of the inference implicitly taking into account the counterfactual alternatives: if Sally had wanted a bagel, she would have likely pressed button a. The inner query takes these alternatives into account, adjusting the probability of the observed action based on alternative goals.
+
 
 ## Preferences
 
@@ -226,35 +210,38 @@ If we have some prior knowledge about Sally's preferences (which goals she is li
 
 A more interesting situation is when we believe that Sally has *some*
 preferences, but we don't know what they are. We capture this by adding a higher
-level prior (a uniform-draw) over preferences. Using this we can learn about Sally's preferences from her actions: after seeing Sally press button b several times, what will we expect her to want the next time?
+level prior (a uniform) over preferences. Using this we can learn about Sally's preferences from her actions: after seeing Sally press button b several times, what will we expect her to want the next time?
 
-~~~~ {.cosh}
+~~~~ 
+;;;fold: choose-action
 (define (choose-action goal? transition state)
   (rejection-query
    (define action (action-prior))
    action
    (goal? (transition state action))))
-
+;;;
 (define (action-prior) (uniform-draw '(a b)))
 
 (define (vending-machine state action)
   (case action
-    (('a) (multinomial '(bagel cookie) '(0.9 0.1)))
-    (('b) (multinomial '(bagel cookie) '(0.1 0.9)))
-    (else 'nothing)))
+        (('a) (multinomial '(bagel cookie) '(0.9 0.1)))
+        (('b) (multinomial '(bagel cookie) '(0.1 0.9)))
+        (else 'nothing)))
 
-(rejection-query
- (define food-preferences (uniform-draw '(0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9)))
- (define (goal-food-prior)  (multinomial '(bagel cookie) (list food-preferences (- 1 food-preferences))))
- (define (goal-prior)
-   (let ((goal-food (goal-food-prior)))
-     (lambda (outcome) (equal? outcome goal-food))))
+(define (sample)
+  (rejection-query
+   (define food-preferences (uniform 0 1))
+   (define (goal-food-prior) (if (flip food-preferences) 'bagel 'cookie))
+   (define (make-goal food)
+     (lambda (outcome) (equal? outcome food)))
+   
+   (goal-food-prior)
+   
+   (and (equal? (choose-action (make-goal (goal-food-prior)) vending-machine 'state) 'b)
+        (equal? (choose-action (make-goal (goal-food-prior)) vending-machine 'state) 'b)
+        (equal? (choose-action (make-goal (goal-food-prior)) vending-machine 'state) 'b))))
 
- (goal-food-prior)
-
- (and (equal? (choose-action (goal-prior) vending-machine 'state) 'b)
-      (equal? (choose-action (goal-prior) vending-machine 'state) 'b)
-      (equal? (choose-action (goal-prior) vending-machine 'state) 'b)))
+(hist (repeat 100 sample)) 
 ~~~~
 
 Try varying the amount and kind of evidence. For instance, if Sally one time says "I want a cookie" (so you have directly observed her goal that time) how much evidence does that give you about her preferences, relative to observing her actions?
@@ -263,131 +250,137 @@ In the above preference inference, it is extremely important that sally *could
 have* taken a different action if she had a different preference (i.e. she could
 have pressed button *a* if she preferred to have a bagel). In the program below we have set up a situation in which both actions lead to cookie most of the time:
 
-~~~~ {.cosh}
+~~~~ 
+;;;fold: choose-action
 (define (choose-action goal? transition state)
   (rejection-query
    (define action (action-prior))
    action
    (goal? (transition state action))))
-
+;;;
 (define (action-prior) (uniform-draw '(a b)))
 
 (define (vending-machine state action)
   (case action
-    (('a) (multinomial '(bagel cookie) '(0.1 0.9)))
-    (('b) (multinomial '(bagel cookie) '(0.1 0.9)))
-    (else 'nothing)))
+        (('a) (multinomial '(bagel cookie) '(0.1 0.9)))
+        (('b) (multinomial '(bagel cookie) '(0.1 0.9)))
+        (else 'nothing)))
 
-(rejection-query
- (define food-preferences (uniform-draw '(0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9)))
- (define (goal-food-prior)  (multinomial '(bagel cookie) (list food-preferences (- 1 food-preferences))))
- (define (goal-prior)
-   (let ((goal-food (goal-food-prior)))
-     (lambda (outcome) (equal? outcome goal-food))))
+(define (sample)
+  (rejection-query
+   (define food-preferences (uniform 0 1))
+   (define (goal-food-prior) (if (flip food-preferences) 'bagel 'cookie))
+   (define (make-goal food)
+     (lambda (outcome) (equal? outcome food)))
+   
+   (goal-food-prior)
+   
+   (and (equal? (choose-action (make-goal (goal-food-prior)) vending-machine 'state) 'b)
+        (equal? (choose-action (make-goal (goal-food-prior)) vending-machine 'state) 'b)
+        (equal? (choose-action (make-goal (goal-food-prior)) vending-machine 'state) 'b))))
 
- (goal-food-prior)
-
- (and (equal? (choose-action (goal-prior) vending-machine 'state) 'b)
-      (equal? (choose-action (goal-prior) vending-machine 'state) 'b)
-      (equal? (choose-action (goal-prior) vending-machine 'state) 'b)))
+(hist (repeat 100 sample)) 
 ~~~~
-Now we can draw no conclusion about Sally's preferences. Try varying the machine
-      probabilities, how does the preference inference change? This effect, that
-      the strength of a preference inference depends on the context of
-      alternative actions, has been demonstrated in young infants by @Kushnir:2010wx.
+
+Now we can draw no conclusion about Sally's preferences. Try varying the machine probabilities, how does the preference inference change? This effect, that the strength of a preference inference depends on the context of alternative actions, has been demonstrated in young infants by @Kushnir:2010wx.
 
 ## Epistemic States
 
-In the above models of goal and preference inference, we have assumed that the structure of the world (both the operation of the vending machine and the, irrelevant, initial state) were common knowledge&mdash;they were non-random constructs used by both the agent (Sally) selecting actions and the observer interpreting these actions. What if we (the observer) don't know how exactly the vending machine works, but think that however it works Sally knows? We can capture this by placing uncertainty on the vending machine, inside the overall query but "outside" of Sally's inference:
+In the above models of goal and preference inference, we have assumed that the structure of the world (both the operation of the vending machine and the, irrelevant, initial state) were common knowledge---they were non-random constructs used by both the agent (Sally) selecting actions and the observer interpreting these actions. What if we (the observer) don't know how exactly the vending machine works, but think that however it works Sally knows? We can capture this by placing uncertainty on the vending machine, inside the overall query but "outside" of Sally's inference:
 
-~~~~ {.mit-church}
+~~~~
+;;;fold: choose-action
 (define (choose-action goal? transition state)
   (rejection-query
    (define action (action-prior))
    action
    (goal? (transition state action))))
-
+;;;
 (define (action-prior) (uniform-draw '(a b)))
 
 (define (make-vending-machine a-effects b-effects)
   (lambda (state action)
     (case action
-      (('a) (multinomial '(bagel cookie) a-effects))
-      (('b) (multinomial '(bagel cookie) b-effects))
-      (else 'nothing))))
+          (('a) (multinomial '(bagel cookie) a-effects))
+          (('b) (multinomial '(bagel cookie) b-effects))
+          (else 'nothing))))
 
 (define (sample)
- (rejection-query
-
+  (rejection-query
+   
    (define a-effects (dirichlet '(1 1)))
    (define b-effects (dirichlet '(1 1)))
    (define vending-machine (make-vending-machine a-effects b-effects))
-
+   
    (define goal-food (uniform-draw '(bagel cookie)))
    (define goal? (lambda (outcome) (equal? outcome goal-food)))
-
+   
    (second b-effects)
-
+   
    (and (equal? goal-food 'cookie)
-        (equal? (choose-action goal? vending-machine 'state) 'b) )
- ))
+        (equal? (choose-action goal? vending-machine 'state) 'b) )))
 
 (define samples (repeat 500 sample))
-(hist samples "Probability that b gives cookie")
+(multiviz
+ "mean: " (mean samples)
+ (hist samples "Probability that b gives cookie"))
 ~~~~
 
 Here we have conditioned on Sally wanting the cookie and Sally choosing to press button b. Thus, we have no *direct* evidence of the effects of pressing the buttons on the machine. What happens if you condition instead on the action and outcome, but not the intentional choice of this outcome (that is, change the condition to `(equal? (vending-machine 'state 'b) 'cookie)`)?
 
 Now imagine a vending machine that has only one button, but it can be pressed many times. We don't know, what the machine will do in response to a given button sequence. We do know that pressing more buttons is less a priori likely.
 
-~~~~ {.mit-church}
+~~~~
+;;;fold: choose-action
 (define (choose-action goal? transition state)
   (rejection-query
    (define action (action-prior))
    action
    (goal? (transition state action))))
-
+;;;
 (define (action-prior) (if (flip 0.7) '(a) (pair 'a (action-prior))))
 
 (define (sample)
- (rejection-query
-
+  (rejection-query
+   
    (define buttons->outcome-probs (mem (lambda (buttons) (dirichlet '(1 1)))))
    (define (vending-machine state action)
      (multinomial '(bagel cookie) (buttons->outcome-probs action)))
-
+   
    (define goal-food (uniform-draw '(bagel cookie)))
    (define goal? (lambda (outcome) (equal? outcome goal-food)))
-
+   
    (list (second (buttons->outcome-probs '(a a)))
          (second (buttons->outcome-probs '(a))))
-
+   
    (and (equal? goal-food 'cookie)
         (equal? (choose-action goal? vending-machine 'state) '(a a)) )
- ))
+   ))
 
 (define samples (repeat 500 sample))
 (multiviz
-(hist (map first samples) "Probability that (a a) gives cookie")
-(hist (map second samples) "Probability that (a) gives cookie"))
+ (hist (map first samples) "Probability that (a a) gives cookie")
+ (hist (map second samples) "Probability that (a) gives cookie"))
 ~~~~
 
-Compare the inferences that result if Sally presses the button twice to those if she only presses the button once. Why can we draw much stronger inferences about the machine when Sally chooses to press the button twice? When Sally does press the button twice, she could have done the "easier" (or rather, a priori more likely) action of pressing the button just once. Since she doesn't, a single press must have been unlikely to result in a cookie. This is an example of the *principle of efficiency*&mdash;all other things being equal, an agent will take the actions that require least effort (and hence, when an agent expends more effort all other things must not be equal). Indeed, this example shows that the principle of efficiency emerges from inference about inference via the Bayesian Occam's razor.
-Sally has an infinite space of possible actions. Because these actions are constructed by a recursive generative process, simpler actions are a priori more likely.
+Compare the inferences that result if Sally presses the button twice to those if she only presses the button once. Why can we draw much stronger inferences about the machine when Sally chooses to press the button twice? When Sally does press the button twice, she could have done the "easier" (or rather, a priori more likely) action of pressing the button just once. Since she doesn't, a single press must have been unlikely to result in a cookie. This is an example of the *principle of efficiency*---all other things being equal, an agent will take the actions that require least effort (and hence, when an agent expends more effort all other things must not be equal). 
+<!---Indeed, this example shows that the principle of efficiency emerges from inference about inference via the Bayesian Occam's razor.-->
+Here, Sally has an infinite space of possible actions but, because these actions are constructed by a recursive generative process, simpler actions are a priori more likely.
 
-In these examples we have seen two important assumptions combining to allow us to infer something about the world from the indirect evidence of an agents actions. The first assumption is the principle of rational action, the second is an assumption of *knowledgeability*&mdash;we assumed that Sally knows how the machine works, though we don't. Thus inference about inference, can be a powerful way to learn what others already know, by observing their actions. (This example was inspired by @Goodman:2009uy)
+In these examples we have seen two important assumptions combining to allow us to infer something about the world from the indirect evidence of an agents actions. The first assumption is the principle of rational action, the second is an assumption of *knowledgeability*---we assumed that Sally knows how the machine works, though we don't. Thus inference about inference, can be a powerful way to learn what others already know, by observing their actions. (This example was inspired by @Goodman:2009uy)
 
 ### Joint inference about beliefs and desires
 
 In social cognition, we often make joint inferences about two kinds of mental states: agents' beliefs about the world and their desires, goals or preferences.  We can see an example of such a joint inference in the vending machine scenario.  Suppose we condition on two observations: that Sally presses the button twice, and that this results in a cookie. Then, assuming that she knows how the machine works, we jointly infer that she wanted a cookie, that pressing the button twice is likely to give a cookie, and that pressing the button once is unlikely to give a cookie.
 
-~~~~ {.mit-church}
+~~~~
+;;;fold: choose-action
 (define (choose-action goal? transition state)
   (rejection-query
    (define action (action-prior))
    action
    (goal? (transition state action))))
-
+;;;
 (define (action-prior) (if (flip 0.7) '(a) (pair 'a (action-prior))))
 
 (define (sample)
@@ -415,17 +408,9 @@ In social cognition, we often make joint inferences about two kinds of mental st
 (hist (map third samples) "Goal probabilities"))
 ~~~~
 
-Notice the U-shaped distribution for the effect of pressing the button just once. Without any direct evidence about what happens when the button is pressed just once, we can infer that it probably won't give a cookie&mdash;because her goal is likely to have been a cookie but she didn't press the button just once&mdash;but there is a small chance that her goal was actually not to get a cookie, in which case pressing the button once could result in a cookie. This very complex (and hard to describe!) inference comes naturally from joint inference of goals and knowledge.
+Notice the U-shaped distribution for the effect of pressing the button just once. Without any direct evidence about what happens when the button is pressed just once, we can infer that it probably won't give a cookie---because her goal is likely to have been a cookie but she didn't press the button just once---but there is a small chance that her goal was actually not to get a cookie, in which case pressing the button once could result in a cookie. This very complex (and hard to describe!) inference comes naturally from joint inference of goals and knowledge.
 
-### Knowing what you know
-
-What if Sally may or may not know how the machine works, and knows this about herself?
-
-### Informational access
-
-An agent can have knowledge of some parts of the world and not others. To capture this we would need to incorporate a model of how informational access (such as seeing an object) effects knowledge. How would you incorporate observations in the case of Sally's vending machine? That is, how will Sally's behavior change if she had previously observed that button b led to a cookie?
-
-### Belief
+<!-- TODO: something on false belief and informational access? -->
 
 
 # Communication and Language
@@ -451,7 +436,7 @@ The goal of the learner is to infer the correct hypothesis, given that the teach
    die
    (equal? side (teacher die))))
 </pre>
-This pair of mutually recursive functions represents a teacher choosing examples or a learner inferring a hypothesis, each thinking about the other. However, notice that this recursion will never halt&mdash;it will be an unending chain of "I think that you think that I think that...". To avoid this infinite recursion say that eventually the learner will just assume that the teacher rolled the die and showed the side that came up (rather than reasoning about the teacher choosing a side):
+This pair of mutually recursive functions represents a teacher choosing examples or a learner inferring a hypothesis, each thinking about the other. However, notice that this recursion will never halt---it will be an unending chain of "I think that you think that I think that...". To avoid this infinite recursion say that eventually the learner will just assume that the teacher rolled the die and showed the side that came up (rather than reasoning about the teacher choosing a side):
 <pre>
 (define (teacher die depth)
   (query
@@ -474,7 +459,7 @@ To make this concrete, assume that there are two dice, A and B, which each have 
 
 Which hypothesis will the learner infer if the teacher shows the green side?
 
-~~~~ {.cosh}
+~~~~ 
 (define (teacher die depth)
   (rejection-query
    (define side (side-prior))
@@ -503,7 +488,7 @@ Which hypothesis will the learner infer if the teacher shows the green side?
 (learner 'green depth)
 ~~~~
 
-If we run this with recursion depth 0&mdash;that is a learner that does probabilistic inference without thinking about the teacher thinking&mdash;we find the learner infers hypothesis B most of the time (about 60% of the time). This is the same as using the "strong sampling" assumption: the learner infers B because B is more likely to have landed on side 2. However, if we increase the recursion depth we find this reverses: the learner infers B only about 40% of the time. Now die A becomes the better inference, because "if the teacher had meant to communicate B, they would have shown the red side because that can never come from A."
+If we run this with recursion depth 0---that is a learner that does probabilistic inference without thinking about the teacher thinking---we find the learner infers hypothesis B most of the time (about 60% of the time). This is the same as using the "strong sampling" assumption: the learner infers B because B is more likely to have landed on side 2. However, if we increase the recursion depth we find this reverses: the learner infers B only about 40% of the time. Now die A becomes the better inference, because "if the teacher had meant to communicate B, they would have shown the red side because that can never come from A."
 
 This model, has been proposed by @Shafto:2012by as a model of natural pedagogy. They describe several experimental tests of this model in the setting of simple "teaching games," showing that people make inferences as above when they think the examples come from a helpful teacher, but not otherwise.
 
@@ -547,7 +532,7 @@ say, "All of the plants have sprouted", "Some of the plants have sprouted", or
 "None of the plants have sprouted". For simplicity we represent the worlds by
 the number of sprouted plants (0, 1, 2, or 3) and take a uniform prior over worlds. Using the above representation for communicating with words:
 
-~~~~ {.cosh}
+~~~~ 
 (define (state-prior) (uniform-draw '(0 1 2 3)))
 
 (define (sentence-prior) (uniform-draw (list all-sprouted some-sprouted none-sprouted)))
@@ -705,52 +690,50 @@ Gergely and Csibra principle of efficiency and equifinality come from Bayes Occa
 # Exercises
 
 1) Tricky Agents: What would happen if Sally knew you were watching her and wanted
-to deceive you?
+to deceive you? 
 
-Complete the code below so that choose-action chooses a misdirection if Sally is deceptive. Then describe and show what happens if you knew
-Sally was deceptive and chose action "b".
+	A) Complete the code below so that choose-action chooses a misdirection if Sally is deceptive. Then describe and show what happens if you knew Sally was deceptive and chose action "b".
 
-~~~
+	~~~
+	(define (choose-action goal? transition state deceive)
+	  (rejection-query
+	   (define action (action-prior))
+	
+	    action
+	
+	;;; add condition statement here
+	...
+	))
+	
+	
+	(define (action-prior) (uniform-draw '(a b c)))
+	
+	(define (vending-machine state action)
+	  (case action
+	    (('a) (multinomial '(bagel cookie doughnut) '(0.8 0.1 0.1)))
+	    (('b) (multinomial '(bagel cookie doughnut) '(0.1 0.8 0.1)))
+	    (('c) (multinomial '(bagel cookie doughnut) '(0.1 0.1 0.8)))
+	    (else 'nothing)))
+	
+	 (define (sample)
+	   (rejection-query
+	   (define deceive (flip .5))
+	   (define goal-food (uniform-draw '(bagel cookie doughnut)))
+	   (define goal? (lambda (outcome) (equal? outcome goal-food)))
+	   (define (sally-choice) (choose-action goal? vending-machine 'state deceive))
+	
+	   goal-food
+	
+	    ;;; add condition statement here
+	    ...
+	))
+	
+	 (hist (repeat 100 sample) "Sally's goal")
+	~~~
 
-(define (choose-action goal? transition state deceive)
-  (rejection-query
-   (define action (action-prior))
+	B) What happens if you don't know Sally is deceptive and she chooses "b" and then "b". What if she chooses "a" and then "b." Show the models and describe the difference in behavior. Is she deceptive in each case?
 
-    action
+2) An agent can have knowledge of some parts of the world and not others. To capture this we would need to incorporate a model of how informational access (such as seeing an object) affects knowledge. How would you incorporate observations in the case of Sally's vending machine? That is, how will Sally's behavior change if she had previously observed that button b led to a cookie?
 
-;;; add condition statement here
-...
-))
-
-
-(define (action-prior) (uniform-draw '(a b c)))
-
-(define (vending-machine state action)
-  (case action
-    (('a) (multinomial '(bagel cookie doughnut) '(0.8 0.1 0.1)))
-    (('b) (multinomial '(bagel cookie doughnut) '(0.1 0.8 0.1)))
-    (('c) (multinomial '(bagel cookie doughnut) '(0.1 0.1 0.8)))
-    (else 'nothing)))
-
- (define (sample)
-   (rejection-query
-   (define deceive (flip .5))
-   (define goal-food (uniform-draw '(bagel cookie doughnut)))
-   (define goal? (lambda (outcome) (equal? outcome goal-food)))
-   (define (sally-choice) (choose-action goal? vending-machine 'state deceive))
-
-   goal-food
-
-    ;;; add condition statement here
-    ...
-))
-
- (hist (repeat 100 sample) "Sally's goal")
-
-~~~
-
-B) What happens if you don't know Sally is deceptive and she chooses "b" and
-then "b". What if she chooses "a" and then "b." Show the models and describe the
-difference in behavior. Is she deceptive in each case?
 
 # References
