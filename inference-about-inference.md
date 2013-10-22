@@ -2,13 +2,13 @@
 
 >***Note: This chapter has not been revised for the new format and Church engine. Some content may be incomplete! Some example may not work!***
 
-The `query` operator is an ordinary Church function, in the sense that it can occur anywhere that any other function can occur. In particular, we can construct a query with another query inside of it: this represents hypothetical inference *about* a hypothetical inference. (There are some implementation-specific restrictions on this. In MIT-Church the `mh-query` operator cannot be nested inside itself, though the `rejection-query` operator can.)
+The `query` operator is an ordinary Church function, in the sense that it can occur anywhere that any other function can occur. In particular, we can construct a query with another query inside of it: this represents hypothetical inference *about* a hypothetical inference. Nested queries are particularly useful in modeling social cognition: reasoning about another agent, who is herself reasoning.
 
-Nested queries are particularly useful in modeling social cognition: reasoning about another agent, who is herself reasoning.
+(There are some implementation-specific restrictions on nesting queries: the `rejection-query` operator can always be nested, while nesting `mh-query` requires special syntax.)
 
 # Prelude: Thinking About Assembly Lines
 
-Imagine where the widget-maker makes a stream of widgets, and the widget tester tests them and removes the faulty widgets. You don't know what tolerance the widget tester is set to, and whish to infer it. We can represent this as:
+Imagine a factory where the widget-maker makes a stream of widgets, and the widget-tester removes the faulty ones. You don't know what tolerance the widget tester is set to, and wish to infer it. We can represent this as:
 
 ~~~~
 ;;;fold: helper functions
@@ -31,33 +31,32 @@ Imagine where the widget-maker makes a stream of widgets, and the widget tester 
 ;;;
 
 (rejection-query
-
+ 
  ;;this machine makes a widget -- which we'll just represent with a real number:
  (define (widget-maker)  (multinomial '(.2 .3 .4 .5 .6 .7 .8) '(.05 .1 .2 .3 .2 .1 .05)))
-
+ 
  ;;this machine tests widgets as they come out of the widget-maker, letting through only those that pass threshold:
  (define (next-good-widget)
-   (let ((widget (widget-maker)))
-     (if (> widget threshold)
-         widget
-         (next-good-widget))))
-
+   (define widget (widget-maker))
+   (if (> widget threshold)
+       widget
+       (next-good-widget)))
+ 
  ;;but we don't know what threshold the widget tester is set to:
-
+ 
  (define threshold  (multinomial '(.3 .4 .5 .6 .7) '(.1 .2 .4 .2 .1)))
-
+ 
  ;;what is the threshold?
  threshold
-
+ 
  ;;if we see this sequence of good widgets:
  (equivalent (repeat 5 next-good-widget)
-         '(0.6 0.7 0.8 .7 .8)))
+             '(0.6 0.7 0.8 .7 .8)))
 ~~~~
 
 But notice that the definition of next-good-widget is exactly like the definition of rejection sampling! We can re-write this as a nested-query model:
 
 ~~~~
-
 ;;;fold: helper functions
 
 (define (equivalent l1 l2) (if (and (null? l1) (null? l2))
@@ -78,30 +77,30 @@ But notice that the definition of next-good-widget is exactly like the definitio
 ;;;
 
 (rejection-query
-
+ 
  ;;this machine makes a widget -- which we'll just represent with a real number:
  (define (widget-maker)  (multinomial '(.2 .3 .4 .5 .6 .7 .8) '(.05 .1 .2 .3 .2 .1 .05)))
-
+ 
  ;;this machine tests widgets as they come out of the widget-maker, letting
  ;; through only those that pass threshold:
-   (define (next-good-widget)
+ (define (next-good-widget)
    (rejection-query
     (define widget (widget-maker))
     widget
     (> widget threshold)))
-
+ 
  ;;but we don't know what threshold the widget tester is set to:
-
+ 
  (define threshold  (multinomial '(.3 .4 .5 .6 .7) '(.1 .2 .4 .2 .1)))
-
+ 
  ;;what is the threshold?
  threshold
-
+ 
  ;;if we see this sequence of good widgets:
  (equivalent (repeat 2 next-good-widget)
-         '(.6 .8 )))
-
+             '(.6 .8 )))
 ~~~~
+
 Rather than thinking about the details inside the widget tester, we are now abstracting to represent that the machine correctly chooses a good widget (by some means).
 
 # Social Cognition
