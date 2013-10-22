@@ -703,5 +703,55 @@ Recursively optimal planning.
 
 Gergely and Csibra principle of efficiency and equifinality come from Bayes Occam.
 
+# Exercises
+
+1) Tricky Agents: What would happen if Sally knew you were watching her and wanted
+to deceive you?
+
+Complete the code below so that choose-action chooses a misdirection if Sally is deceptive. Then describe and show what happens if you knew
+Sally was deceptive and chose action "b".
+
+~~~
+
+(define (choose-action goal? transition state deceive)
+  (rejection-query
+   (define action (action-prior))
+
+    action
+
+;;; add condition statement here
+...
+))
+
+
+(define (action-prior) (uniform-draw '(a b c)))
+
+(define (vending-machine state action)
+  (case action
+    (('a) (multinomial '(bagel cookie doughnut) '(0.8 0.1 0.1)))
+    (('b) (multinomial '(bagel cookie doughnut) '(0.1 0.8 0.1)))
+    (('c) (multinomial '(bagel cookie doughnut) '(0.1 0.1 0.8)))
+    (else 'nothing)))
+
+ (define (sample)
+   (rejection-query
+   (define deceive (flip .5))
+   (define goal-food (uniform-draw '(bagel cookie doughnut)))
+   (define goal? (lambda (outcome) (equal? outcome goal-food)))
+   (define (sally-choice) (choose-action goal? vending-machine 'state deceive))
+
+   goal-food
+
+    ;;; add condition statement here
+    ...
+))
+
+ (hist (repeat 100 sample) "Sally's goal")
+
+~~~
+
+B) What happens if you don't know Sally is deceptive and she chooses "b" and
+then "b". What if she chooses "a" and then "b." Show the models and describe the
+difference in behavior. Is she deceptive in each case?
 
 # References
