@@ -384,28 +384,28 @@ In social cognition, we often make joint inferences about two kinds of mental st
 (define (action-prior) (if (flip 0.7) '(a) (pair 'a (action-prior))))
 
 (define (sample)
- (rejection-query
-
+  (rejection-query
+   
    (define buttons->outcome-probs (mem (lambda (buttons) (dirichlet '(1 1)))))
    (define (vending-machine state action)
      (multinomial '(bagel cookie) (buttons->outcome-probs action)))
-
+   
    (define goal-food (uniform-draw '(bagel cookie)))
    (define goal? (lambda (outcome) (equal? outcome goal-food)))
-
+   
    (list (second (buttons->outcome-probs '(a a)))
          (second (buttons->outcome-probs '(a)))
          goal-food)
-
+   
    (and (equal? (vending-machine 'state '(a a)) 'cookie)
         (equal? (choose-action goal? vending-machine 'state) '(a a)) )
- ))
+   ))
 
 (define samples (repeat 500 sample))
 (multiviz
-(hist (map first samples) "Probability that (a a) gives cookie")
-(hist (map second samples) "Probability that (a) gives cookie")
-(hist (map third samples) "Goal probabilities"))
+ (hist (map first samples) "Probability that (a a) gives cookie")
+ (hist (map second samples) "Probability that (a) gives cookie")
+ (hist (map third samples) "Goal probabilities"))
 ~~~~
 
 Notice the U-shaped distribution for the effect of pressing the button just once. Without any direct evidence about what happens when the button is pressed just once, we can infer that it probably won't give a cookie---because her goal is likely to have been a cookie but she didn't press the button just once---but there is a small chance that her goal was actually not to get a cookie, in which case pressing the button once could result in a cookie. This very complex (and hard to describe!) inference comes naturally from joint inference of goals and knowledge.
@@ -421,23 +421,28 @@ Notice the U-shaped distribution for the effect of pressing the button just once
 Imagine playing the following two-player game. On each round the "teacher" pulls a die from a bag of weighted dice, and has to communicate to the "learner" which die it is (both players are familiar with the dice and their weights). However, the teacher may only communicate by giving the learner examples: showing them faces of the die.
 
 We can formalize the inference of the teacher in choosing the examples to give by assuming that the goal of the teacher is to successfully teach the hypothesis -- that is, to choose examples such that the learner will infer the intended hypothesis (throughout this section we simplify the code by specializing to the situation at hand, rather than using the more general `choose-action` function introduced above):
-<pre>
+
+~~~~
 (define (teacher die)
   (query
    (define side (side-prior))
    side
    (equal? die (learner side))))
-</pre>
+~~~~
+
 The goal of the learner is to infer the correct hypothesis, given that the teacher chose to give these examples:
-<pre>
+
+~~~~
 (define (learner side)
   (query
    (define die (die-prior))
    die
    (equal? side (teacher die))))
-</pre>
+~~~~
+
 This pair of mutually recursive functions represents a teacher choosing examples or a learner inferring a hypothesis, each thinking about the other. However, notice that this recursion will never halt---it will be an unending chain of "I think that you think that I think that...". To avoid this infinite recursion say that eventually the learner will just assume that the teacher rolled the die and showed the side that came up (rather than reasoning about the teacher choosing a side):
-<pre>
+
+~~~~
 (define (teacher die depth)
   (query
    (define side (side-prior))
@@ -451,7 +456,7 @@ This pair of mutually recursive functions represents a teacher choosing examples
    (if (= depth 0)
        (equal? side (roll die))
        (equal? side (teacher die (- depth 1))))))
-</pre>
+~~~~
 
 To make this concrete, assume that there are two dice, A and B, which each have three sides (red, green, blue) that have weights like so:
 
@@ -497,23 +502,28 @@ This model, has been proposed by @Shafto:2012by as a model of natural pedagogy. 
 Unlike the situation above, in which concrete examples were given from teacher to student, words in natural language denote more abstract concepts. However, we can use almost the same setup to reason about speakers and listeners communicating with words, if we assume that sentences have literal meanings. We assume for simplicity that the meaning of sentences are truth-functional: that each sentence corresponds to a function from states of the world to true/false.
 
 As above, the speaker chooses what to say in order to lead the listener to infer the correct state:
-<pre>
+
+~~~~
 (define (speaker state)
   (query
    (define words (sentence-prior))
    words
    (equal? state (listener words))))
-</pre>
+~~~~
+
 The listener does an inference of the state of the world given that the speaker chose to say what they did:
-<pre>
+
+~~~~
 (define (listener words)
   (query
      (define state (state-prior))
      state
      (equal? words (speaker state)))))
-</pre>
+~~~~
+
 However this suffers from two flaws: the recursion never halts, and the literal meaning has not been used. We slightly modify the listener function such that the listener either assumes that the literal meaning of the sentence is true, or figures out what the speaker must have meant given that they chose to say what they said:
-<pre>
+
+~~~~
 (define (listener words)
   (query
      (define state (state-prior))
@@ -521,8 +531,9 @@ However this suffers from two flaws: the recursion never halts, and the literal 
      (if (flip literal-prob)
          (words state)
          (equal? words (speaker state))))))
-</pre>
-Here the probability <code>literal-prob</code> controls the expected depth of recursion. Another ways to bound the depth of recursion is with an explicit depth argument (which is decremented on each recursion).
+~~~~
+
+Here the probability `literal-prob` controls the expected depth of recursion. Another ways to bound the depth of recursion is with an explicit depth argument (which is decremented on each recursion).
 
 ### Example: Scalar Implicature
 
@@ -563,13 +574,13 @@ We see that if the listener hears "some" the probability of three out of three i
 
 ## Semantics: conditions on beliefs
 
-In the above we have used a standard, truth-functional, formulation for the meaning of a sentence: each sentence specifies a (deterministic) predicate on world states. For instance, "All balls are red." translated into something like <code>(lambda (world) (null? (filter (not red?) (objects world))))</code>. Thus the semantics of a sentence specifies the worlds in which the sentence is satisfied. That is the *literal meaning* of a sentence is the sort of thing one can condition on, transforming a prior over worlds into a posterior. Here's another way of motivating this view: meanings are belief update operations, and since the right way to update beliefs coded as distributions is conditioning, meanings are conditioning statements.
+In the above we have used a standard, truth-functional, formulation for the meaning of a sentence: each sentence specifies a (deterministic) predicate on world states. For instance, "All balls are red." translated into something like `(lambda (world) (null? (filter (not red?) (objects world))))`. Thus the semantics of a sentence specifies the worlds in which the sentence is satisfied. That is the *literal meaning* of a sentence is the sort of thing one can condition on, transforming a prior over worlds into a posterior. Here's another way of motivating this view: meanings are belief update operations, and since the right way to update beliefs coded as distributions is conditioning, meanings are conditioning statements.
 
-Of course, the deterministic predicates can be immediately (without changing any code) relaxed to probabilistic truth functions, that assign a probability to each world. This might be useful if we want to allow exceptions, for example a noisy all might be: <code>(lambda (world) (if (flip noise) true (null? (filter (not red?) (objects world)))))</code>.
+Of course, the deterministic predicates can be immediately (without changing any code) relaxed to probabilistic truth functions, that assign a probability to each world. This might be useful if we want to allow exceptions, for example a noisy all might be: `(lambda (world) (if (flip noise) true (null? (filter (not red?) (objects world)))))`.
 
-
+<!--
 ### Compositional Meanings
-
+-->
 
 
 
@@ -577,7 +588,7 @@ Of course, the deterministic predicates can be immediately (without changing any
 
 Single step, goal-based decision problem.
 
-~~~~ {.mit-church}
+~~~~
 (define (choose-action goal? transition state)
   (rejection-query
     (define action (action-prior))
@@ -599,7 +610,7 @@ Single step, goal-based decision problem.
 
 Single step, utility-based decision problem.
 
-~~~~ {.mit-church}
+~~~~
 ;;;fold:
 (define (iota count start step)
   (if (equal? count 0)
@@ -628,7 +639,7 @@ Single step, utility-based decision problem.
 
 Multi-step, suboptimal planning as inference
 
-~~~~ {.mit-church}
+~~~~
 ;;;fold:
 (define (last l)
     (cond ((null? (rest l)) (first l))
@@ -683,9 +694,10 @@ Multi-step, suboptimal planning as inference
 (sample-action transition (pair 'green-light 1) goal-function ending?)
 ~~~~
 
-Recursively optimal planning.
+<!-- Recursively optimal planning.
 
 Gergely and Csibra principle of efficiency and equifinality come from Bayes Occam.
+-->
 
 # Exercises
 
