@@ -701,7 +701,7 @@ Gergely and Csibra principle of efficiency and equifinality come from Bayes Occa
 
 # Exercises
 
-1) Tricky Agents: What would happen if Sally knew you were watching her and wanted
+1) **Tricky Agents**. What would happen if Sally knew you were watching her and wanted
 to deceive you? 
 
 	A) Complete the code below so that choose-action chooses a misdirection if Sally is deceptive. Then describe and show what happens if you knew Sally was deceptive and chose action "b".
@@ -745,7 +745,55 @@ to deceive you?
 
 	B) What happens if you don't know Sally is deceptive and she chooses "b" and then "b". What if she chooses "a" and then "b." Show the models and describe the difference in behavior. Is she deceptive in each case?
 
-2) An agent can have knowledge of some parts of the world and not others. To capture this we would need to incorporate a model of how informational access (such as seeing an object) affects knowledge. How would you incorporate observations in the case of Sally's vending machine? That is, how will Sally's behavior change if she had previously observed that button b led to a cookie?
+2) **Monty Hall**. Here, we will use the tools of Bayesian inference to explore a classic statistical puzzle -- the Monty Hall problem. Here is one statement of the problem:
 
+    > Alice is on a game show and she's given the choice of three doors. Behind one door is a car; behind the others, goats. Alice picks door 1. The host, Monty, who knows what's behind the doors, opens another door, say No. 3, revealing a goat. He then asks Alice if she wants to switch doors. Should she switch?
+
+    Intuitively, it may seem like switching doesn't matter. However, the canonical solution is that you *should* switch doors. We'll explore (a) the intuition that switching doesn't matter, (b) the canonical solution, and more. This is the starter code you'll be working with:
+
+    ~~~~ {data-exercise="exmonty"}
+    (define (remove lst bad-items)
+      ;; remove bad items from a list
+      (if (null? lst)
+          lst
+          (let ((kar (first lst)))
+            (if (member kar bad-items)
+                (remove (rest lst) bad-items)
+                (pair kar (remove (rest lst) bad-items))
+                ))))
+    
+    (enumeration-query
+     (define doors (list 1 2 3))
+     (define alice ...)
+     (define prize ...)
+     (define monty-random ...)
+     ;;(define monty-avoid-both ...)
+     ;;(define monty-avoid-alice ...)
+     ;;(define monty-avoid-prize ...)
+
+     ;; we'll be testing multiple possible montys
+     ;; let's use plain "monty" as an alias for whichever one we're testing
+     (define monty monty-random)
+    
+     ;; query
+     ;; what information could tell us whether we should switch?
+     ...
+    
+     ;; condition
+     ;; look at the problem description - what evidence do we have?
+     ...
+    
+    )
+    ~~~~
+
+    A) Whether you should switch depends crucially on how you believe Monty chooses doors to pick. First, write the model such that the host *randomly* picks doors (for this, fill in `monty-random`). In this setting, should Alice switch?
+    
+    B) Now, fill in `monty-avoid-both` (make sure you switch your `(define monty ...)` alias to use `monty-avoid-both`). Here, Monty randomly picks a door that is *neither* the prize door *nor* Alice's door. For both-avoiding Monty, you'll find that Alice *should* switch. This is unintuitive  -- we know that Monty picked door 3, so why should the process he used to arrive at this choice matter? By hand, compute the posterior probability table for both  `monty-random` and `monty-avoid-both`; using this table, explain why Alice should switch for random Monty but not both-avoiding Monty. Hint: you will want to compare particular *rows* of these tables.
+    
+    C) Fill in `monty-avoid-alice`. Here, Monty randomly picks a door that is simply not Alice's door. Should Alice switch here?
+    
+    D) Fill in `monty-avoid-prize`. Here, Monty randomly picks a door that is simply not the prize door. Should Alice switch here?
+
+    E) An interesting cognitive question is: why do we have the initial intuition that switching shouldn't matter? Given your explorations, propose an answer.
 
 # References
