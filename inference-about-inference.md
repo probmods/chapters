@@ -762,18 +762,51 @@ to deceive you?
                 (pair kar (remove (rest lst) bad-items))
                 ))))
     
+    (define doors (list 1 2 3))
+    
+    ;;;; monty-random
+    (define (monty-random alice-door prize-door)
+      (enumeration-query
+    
+       ))
+    
+    ;;;; monty-avoid-both
+    ; (define (monty-avoid-both alice-door prize-door)
+    ;   (enumeration-query
+    ;    ..defines..
+    ;    ..query..
+    ;    ..condition..
+    ;    ))
+    
+    ;;;; monty-avoid-alice
+    ; (define (monty-avoid-alice alice-door prize-door)
+    ;   (enumeration-query
+    ;    ..defines..
+    ;    ..query..
+    ;    ..condition..
+    ;    ))
+    
+    ;;;; monty-avoid-prize
+    ; (define (monty-avoid-prize alice-door prize-door)
+    ;   (enumeration-query
+    ;    ..defines..
+    ;    ..query..
+    ;    ..condition..
+    ;    ))
+    
     (enumeration-query
-     (define doors (list 1 2 3))
-     (define alice ...)
-     (define prize ...)
-     (define monty-random ...)
-     ;;(define monty-avoid-both ...)
-     ;;(define monty-avoid-alice ...)
-     ;;(define monty-avoid-prize ...)
-
+     (define alice-door (uniform-draw doors))
+     (define prize-door (uniform-draw doors))
+    
      ;; we'll be testing multiple possible montys
-     ;; let's use plain "monty" as an alias for whichever one we're testing
-     (define monty monty-random)
+     ;; let's use "monty-function" as an alias for whichever one we're testing
+     (define monty-function monty-random)
+     
+     (define monty-door
+       ;; get the result of whichever enumeration-query we're asking about
+       ;; this will be in the form ((x1 x2 ... xn) (p1 p2 ... pn))
+       ;; and then apply multinomial to sample from that distribution
+       (apply multinomial (monty-function alice-door prize-door)))
     
      ;; query
      ;; what information could tell us whether we should switch?
@@ -782,7 +815,6 @@ to deceive you?
      ;; condition
      ;; look at the problem description - what evidence do we have?
      ...
-    
     )
     ~~~~
 
