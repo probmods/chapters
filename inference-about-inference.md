@@ -797,8 +797,8 @@ to deceive you?
     ;    ))
     
     (enumeration-query
-     (define alice-door (uniform-draw doors))
-     (define prize-door (uniform-draw doors))
+     (define alice-door ...)
+     (define prize-door ...)
     
      ;; we'll be testing multiple possible montys
      ;; let's use "monty-function" as an alias for whichever one we're testing
