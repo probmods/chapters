@@ -747,7 +747,7 @@ to deceive you?
 
 2) **Monty Hall**. Here, we will use the tools of Bayesian inference to explore a classic statistical puzzle -- the Monty Hall problem. Here is one statement of the problem:
 
-    > Alice is on a game show and she's given the choice of three doors. Behind one door is a car; behind the others, goats. Alice picks door 1. The host, Monty, who knows what's behind the doors, opens another door, say No. 3, revealing a goat. He then asks Alice if she wants to switch doors. Should she switch?
+    > Alice is on a game show and she's given the choice of three doors. Behind one door is a car; behind the others, goats. She picks door 1. The host, Monty, knows what's behind the doors and opens another door, say No. 3, revealing a goat. He then asks Alice if she wants to switch doors. Should she switch?
 
     Intuitively, it may seem like switching doesn't matter. However, the canonical solution is that you *should* switch doors. We'll explore (a) the intuition that switching doesn't matter, (b) the canonical solution, and more. This is the starter code you'll be working with:
 
@@ -765,10 +765,12 @@ to deceive you?
     (define doors (list 1 2 3))
     
     ;;;; monty-random
-    (define (monty-random alice-door prize-door)
-      (enumeration-query
-    
-       ))
+    ; (define (monty-random alice-door prize-door)
+    ;   (enumeration-query
+    ;    ..defines..
+    ;    ..query..
+    ;    ..condition..
+    ;   ))
     
     ;;;; monty-avoid-both
     ; (define (monty-avoid-both alice-door prize-door)
@@ -804,8 +806,8 @@ to deceive you?
      
      (define monty-door
        ;; get the result of whichever enumeration-query we're asking about
-       ;; this will be in the form ((x1 x2 ... xn) (p1 p2 ... pn))
-       ;; and then apply multinomial to sample from that distribution
+       ;; this will be a list of the form ((x1 x2 ... xn) (p1 p2 ... pn))
+       ;; we then (apply multinomial ) on this list to sample from that distribution
        (apply multinomial (monty-function alice-door prize-door)))
     
      ;; query
@@ -820,7 +822,7 @@ to deceive you?
 
     A) Whether you should switch depends crucially on how you believe Monty chooses doors to pick. First, write the model such that the host *randomly* picks doors (for this, fill in `monty-random`). In this setting, should Alice switch?
     
-    B) Now, fill in `monty-avoid-both` (make sure you switch your `(define monty ...)` alias to use `monty-avoid-both`). Here, Monty randomly picks a door that is *neither* the prize door *nor* Alice's door. For both-avoiding Monty, you'll find that Alice *should* switch. This is unintuitive  -- we know that Monty picked door 3, so why should the process he used to arrive at this choice matter? By hand, compute the posterior probability table for both  `monty-random` and `monty-avoid-both`; using this table, explain why Alice should switch for random Monty but not both-avoiding Monty. Hint: you will want to compare particular *rows* of these tables.
+    B) Now, fill in `monty-avoid-both` (make sure you switch your `(define monty-function ...)` alias to use `monty-avoid-both`). Here, Monty randomly picks a door that is *neither* the prize door *nor* Alice's door. For both-avoiding Monty, you'll find that Alice *should* switch. This is unintuitive  -- we know that Monty picked door 3, so why should the process he used to arrive at this choice matter? By hand, compute the posterior probability table for both  `monty-random` and `monty-avoid-both`; using this table, explain why Alice should switch for random Monty but not both-avoiding Monty. Hint: you will want to compare particular *rows* of these tables.
     
     C) Fill in `monty-avoid-alice`. Here, Monty randomly picks a door that is simply not Alice's door. Should Alice switch here?
     
