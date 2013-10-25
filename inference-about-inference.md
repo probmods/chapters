@@ -140,6 +140,24 @@ We see, unsurprisingly, that if Sally wants a cookie, she will always press butt
 
 Technically, this method of making a choices is not optimal, but rather it is *soft-max* optimal (also known as following the "Boltzmann policy").
 
+<!--
+
+### Goals Versus Utilities
+
+In Bayesian decision theory, 
+
+~~~~
+(define (choose-action utility transition state)
+  (query
+   (define action (action-prior))
+   action
+   (factor (utility (transition state action)))))
+~~~~
+
+This is equivalent to choosing an action proportionally to it's utility: $P(a|s) \propto \sum_{s'} P(s'|s) \exp[U(s')+\ln(P(a))]$.
+
+-->
+
 ## Goal Inference
 
 Now imagine that we don't know Sally's goal (which food she wants), but we observe her pressing button b. We can use a query to infer her goal (this is sometimes called "inverse planning", since the outer query "inverts" the query inside `choose-action`).
@@ -518,7 +536,7 @@ The listener does an inference of the state of the world given that the speaker 
   (query
      (define state (state-prior))
      state
-     (equal? words (speaker state)))))
+     (equal? words (speaker state))))
 ~~~~
 
 However this suffers from two flaws: the recursion never halts, and the literal meaning has not been used. We slightly modify the listener function such that the listener either assumes that the literal meaning of the sentence is true, or figures out what the speaker must have meant given that they chose to say what they said:
@@ -530,7 +548,7 @@ However this suffers from two flaws: the recursion never halts, and the literal 
      state
      (if (flip literal-prob)
          (words state)
-         (equal? words (speaker state))))))
+         (equal? words (speaker state)))))
 ~~~~
 
 Here the probability `literal-prob` controls the expected depth of recursion. Another ways to bound the depth of recursion is with an explicit depth argument (which is decremented on each recursion).
@@ -567,7 +585,8 @@ the number of sprouted plants (0, 1, 2, or 3) and take a uniform prior over worl
        (equal? words (speaker state (- depth 1))))))
 
 (define depth 1)
-(listener some-sprouted depth)
+
+(hist (repeat 300 (lambda () (listener some-sprouted depth))))
 ~~~~
 
 We see that if the listener hears "some" the probability of three out of three is low, even though the basic meaning of "some" is equally consistent with 3/3, 1/3, and 2/3. This is called the "some but not all" implicature.
