@@ -301,11 +301,11 @@ var forest_protocol = location.protocol.match(/file/) ? "http://" : "//";
     _(editor).extend(options);
  
  //fold ";;;fold:" parts:
- var lastLine = editor.lastLine()
- for(i=0;i<=lastLine;i++) {
-    var text = editor.getLine(i)
-    pos = text.indexOf(";;;fold:")
-    if (pos==0) {editor.foldCode(CodeMirror.Pos(i,pos),trippleCommentRangeFinder)}
+ var lastLine = editor.lastLine();
+ for(var i=0;i<=lastLine;i++) {
+    var txt = editor.getLine(i),
+        pos = txt.indexOf(";;;fold:");
+   if (pos==0) {editor.foldCode(CodeMirror.Pos(i,pos),trippleCommentRangeFinder);}
  }
  
     // results div
