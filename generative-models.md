@@ -527,7 +527,7 @@ Were you often right? Were there some cases of 'surprisingly stable' towers?  @H
 
 (define (doesTowerFall initialW finalW)
   ;y position is 0 at the TOP of the screen
-  (define (highestY world) (min (map getY world)))
+  (define (highestY world) (apply min (map getY world)))
   (define eps 1) ;things might move around a little, but within 1 pixel is close
   (define (approxEqual a b) (< (abs (- a b)) eps))
   (not (approxEqual (highestY initialW) (highestY finalW))))
@@ -726,7 +726,7 @@ Directly compute the probability of the bent coin in the example. Check your ans
       (define a (expt 10 n))
       (/ (round (* x a)) a))
 
-    (define (highestY world) (min (map getY world))) ;; y = 0 is at the TOP of the screen
+    (define (highestY world) (apply min (map getY world))) ;; y = 0 is at the TOP of the screen
 
     ;; get the height of the tower in a world
     (define (getTowerHeight world) (- worldHeight (highestY world)))
