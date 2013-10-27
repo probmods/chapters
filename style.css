@@ -325,6 +325,11 @@ button.run {
     font-weight: bold
 }
 
+.CodeMirrorError {
+    background-color: #FFA500;
+    font-weight: bold
+}
+
 /* d3 */
 
 

@@ -2,13 +2,14 @@
 
 var js_outmirror = null,
     exec_outmirror = null,
-    church_to_js = require("./church_to_js").church_to_js,
+//    church_to_js = require("./church_to_js").church_to_js,
     church_builtins = require("./church_builtins"),
     pr = require("./probabilistic/index"),
     util = require("./probabilistic/util"),
-    transform = require("./probabilistic/transform");
+    transform = require("./probabilistic/transform"),
+    evaluate = require("./evaluate").evaluate
 
-var format_result = require("./format_result").format_result;
+//var format_result = require("./format_result").format_result;
 
 util.openModule(pr);
 //util.openModule(church_builtins);
@@ -65,11 +66,13 @@ var forest_protocol = location.protocol.match(/file/) ? "http://" : "//";
 
     $results.show();
     try {
-      var jsCode = church_to_js(code);
-      jsCode = transform.probTransform(jsCode);
-
-      var runResult = eval(jsCode),
-          underlyingData; 
+//      var jsCode = church_to_js(code);
+//      jsCode = transform.probTransform(jsCode);
+//      var runResult = eval(jsCode),
+ 
+      var runResult = evaluate(code)
+ 
+      var underlyingData
       
       if (typeof runResult == "function") {
         // otherwise, call the function with the current div as an argument
@@ -77,18 +80,30 @@ var forest_protocol = location.protocol.match(/file/) ? "http://" : "//";
         //underlyingData = format_result(runResult($results));
       }
       else {
-        runResult = format_result(runResult);
+//        runResult = format_result(runResult);
         // if we get back a string, just show the text
         underlyingData = runResult;
-        //underlyingData = format_result(runResult);
+        //underlyingData = format_result(runResult); //FIXME: put back in formatting?
         $results.removeClass("error").text(runResult);
       } 
 
        resultData['forest_results'] =  JSON.stringify(underlyingData); 
       
     } catch (e) {
+ 
       var error = e.message;
       $results.addClass("error").text( error );
+ 
+    if (e.stackarray != undefined) {
+        $results.append("\nStack trace: " + e.stack );
+ 
+        var errorlocation = e.stackarray[0]
+        var start=errorlocation.start.split(":"), end=errorlocation.end.split(":")
+        var mark = editor.markText({line: Number(start[0])-1, ch: Number(start[1])-1},
+                            {line: Number(end[0])-1, ch: Number(end[1])},
+                                   {className: "CodeMirrorError", clearOnEnter: true})
+//        mark.clear()
+    }
 
       resultData['forest_errors'] = error;
     }
