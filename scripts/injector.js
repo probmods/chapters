@@ -7,6 +7,7 @@ var js_outmirror = null,
     pr = require("./probabilistic/index"),
     util = require("./probabilistic/util"),
     transform = require("./probabilistic/transform"),
+    format_result = require("./evaluate").format_result,
     evaluate = require("./evaluate").evaluate
 
 //var format_result = require("./format_result").format_result;
@@ -84,7 +85,7 @@ var forest_protocol = location.protocol.match(/file/) ? "http://" : "//";
 //        runResult = format_result(runResult);
         // if we get back a string, just show the text
         underlyingData = runResult;
-        //underlyingData = format_result(runResult); //FIXME: put back in formatting?
+        runResult = format_result(runResult);
         $results.removeClass("error").text(runResult);
       } 
 
