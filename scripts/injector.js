@@ -65,6 +65,7 @@ var forest_protocol = location.protocol.match(/file/) ? "http://" : "//";
                      };
 
     $results.show();
+    if (editor.errormark != undefined){editor.errormark.clear()}
     try {
 //      var jsCode = church_to_js(code);
 //      jsCode = transform.probTransform(jsCode);
@@ -94,12 +95,12 @@ var forest_protocol = location.protocol.match(/file/) ? "http://" : "//";
       var error = e.message;
       $results.addClass("error").text( error );
  
-    if (e.stackarray != undefined) {
+      if (e.stackarray != undefined) {
         $results.append("\nStack trace: " + e.stack );
  
         var errorlocation = e.stackarray[0]
         var start=errorlocation.start.split(":"), end=errorlocation.end.split(":")
-        var mark = editor.markText({line: Number(start[0])-1, ch: Number(start[1])-1},
+        editor.errormark = editor.markText({line: Number(start[0])-1, ch: Number(start[1])-1},
                             {line: Number(end[0])-1, ch: Number(end[1])},
                                    {className: "CodeMirrorError", clearOnEnter: true})
 //        mark.clear()
