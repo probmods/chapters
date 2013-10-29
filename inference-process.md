@@ -329,11 +329,97 @@ Proposals are made by changing a single random choice, then updating the executi
 To get this all to work we need a way to identify random choices across different executions of the program. We can do this by augmenting the program with "call names".
 
 
-# Biases of MCMC
+## Biases of MCMC
 
 An MCMC sampler is guaranteed to take unbiased samples from its stationary distribution ''in the limit'' of arbitrary time between samples. In practice MCMC will have characteristic biases in the form of long burn-in and slow mixing. 
 
 We already saw an example of slow mixing above: the first Markov chain we used to sample from the uniform distribution would take (on average) several iterations to switch from `a` or `b` to `c` or `d`. In order to get approximately independent samples, we needed to wait longer than this time between taking iterations. In contrast, the more efficient Markov chain (with uniform transition function) let us take sample with little lag. In this case poor mixing was the result of a poorly chosen transition function. Poor mixing is often associated with multimodal distributions.
+
+
+
+# Inference for nested queries
+
+In the [previous chapter](inference-about-inference.html) we saw how inference about inference could be modeled by using nested-queries. For the examples in that chapter we used rejection sampling, because it is straightforward and well-behaved. Of course, rejection sampling will become unacceptably slow if the probability of the condition in any level of query becomes small---this happens very quickly for nested-query models when the state space grows. Each of the other types of query can, in principle, also be nested, but some special care is needed to get good performance.
+
+To explore alliterative algorithms for nested-query, let's start with a simple example:
+
+~~~~
+(define (inner x)
+  (rejection-query
+    (define y (flip))
+    y
+    (flip (if x 1.0 (if y 0.9 0.1)))))
+    
+(define (outer)
+  (rejection-query
+    (define x (flip))
+    x
+    (not (inner x))))
+    
+(hist (repeat 10000 outer))
+~~~~
+
+We could compute the same answer using enumeration, recall that enumeration returns the explicit marginal distribution, so we have to sample from it using `multinomial`:
+
+~~~~
+(define (inner x)
+  (enumeration-query
+   (define y (flip))
+   y
+   (flip (if x 1.0 (if y 0.9 0.1)))))
+
+(define (outer)
+  (enumeration-query
+   (define x (flip))
+   x
+   (not (apply multinomial (inner x)))))
+
+(hist (repeat 10000 (lambda () (apply multinomial (outer)))))
+~~~~
+
+However, notice that this combination will recompute the inner and outer distributions every time they are encountered. Because these distributions are deterministically fixed (since they are the explicit marginal distributions, not samples), we could *cache* their values using `mem`. This technique, an example of *dynamic programming*, avoids work and so speeds up the computation:
+
+~~~~
+(define inner 
+  (mem (lambda (x)
+         (enumeration-query
+          (define y (flip))
+          y
+          (flip (if x 1.0 (if y 0.9 0.1)))))))
+
+(define outer
+  (mem (lambda () 
+         (enumeration-query
+          (define x (flip))
+          x
+          (not (apply multinomial (inner x)))))))
+
+(hist (repeat 10000 (lambda () (apply multinomial (outer)))))
+~~~~
+
+This enumeration-with-caching technique is extremely useful for exploring small nested-query models, but it becomes impractical when the state space of any one of the queries grows too large. As before, an alternative is MCMC. 
+
+~~~~
+(define inner 
+  (mem (lambda (x)
+         (mh-query 1000 1
+          (define y (flip))
+          y
+          (flip (if x 1.0 (if y 0.9 0.1)))))))
+
+(define outer
+  (mem (lambda () 
+         (mh-query 1000 1
+          (define x (flip))
+          x
+          (not (uniform-draw (inner x)))))))
+
+(hist (repeat 10000 (lambda () (uniform-draw (outer)))))
+~~~~
+
+Here we are caching a set of samples from each query, and drawing one at random when we need a sample from that distribution. Because we re-use the same set of samples many times, this can potentially introduce bias into our results; if the number of samples is large enough, though, this bias will be very small.
+
+
 
 
 # Exercises

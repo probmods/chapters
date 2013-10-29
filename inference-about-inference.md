@@ -517,7 +517,8 @@ This model, has been proposed by @Shafto:2012by as a model of natural pedagogy. 
 
 ## Communicating with Words
 
-Unlike the situation above, in which concrete examples were given from teacher to student, words in natural language denote more abstract concepts. However, we can use almost the same setup to reason about speakers and listeners communicating with words, if we assume that sentences have literal meanings. We assume for simplicity that the meaning of sentences are truth-functional: that each sentence corresponds to a function from states of the world to true/false.
+Unlike the situation above, in which concrete examples were given from teacher to student, words in natural language denote more abstract concepts. However, we can use almost the same setup to reason about speakers and listeners communicating with words, if we assume that sentences have *literal meanings*, which anchor sentences to possible worlds.
+We assume for simplicity that the meaning of sentences are truth-functional: that each sentence corresponds to a function from states of the world to true/false.
 
 As above, the speaker chooses what to say in order to lead the listener to infer the correct state:
 
@@ -553,13 +554,16 @@ However this suffers from two flaws: the recursion never halts, and the literal 
 
 Here the probability `literal-prob` controls the expected depth of recursion. Another ways to bound the depth of recursion is with an explicit depth argument (which is decremented on each recursion).
 
+We have used a standard, truth-functional, formulation for the meaning of a sentence: each sentence specifies a (deterministic) predicate on world states. Thus the literal meaning of a sentence specifies the worlds in which the sentence is satisfied. That is the literal meaning of a sentence is the sort of thing one can condition on, transforming a prior over worlds into a posterior. Here's another way of motivating this view: meanings are belief update operations, and since the right way to update beliefs coded as distributions is conditioning, meanings are conditioning statements. Of course, the deterministic predicates can be immediately (without changing any other code) relaxed to probabilistic truth functions, that assign a probability to each world. This might be useful if we want to allow exceptions.
+
 ### Example: Scalar Implicature
 
 Let us imagine a situation in which there are three plants which may or may not
 have sprouted. We imagine that there are three sentences that the speaker could
 say, "All of the plants have sprouted", "Some of the plants have sprouted", or
 "None of the plants have sprouted". For simplicity we represent the worlds by
-the number of sprouted plants (0, 1, 2, or 3) and take a uniform prior over worlds. Using the above representation for communicating with words:
+the number of sprouted plants (0, 1, 2, or 3) and take a uniform prior over worlds. 
+Using the above representation for communicating with words (with an explicit depth argument):
 
 ~~~~ 
 (define (state-prior) (uniform-draw '(0 1 2 3)))
@@ -590,12 +594,6 @@ the number of sprouted plants (0, 1, 2, or 3) and take a uniform prior over worl
 ~~~~
 
 We see that if the listener hears "some" the probability of three out of three is low, even though the basic meaning of "some" is equally consistent with 3/3, 1/3, and 2/3. This is called the "some but not all" implicature.
-
-## Semantics: conditions on beliefs
-
-In the above we have used a standard, truth-functional, formulation for the meaning of a sentence: each sentence specifies a (deterministic) predicate on world states. For instance, "All balls are red." translated into something like `(lambda (world) (null? (filter (not red?) (objects world))))`. Thus the semantics of a sentence specifies the worlds in which the sentence is satisfied. That is the *literal meaning* of a sentence is the sort of thing one can condition on, transforming a prior over worlds into a posterior. Here's another way of motivating this view: meanings are belief update operations, and since the right way to update beliefs coded as distributions is conditioning, meanings are conditioning statements.
-
-Of course, the deterministic predicates can be immediately (without changing any code) relaxed to probabilistic truth functions, that assign a probability to each world. This might be useful if we want to allow exceptions, for example a noisy all might be: `(lambda (world) (if (flip noise) true (null? (filter (not red?) (objects world)))))`.
 
 <!--
 ### Compositional Meanings
