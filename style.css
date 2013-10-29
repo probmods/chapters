@@ -374,3 +374,18 @@ button.run {
     shape-rendering: crispEdges;
 }
 
+/* chapter tables */
+table {
+border-collapse: collapse
+}
+
+th {
+border: 1px solid #afafaf;
+padding: 0 0.5em 0 0.5em;
+font-weight: 600;
+}
+
+td {
+border: 1px solid #afafaf;
+padding: 0 0.5em 0 0.5em;
+}
