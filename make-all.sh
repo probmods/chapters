@@ -1,14 +1,14 @@
 #!/bin/bash
 
-# compile webchurch
-echo "making webchurch"
-git submodule update --init --recursive
-git submodule update --recursive
+echo "Compiling webchurch"
+# git submodule update --init --recursive
+# git submodule update --recursive
 cd webchurch
 ./compile.sh
 cd ..
 
-echo "making index"
+echo ""
+echo "Making index"
 python make-index.py
 i=1
 
