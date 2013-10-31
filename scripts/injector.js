@@ -291,7 +291,13 @@ var forest_protocol = location.protocol.match(/file/) ? "http://" : "//";
     return attributes;
   };
 
-  var chapterName = _(location.href.split("/")).last().replace(".html","").split("#")[0];
+
+  // this is potentially set in play-space-list.html,
+  // which is a temporary file that will eventually supplant
+  // play-space.html after testing on the server
+  if (typeof window.chapterName == "undefined") {
+    chapterName = _(location.href.split("/")).last().replace(".html","").split("#")[0];
+  }
 
   var injectEditor = function(domEl, options) {
     var attributes = getAttributes(domEl),
