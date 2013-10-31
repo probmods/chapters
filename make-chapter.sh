@@ -16,7 +16,7 @@ then
     numberoffset="0"
 fi
 
-echo "compiling $1 number-offset=$numberoffset baseheaderlevel=$baseheaderlevel"
+echo "$numberoffset. $1"
 
 pandoc --toc \
 --smart \
