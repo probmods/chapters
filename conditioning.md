@@ -651,5 +651,16 @@ disease by changing the prior probability of the disease such that it is always 
 
     G) What difference do you see between your code and the mathematical notation? What are the advantages and disadvantages of each? Which do you prefer?
 
+<!--
+
+1. Write a church program that reproduces approximately the model from Griffiths and Tenenbaum (2006), "Optimal predictions in everyday cognition", Psychological Science.  Specifically, make a version of Figure 1, for Gaussian and Gamma priors (the Erlang is a special case of a Gamma distribution).  Your version of this figure can be discrete and approximate, using the church functions for drawing histograms of samples `(hist and density)` and line plots with discrete data points `(lineplot ...)` that are introduced in the churchserv examples on the [[Learning as Conditional Inference]] page.
+
+(a) Your basic programs should do two things: (1) Draw samples from the priors for various parameter settings (e.g., mean and variance of the Gaussian), which should approximate the top panels of Fig 1; (2) Compute the prediction function, the median of the posterior for $t_{total}$ conditioned on observing one value of $t$ sampled from between 0 and $t_{total}$, which should approximate the bottom panels of Fig 1. Plot the median posterior prediction as a function of the observed sample of $t$ for approximately 7-10 different values, enough to give a good sense of the shape of the function.
+
+(b) Modify your program for the prediction function to condition on the proposition that $t_{total}$ is greater than or equal to some observed quantity $t$, rather than taking $t$ to be a random sample from between 0 and $t_{total}$.  How does the prediction function change as a result of this modification, either qualitatively or quantitatively?  Why does it change?  (Extra credit: The appendix of Griffiths and Tenenbaum (2006) derives the prediction function in (a) analytically, using calculus.  Derive the prediction function for (b) analytically using a similar approach, and show how the two different mathematical forms derived correspond to the sampling-based approximate results that church returns.)
+
+(c) From a Bayesian viewpoint, the two different church programs described in (a) and (b) correspond to using two different likelihood functions, or observation models, with the same prior on event durations or magnitudes.  What kinds of natural learning situations would be best captured by these different likelihood function or observation models?
+-->
+
 
 # References
