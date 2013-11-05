@@ -1,14 +1,13 @@
 % Learning as Conditional Inference
 
->***Note: This chapter has not been revised for the new format and Church engine. Some content may be incomplete! Some example may not work!***
-
 
 <!--
 -revise learning as induction section:
   -be more explicit about learning curves, trajectories.
   -infinite hypothesis spaces. poverty of stimulus arguments, inductive bias.
-  -get TOC
   -add number game?
+  -more on LoT / RR style models
+    -conjugate vs length prior
 -->
 
 
@@ -201,11 +200,32 @@ Most real world problems of parameter estimation, or learning continuous paramet
 
 ## Example: Estimating Causal Power
 
+A common problem for cognition is *causal learning*: from observed evidence about the co-occurance of events, attempt to infer the causal structure relating them. An especially simple case that has been studied by psychologists is *elemental causal induction*: causal learning when there are only two events, a potential cause C and a potential effect E. Cheng and colleagues [@Cheng] have suggested assuming that C and background effects can both cause C, with a noisy-or interaction. Causal learning then because an example of parameter learning,  where the parameter is the "causal power" of C to cause E:
 
+~~~~
+(define samples
+  (mh-query 10000 1
+            (define cp (uniform 0 1)) ;;causal power of C to cause E.
+            (define b (uniform 0 1))  ;;background probability of E.
+            
+            ;;the noisy causal relation to get E given C:
+            (define (E-if-C C) 
+              (or (and C (flip cp))
+                  (flip b)))
+            
+            ;;infer the causal power:
+            cp
+            
+            ;;condition on some contingency evidence:
+            (and (E-if-C true)
+                 (E-if-C true)
+                 (not (E-if-C false))
+                 (E-if-C true))))
 
+(hist samples)
+~~~~
 
-
-
+Experiment with this model: when does it conclude that a causal relation is likely (high `cp`)? Does this match your intuitions? What role does the background rate `b` play? What happens if you change the functional relationship in `E-if-C`?
 
 
 
@@ -289,7 +309,7 @@ Is it possible to get graded effects from rule-based concepts? Perhaps these eff
 (scatter (map pair (means samples) (append human-T human-A human-B)) "model vs human")
 ~~~~
 
-Goodman, et al, have used to this model to capture a variety of classic categorization effects @Goodman:2008p865. Thus probabilistic induction of (deterministic) rules can capture many of the graded effects previously taken as evidence against rule-based models.
+Goodman, et al, have used to this model to capture a variety of classic categorization effects [@Goodman:2008p865]. Thus probabilistic induction of (deterministic) rules can capture many of the graded effects previously taken as evidence against rule-based models.
 
 This style of compositional concept induction model, can be naturally extended to more complex hypothesis spaces For example: 
 
@@ -302,5 +322,6 @@ It has been used to model theory acquisition, learning natural numbers concepts,
 
 * Learning Structured Generative Concepts. A. Stuhlmueller, J. B. Tenenbaum, and N. D. Goodman (2010). Proceedings of the Thirty-Second Annual Conference of the Cognitive Science Society.
 
+# References
 
 
