@@ -5,7 +5,6 @@ observing-sequences
 inference-about-inference
 inference-process
 learning-as-conditional-inference
-grammar-based-induction-LoT
 hierarchical-models
 occam's-razor
 mixture-models

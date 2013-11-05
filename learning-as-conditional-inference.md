@@ -37,7 +37,7 @@ This "learning curve" reflects a highly systematic and rational process of condi
 
 For simplicity let's consider only two hypotheses, two possible definitions of `coin`, representing a fair coin and a trick coin that produces heads 95% of the time.  A priori, how likely is any coin offered up by a friend to be a trick coin?  Of course there is no objective or universal answer to that question, but for the sake of illustration let's assume that the *prior probability* of seeing a trick coin is 1 in a 1000, versus 999 in 1000 for a fair coin.  These probabilities determine the weight passed to `make-coin`.  Now to inference:
 
-~~~~ {.mit-church}
+~~~~
 (define observed-data '(h h h h h))
 (define num-flips (length observed-data))
 
@@ -71,7 +71,7 @@ The previous example represents perhaps the simplest imaginable case of learning
 
 We can explore a basic case of learning with continuous hypothesis spaces by slightly enriching our coin flipping example.  Suppose that our hypothesis generator `make-coin`, instead of simply flipping a coin to determine which of two coin weights to use, can choose *any* coin weight between 0 and 1.  For this we need to introduce a new kind of XRP that outputs a real number in the interval $[0,1]$, corresponding to the coin weight, in addition to `flip` which outputs a Boolean truth value.  The simplest such XRP in Church is called `uniform`, which outputs a random real number chosen uniformly between a given upper and lower bound.  The following program computes conditional inferences about the weight of a coin drawn from a *prior distribution* described by the `uniform` function, conditioned on a set of observed flips.
 
-~~~~ {.mit-church}
+~~~~
 (define observed-data '(h h h h h))
 (define num-flips (length observed-data))
 (define num-samples 1000)
@@ -79,21 +79,20 @@ We can explore a basic case of learning with continuous hypothesis spaces by sli
 
 (define samples
   (mh-query
-     num-samples 10
+   num-samples 10
+   
+   (define coin-weight (uniform 0 1))
+   
+   (define make-coin (lambda (weight) (lambda () (if (flip weight) 'h 't))))
+   (define coin (make-coin coin-weight))
+   
+   coin-weight
+   
+   (equal? observed-data (repeat num-flips coin))))
 
-     (define coin-weight (uniform 0 1))
-
-     (define make-coin (lambda (weight) (lambda () (if (flip weight) 'h 't))))
-     (define coin (make-coin coin-weight))
-
-     coin-weight
-
-     (equal? observed-data (repeat num-flips coin))
-   )
-)
-
-(hist (append '(0) '(1) prior-samples) 10 "Coin weight, prior to observing data")
-(hist (append '(0) '(1) samples) 10 "Coin weight, conditioned on observed data")
+(multiviz 
+ (hist prior-samples "Coin weight, prior to observing data")
+ (hist samples "Coin weight, conditioned on observed data"))
 ~~~~
 
 Because the output of inference is a set of conditional samples, and each sample is drawn from the uncountable interval $[0,1]$, we cannot expect that any of these samples will correspond exactly to the true coin weight or the single most likely value.  By binning the samples, however, we can get a meaningful estimate of how likely the coin weight is to fall in any subinterval of $[0,1]$.  We call the distribution of samples produced by conditional inference on data the *conditional distribution*, or sometimes the *posterior distribution*, to contrast with the prior distribution expressing our a priori beliefs.   The code above illustrates both prior and conditional distributions, each with a histogram of 1000 samples.  (We append a single 0 and 1 to each set of samples in order to force the histograms to cover the whole range $[0,1]$.)
@@ -190,6 +189,94 @@ Is the family of Beta distributions sufficient to represent all of people's intu
 Imagine the learning curve as you flip this coin from the bank and get 5 heads in a row... then 10 heads in a row... then 15 heads... and so on.  Your beliefs seem to shift from "fair coin" to "trick coin" hypotheses discretely, rather than going through a graded sequence of hypotheses about a continuous coin weight moving smoothly between 0.5 and 1.  It is clear that this "trick coin" hypothesis, however, is not merely the hypothesis of a coin that always (or almost always) comes up heads, as in the first simple example in this section where we compared two coins with weight 0.5 and 0.95.  Suppose that you flipped a quarter fresh from the bank 100 times and got 85 heads and 15 tails.  As strong as your prior belief starts out in favor of a fair coin, this coin also won't seem fair.  Using a strong beta prior (e.g., $beta(100,100)$ or $beta(1000,1000)$) suggests counterintuitively that the weight is still near 0.5 (respectively, 0.52 or 0.62). Given the choice between a coin of weight 0.5 and 0.95, weight 0.95 is somewhat more likely.  But neither of those choices matches intuition at this point, which is probably close to the empirically observed frequency: "This coin obviously isn't fair, and given that it came up heads 85/100 times, my best guess is it that it will come heads around 85% of the time in the future."  Confronted with these anomalous sequences, 25/25 heads or 85/100 heads from a freshly unwrapped quarter, it seems that the evidence shifts us from an initially strong belief in a fair coin (something like a $beta(1000,1000)$ prior) to a strong belief in a discretely different alternative hypothesis, a biased coin of some unknown weight (more like a uniform or $beta(1,1)$ distribution). Once we make the transition to the biased coin hypothesis we can estimate the coin's weight on mostly empirical grounds, effectively as if we are inferring that we should "switch" our prior on the coin's weight from a strongly symmetric beta to a much more uniform distribution.
 
 We will see later on how to explain this kind of belief trajectory -- and we will see a number of learning, perception and reasoning phenomena that have this character.  The key will be to describe people's prior beliefs using more expressive programs than we can capture with a single XRP representing distributions familiar in statistics.   Our intuitive theories of the world have a more abstract structure, embodying a hierarchy of more or less complex mental models.
+
+
+
+# Grammar-based Concept Induction
+
+How can we account for the productivity of human concepts (the fact that every child learns a remarkable number of different, complex concepts)? The "classical" theory of concepts formation accounted for this productivity by hypothesizing that concepts are represented compositionally, by logical combination of the features of objects (see for example Bruner, Goodnow, and Austin, 1951). That is, concepts could be thought of as rules for classifying objects (in or out of the concept) and concept learning was a process of deducing the correct rule.
+
+While this theory was appealing for many reasons, it failed to account for a variety of categorization experiments. Here are the training examples, and one transfer example, from the classic experiment of Medin and Schaffer (1978). The bar graph above the stimuli shows the portion of human participants who said that bug was a "fep" in the test phase (the data comes from a replication by Nosofsky, Gluck, Palmeri, McKinley (1994); the bug stimuli are courtesy of Pat Shafto):  
+
+<img src='images/Medin54-bugs.png' width='500' />
+
+Notice three effects: there is a gradient of generalization (rather than all-or-nothing classification), some of the Feps are better (or more typical) than others (this is called "typicality"), and the transfer item is a ''better'' Fep than any of the Fep exemplars (this is called "prototype enhancement"). Effects like these were difficult to capture with classical rule-based models of category learning, which led to deterministic behavior. As a result of such difficulties, psychological models of category learning turned to more uncertain, prototype and exemplar based theories of concept representation. These models were able to predict behavioral data very well, but lacked  compositional conceptual structure.
+
+Is it possible to get graded effects from rule-based concepts? Perhaps these effects are driven by uncertainty in ''learning'' rather than uncertainty in the ''representations'' themselves? To explore these questions Goodman, Tenenbaum, Feldman, and Griffiths (2008) introduced the Rational Rules model, which learns deterministic rules by probabilistic inference. This model has an infinite hypothesis space of rules (represented in propositional logic), which are generated compositionally. Here is a slightly simplified version of the model, applied to the above experiment:
+
+~~~~
+;;first set up the training (cat A/B) and test objects:
+(define num-features 4)
+
+(define A-objects (list '(0 0 0 1) '(0 1 0 1) '(0 1 0 0) '(0 0 1 0) '(1 0 0 0)))
+
+(define B-objects (list '(0 0 1 1) '(1 0 0 1) '(1 1 1 0) '(1 1 1 1)))
+
+(define T-objects (list '(0 1 1 0) '(0 1 1 1) '(0 0 0 0) '(1 1 0 1)
+                        '(1 0 1 0) '(1 1 0 0) '(1 0 1 1)))
+
+;;here are the human results from Nosofsky et al, for comparison:
+(define human-A '(0.77 0.78 0.83 0.64 0.61))
+(define human-B '(0.39 0.41 0.21 0.15))
+(define human-T '(0.56 0.41 0.82 0.40 0.32 0.53 0.20))
+
+;;two parameters: stopping probability of the grammar, and noise probability:
+(define tau 0.3)         
+(define noise-param (exp -1.5)) 
+
+;;a generative process for disjunctive normal form propositional equations:
+(define (get-formula)
+  (if (flip tau)
+      (let ((c (Conj))
+            (f (get-formula)))
+        (lambda (x) (or (c x) (f x))))
+      (Conj)))
+
+(define (Conj)
+  (if (flip tau)
+      (let ((c (Conj))
+            (p (Pred)))
+        (lambda (x) (and (c x) (p x))))
+      (Pred)))
+
+(define (Pred)
+  (let ((index (sample-integer num-features))
+        (value (sample-integer 2)))
+    (lambda (x) (= (list-ref x index) value))))
+
+
+(define (noisy-equal? a b) (flip (if (equal? a b) 0.999999999 noise-param)))
+
+(define samples
+  (mh-query 
+   1000 10
+   
+   ;;infer a classification formula
+   (define my-formula (get-formula))
+   
+   ;;look at posterior predictive classification
+   (map my-formula (append T-objects A-objects B-objects))
+   
+   ;;conditioning (noisily) on all the training eamples:
+   (and (all (map (lambda (x) (noisy-equal? true (my-formula x))) A-objects))
+        (all (map (lambda (x) (noisy-equal? false (my-formula x))) B-objects)))))
+
+
+;;now plot the predictions vs human data:
+(define (means samples) 
+  (if (null? (first samples))
+      '()
+      (pair (mean (map (lambda (x) (if x 1.0 0.0)) (map first samples)))
+            (means (map rest samples)))))
+
+(scatter (map pair (means samples) (append human-T human-A human-B)) "model vs human")
+'done
+~~~~
+
+Goodman, et al, have used to this model to capture a variety of classic categorization effects <ref>A rational analysis of rule-based concept learning. N. D. Goodman, J. B. Tenenbaum, J. Feldman, and T. L. Griffiths (2008). Cognitive Science. 32:1, 108-154.</ref>. Thus probabilistic induction of (deterministic) rules can capture many of the graded effects previously taken as evidence against rule-based models.
+
+This style of compositional concept induction model, can be naturally extended to more complex hypothesis spaces <ref>For example: Compositionality in rational analysis: Grammar-based induction for concept learning. N. D. Goodman, J. B. Tenenbaum, T. L. Griffiths, and J. Feldman (2008). In M. Oaksford and N. Chater (Eds.). The probabilistic mind: Prospects for Bayesian cognitive science. A Bayesian Model of the Acquisition of Compositional Semantics. S. T. Piantadosi, N. D. Goodman, B. A. Ellis, and J. B. Tenenbaum (2008). Proceedings of the Thirtieth Annual Conference of the Cognitive Science Society.</ref>. It has been used to model theory acquisition, learning natural numbers concepts, etc. Further, there is no reason that the concepts need to be deterministic: in Church stochastic functions can be constructed compositionally and learned by induction <ref>Learning Structured Generative Concepts. A. Stuhlmueller, J. B. Tenenbaum, and N. D. Goodman (2010). Proceedings of the Thirty-Second Annual Conference of the Cognitive Science Society.</ref>.
+
 
 
 # Exercises
