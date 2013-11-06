@@ -231,6 +231,74 @@ Experiment with this model: when does it conclude that a causal relation is like
 
 # Grammar-based Concept Induction
 
+An important worry about Bayesian models of learning is that the Hypothesis space must either be too simple, as in the models above, specified in a rather ad-hoc way, or both. There is a tension here: human representations of the world are enormously complex and so the space of possible representations must be correspondingly big, and yet we would like to understand the representational resources in simple and uniform terms. How can we construct very large (possibly infinite) hypothesis spaces, and priors over them, with limited tools? One possibility is to use a grammar to specify a *hypothesis language*: a small grammar can generate an infinite array of potential hypotheses. because grammars are themselves generative processes, a prior is provided as well.
+
+## Example: Inferring an Arithmetic Expression
+
+Consider the following Church program, which induces an arithmetic function from examples. We generate an expression as a list, and then turn it into a value (in this case a procedure) by using `eval`---a function that invokes evaluation.
+
+~~~~
+(define (random-arithmetic-expression)
+  (if (flip 0.7)
+      (if (flip) 'x (sample-integer 10))
+      (list (uniform-draw '(+ -)) (random-arithmetic-expression) (random-arithmetic-expression))))
+
+(define (procedure-from-expression expr)
+  (eval (list 'lambda '(x) expr)))
+
+(define (sample)
+(rejection-query
+ 
+ (define my-expr (random-arithmetic-expression))
+ (define my-proc (procedure-from-expression my-expr))
+ 
+ my-expr
+ 
+ (= (my-proc 1) 3)))
+
+(apply multiviz (repeat 20 sample))
+~~~~
+
+The query asks for an arithmetic expression on variable `x` such that it evaluates to `3` when `x` is `1`. In this example there are many extensionally equivalent ways to satisfy the condition, for instance the expressions `3`, `(+ 1 2)`, and `(+ x 2)`, but because the more complex expressions require more choices to generate, they are chosen less often. What happens if we observe more data? For instance, try changing the condition in the above query to `(and (= (my-proc 1) 3) (= (my-proc 2) 4))`.
+
+This model learns from an infinite hypothesis space---all expressions made from 'x', '+', '-', and constant integers---but specifies both the hypothesis space and its prior using the simple generative process `random-arithmetic-expression`.
+
+<!--
+This query has a very "strict" condition: the function must give 3 when applied to 1. As the amount of data increases this strictness will make inference increasingly hard. We can ease inference by ''relaxing'' the condition, only requiring equality with high probability. To do so we use a "noisy" equality in the condition:
+
+~~~~
+(define (noisy= x y) (log-flip (* -3 (abs (- x y)))))
+
+(define (random-arithmetic-expression)
+  (if (flip 0.6)
+      (if (flip) 'x (sample-integer 10))
+      (list (uniform-draw '(+ -)) (random-arithmetic-expression) (random-arithmetic-expression))))
+
+(define (procedure-from-expression expr)
+  (eval (list 'lambda '(x) expr) (get-current-environment)))
+
+(define samples
+ (mh-query
+  100 100
+ 
+  (define my-expr (random-arithmetic-expression))
+  (define my-proc (procedure-from-expression my-expr))
+ 
+  my-expr
+ 
+  (and (noisy= (my-proc 1) 3)
+       (noisy= (my-proc 3) 5) )  ))
+
+(apply multiviz samples)
+~~~~
+
+Try adding in more data consistent with the (+ x 2) rule, e.g., ` (noisy= (my-proc 4) 6) `, ` (noisy= (my-proc 9) 11) `. How do the results of querying on the arithmetic expression change as more consistent data points are observed, and why?  
+
+This is an example of a very powerful technique in probabilistic programing: a difficult inference problem can often be relaxed into an easier problem by inserting a noisy operation. Such a relaxation will have a parameter (the noise parameter), and various "temperature" techniques can be used to get samples from the original problem, using samples from the relaxed problem. (Temperature techniques that have been implemented for Church include parallel tempering, tempered transitions, and annealed importance sampling.)
+-->
+
+## Example: Rational Rules
+
 How can we account for the productivity of human concepts (the fact that every child learns a remarkable number of different, complex concepts)? The "classical" theory of concepts formation accounted for this productivity by hypothesizing that concepts are represented compositionally, by logical combination of the features of objects (see for example Bruner, Goodnow, and Austin, 1951). That is, concepts could be thought of as rules for classifying objects (in or out of the concept) and concept learning was a process of deducing the correct rule.
 
 While this theory was appealing for many reasons, it failed to account for a variety of categorization experiments. Here are the training examples, and one transfer example, from the classic experiment of Medin and Schaffer (1978). The bar graph above the stimuli shows the portion of human participants who said that bug was a "fep" in the test phase (the data comes from a replication by Nosofsky, Gluck, Palmeri, McKinley (1994); the bug stimuli are courtesy of Pat Shafto):  
