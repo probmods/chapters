@@ -259,9 +259,38 @@ Consider the following Church program, which induces an arithmetic function from
 (apply multiviz (repeat 20 sample))
 ~~~~
 
-The query asks for an arithmetic expression on variable `x` such that it evaluates to `3` when `x` is `1`. In this example there are many extensionally equivalent ways to satisfy the condition, for instance the expressions `3`, `(+ 1 2)`, and `(+ x 2)`, but because the more complex expressions require more choices to generate, they are chosen less often. What happens if we observe more data? For instance, try changing the condition in the above query to `(and (= (my-proc 1) 3) (= (my-proc 2) 4))`.
+The query asks for an arithmetic expression on variable `x` such that it evaluates to `3` when `x` is `1`. In this example there are many extensionally equivalent ways to satisfy the condition, for instance the expressions `3`, `(+ 1 2)`, and `(+ x 2)`, but because the more complex expressions require more choices to generate, they are chosen less often. What happens if we observe more data? For instance, try changing the condition in the above query to `(and (= (my-proc 1) 3) (= (my-proc 2) 4))`. Using `eval` can be rather slow, so here's another formulation that directly builds the arithmetic function by random combination of subfunctions:
 
-This model learns from an infinite hypothesis space---all expressions made from 'x', '+', '-', and constant integers---but specifies both the hypothesis space and its prior using the simple generative process `random-arithmetic-expression`.
+~~~~
+(define (random-arithmetic-fn)
+  (if (flip 0.3)
+      (random-combination (random-arithmetic-fn) (random-arithmetic-fn))
+      (if (flip) 
+          (lambda (x) x) 
+          (random-constant-fn))))
+
+(define (random-combination f g)
+  (define op (uniform-draw (list + -)))
+  (lambda (x) (op (f x) (g x))))
+
+(define (random-constant-fn)
+  (define i (sample-integer 10))
+  (lambda (x) i))
+
+
+(define (sample)
+  (rejection-query
+   
+   (define my-proc (random-arithmetic-fn))
+   
+   (my-proc 2)
+   
+   (= (my-proc 1) 3)))
+
+(repeat 100 sample)
+
+(hist (repeat 500 sample))
+~~~~
 
 <!--
 This query has a very "strict" condition: the function must give 3 when applied to 1. As the amount of data increases this strictness will make inference increasingly hard. We can ease inference by ''relaxing'' the condition, only requiring equality with high probability. To do so we use a "noisy" equality in the condition:
@@ -296,6 +325,9 @@ Try adding in more data consistent with the (+ x 2) rule, e.g., ` (noisy= (my-pr
 
 This is an example of a very powerful technique in probabilistic programing: a difficult inference problem can often be relaxed into an easier problem by inserting a noisy operation. Such a relaxation will have a parameter (the noise parameter), and various "temperature" techniques can be used to get samples from the original problem, using samples from the relaxed problem. (Temperature techniques that have been implemented for Church include parallel tempering, tempered transitions, and annealed importance sampling.)
 -->
+
+This model learns from an infinite hypothesis space---all expressions made from 'x', '+', '-', and constant integers---but specifies both the hypothesis space and its prior using the simple generative process `random-arithmetic-expression`.
+
 
 ## Example: Rational Rules
 
