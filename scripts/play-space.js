@@ -52,7 +52,7 @@ var save = function(name) {
 
 
 var saveAs = function() {
-  var name = prompt("Please enter a name", editor.exerciseName.split('.').pop());
+  var name = prompt("Please enter a name", "");
 
   save(name);
   
