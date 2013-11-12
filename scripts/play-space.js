@@ -7,7 +7,7 @@ window.chapterName = "play-space";
 
 var save = function(name) {
   if (typeof name === "undefined") {
-    name = $("#code-names > [selected]").text();
+    name = $("#code-names :selected").text();
   }
   var editor = $(".CodeMirror")[0].CodeMirror;
   
