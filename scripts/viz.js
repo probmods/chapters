@@ -291,16 +291,18 @@ _lineplot = function(samples, title) {
 
 function plot(samples, title, lines) {
   //samples is a list of pairs
-  data = listToArray(samples);
-  xVals = data.map(function(x) {return x[0];});
-  yVals = data.map(function(x) {return x[1];});
-  maxX = Math.max.apply(Math, xVals)
-  maxY = Math.max.apply(Math, yVals)
-  minX = Math.min.apply(Math, xVals)
-  minY = Math.min.apply(Math, yVals)
+  var data = listToArray(samples);
+  var xVals = data.map(function(x) {return x[0];});
+  var yVals = data.map(function(x) {return x[1];});
+  var maxX = Math.max.apply(Math, xVals)
+  var maxY = Math.max.apply(Math, yVals)
+  var minX = Math.min.apply(Math, xVals)
+  var minY = Math.min.apply(Math, yVals)
 
   return function($div) {
-    var div = $div[0];
+
+    var $plotDiv = $("<div></div>").appendTo($div);
+    var div = $plotDiv[0];
     
     var margin = {top: 40, right: 20, bottom: 30, left: 40},
         width = 0.8 * $div.width() - margin.left - margin.right,
