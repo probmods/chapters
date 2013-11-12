@@ -4,7 +4,6 @@
 
 > Entities should not be multiplied without necessity. -- William of Ockham
 
-
 In learning, perceiving or thinking about the world, we are fitting models to the data of experience. Typically our hypothesis space will span models varying greatly in complexity: some models will have many more free parameters or degrees of freedom than others.  Under traditional approaches to model fitting where we adjust each model's parameters until it fits best, then choose the best-fitting model &mdash; a model with strictly more free parameters will tend to be preferred regardless of whether it actually comes closer to describing the true processes that generated the data.  But this is not the way the mind works.  We assess models with a natural eye for complexity, balancing fit to the data with model complexity in subtle ways that will not inevitably prefer the most complex model. Instead we often seem to judge models using Occam's razor: we choose the least complex hypothesis that fits the data well. In doing so we avoid "over-fitting" our data in order to support successful generalizations and predictions.
 
 Fitting curves (or smooth functions) to sparsely sampled, noisy data provides a familiar example of the problem.
@@ -26,8 +25,10 @@ From the standpoint of a sampling-based probabilistic programming language such 
 It is convenient to emphasize an aspect of probabilistic modeling that seems deceptively trivial, but comes up repeatedly when thinking about inference. In Bayesian statistics we think of probabilities as being *degrees of belief*. Our generative model reflects world knowledge and the probabilities that we assign to the possible sampled values reflect how strongly we believe in each possibility. The laws of probability theory ensure that our beliefs remain consistent as we reason.
 
 A consequence of belief maintenance is known as the *Law of Conservation of Belief* (LCB). Here are two equivalent formulations of this principle:
-# Sampling from a distribution selects exactly one possibility (in doing so it implicitly rejects all other possible values).
-# The total probability mass of a distribution must sum to $1$. That is, we only have a single unit of belief to spread around.
+
+#. Sampling from a distribution selects exactly one possibility (in doing so it implicitly rejects all other possible values).
+#. The total probability mass of a distribution must sum to $1$. That is, we only have a single unit of belief to spread around.
+
 The latter formulation leads to a common metaphor in discussing generative models: We can usefully think of belief as a "currency" that is "spent" by the probabilistic choices required to construct a sample. Since each choice requires "spending" some currency, an outcome that requires more choices to construct it will generally be more costly, i.e. less probable.
 
 It is this conservation of belief that gives rise to the Bayesian Occam's razor. A hypothesis that spends its probability on many alternatives that don't explain the current data will have less probability for the alternatives that do, and will hence do less well overall than a hypothesis which only entertains options that fit the current data. We next examine a special case where this tradeoff plays out clearly, the *size principle*, then come back to the more general cases.
@@ -39,11 +40,11 @@ If beliefs are causal histories of how the observed data were generated, and deg
 
 # The Size Principle
 
-A simple case of Bayes Occam's razor comes from the *size principle* <ref>Tenenbaum and Griffiths, 2001</ref>: Of hypotheses which generate data uniformly, the one consistent with the data and with smallest extension is the most probable.
+A simple case of Bayes Occam's razor comes from the *size principle* @TG01: Of hypotheses which generate data uniformly, the one consistent with the data and with smallest extension is the most probable.
 
 The following Church program demonstrates the size principle with a very simple model. Here we have two hypothesized sets: `Big` has 6 elements and `Small` has 3 elements. The generative model chooses one of the hypotheses at random and samples some number of symbols from it uniformly. We then wish to infer the hypothesis given observed elements.
 
-~~~~ {.mit-church}
+~~~~
 (define samples
    (mh-query
     100 100
@@ -65,7 +66,7 @@ The following Church program demonstrates the size principle with a very simple 
 
 With a single observed `a`, we already favor hypothesis `Small`. What happens when we increase the amount of observed data? Consider the learning trajectory:
 
-~~~~ {.mit-church}
+~~~~
 (define (samples data)
    (mh-query
     100 10
@@ -85,18 +86,27 @@ With a single observed `a`, we already favor hypothesis `Small`. What happens wh
 
 (define (big-freq data) (mean (map (lambda (hyp) (if (equal? hyp 'Big) 1.0 0.0)) (samples data))))
 
-(lineplot-value (pair 1 (big-freq '(a))) "Prob. of hypothesis Big")
-(lineplot-value (pair 3 (big-freq '(a b a))) "Prob. of hypothesis Big")
-(lineplot-value (pair 5 (big-freq '(a b a b b))) "Prob. of hypothesis Big")
-(lineplot-value (pair 7 (big-freq '(a b a b b a b))) "Prob. of hypothesis Big")
+(lineplot
+ (list
+  (pair 1 (big-freq '(a)))
+  (pair 3 (big-freq '(a b a)))
+  (pair 5 (big-freq '(a b a b b)))
+  (pair 7 (big-freq '(a b a b b a b))))
+ "P(Big | observations)"
+ )
 ~~~~
-As the number of data points increases, the hypothesis `Small` rapidly comes to dominate the posterior distribution.  Why is this happening? We sample observations uniformly from hypotheses, the law of conservation of belief and the symmetry between observations imply that the probability of a draw from `Big` is $\frac{1}{6}$, while the probability of a draw from `Small` is $\frac{1}{3}$. Thus, by the product rule of probabilities, the probability of drawing a set of N observations from `Big` is $(\frac{1}{6})^N$, while the probability of drawing a set of observations from `Small` is $(\frac{1}{3})^N$. The later probability decreases much more slowly than the former as the number of observations increases. Using Bayes' rule, the posterior distribution over hypotheses is given by:
-$$P(hypothesis | observations) \propto P(observations|hypothesis)P(hypothesis)$$
-Because our hypotheses are equally probable a priori, this simplifies to
-$$P(hypothesis | observations) \propto P(observations|hypothesis)$$
-So we see that the the posterior distribution over hypotheses in this case is just the normalized likelihood $P(observations|hypothesis)$.  The likelihood ratio $P(observations|Big)/P(observations|Small) = (\frac{1}{2})^N$ determines how quickly the simpler hypothesis `Small` comes to dominate the posterior.
 
-The size principle is related to an influential proposal in linguistics known as the *subset principle*.  Intuitively the subset principle suggests that when two grammars both account for the same data, the grammar that generates a smaller language should be preferred.<ref name="Subset Principle">The term *subset principle* is usually used in linguistics to refer to the notion that a grammar that generates a smaller language should be preferred to one that generates a larger language. However, the name originally was introduced by Bob Berwick to refer to a result due to Dana Angluin giving necessary and sufficient conditions for Gold-style learnability of a class of languages. Essentially it states that a class of languages is learnable in the limit using this principle if every language in the class has a *characteristic subset*. </ref>
+As the number of data points increases, the hypothesis `Small` rapidly comes to dominate the posterior distribution.  Why is this happening? We sample observations uniformly from hypotheses, the law of conservation of belief and the symmetry between observations imply that the probability of a draw from `Big` is $\frac{1}{6}$, while the probability of a draw from `Small` is $\frac{1}{3}$. Thus, by the product rule of probabilities, the probability of drawing a set of N observations from `Big` is $(\frac{1}{6})^N$, while the probability of drawing a set of observations from `Small` is $(\frac{1}{3})^N$. The later probability decreases much more slowly than the former as the number of observations increases. Using Bayes' rule, the posterior distribution over hypotheses is given by:
+
+$$P(\textrm{hypothesis} \mid \textrm{observations}) \propto P(\textrm{observations} \mid \textrm{hypothesis})P(\textrm{hypothesis})$$
+
+Because our hypotheses are equally probable a priori, this simplifies to:
+
+$$P(\textrm{hypothesis} \mid \textrm{observations}) \propto P(\textrm{observations} \mid \textrm{hypothesis})$$
+
+So we see that the the posterior distribution over hypotheses in this case is just the normalized likelihood $P(\textrm{observations} \mid \textrm{hypothesis})$.  The likelihood ratio $P(\textrm{observations} \mid \textrm{Big})/P(\textrm{observations} \mid \textrm{Small}) = (\frac{1}{2})^N$ determines how quickly the simpler hypothesis `Small` comes to dominate the posterior.
+
+The size principle is related to an influential proposal in linguistics known as the *subset principle*. Intuitively, the subset principle suggests that when two grammars both account for the same data, the grammar that generates a smaller language should be preferred.^[The term *subset principle* is usually used in linguistics to refer to the notion that a grammar that generates a smaller language should be preferred to one that generates a larger language. However, the name originally was introduced by Bob Berwick to refer to a result due to Dana Angluin giving necessary and sufficient conditions for Gold-style learnability of a class of languages. Essentially it states that a class of languages is learnable in the limit using this principle if every language in the class has a *characteristic subset*.]
 
 ## Example: The Rectangle Game
 
@@ -169,10 +179,13 @@ To illustrate the power of the size principle in inferring the most parsimonious
 ~~~~
 
 Explore how the concept learned varies as a function of the number and distribution of example points. Try varying the observed data and seeing how the inferred rectangle changes:
-:(define obs-data '((0.2 0.6) (0.2 0.8) (0.4 0.8) (0.4 0.6) (0.3 0.7)))
-:(define obs-data '((0.4 0.7) (0.5 0.4) (0.45 0.5) (0.43 0.7) (0.47 0.6)))
-:(define obs-data '((0.4 0.7) (0.5 0.4)))
-:(define obs-data '((0.4 0.7) (0.5 0.4) (0.46 0.63) (0.43 0.51) (0.42 0.45) (0.48 0.66)))
+
+~~~~ {.norun}
+(define obs-data '((0.2 0.6) (0.2 0.8) (0.4 0.8) (0.4 0.6) (0.3 0.7)))
+(define obs-data '((0.4 0.7) (0.5 0.4) (0.45 0.5) (0.43 0.7) (0.47 0.6)))
+(define obs-data '((0.4 0.7) (0.5 0.4)))
+(define obs-data '((0.4 0.7) (0.5 0.4) (0.46 0.63) (0.43 0.51) (0.42 0.45) (0.48 0.66)))
+~~~~
 
 Compare this to the results of a slightly different causal process for the same observations, known as *weak sampling*:
 
@@ -324,8 +337,7 @@ Blocking is a basic phenomenon in language comprehension and production that nat
 
 The law of conservation of belief turns most clearly into Occam's Razor when we consider models with more
 internal structure: some continuous or discrete parameters that at different settings determine how likely
-the model is to produce data that look more or less like our observations.  To select among models we simply need to describe each model as a probabilistic program, and also to write a higher-level program that generates these hypotheses.  Church query will then automatically draw samples at both of these levels of abstraction, asking which models are most likely to have given rise to the observed data, as well as for each of those models, which internal
-parameter settings are most likely.
+the model is to produce data that look more or less like our observations.  To select among models we simply need to describe each model as a probabilistic program, and also to write a higher-level program that generates these hypotheses.  Church query will then automatically draw samples at both of these levels of abstraction, asking which models are most likely to have given rise to the observed data, as well as for each of those models, which internal parameter settings are most likely. Note that we are dealing with [*statistical models*](http://http://en.wikipedia.org/wiki/Statistical_model), which are stochastic, rather than deterministic
 
 ## Example: Fair or unfair coin?
 
@@ -370,11 +382,13 @@ This example shows how our inferences about coin flipping can be explained in te
 
 Try these cases and see if the inferences accord with your intuitions:
 
-`(h h t h t h h h t h) -> fair coin, probability of H = 0.5`
-`(h h h h h h h h h h) -> ?? suspicious coincidence, probability of H = 0.5 ..?`
-`(h h h h h h h h h h h h h h h) -> probably unfair coin, probability of H near 1 `
-`(h h h h h h h h h h h h h h h h h h h h) -> definitely unfair coin, probability of H near 1`
-`(h h h h h h t h t h h h h h t h h t h h h h h t h t h h h h h t h h h h h h h h h t h h h h t h h h h h h h h) -> unfair coin, probability of H = 0.85`
+~~~~ {.norun}
+(h h t h t h h h t h) ;; fair coin, probability of H = 0.5
+(h h h h h h h h h h) ;; ?? suspicious coincidence, probability of H = 0.5 ..?
+(h h h h h h h h h h h h h h h) ;; probably unfair coin, probability of H near 1 
+(h h h h h h h h h h h h h h h h h h h h) ;; definitely unfair coin, probability of H near 1
+(h h h h h h t h t h h h h h t h h t h h h h h t h t h h h h h t h h h h h h h h h t h h h h t h h  h h h h h) ;; unfair coin, probability of H = 0.85
+~~~~
 
 Now let's look at the learning trajectories for this model:
 
@@ -412,9 +426,9 @@ In general (though not on every run) the learning trajectory stays near 0.5 init
 
 ## The Effect of Unused Parameters
 
-When statisticians suggest methods for model selection, they often include a penalty for the *number* of parameters<ref>See for instance the [AIC](http://en.wikipedia.org/wiki/Akaike_information_criterion).</ref> This seems like a worrying policy from the point of view of a probabilistic program: we could always introduce parameters that are not used, and therefore have no effect on the program. For instance we could change the above coin flipping example so that it draws the potential unfair coin weight even in the model which gives a fair coin:
+When statisticians suggest methods for model selection, they often include a penalty for the *number* of parameters (e.g., [AIC](http://en.wikipedia.org/wiki/Akaike_information_criterion)). This seems like a worrying policy from the point of view of a probabilistic program: we could always introduce parameters that are not used, and therefore have no effect on the program. For instance we could change the above coin flipping example so that it draws the potential unfair coin weight even in the model which gives a fair coin:
 
-~~~~ {.mit-church}
+~~~~
 (define make-coin (lambda (weight) (lambda () (if (flip weight) 'h 't))))
 
 (define observed-data '(h))
@@ -424,7 +438,7 @@ When statisticians suggest methods for model selection, they often include a pen
    (mh-query
      1000 10
 
-     (define unfair-coin-weight (first (beta 1 10))) ;;always draw this...
+     (define unfair-coin-weight (beta 1 10))
 
      (define fair-coin? (flip fair-prior))
      (define coin-weight (if fair-coin?
@@ -441,9 +455,8 @@ When statisticians suggest methods for model selection, they often include a pen
 )
 
 (hist (map first samples) "Fair coin?")
-
-'done
 ~~~~
+
 The two models now have the same number of free parameters (the unfair coin weight), but we will still favor the simpler hypothesis, as we did above. Why? The Bayesian Occam's razor penalizes models not for having more parameters (or longer code) but for too much flexibility &mdash; being able to fit too many other potential observations. Unused parameters (or parameters with very little effect) don't increase this flexibility, and hence aren't penalized. The Bayesian Occam's razor only penalizes complexity that matters for prediction, and only to the extent that it matters.
 
 ## Example: Curve Fitting
@@ -530,17 +543,23 @@ This Church program samples polynomials up to order 3 that are (noisily) consist
 
 Try the above code using a different data set generated from the same function:
 
- (define obs-y-vals '(0.66 -0.32 -0.41 -0.59 -0.87 -0.75 -0.23 0.47 1.31 1.97 3.25))
+~~~~
+(define obs-y-vals '(0.66 -0.32 -0.41 -0.59 -0.87 -0.75 -0.23 0.47 1.31 1.97 3.25))
+~~~~
 
 Try a simpler data set that should also suggest a 2nd order polynomial:
 
- (define x-vals (range -3 3))
- (define obs-y-vals '(2 0.1 -1 -1.5 -0.8 0 1.9))
+~~~~
+(define x-vals (range -3 3))
+(define obs-y-vals '(2 0.1 -1 -1.5 -0.8 0 1.9))
+~~~~
 
 These data should suggest a 1st order polynomial:
 
- (define x-vals (range -3 3))
- (define obs-y-vals '(2 1.6 0.9 0.3 -0.1 -0.45 -1.2))
+~~~~
+(define x-vals (range -3 3))
+(define obs-y-vals '(2 1.6 0.9 0.3 -0.1 -0.45 -1.2))
+~~~~
 
 <!--
 # Example: Disjunction Fallacy
@@ -690,20 +709,16 @@ We see from these examples that several of the gestalt principles for perceptual
 
 # Exercises
 
-## 1
+1) **Causal induction**. Write the causal support model from Griffiths and Tenenbaum (2005), "Structure and strength in causal induction" (GT05) in Church.  You don't need to compute the log likelihood ratio for P(data|Graph 1)/P(data|Graph 0) [that is, P(data|C causes E)/P(data|C and E are independent] but can simply estimate the posterior probability P(Graph 1|data) [that is, P(C causes E|data)] as in Griffiths and Tenenbaum (2009), "Theory-based causal induction" (GT09).
 
-Write the causal support model from Griffiths and Tenenbaum (2005), "Structure and strength in causal induction" (GT05) in Church.  You don't need to compute the log likelihood ratio for P(data|Graph 1)/P(data|Graph 0) [that is, P(data|C causes E)/P(data|C and E are independent] but can simply estimate the posterior probability P(Graph 1|data) [that is, P(C causes E|data)] as in Griffiths and Tenenbaum (2009), "Theory-based causal induction" (GT09).
+    A) Replicate the model predictions from Fig. 1 of GT05.
 
-(a) Replicate the model predictions from Fig. 1 of GT05.
-
-(b) Show samples from the posteriors over the causal strength and background rate
+    B) Show samples from the posteriors over the causal strength and background rate
 parameters, as in Fig 4 of GT05.
 
-(c) Try using different parameterizations of the function that relates the cause and the background to the effect, as described in GT09: noisy-or for generative causes, noisy-and-not for preventive causes, generic multinomial parameterization for causes that have an unknown effect.  Show their predictions for a few different data sets, including the Delta-P = 0 cases.
+    C) Try using different parameterizations of the function that relates the cause and the background to the effect, as described in GT09: noisy-or for generative causes, noisy-and-not for preventive causes, generic multinomial parameterization for causes that have an unknown effect.  Show their predictions for a few different data sets, including the Delta-P = 0 cases.
 
-## 2
-
-Try an informal behavioral experiment with several friends as experimental subjects to see whether the Bayesian approach to curve fitting given on the wiki page corresponds with how people actually find functional patterns in sparse noisy data.  Your experiment should consist of showing each of 4-6 people 8-10 data sets (sets of x-y values, illustrated graphically as points on a plane with x and y axes), and asking them to draw a continuous function that interpolates between the data points and extrapolates at least a short distance beyond them (as far as people feel comfortable extrapolating).  Explain to people that the data were produced by measuring y as some function of x, with the possibility of noise in the measurements.
+2) Try an informal behavioral experiment with several friends as experimental subjects to see whether the Bayesian approach to curve fitting given on the wiki page corresponds with how people actually find functional patterns in sparse noisy data.  Your experiment should consist of showing each of 4-6 people 8-10 data sets (sets of x-y values, illustrated graphically as points on a plane with x and y axes), and asking them to draw a continuous function that interpolates between the data points and extrapolates at least a short distance beyond them (as far as people feel comfortable extrapolating).  Explain to people that the data were produced by measuring y as some function of x, with the possibility of noise in the measurements.
 
 The challenge of this exercise comes in choosing the data sets you will show people, interpreting the results and thinking about how to modify or improve a probabilistic program for curve fitting to better explain what people do. Of the 8-10 data sets you use, devise several ("type A") for which you believe the church program for polynomial curve fitting will match the functions people draw, at least qualitatively.  Come up with several other data sets ("type B") for which you expect people to draw qualitatively different functions than the church polynomial fitting program does. Does your experiment bear out your guesses about type A and type B?  If yes, why do you think people found different functions to best explain the type B data sets?  If not, why did you think they would?  There are a number of factors to consider, but two important ones are the noise model you use, and the choice of basis functions: not all functions that people can learn or that describe natural processes in the world can be well described in terms of polynomials; other types of functions may need to be considered.
 
@@ -711,9 +726,7 @@ Can you modify the church program to fit curves of qualitatively different forms
 
 You should hand in the data sets you used for the informal experiment, discussion of the experimental results, and a modified church program for fitting qualitatively different forms from polynomials plus samples from running the program forward.
 
-## 3
-
-Write the *number game* model from "Rules and similarity in concept learning", Tenenbaum (2000), in Church.
+3) **Number game**. Write the *number game* model from "Rules and similarity in concept learning", Tenenbaum (2000), in Church.
 
 Replicate the model predictions in Fig. 1b. You may want to start by writing out the hypotheses by hand.
 
