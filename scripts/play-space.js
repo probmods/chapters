@@ -5,9 +5,11 @@ var fileNames = [];
 // var chapterName = _(location.href.split("/")).last().replace(".html","").split("#")[0];
 window.chapterName = "play-space";
 
-var saveAs = function() {
+var save = function(name) {
+  if (typeof name === "undefined") {
+    name = $("#code-names > [selected]").text();
+  }
   var editor = $(".CodeMirror")[0].CodeMirror;
-  var name = prompt("Please enter a name", editor.exerciseName.split('.').pop());
   
   var exerciseName = [chapterName, name].join(".");
   editor.id = exerciseName;
@@ -46,6 +48,14 @@ var saveAs = function() {
       console.log("POST to /code/" + exerciseName + ": failure");
     }
   });
+}
+
+
+var saveAs = function() {
+  var name = prompt("Please enter a name", editor.exerciseName.split('.').pop());
+
+  save(name);
+  
 }
 
 var loadFrom = function(name) {
