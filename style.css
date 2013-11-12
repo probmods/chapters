@@ -313,7 +313,11 @@ button.run {
 }
 
 .CodeMirror-focused {
+    /* transition: left 0.2s, top 0.2s; */
+    transition: box-shadow 0.1s;
     box-shadow: 3px 3px 3px #99ccff;
+    /* left: -3px; */
+    /* top: -3px */
 }
 
 .CodeMirror:hover button.run, .CodeMirror:hover .code-settings, .CodeMirror-focused button.run, .CodeMirror-focused .code-settings {
