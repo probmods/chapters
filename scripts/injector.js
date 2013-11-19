@@ -57,7 +57,11 @@ var forest_protocol = location.protocol.match(/file/) ? "http://" : "//";
   };
   
   var runners = {};
-  runners['webchurch'] = function(editor) {
+  runners['webchurch'] = makewebchurchrunner();
+  runners['webchurch-opt'] = makewebchurchrunner(true);
+ 
+  function makewebchurchrunner(evalparams){
+   return function(editor) {
     var code = editor.getValue(),
         exerciseName = editor.exerciseName,
         $results = editor.$results,
@@ -72,7 +76,7 @@ var forest_protocol = location.protocol.match(/file/) ? "http://" : "//";
 //      jsCode = transform.probTransform(jsCode);
 //      var runResult = eval(jsCode),
  
-      var runResult = evaluate(code)
+      var runResult = evaluate(code,evalparams)
  
       var underlyingData
       
@@ -99,8 +103,9 @@ var forest_protocol = location.protocol.match(/file/) ? "http://" : "//";
       if (e.stackarray != undefined) {
         $results.append("\nStack trace: " + e.stack );
  
-        var errorlocation = e.stackarray[0]
-        var start=errorlocation.start.split(":"), end=errorlocation.end.split(":")
+//        var errorlocation = e.stackarray[0]
+//        var start=errorlocation.start.split(":"), end=errorlocation.end.split(":")
+        var start=e.start.split(":"), end=e.end.split(":")
         editor.errormark = editor.markText({line: Number(start[0])-1, ch: Number(start[1])-1},
                             {line: Number(end[0])-1, ch: Number(end[1])},
                                    {className: "CodeMirrorError", clearOnEnter: true})
@@ -113,7 +118,7 @@ var forest_protocol = location.protocol.match(/file/) ? "http://" : "//";
     // start trying to submit results
     submitResult(resultData, editor);
 
-  };
+ }};
 
   var query_settings = {
     method: 'get',          // method; get or post
@@ -337,7 +342,7 @@ var forest_protocol = location.protocol.match(/file/) ? "http://" : "//";
 
     // engine selector
 
-    var engines = ["webchurch", "cosh", "bher", "mit-church"],
+    var engines = ["webchurch", "webchurch-opt", "cosh", "bher", "mit-church"],
         engineSelectorString = "<select>\n" + _(engines).map(
           function(engine) {
             var tmpl = _.template('<option value="{{ engine }}" {{ selectedString }}> {{ engine }} </option>'),
@@ -426,7 +431,7 @@ var forest_protocol = location.protocol.match(/file/) ? "http://" : "//";
       // use setTimeout so the run-button disabling actually
       // shows up on the DOM
       setTimeout(function() { runners[editor.engine](editor);
-                              if (editor.engine == "webchurch") { 
+                              if (editor.engine == "webchurch" || editor.engine == "webchurch-opt") {
                                 $runButton.removeAttr('disabled');
                               }
                             }, 15);
