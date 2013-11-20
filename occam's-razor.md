@@ -337,7 +337,7 @@ Blocking is a basic phenomenon in language comprehension and production that nat
 
 The law of conservation of belief turns most clearly into Occam's Razor when we consider models with more
 internal structure: some continuous or discrete parameters that at different settings determine how likely
-the model is to produce data that look more or less like our observations.  To select among models we simply need to describe each model as a probabilistic program, and also to write a higher-level program that generates these hypotheses.  Church query will then automatically draw samples at both of these levels of abstraction, asking which models are most likely to have given rise to the observed data, as well as for each of those models, which internal parameter settings are most likely. Note that we are dealing with [*statistical models*](http://http://en.wikipedia.org/wiki/Statistical_model), which are stochastic, rather than deterministic
+the model is to produce data that look more or less like our observations.  To select among models we simply need to describe each model as a probabilistic program, and also to write a higher-level program that generates these hypotheses.  Church query will then automatically draw samples at both of these levels of abstraction, asking which models are most likely to have given rise to the observed data, as well as for each of those models, which internal parameter settings are most likely. Note that we are dealing with [*statistical models*](http://http://en.wikipedia.org/wiki/Statistical_model), which are stochastic, rather than deterministic.
 
 ## Example: Fair or unfair coin?
 
