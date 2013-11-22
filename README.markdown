@@ -24,15 +24,26 @@ I highly recommend reading through the [Pandoc Markdown documentation](http://jo
     (flip (0.5))
     ~~~~
 
-Within the curly braces, `data-engine="bher"` specifies that this code block will be run through the `bher` inference engine (the current choices are `webchurch`, `bher`, `mit-church`, and `cosh`). This engine property will be injected as a CSS class in the compiled HTML. The `data-exercise` property indicates the name of the exercise; this is used to organize records in the database of student-run programs. It is permissible to not declare a `data-exercise` property (in this case, the database won't store runs for this exercise), but if such a property is declared, **it must be unique within the chapter file**.
+Within the curly braces, `data-engine="bher"` specifies that this code block will be run through the `bher` inference engine (the current choices are `webchurch`, `bher`, `mit-church`, and `cosh`). This engine property will be injected as a CSS class in the compiled HTML. The `data-exercise` property indicates the name of the exercise; this is used to organize records in the database of student-run programs. `data-exercise` is an optional property (in this case, the database won't store runs for this exercise), but if it is declared, **it must be unique within the chapter file**.
 
 The look and feel of the book is controlled by three files: `chapter.template`, `index.template`, and `style.css`.
 
-# Compile scripts
+# Compiling
 
-You can compile all the chapters along with any `.md` files not listed inside `chapters.txt` using the command:
+Use the command:
 
     make all
+
+If you want to compile just some subset of files, you can do:
+
+    make generative-models.html conditioning.html mixture-models.html
+
+Some other commands:
+
+- `make clean`: Remove all compiled and intermediate files.
+- `make rebuild`: Do `make clean` and then `make all`.
+- `make public`: Compile only the public chapters.
+- `make private`: Compile only the private chapters.
 
 Read the Makefile for details
 

@@ -3,19 +3,18 @@
 # List files to be made by finding all *.md files and changing them to .html
 # HT http://stackoverflow.com/q/6767413/351392 for the $(shell) syntax
 
-chapters := $(addsuffix .html, $(shell cat chapters.txt))
+public := $(addsuffix .html, $(shell cat chapters.txt))
 
 ## compile files not specified
 ## in chapters.txt and that aren't the index
-## http://stackoverflow.com/a/17863387/351392
-## this is utter sorcery.
-hidden := $(addsuffix .html, $(shell ls *.md | grep -v -f chapters.txt | sed -e 's/\.md//g'))
+## HT http://stackoverflow.com/a/17863387/351392
+private := $(addsuffix .html, $(shell ls *.md | grep -v -f chapters.txt | sed -e 's/\.md//g'))
 
-all : $(chapters) $(hidden)
+all : $(public) $(private)
 
-chapters : $(chapters)
+public : $(public)
 
-hidden : $(hidden)
+private : $(private)
 
 # Pattern rule
 # make the HTML file without the list of chapters
