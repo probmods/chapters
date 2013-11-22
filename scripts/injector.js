@@ -100,7 +100,7 @@ var forest_protocol = location.protocol.match(/file/) ? "http://" : "//";
       var error = e.message;
       $results.addClass("error").text( error );
  
-      if (e.stackarray != undefined) {
+      if (e.start) {
         $results.append("\nStack trace: " + e.stack );
  
 //        var errorlocation = e.stackarray[0]
