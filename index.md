@@ -32,7 +32,7 @@ It is possible to use deterministic generative models to describe possible ways 
 In order to make the idea of generative models precise we want a formal language that is designed to express the kinds of knowledge individuals have about the world. This language should be universal in the sense that it should be able to express any (computable) process. We build on the $\lambda$-calculus (as realized in functional programming languages) because the $\lambda$-calculus describes computational processes and captures the idea that what is important is causal dependence---in particular the $\lambda$-calculus does not focus on the sequence of time, but rather on which events influence which other events. We introduce randomness into this language to construct a stochastic $\lambda$-calculus, and describe conditional inferences in this language.
 
 # Chapters
-%(chapters)s
+<!-- _chapterlist_ -->
 
 # Acknowledgements
 
