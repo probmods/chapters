@@ -1,7 +1,7 @@
 .DS_Store
 haskell/*
-chapter.template
 *.html
 *.pyhtml
 scripts/mathjax/*
 mediawiki/*
+.chapters.txt
