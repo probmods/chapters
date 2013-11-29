@@ -25,7 +25,7 @@
 
   // listXY: a list containing (1) a list of x axis labels and (2) a list containing
   // y axis values
-  _barplot = function(listXY, title) {
+  barplot = function(listXY, title) {
     var arrayXY = listToArray(listXY, true),
         xs = arrayXY[0].map(function(x) { return format_result(x) }),
         ys = arrayXY[1],
@@ -89,7 +89,7 @@
     
   };
 
-  _hist = function(samps, title) {
+  hist = function(samps, title) {
 
     // TODO: this is a hack. we want proper conversion of data types
     var values = erinSort(listToArray(samps)),
@@ -176,7 +176,7 @@
 
   };
 
-  _density = function(samps, title, withHist) {
+  density = function(samps, title, withHist) {
 
     // TODO: this is a hack. we want proper conversion of data types
     var values = erinSort(listToArray(samps)),
@@ -286,7 +286,7 @@
 
   };
 
-  _multiviz = function(vizs) {
+  multiviz = function(vizs) {
     var vizs = Array.prototype.slice.call(arguments);
     
     //TODO: need to rescale the target div to accomodate more items?
@@ -306,11 +306,11 @@
     }
   };
 
-  _scatter = function(samples, title) {
+  scatter = function(samples, title) {
     return plot(samples, title, false)
   };
 
-  _lineplot = function(samples, title) {
+  lineplot = function(samples, title) {
     return plot(samples, title, true);
   };
 
