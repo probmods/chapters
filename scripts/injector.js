@@ -239,7 +239,7 @@ var forest_protocol = location.protocol.match(/file/) ? "http://" : "//";
               // convert from array to list (this is convoluted)
               sampsList = arrayToList(samps); 
 
-          var histPlotter = _hist(sampsList, title);
+          var histPlotter = hist(sampsList, title);
           histPlotter($results);
         });
       }
