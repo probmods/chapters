@@ -91,6 +91,11 @@ function applyWorld(initialWorld) {
     var isStatic = shapeProps[1];
     var dims = shapeProps[2];
     var position = worldObj[1];
+    if (worldObj.length > 2) {
+      var velocity = worldObj[2];
+    } else {
+      var velocity = [0,0];
+    }
     if (isStatic) {
       bodyDef.type = b2Body.b2_staticBody;
     } else {
@@ -109,6 +114,8 @@ function applyWorld(initialWorld) {
     }
     bodyDef.position.x = position[0] / SCALE;
     bodyDef.position.y = position[1] / SCALE;
+    bodyDef.linearVelocity.x = velocity[0] / SCALE;
+    bodyDef.linearVelocity.y = velocity[1] / SCALE;
     world.CreateBody(bodyDef).CreateFixture(fixDef);
     /*if (shape == "rect") {
       console.log(myShape.GetBody().GetFixtureList().GetShape().GetVertices());
@@ -185,17 +192,23 @@ function getDynamicObjPositions(churchWorld) {
 emptyWorld = arrayToList([]);
 
 //add a circle at specified position (x and y are between 0 and 1) and radius. return world with circle added.
-addCircle = function(churchWorld, x, y, r, isStatic) {
+addCircle = function(churchWorld, x, y, r, isStatic, dx, dy) {
+  var dx=dx || 0;
+  var dy=dy || 0;
   var jsWorld = churchWorld_to_jsWorld(churchWorld);
   jsWorld.push( [ ["circle", isStatic, [r]],
-                    [x, y] ] );
+                    [x, y],
+                    [dx, dy] ] );
   return jsWorld_to_churchWorld(jsWorld);
 }
 
-addRect = function(churchWorld, x, y, w, h, isStatic) {
+addRect = function(churchWorld, x, y, w, h, isStatic, dx, dy) {
+  var dx=dx || 0;
+  var dy=dy || 0;
   var jsWorld = churchWorld_to_jsWorld(churchWorld);
   jsWorld.push( [ ["rect", isStatic, [w, h]],
-                    [x, y] ] );
+                    [x, y],
+                    [dx, dy] ] );
   return jsWorld_to_churchWorld(jsWorld);
 }
 
