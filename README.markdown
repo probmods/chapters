@@ -12,7 +12,7 @@ Source files should be named `[filename].md`. There is one special source file, 
 
 `.md` files not listed in `chapters.txt` will still be compiled, but they will not appear linked to from the homepage or the chapters.
 
-The syntax for the .md files is [Pandoc-extended Markdown](http://johnmacfarlane.net/pandoc/README.html#pandocs-markdown). I highly recommend reading through that page before modifying the source files. A decent example of the syntax in action lives in `generative-models.md`. One convention is worth mentioning. We use the "fenced" code-block syntax, e.g., 
+The syntax for the .md files is [Pandoc-extended Markdown](http://johnmacfarlane.net/pandoc/README.html#pandocs-markdown). I highly recommend reading through that page before modifying the source files. A decent example of the syntax in action lives in `generative-models.md`. One convention is worth mentioning. We use the "fenced" code-block syntax, e.g.,
 
     ~~~~ {data-engine="bher" data-exercise="simple-flip"}
     (flip (0.5))
@@ -71,6 +71,7 @@ The dependency graph for the homepage, `index.html`, is this:
 - Bash
 - Pandoc 1.11.1+
 - Python 2.7+
+- [Browserify](http://browserify.org/)
 
 # Development Notes
 
