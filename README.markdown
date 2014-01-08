@@ -83,3 +83,12 @@ The dependency graph for the homepage, `index.html`, is this:
 ## CONSIDER
 
 - A heavier-weight templating system (yst, hakyll, nanoc, current scripts + dependencies declared in a Makefile, Django itself)
+
+# Error Quelling
+
+## Pandoc error
+
+You are likely blessed with a newer version than the one the codebase is
+designed for. A current workaround is to remove the following lines from make-chapter.sh:
+--csl apa.csl \
+--bibliography dev.bib \
