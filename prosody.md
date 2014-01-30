@@ -57,7 +57,7 @@
           (member-of e (rest elements)))
       #f))
 
-                                        ;_______________________________________________________________________________
+;_______________________________________________________________________________
 
 (define states (list 'bob 'mary 'bobmary))
 ;;either bob went to the restaurant alone, or mary did, or both bob and mary went
@@ -75,32 +75,32 @@
 (define utterances '(bob mary bobandmary))
 (define (get-utterance-prob utterance)
   (case utterance
-    (('bob 'mary) 1)
-    (('bobandmary) 0.5)
-    (('null) 0)))
+        (('bob 'mary) 1)
+        (('bobandmary) 0.5)
+        (('null) 0)))
 (define (utterance-prior) (multinomial utterances (map get-utterance-prob utterances)))
 
 (define prosodies (list #f #t))
 (define (get-prosody-prob prosody)
   (case prosody
-    ((#f) 1)
-    ((#t) 1)))
+        ((#f) 1)
+        ((#t) 1)))
 (define (prosody-prior) (multinomial prosodies (map get-prosody-prob prosodies)))
 
 (define (noise-model utterance prosody)
   (if prosody
       (lambda (x)
         (case x
-          ((utterance) 0.99)
-          (('bob) 0.005)
-          (('mary) 0.005)
-          (else 0)))
+              ((utterance) 0.99)
+              (('bob) 0.005)
+              (('mary) 0.005)
+              (else 0)))
       (lambda (x)
         (case x
-          ((utterance) 0.98)
-          (('bob) 0.01)
-          (('mary) 0.01)
-          (else 0)))))
+              ((utterance) 0.98)
+              (('bob) 0.01)
+              (('mary) 0.01)
+              (else 0)))))
 
 ;;sample a new utterance from the noise model
 (define (sample-noise-model utterance prosody)
@@ -109,10 +109,10 @@
 
 (define (literal-meaning utterance)
   (case utterance
-    (('bob) (list 'bob 'bobmary))
-    (('mary) (list 'mary 'bobmary))
-    (('bobandmary) (list 'bobmary))
-    (('null) (list 'bob 'mary 'bobmary))))
+        (('bob) (list 'bob 'bobmary))
+        (('mary) (list 'mary 'bobmary))
+        (('bobandmary) (list 'bobmary))
+        (('null) (list 'bob 'mary 'bobmary))))
 
 (define (literal-evaluation utterance state)
   (member-of state (literal-meaning utterance)))
@@ -149,19 +149,19 @@
          (enumeration-query
           (define utterance (utterance-prior))
           (define prosody (prosody-prior))
-
+          
           (list (sample-noise-model utterance prosody) prosody)
-
+          
           (factor (+ (* (- hardness 1) (log (get-utterance-prob utterance)))
-                         (* (- hardness 1) (log (get-prosody-prob prosody)))
-                         (* hardness (speaker-utility knowledge-state utterance prosody depth))))))))
+                     (* (- hardness 1) (log (get-prosody-prob prosody)))
+                     (* hardness (speaker-utility knowledge-state utterance prosody depth))))))))
 
 (define listener
   (mem (lambda (utterance prosody depth)
          (enumeration-query
           (define knowledge-state (knowledge-prior))
           (define state (sample-from-knowledge-state knowledge-state))
-
+          
           (list knowledge-state state)
           
           (if (equal? depth 0)
@@ -173,6 +173,7 @@
 (define hardness 2)
 
 (map first (map (lambda (x) (second (listener 'bob #f x))) (list 0 1 2 3 4 5 6 7 8 9 10 11 12)))
+
 
 ~~~~
 
@@ -233,7 +234,7 @@
           (member-of e (rest elements)))
       #f))
 
-                                        ;_______________________________________________________________________________
+;_______________________________________________________________________________
 
 (define states (list 'some 'all))
 ;;either bob went to the restaurant alone, or mary did, or both bob and mary went
@@ -251,31 +252,31 @@
 (define utterances '(some all))
 (define (get-utterance-prob utterance)
   (case utterance
-    (('some 'all) 1)
-    (('null) 0)))
+        (('some 'all) 1)
+        (('null) 0)))
 (define (utterance-prior) (multinomial utterances (map get-utterance-prob utterances)))
 
 (define prosodies (list #f #t))
 (define (get-prosody-prob prosody)
   (case prosody
-    ((#f) 1)
-    ((#t) 1)))
+        ((#f) 1)
+        ((#t) 1)))
 (define (prosody-prior) (multinomial prosodies (map get-prosody-prob prosodies)))
 
 (define (noise-model utterance prosody)
   (if prosody
       (lambda (x)
         (case x
-          ((utterance) 0.99)
-          (('some) 0.005)
-          (('all) 0.005)
-          (else 0)))
+              ((utterance) 0.99)
+              (('some) 0.005)
+              (('all) 0.005)
+              (else 0)))
       (lambda (x)
         (case x
-          ((utterance) 0.98)
-          (('some) 0.01)
-          (('all) 0.01)
-          (else 0)))))
+              ((utterance) 0.98)
+              (('some) 0.01)
+              (('all) 0.01)
+              (else 0)))))
 
 ;;sample a new utterance from the noise model
 (define (sample-noise-model utterance prosody)
@@ -284,8 +285,8 @@
 
 (define (literal-meaning utterance)
   (case utterance
-    (('some) (list 'some 'all))
-    (('all) (list 'all))))
+        (('some) (list 'some 'all))
+        (('all) (list 'all))))
 
 (define (literal-evaluation utterance state)
   (member-of state (literal-meaning utterance)))
@@ -322,19 +323,19 @@
          (enumeration-query
           (define utterance (utterance-prior))
           (define prosody (prosody-prior))
-
+          
           (list (sample-noise-model utterance prosody) prosody)
-
+          
           (factor (+ (* (- hardness 1) (log (get-utterance-prob utterance)))
-                         (* (- hardness 1) (log (get-prosody-prob prosody)))
-                         (* hardness (speaker-utility knowledge-state utterance prosody depth))))))))
+                     (* (- hardness 1) (log (get-prosody-prob prosody)))
+                     (* hardness (speaker-utility knowledge-state utterance prosody depth))))))))
 
 (define listener
   (mem (lambda (utterance prosody depth)
          (enumeration-query
           (define knowledge-state (knowledge-prior))
           (define state (sample-from-knowledge-state knowledge-state))
-
+          
           (list knowledge-state state)
           
           (if (equal? depth 0)
@@ -407,7 +408,7 @@
 (define (list-product a b)
   (flatten-nonrecursive (map (lambda (x) (map (lambda (y) (list x y)) b)) a)))
 
-                                        ;_______________________________________________________________________________
+;_______________________________________________________________________________
 
 (define states (list-product (list 'bob 'mary 'bobmary) (list 'restaurant 'bar 'restaurantbar)))
 
@@ -439,59 +440,59 @@
 (define utterances (list-product (list 'bob 'mary 'bobmary) (list 'restaurant 'bar 'restaurantbar)))
 (define (get-utterance-prob utterance)
   (* (case (first utterance)
-       (('bob 'mary) 0.4)
-       (('bobmary) 0.2)
-       (('null) 0))
+           (('bob 'mary) 0.4)
+           (('bobmary) 0.2)
+           (('null) 0))
      (case (second utterance)
-       (('restaurant 'bar) 0.4)
-       (('restaurantbar) 0.2)
-       (('null) 0))))
+           (('restaurant 'bar) 0.4)
+           (('restaurantbar) 0.2)
+           (('null) 0))))
 
 (define (utterance-prior) (multinomial utterances (map get-utterance-prob utterances)))
 
 (define prosodies (list 'none 'first 'second 'both))
 (define (get-prosody-prob prosody)
   (case prosody
-    (('none) 0.5)
-    (('first 'second) 0.25)
-    (('both) 0.125)))
+        (('none) 0.5)
+        (('first 'second) 0.25)
+        (('both) 0.125)))
 (define (prosody-prior) (multinomial prosodies (map get-prosody-prob prosodies)))
 
 (define (noise-model utterance prosody)
   (case prosody
-    (('first) (lambda (x)
-                (* (case (first x)
-                     (((first utterance)) 0.98)
-                     (('bob) 0.01)
-                     (('mary) 0.01)
-                     (else 0))
-                   (case (second x)
-                     (((second utterance)) 0.96)
-                     (('restaurant) 0.02)
-                     (('bar) 0.02)
-                     (else 0)))))
-    (('second) (lambda (x)
-                (* (case (first x)
-                     (((first utterance)) 0.96)
-                     (('bob) 0.02)
-                     (('mary) 0.02)
-                     (else 0))
-                   (case (second x)
-                     (((second utterance)) 0.98)
-                     (('restaurant) 0.01)
-                     (('bar) 0.01)
-                     (else 0)))))
-    (('none) (lambda (x)
-                (* (case (first x)
-                     (((first utterance)) 0.96)
-                     (('bob) 0.02)
-                     (('mary) 0.02)
-                     (else 0))
-                   (case (second x)
-                     (((second utterance)) 0.96)
-                     (('restaurant) 0.02)
-                     (('bar) 0.02)
-                     (else 0)))))))
+        (('first) (lambda (x)
+                    (* (case (first x)
+                             (((first utterance)) 0.98)
+                             (('bob) 0.01)
+                             (('mary) 0.01)
+                             (else 0))
+                       (case (second x)
+                             (((second utterance)) 0.96)
+                             (('restaurant) 0.02)
+                             (('bar) 0.02)
+                             (else 0)))))
+        (('second) (lambda (x)
+                     (* (case (first x)
+                              (((first utterance)) 0.96)
+                              (('bob) 0.02)
+                              (('mary) 0.02)
+                              (else 0))
+                        (case (second x)
+                              (((second utterance)) 0.98)
+                              (('restaurant) 0.01)
+                              (('bar) 0.01)
+                              (else 0)))))
+        (('none) (lambda (x)
+                   (* (case (first x)
+                            (((first utterance)) 0.96)
+                            (('bob) 0.02)
+                            (('mary) 0.02)
+                            (else 0))
+                      (case (second x)
+                            (((second utterance)) 0.96)
+                            (('restaurant) 0.02)
+                            (('bar) 0.02)
+                            (else 0)))))))
 
 (define (sample-noise-model utterance prosody)
   (let ((noise-dist (noise-model utterance prosody)))
@@ -500,41 +501,41 @@
 (define (literal-meaning utterance)
   (list
    (case (first utterance)
-     (('bob) (list 'bob 'bobmary))
-     (('mary) (list 'mary 'bobmary))
-     (('bobmary) (list 'bobmary))
-     (('null) (list 'bob 'mary 'bobmary)))
+         (('bob) (list 'bob 'bobmary))
+         (('mary) (list 'mary 'bobmary))
+         (('bobmary) (list 'bobmary))
+         (('null) (list 'bob 'mary 'bobmary)))
    (case (second utterance)
-     (('restaurant) (list 'restaurant 'restaurantbar))
-     (('bar) (list 'bar 'restaurantbar))
-     (('restaurantbar) (list 'restaurantbar))
-     (('null) (list 'restaurant 'bar 'restaurantbar)))))
+         (('restaurant) (list 'restaurant 'restaurantbar))
+         (('bar) (list 'bar 'restaurantbar))
+         (('restaurantbar) (list 'restaurantbar))
+         (('null) (list 'restaurant 'bar 'restaurantbar)))))
 
 (define (literal-evaluation utterance state)
   (let ((lit (literal-meaning utterance)))
     (and (member-of (first state) (first lit))
          (member-of (second state) (second lit)))))
 
- (define (find-state-prob listener-probs state)
-   (if (equal? listener-probs '())
-       0
-       (if (equal? state (second (first (first listener-probs))))
-           (second (first listener-probs))
-           (find-state-prob (rest listener-probs) state))))
+(define (find-state-prob listener-probs state)
+  (if (equal? listener-probs '())
+      0
+      (if (equal? state (second (first (first listener-probs))))
+          (second (first listener-probs))
+          (find-state-prob (rest listener-probs) state))))
 
- (define (get-expected-surprisal knowledge-state listener)
-   (let ((listener (zip (first listener) (second listener))))
-     (let ((relevant-listener-probs (filter (lambda (x) (equal? knowledge-state (first (first x))))
-                                            listener)))
-       (let ((state-probs (map (lambda (x) (find-state-prob relevant-listener-probs x)) knowledge-state)))
-         (sum (map (lambda (x) (* (/ 1 (length knowledge-state)) (log x))) state-probs))))))
+(define (get-expected-surprisal knowledge-state listener)
+  (let ((listener (zip (first listener) (second listener))))
+    (let ((relevant-listener-probs (filter (lambda (x) (equal? knowledge-state (first (first x))))
+                                           listener)))
+      (let ((state-probs (map (lambda (x) (find-state-prob relevant-listener-probs x)) knowledge-state)))
+        (sum (map (lambda (x) (* (/ 1 (length knowledge-state)) (log x))) state-probs))))))
 
- (define (speaker-utility knowledge-state utterance prosody depth)
-   (let ((utterance-dist (zip utterances (map (noise-model utterance prosody) utterances))))
-     (let ((utterance-dist (filter (lambda (x) (> (second x) 0)) utterance-dist)))
-       (let ((listeners (map (lambda (x) (listener (first x) prosody (- depth 1))) utterance-dist)))
-         (let ((surprisals (map (lambda (x) (get-expected-surprisal knowledge-state x)) listeners)))
-           (sum (map (lambda (x y) (* (second x) y)) utterance-dist surprisals)))))))
+(define (speaker-utility knowledge-state utterance prosody depth)
+  (let ((utterance-dist (zip utterances (map (noise-model utterance prosody) utterances))))
+    (let ((utterance-dist (filter (lambda (x) (> (second x) 0)) utterance-dist)))
+      (let ((listeners (map (lambda (x) (listener (first x) prosody (- depth 1))) utterance-dist)))
+        (let ((surprisals (map (lambda (x) (get-expected-surprisal knowledge-state x)) listeners)))
+          (sum (map (lambda (x y) (* (second x) y)) utterance-dist surprisals)))))))
 
 
 (define speaker
@@ -542,20 +543,20 @@
          (enumeration-query
           (define utterance (utterance-prior))
           (define prosody (prosody-prior))
-
+          
           (list (sample-noise-model utterance prosody) prosody)
-
-
+          
+          
           (factor (+ (* (- hardness 1) (log (get-utterance-prob utterance)))
-                (* (- hardness 1) (log (get-prosody-prob prosody)))
-                (* hardness (speaker-utility knowledge-state utterance prosody depth))))))))
+                     (* (- hardness 1) (log (get-prosody-prob prosody)))
+                     (* hardness (speaker-utility knowledge-state utterance prosody depth))))))))
 
 (define listener
   (mem (lambda (utterance prosody depth)
          (enumeration-query
           (define knowledge-state (knowledge-prior))
           (define state (sample-from-knowledge-state knowledge-state))
-
+          
           (list knowledge-state state)
           
           (if (equal? depth 0)
@@ -571,7 +572,7 @@
                         (list x y (filter (lambda (z) (> (second z) 0.01)) 
                                           (let ((l (listener (list 'bob 'restaurant) y x)))
                                             (zip (first l) (second l))))))
-     (list 1 2 3 4 5 6 7 8 9 10)))
+                      (list 1 2 3 4 5 6 7 8 9 10)))
      (list 'none 'first 'second))
 
 ~~~~
