@@ -103,9 +103,6 @@
               freq: _(strvalues).filter(function(x) {return x == val;}).length / n
             };
           });
-
-    var str_lengths = strvalues.map(function(x) {return x.length;});
-    var max_str_length = str_lengths.length > 1 ? Math.max.apply(str_lengths) : str_lengths[0];
     
     var maxFreq = Math.max.apply(Math, counts.map(function(x) {return x.freq;}));
     var continuous;
@@ -125,9 +122,8 @@
       var div = $histDiv[0];
       
       //TODO: make left margin vary depending on how long the names of the elements in the list are
-      var margin = {top: 40, right: 20, bottom: 60, left: Math.min(max_str_length*10, 500)},
-          percent = max_str_length > 30 ? 1 : 0.85;
-          width = percent * $div.width() - margin.left - margin.right,
+      var margin = {top: 40, right: 20, bottom: 60, left: 60},
+          width = 0.85 * $div.width() - margin.left - margin.right,
           height = 100 + (20 * counts.length) - margin.top - margin.bottom;
 
       var x = d3.scale.linear()
