@@ -48,7 +48,7 @@
       
       //TODO: make left margin vary depending on how long the names of the elements in the list are
       var margin = {top: 40, right: 20, bottom: 60, left: 60},
-          width = 0.85 * $div.width() - margin.left - margin.right,
+          width = 1 * $div.width() - margin.left - margin.right,
           height = 100 + (20 * counts.length) - margin.top - margin.bottom;
 
       var x = d3.scale.linear()
@@ -120,10 +120,30 @@
 
       var $histDiv = $("<div></div>").appendTo($div);
       var div = $histDiv[0];
+
+      var str_lengths = strvalues.map(function(x) {return x.length;});
+      var possible_max = Math.max.apply(str_lengths);
+      var max_str_length = (possible_max == Infinity || possible_max == -Infinity) ? str_lengths[0]: possible_max;
+      var label_needs = max_str_length*7.6;
+      var max_percent_left = 0.6;
+      var left_mar = Math.min(Math.max(60, label_needs), $div.width()*max_percent_left); //at least 60 and at most 75% of div
+      //var percent = left_mar > 60 ? Math.min(1, ((left_mar - 60) / $div.width()) + 0.85) : 0.85;
+      var percent;
+      if (left_mar > 60) {
+        if (left_mar > $div.width()*max_percent_left) {
+          percent = 1;
+        } else {
+          percent = 1; //fix this to be prettier later.
+        }
+      } else {
+        percent = 0.85;
+      }
+      /*var left_percent = 
+      var percent = Math.max(0.85, (label_needs/$div.width))*/
       
       //TODO: make left margin vary depending on how long the names of the elements in the list are
-      var margin = {top: 40, right: 20, bottom: 60, left: 60},
-          width = 0.85 * $div.width() - margin.left - margin.right,
+      var margin = {top: 40, right: 20, bottom: 60, left: left_mar},
+          width = percent * $div.width() - margin.left - margin.right,
           height = 100 + (20 * counts.length) - margin.top - margin.bottom;
 
       var x = d3.scale.linear()
