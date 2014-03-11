@@ -60,3 +60,7 @@ Read the Makefile for details
 
 - Add some directory structure to separate input (Markdown + assets [e.g., images]) from output.
 
+## build times (seconds)
+
+single threaded: 10.8, 10.7
+-j: 6.8, 6.9
