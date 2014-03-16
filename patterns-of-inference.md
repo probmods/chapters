@@ -539,7 +539,7 @@ Notice that we have set the probabilities in the `pass?` function to be asymmetr
 
 See how conditional inferences about Bill and exam 1 change as you add in more data about this student or this exam, or additional students and exams. Try using each of the below expressions as the condition for the above inference. Try to explain the different inferences that result at each stage.  What does each new piece of the larger data set contribute to your intuition about Bill  and exam 1?
 
-~~~~
+~~~~ {.norun}
 (and (not (pass? 'bill 'exam1)) (not (pass? 'bill 'exam2)))
 
 (and (not (pass? 'bill 'exam1))
