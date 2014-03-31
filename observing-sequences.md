@@ -84,7 +84,7 @@ Conditioning on the first value tells us something about the second. This model 
 It turns out that exchangeable sequences can always be modeled in the form used for the last example: 
 [de Finetti's theorem](http://en.wikipedia.org/wiki/De_Finetti\'s_theorem) says that, under certain technical conditions, any exchangeable sequence can be represented as follows, for some `latent-prior` and `observe` functions:
 
-~~~~
+~~~~ {.idealized}
 (define latent (latent-prior))
 
 (define (thunk) (observe latent))
