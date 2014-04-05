@@ -11,16 +11,26 @@
 
   function erinSort(array) {
     var firstElem = array[0];
+    console.log(typeof(firstElem));
     if (typeof(firstElem) == "number") {
       return array.sort(function(a,b) {return b-a});
+    }
+    if (typeof(firstElem) == "boolean") {
+      return array.sort(function(a,b) {return a-b});
     }
     if (typeof(firstElem) == "string") {
       return array.sort();
     }
-    if (Object.prototype.toString.call(firstElem) === '[object Array]') {
-      return array;
-    }
-    return array;
+    return array.sort(function(a,b) {
+      if (format_result(a) < format_result(b)) {
+        return -1;
+      }
+      if (format_result(a) > format_result(b)) {
+        return 1;
+      }
+      // a must be equal to b
+      return 0;
+    });
   }
 
   // listXY: a list containing (1) a list of x axis labels and (2) a list containing
