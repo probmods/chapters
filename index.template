@@ -26,7 +26,8 @@
   <body>
     <div id="chapter-wrapper">
       <div id='header' >
-        <span style='font-family: Baskerville, Palatino Linotype, Palatino; font-size: 50px'</span>$title$</span>
+        <span style='font-family: Baskerville, Palatino Linotype, Palatino; font-size: 50px'</span>Probabilistic Models of Cognition</span><br>
+        <span style='font-family: Baskerville, Palatino Linotype, Palatino; font-size: 25px'><i>by</i> Noah D. Goodman and Joshua B. Tenenbaum</span>
       </div>
       <div id="chapter"> 
 $body$

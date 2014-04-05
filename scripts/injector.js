@@ -100,7 +100,7 @@ var forest_protocol = location.protocol.match(/file/) ? "http://" : "//";
       var error = e.message;
       $results.addClass("error").text( error );
  
-      if (e.stackarray != undefined) {
+      if (e.start) {
         $results.append("\nStack trace: " + e.stack );
  
 //        var errorlocation = e.stackarray[0]
@@ -239,7 +239,7 @@ var forest_protocol = location.protocol.match(/file/) ? "http://" : "//";
               // convert from array to list (this is convoluted)
               sampsList = arrayToList(samps); 
 
-          var histPlotter = _hist(sampsList, title);
+          var histPlotter = hist(sampsList, title);
           histPlotter($results);
         });
       }

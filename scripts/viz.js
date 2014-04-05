@@ -11,21 +11,31 @@
 
   function erinSort(array) {
     var firstElem = array[0];
+    console.log(typeof(firstElem));
     if (typeof(firstElem) == "number") {
       return array.sort(function(a,b) {return b-a});
+    }
+    if (typeof(firstElem) == "boolean") {
+      return array.sort(function(a,b) {return a-b});
     }
     if (typeof(firstElem) == "string") {
       return array.sort();
     }
-    if (Object.prototype.toString.call(firstElem) === '[object Array]') {
-      return array;
-    }
-    return array;
+    return array.sort(function(a,b) {
+      if (format_result(a) < format_result(b)) {
+        return -1;
+      }
+      if (format_result(a) > format_result(b)) {
+        return 1;
+      }
+      // a must be equal to b
+      return 0;
+    });
   }
 
   // listXY: a list containing (1) a list of x axis labels and (2) a list containing
   // y axis values
-  _barplot = function(listXY, title) {
+  barplot = function(listXY, title) {
     var arrayXY = listToArray(listXY, true),
         xs = arrayXY[0].map(function(x) { return format_result(x) }),
         ys = arrayXY[1],
@@ -48,7 +58,7 @@
       
       //TODO: make left margin vary depending on how long the names of the elements in the list are
       var margin = {top: 40, right: 20, bottom: 60, left: 60},
-          width = 0.85 * $div.width() - margin.left - margin.right,
+          width = 1 * $div.width() - margin.left - margin.right,
           height = 100 + (20 * counts.length) - margin.top - margin.bottom;
 
       var x = d3.scale.linear()
@@ -89,7 +99,7 @@
     
   };
 
-  _hist = function(samps, title) {
+  hist = function(samps, title) {
 
     // TODO: this is a hack. we want proper conversion of data types
     var values = erinSort(listToArray(samps)),
@@ -103,8 +113,6 @@
               freq: _(strvalues).filter(function(x) {return x == val;}).length / n
             };
           });
-
-    // console.log(strvalues);
     
     var maxFreq = Math.max.apply(Math, counts.map(function(x) {return x.freq;}));
     var continuous;
@@ -122,10 +130,30 @@
 
       var $histDiv = $("<div></div>").appendTo($div);
       var div = $histDiv[0];
+
+      var str_lengths = strvalues.map(function(x) {return x.length;});
+      var possible_max = Math.max.apply(str_lengths);
+      var max_str_length = (possible_max == Infinity || possible_max == -Infinity) ? str_lengths[0]: possible_max;
+      var label_needs = max_str_length*7.6;
+      var max_percent_left = 0.6;
+      var left_mar = Math.min(Math.max(60, label_needs), $div.width()*max_percent_left); //at least 60 and at most 75% of div
+      //var percent = left_mar > 60 ? Math.min(1, ((left_mar - 60) / $div.width()) + 0.85) : 0.85;
+      var percent;
+      if (left_mar > 60) {
+        if (left_mar > $div.width()*max_percent_left) {
+          percent = 1;
+        } else {
+          percent = 1; //fix this to be prettier later.
+        }
+      } else {
+        percent = 0.85;
+      }
+      /*var left_percent = 
+      var percent = Math.max(0.85, (label_needs/$div.width))*/
       
       //TODO: make left margin vary depending on how long the names of the elements in the list are
-      var margin = {top: 40, right: 20, bottom: 60, left: 60},
-          width = 0.85 * $div.width() - margin.left - margin.right,
+      var margin = {top: 40, right: 20, bottom: 60, left: left_mar},
+          width = percent * $div.width() - margin.left - margin.right,
           height = 100 + (20 * counts.length) - margin.top - margin.bottom;
 
       var x = d3.scale.linear()
@@ -176,7 +204,7 @@
 
   };
 
-  _density = function(samps, title, withHist) {
+  density = function(samps, title, withHist) {
 
     // TODO: this is a hack. we want proper conversion of data types
     var values = erinSort(listToArray(samps)),
@@ -286,7 +314,7 @@
 
   };
 
-  _multiviz = function(vizs) {
+  multiviz = function(vizs) {
     var vizs = Array.prototype.slice.call(arguments);
     
     //TODO: need to rescale the target div to accomodate more items?
@@ -306,11 +334,11 @@
     }
   };
 
-  _scatter = function(samples, title) {
+  scatter = function(samples, title) {
     return plot(samples, title, false)
   };
 
-  _lineplot = function(samples, title) {
+  lineplot = function(samples, title) {
     return plot(samples, title, true);
   };
 

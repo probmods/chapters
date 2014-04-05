@@ -535,11 +535,11 @@ Now what if you have evidence from several students and several exams? We first 
 
 Initially we observe that Bill failed exam 1.  A priori, we assume that most students do their homework and most exams are fair, but given this one observation it becomes somewhat likely that either the student didn't study or the exam was unfair.
 
-Notice that we have set the probabilities in the `pass?` function to be asymmetric: whether a student does homework has a greater influence on passing the test than whether the exam is fair. This in turns means that when inferring the *cause* of a failed exam, the model tends to attribute it to the person property (not doing homework) over the situation property (exam being unfair). This is asymmetry is an example of the *fundamental attribution bias* [@Ross1977]: we tend to attribute outcomes to personal traits rather than situations. However there are many interacting tendencies (for instance the direction of this bias switches for members of some east-asian cultures). How could you extend the model to account for these interactions?
+Notice that we have set the probabilities in the `pass?` function to be asymmetric: whether a student does homework has a greater influence on passing the test than whether the exam is fair. This in turns means that when inferring the *cause* of a failed exam, the model tends to attribute it to the person property (not doing homework) over the situation property (exam being unfair). This asymmetry is an example of the *fundamental attribution bias* [@Ross1977]: we tend to attribute outcomes to personal traits rather than situations. However there are many interacting tendencies (for instance the direction of this bias switches for members of some east-asian cultures). How could you extend the model to account for these interactions?
 
 See how conditional inferences about Bill and exam 1 change as you add in more data about this student or this exam, or additional students and exams. Try using each of the below expressions as the condition for the above inference. Try to explain the different inferences that result at each stage.  What does each new piece of the larger data set contribute to your intuition about Bill  and exam 1?
 
-~~~~
+~~~~ {.norun}
 (and (not (pass? 'bill 'exam1)) (not (pass? 'bill 'exam2)))
 
 (and (not (pass? 'bill 'exam1))

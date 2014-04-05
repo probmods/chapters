@@ -23,8 +23,8 @@ function stopAnim() {
 }
 
 var SCALE = 30; // 1 meter = 30 pixels
-_worldWidth = 350;
-_worldHeight = 500;
+worldWidth = 350;
+worldHeight = 500;
 
 var  b2World = Box2D.Dynamics.b2World,
      b2Vec2 = Box2D.Common.Math.b2Vec2,
@@ -91,6 +91,11 @@ function applyWorld(initialWorld) {
     var isStatic = shapeProps[1];
     var dims = shapeProps[2];
     var position = worldObj[1];
+    if (worldObj.length > 2) {
+      var velocity = worldObj[2];
+    } else {
+      var velocity = [0,0];
+    }
     if (isStatic) {
       bodyDef.type = b2Body.b2_staticBody;
     } else {
@@ -109,6 +114,8 @@ function applyWorld(initialWorld) {
     }
     bodyDef.position.x = position[0] / SCALE;
     bodyDef.position.y = position[1] / SCALE;
+    bodyDef.linearVelocity.x = velocity[0] / SCALE;
+    bodyDef.linearVelocity.y = velocity[1] / SCALE;
     world.CreateBody(bodyDef).CreateFixture(fixDef);
     /*if (shape == "rect") {
       console.log(myShape.GetBody().GetFixtureList().GetShape().GetVertices());
@@ -182,20 +189,26 @@ function getDynamicObjPositions(churchWorld) {
   return positions;
 }
 
-_emptyWorld = arrayToList([]);
+emptyWorld = arrayToList([]);
 
 //add a circle at specified position (x and y are between 0 and 1) and radius. return world with circle added.
-_addCircle = function(churchWorld, x, y, r, isStatic) {
+addCircle = function(churchWorld, x, y, r, isStatic, dx, dy) {
+  var dx=dx || 0;
+  var dy=dy || 0;
   var jsWorld = churchWorld_to_jsWorld(churchWorld);
   jsWorld.push( [ ["circle", isStatic, [r]],
-                    [x, y] ] );
+                    [x, y],
+                    [dx, dy] ] );
   return jsWorld_to_churchWorld(jsWorld);
 }
 
-_addRect = function(churchWorld, x, y, w, h, isStatic) {
+addRect = function(churchWorld, x, y, w, h, isStatic, dx, dy) {
+  var dx=dx || 0;
+  var dy=dy || 0;
   var jsWorld = churchWorld_to_jsWorld(churchWorld);
   jsWorld.push( [ ["rect", isStatic, [w, h]],
-                    [x, y] ] );
+                    [x, y],
+                    [dx, dy] ] );
   return jsWorld_to_churchWorld(jsWorld);
 }
 
@@ -206,37 +219,37 @@ _addRect = function(churchWorld, x, y, w, h, isStatic) {
   return Math.round(x / (_worldWidth / ncol));
 }*/
 
-_plinkoWorld = function(nrow, ncol) {
+plinkoWorld = function(nrow, ncol) {
   var pegRadius = 3;
   var wallWidth = 5;
   var binHeight = 120;
   //ground
-  var ground = [ [ "rect", true, [_worldWidth, wallWidth] ],
-                 [ _worldWidth / 2, _worldHeight ]];
+  var ground = [ [ "rect", true, [worldWidth, wallWidth] ],
+                 [ worldWidth / 2, worldHeight ]];
   //pegs
   var pegs = [];
   var pegShapeProperties = ["circle", true, [pegRadius]];
   for (var r=0; r<nrow; r++) {
     for (var c=0; c<ncol; c++) {
-      var xpos = _worldWidth / (ncol + 1) * (c + 1);
-      var ypos = (_worldHeight - binHeight) / (nrow + 2) * (r+1);
+      var xpos = worldWidth / (ncol + 1) * (c + 1);
+      var ypos = (worldHeight - binHeight) / (nrow + 2) * (r+1);
       pegs.push([ pegShapeProperties,
                   [ xpos, ypos]]);}}
   //walls
-  var wallShapeProperties = ["rect", true, [wallWidth, _worldHeight]];
-  function wall(xpos) {return [wallShapeProperties, [xpos, _worldHeight / 2]];}
-  var walls = [wall(0), wall(_worldWidth)];
+  var wallShapeProperties = ["rect", true, [wallWidth, worldHeight]];
+  function wall(xpos) {return [wallShapeProperties, [xpos, worldHeight / 2]];}
+  var walls = [wall(0), wall(worldWidth)];
   //bins
   var bins = [];
   var binShapeProperties = ["rect", true, [wallWidth, binHeight]];
-  var ypos = _worldHeight - (binHeight/2);
+  var ypos = worldHeight - (binHeight/2);
   for (var c=0; c < ncol + 2; c++) {
     var xpos = _worldWidth / (ncol+1) * c;
     bins.push([binShapeProperties, [xpos, ypos]])}
   return jsWorld_to_churchWorld([ground].concat(pegs, walls, bins));
 }
 
-_runPhysics = function(steps, initialWorld) {
+runPhysics = function(steps, initialWorld) {
   clearWorld();
   applyWorld(initialWorld);
   for (var s=0; s<steps; s++) {
@@ -250,7 +263,7 @@ _runPhysics = function(steps, initialWorld) {
 }
 
 
-_animatePhysics = function(steps, initialWorld) {
+animatePhysics = function(steps, initialWorld) {
   function simulate(canvas, steps, initializeStep) {
     clearWorld();
     applyWorld(initialWorld);
@@ -291,9 +304,9 @@ _animatePhysics = function(steps, initialWorld) {
     var $physicsDiv = $("<div>").appendTo($div);
     $physicsDiv.append("<br/>");
     var $canvas = $("<canvas/>").appendTo($physicsDiv);
-    $canvas.attr("width", _worldWidth)
+    $canvas.attr("width", worldWidth)
            .attr("style", "background-color:#333333;")
-           .attr("height", _worldHeight);
+           .attr("height", worldHeight);
     $physicsDiv.append("<br/>");
     //var initializeStep = true;
     //simulate($canvas, 0, initializeStep);

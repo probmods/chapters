@@ -83,6 +83,10 @@ display: none;
 /* DEFAULT THEME */
 
 .cm-s-default .cm-keyword {color: #708;}
+.cm-s-default .cm-erp {color: #c16;}
+.cm-s-default .cm-query {color: #0a0;}
+.cm-s-default .cm-query-qud {color: #a3a;}
+.cm-s-default .cm-query-cond {color: #07f;}
 .cm-s-default .cm-atom {color: #219;}
 .cm-s-default .cm-number {color: #164;}
 .cm-s-default .cm-def {color: #00f;}

@@ -53,6 +53,7 @@ Read the Makefile for details
 - Pandoc 1.11.1+
 - Python 2.7+
 - GNU make
+- [Browserify](http://browserify.org/)
 
 # Development Notes
 
@@ -64,3 +65,11 @@ Read the Makefile for details
 
 single threaded: 10.8, 10.7
 -j: 6.8, 6.9
+
+# Troubleshooting
+
+## Pandoc
+
+You might have a newer version than the one the codebase is designed for. A current workaround is to remove the following lines from `make-chapter.sh`:
+--csl apa.csl \
+--bibliography dev.bib \

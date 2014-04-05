@@ -1,20 +1,6 @@
 % Probabilistic Models of Cognition
 
-
-***Authors***: Noah D. Goodman and Joshua B. Tenenbaum
-
-***Contributors***: Timothy J. O'Donnell, Andreas Stuhlmuller, Tomer Ullman,\
-John McCoy, Long Ouyang
-
-
-
->*Best viewed in recent versions of Chrome, Firefox, or Safari on a laptop or desktop computer.*
-
->*This book contains many technical exercises that run directly in your web browser. At the end of some chapters, we present some extended exercises as homework problems. To save your progress on homework problems, you can register an account; this also helps us improve the book by tracking what kinds of programs users run and what kinds of errors they encounter.*
-
-><div id="register" style='display: none; font-style: italic'><a href="/login">Login</a> or <a href="/register">register an account</a> </div>
-
-# Prelude
+>[About this book]
 
 What is thought? How can we describe the intelligent inferences made in everyday human reasoning and learning? How can we engineer intelligent machines? The computational theory of mind aims to answer these questions starting from the hypothesis that the mind is a computer, mental representations are computer programs, and thinking is a computational process -- running a computer program.
 
@@ -34,6 +20,18 @@ In order to make the idea of generative models precise we want a formal language
 # Chapters
 <!-- _chapterlist_ -->
 
-# Acknowledgements
+# About this book
+
+Best viewed in recent versions of Chrome, Firefox, or Safari on a laptop or desktop computer.
+
+This book contains many technical exercises that run directly in your web browser. At the end of some chapters, we present some extended exercises as homework problems. To save your progress on homework problems, you can register an account; this also helps us improve the book by tracking what kinds of programs users run and what kinds of errors they encounter. <a href="/login">Login</a> or <a href="/register">register an account</a>
+
+## How to cite
+
+Please cite this book as: N. D. Goodman and J. B. Tenenbaum (electronic). Probabilistic Models of Cognition.
+
+## Acknowledgements
+
+We are grateful to the following people, who contributed content or technical expertise to this or a previous version of the book: Timothy J. O'Donnell, Andreas Stuhlmuller, Tomer Ullman, John McCoy, Long Ouyang. 
 
 The construction and ongoing support of this tutorial are made possible by grants from the Office of Naval Research, the James S. McDonnell Foundation, the National Science Foundation, and the Stanford VPOL.

@@ -84,7 +84,7 @@ Conditioning on the first value tells us something about the second. This model 
 It turns out that exchangeable sequences can always be modeled in the form used for the last example: 
 [de Finetti's theorem](http://en.wikipedia.org/wiki/De_Finetti\'s_theorem) says that, under certain technical conditions, any exchangeable sequence can be represented as follows, for some `latent-prior` and `observe` functions:
 
-~~~~
+~~~~ {.idealized}
 (define latent (latent-prior))
 
 (define (thunk) (observe latent))
@@ -319,7 +319,7 @@ Now, let's look at one of the procedures defining our PCFG in detail.
 	                  (multinomial
 	                   (list (list V AP) 
 	                         (list V NP))
-	                   (list (/ 1 2) (/ 1 2)))))).
+	                   (list (/ 1 2) (/ 1 2))))))
 
 When `VP` is called it `map`s `sample` across a list which is sampled from a multinomial distribution: in this case either `(V AP)` or `(V NP)`. These two lists correspond to the "right-hand sides" (RHSs) of the rules $VP \longrightarrow V\ AP$ and $VP \longrightarrow V\ NP$ in the standard representation of PCFGs. These are lists that consist of symbols which are actually the names of other procedures. Therefore when `sample` is applied to them, they themselves recursively sample their RHSs until no more recursion can take place.  Note that we have wrapped our terminal symbols up as thunks so that when they are sampled they deterministically return the terminal symbol.
 

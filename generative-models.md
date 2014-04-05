@@ -662,7 +662,7 @@ Directly compute the probability of the bent coin in the example. Check your ans
 
     c) Why are the probabilities different for the last two? Explain both in terms of the probability calculations you did and in terms of the "causal" process of evaluating and making random choices.
 
-#) Use the rules of probability, described above, to compute the probability that the geometric distribution define by the following stochastic recursion returns the number 5.
+#) Use the rules of probability, described above, to compute the probability that the geometric distribution defined by the following stochastic recursion returns the number 5.
 
     ~~~~ {data-exercise="ex6"}
     (define (geometric p)
