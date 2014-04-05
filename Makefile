@@ -41,7 +41,7 @@ private : $(private)
 # Pattern rule
 # make the nocl file, i.e., the HTML file without the list of chapters
 # in the navigation bar
-.%.html : %.md chapter.template
+.%.html : %.md chapter.template dev.bib
 	@if [ "$(REQUIRES_CITEPROC_HS)" = " " ] ; then \
 	  pandoc --toc \
 		--smart \
