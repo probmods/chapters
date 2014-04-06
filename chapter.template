@@ -18,7 +18,9 @@
   <div id='header'>
     <div id='logotype'>Probabilistic Models of Cognition</div>
     <ul id="nav">
-      <span class="nav0"><li class="all-chapters">All chapters <!-- _chapterlist_ --> </li></span>
+      <span class="nav0"><li class="all-chapters">All chapters
+          <!-- _chapterlist_ -->
+      </li></span>
       <a class="nav0" href="/register"><li id="register-link">Register</li></a>
       <a class="nav0" href="/login"><li id="login-link">Login</li></a>
       <!-- <a class="nav0" href="/profile"><li id="profile-link" style='display: none'>Profile</li></a>  -->
