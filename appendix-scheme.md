@@ -344,7 +344,7 @@ Higher-order functions like `repeat`, `map`, or `apply` can be quite useful.  He
 	
 	G) Why doesn't this code work?
 	
-		~~~~ {data-exercise="ex1g"}
+		~~~~ {.shouldfail data-exercise="ex1g"}
 		(4 + 6)
 		~~~~
 	
@@ -469,7 +469,7 @@ Higher-order functions like `repeat`, `map`, or `apply` can be quite useful.  He
 	
 	A) The following code tries to define a list but gives an error instead. Why?
 	
-		~~~~
+		~~~~ {.shouldfail}
 		(3 4 7 8)
 		~~~~
 	

@@ -16,7 +16,7 @@ Just as reasoning can be seen as a form of conditional inference, so can learnin
 By saying that we are learning "persistent" facts we are indicating that there is something to infer which we expect to be relevant to many observations over time. 
 Thus, we will formulate learning as inference in a model that (1) has a fixed latent value of interest, the *hypothesis*, and (2) has a sequence of observations, the *data points*. This will be a special class of [models for sequences of observations](observing-sequences.html)---those that fit the pattern of [Bayes rule](conditioning.html#bayes-rule):
 
-~~~~
+~~~~ {.idealized}
 (query
  (define hypothesis (prior))
  hypothesis
@@ -121,7 +121,7 @@ Experiment with different data sets, varying both the number of flips and the re
 
 When studying learning as conditional inference, that is when considering an *ideal learner model*, we are particularly interested in the dynamics of how inferred hypotheses change as a function of amount of data (often thought of as time the learner spends acquiring data). We can map out the *trajectory* of learning by plotting a summary of the posterior distribution over hypotheses as a function of the amount of observed data. Here we plot the mean of the samples of the coin weight (the *expected* weight) in the above example (NOTE: for now this must be run using MIT-Church):
 
-~~~~ {data-engine="mit-church"}
+~~~~ {.mit-church data-engine="mit-church"}
 (define make-coin (lambda (weight) (lambda () (if (flip weight) 'h 't))))
 
 (define (samples data)
