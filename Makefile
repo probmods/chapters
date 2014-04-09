@@ -50,7 +50,6 @@ private : $(private)
 		--write html5 \
 		--csl apa.csl \
 		--bibliography dev.bib \
-		--mathjax \
 		--output "$@" \
 		"$<"; \
 	else \
@@ -59,7 +58,6 @@ private : $(private)
 		--template chapter.template \
 		--read markdown \
 		--write html5 \
-		--mathjax \
 		--output "$@" \
 		"$<"; \
 	fi
@@ -88,7 +86,7 @@ chapterlist.html : .chapters.txt
 	-e "s/<!-- _chapternum_ -->/$(CHAPTERNUM)/g" \
 	"$<" > "$@"
 
-.index.html: index.md
+.index.html: index.md index.template
 	@pandoc --smart --mathjax --template index.template index.md -o .index.html
 
 $(prefix)index.html: $(prefix).index.html $(prefix)chapterlist.html
