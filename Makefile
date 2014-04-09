@@ -89,7 +89,7 @@ chapterlist.html : .chapters.txt
 	"$<" > "$@"
 
 .index.html: index.md
-	@pandoc --mathjax --template index.template index.md -o .index.html
+	@pandoc --smart --mathjax --template index.template index.md -o .index.html
 
 $(prefix)index.html: $(prefix).index.html $(prefix)chapterlist.html
 	@echo "* index.html"
