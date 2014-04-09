@@ -24,7 +24,10 @@ In order to make the idea of generative models precise we want a formal language
 
 Best viewed in recent versions of Chrome, Firefox, or Safari on a laptop or desktop computer.
 
-This book contains many technical exercises that run directly in your web browser. At the end of some chapters, we present some extended exercises as homework problems. To save your progress on homework problems, you can register an account; this also helps us improve the book by tracking what kinds of programs users run and what kinds of errors they encounter. <a href="/login">Login</a> or <a href="/register">register an account</a>
+This book contains many technical exercises that run directly in your web browser. At the end of some chapters, we present some extended exercises as homework problems. To save your progress on homework problems, you can register an account; this also helps us improve the book by tracking what kinds of programs users run and what kinds of errors they encounter.
+
+<!-- login/register links need to be in a div with id 'register' so that nav.js can show the appropriate content (i.e., a login/register section if the user is not logged in and a logout section if the user is logged in)   -->
+<div id="register" style='display: none; font-style: italic'><a href="/login">Login</a> or <a href="/register">register an account</a></div>
 
 ## How to cite
 
