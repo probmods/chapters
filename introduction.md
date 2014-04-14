@@ -1,4 +1,4 @@
-% Preface
+% Introduction
 
 What is thought? How can we describe the intelligent inferences made in everyday human reasoning and learning? How can we engineer intelligent machines? The computational theory of mind aims to answer these questions starting from the hypothesis that the mind is a computer, mental representations are computer programs, and thinking is a computational process -- running a computer program.
 
