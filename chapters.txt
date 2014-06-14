@@ -1,3 +1,4 @@
+introduction
 generative-models
 conditioning
 patterns-of-inference

@@ -5,14 +5,30 @@
     <link rel="stylesheet" type="text/css" href="style.css?1">
     <style>
       ol {
-      font-size: 1.5em;
-      line-height: 1.75em;
+      font-size: 1.25em;
+      line-height: 1.5em;
+      }
+      ol a  {
+      text-decoration: none;
+      border-bottom: 1px dotted #99ccff;
       }
       #header {
       width: 55em;
       padding: 1.5em 0em 1.5em 0em;
       text-align: center;
       }
+      #title {
+      font-family:  Baskerville, Palatino Linotype, Palatino;
+      font-size: 50px;
+      text-shadow: 1px 1px black
+      }
+
+      #authors {
+      font-family: Baskerville, Palatino Linotype, Palatino;
+      font-size: 20px;
+      text-shadow: 1px 1px black
+      }
+
     </style>
     <script src="scripts/underscore-min.js"></script> 
     <script src="scripts/jquery.js"></script>
@@ -26,8 +42,8 @@
   <body>
     <div id="chapter-wrapper">
       <div id='header' >
-        <span style='font-family: Baskerville, Palatino Linotype, Palatino; font-size: 50px'</span>Probabilistic Models of Cognition</span><br>
-        <span style='font-family: Baskerville, Palatino Linotype, Palatino; font-size: 25px'><i>by</i> Noah D. Goodman and Joshua B. Tenenbaum</span>
+        <span id='title'>Probabilistic Models of Cognition</span><br>
+        <span id='authors'><i>by</i> Noah D. Goodman and Joshua B. Tenenbaum</span>
       </div>
       <div id="chapter"> 
 $body$

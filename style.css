@@ -42,6 +42,12 @@ ul#nav {
     text-decoration: none;
 }
 
+/* used to make li elements have no number before them
+e.g., the "index" item in the list of chapters  */
+.nonum {
+list-style-type: none
+}
+
 /* top level nav items */
 .nav0 > li {
     display: inline;

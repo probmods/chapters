@@ -643,7 +643,7 @@ The presence of the cylinder is providing evidence that the illumination of squa
 
 Now let's condition on the presence of the cylinder, by conditioning on the presence of it's "shadow" (i.e. lower illumination than expected *a priori*):
 
-~~~~
+~~~~ {.skip}
 (define observed-luminance 3.0)
 
 (define samples

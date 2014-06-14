@@ -20,9 +20,15 @@ for line in open("chapters.txt"):
 
 lis = []
 
-for url, chapter in chapters:
+counter = 0
+
+for url, chapter in chapters: 
     link = tag("a", chapter, {"href": url + ".html"})
-    li = tag("li", link)
+    if counter == 0:
+        li = tag("li", link, {"class": "nonum"})
+    else:
+        li = tag("li", link)
+    counter += 1
     lis.append(li)
 
 lis = "\n" + "\n".join(lis) + "\n"
