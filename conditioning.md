@@ -110,7 +110,7 @@ How can we imagine answering a hypothetical such as those above? We have already
 ~~~~
 
 Notice that we have used a stochastic recursion to sample the definitions repeatedly until we get `(>= D 2)`, and we then return `A`: we generate and test until the condition is satisfied.
-This process is known as *rejection sampling*; we can us this technique to make a more general function that implements `query`---called `rejection-query`, schematically defined as:
+This process is known as *rejection sampling*; we can use this technique to make a more general function that implements `query`---called `rejection-query`, schematically defined as:
 
 ~~~~ {.norun}
 (define (rejection-query ..defines.. ..query-expression.. ..conditioner..)
