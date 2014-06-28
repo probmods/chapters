@@ -259,6 +259,8 @@ The models above generate sequences of words, but lack constituent structure (or
 Probabilistic context-free grammars (PCFGs) are a straightforward (and canonical) way to generate sequences of words with constituent structure. There are many ways to write a PCFG in Church. One especially direct way (inspired by Prolog programming) is to let each non-terminal be represented by a Church procedure; here constituency is embodied by one procedure calling another---that is by causal dependence.
 
 ~~~~
+(define (sample distribution) (distribution))
+
 (define (terminal t) (lambda () t))
 
 (define D (lambda ()
@@ -309,8 +311,7 @@ Probabilistic context-free grammars (PCFGs) are a straightforward (and canonical
 (S)
 ~~~~
 
-We have used the procedure `sample`, which applies a thunk (to no arguments), resulting in a sample. `sample` is in fact trivial---it can be defined by:
-`(define (sample distribution) (distribution))`.
+We have definied a utility procedure `sample`, which applies a thunk (to no arguments), resulting in a sample.
 
 Now, let's look at one of the procedures defining our PCFG in detail.
 
