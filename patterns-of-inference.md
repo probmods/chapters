@@ -664,6 +664,31 @@ Now let's condition on the presence of the cylinder, by conditioning on the pres
 ~~~~
 <!-- FIXME: need webchurch to recognize `and` and commute with condition... otherwise have to write these two conditions explicitly. -->
 
+<!-- This code will run (and do what the previous code was supposed to):
+
+~~~~
+(define observed-luminance 3.0)
+
+(define samples
+   (mh-query
+    1000 10
+
+    (define shadow (flip))
+    (define reflectance (gaussian 1 1))
+    (define illumination
+      (if shadow (gaussian 0.5 0.1) (gaussian 3 0.5)))
+    (define luminance (* reflectance illumination))
+
+    reflectance
+
+    (and (= luminance (gaussian observed-luminance 0.1))
+         shadow)))
+
+(multiviz "Mean reflectance: " (mean samples)
+          (hist samples "Reflectance"))
+~~~~
+ -->
+
 The variables `reflectance` and `illumination` are conditionally independent in the generative model, but after we condition on `luminance` they become dependent: changing one of them affects the probability of the other. This phenomenon has important consequences for cognitive science.  Although the model of (our knowledge of) the world has a certain kind of modularity implied by conditional independence, as soon as we start using the model to do conditional inference on some data, formerly modularly isolated variables can become dependent.
 
 ## Other vision examples (to be developed)
