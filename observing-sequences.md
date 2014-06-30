@@ -222,7 +222,7 @@ This version thinks that alternating sequences are non-random, but there are oth
 
 # Hidden Markov Models
 
-Another popular model in computational linguistics is the hidden Markov model (HMM). The HMM extends the Markov model by assuming that the "actual" states aren't observable. Instead there is an ''observation model'' that generates an observation from each "hidden state". We use the same construction as above to generate an unknown observation model.
+Another popular model in computational linguistics is the hidden Markov model (HMM). The HMM extends the Markov model by assuming that the "actual" states aren't observable. Instead there is an "observation model" that generates an observation from each "hidden state". We use the same construction as above to generate an unknown observation model.
 
 ~~~~
 (define states '(s1 s2 s3 s4 s5 s6 s7 s8 stop))
@@ -412,7 +412,7 @@ The PCFG can't be written with `unfold` because it builds a tree (nested list) r
 Note that this samples a hierarchical (or "parenthesized") sequence of terminals. How would you "flatten" this to return a sequence without parentheses?
 
 
-# Excercises
+# Exercises
 
 <!-- Write a version of the preceding PCFG that draws the RHS distributions from a Dirichlet distribution (as in the hierarchical n-gram model).-->
 

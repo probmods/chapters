@@ -346,7 +346,7 @@ In the above models of goal and preference inference, we have assumed that the s
 
 Here we have conditioned on Sally wanting the cookie and Sally choosing to press button b. Thus, we have no *direct* evidence of the effects of pressing the buttons on the machine. What happens if you condition instead on the action and outcome, but not the intentional choice of this outcome (that is, change the condition to `(equal? (vending-machine 'state 'b) 'cookie)`)?
 
-Now imagine a vending machine that has only one button, but it can be pressed many times. We don't know, what the machine will do in response to a given button sequence. We do know that pressing more buttons is less a priori likely.
+Now imagine a vending machine that has only one button, but it can be pressed many times. We don't know what the machine will do in response to a given button sequence. We do know that pressing more buttons is less a priori likely.
 
 ~~~~
 ;;;fold: choose-action

@@ -16,7 +16,7 @@ To see how the same concepts apply in a domain that is not usually thought of as
 
 Parallel problems of conditional inference arise in visual perception, social cognition, and virtually every other domain of cognition.  In visual perception, we observe an image or image sequence that is the result of rendering a three-dimensional physical scene onto our two-dimensional retinas.  A probabilistic program can model both the physical processes at work in the world that produce natural scenes, and the imaging processes (the "graphics") that generate images from scenes.  *Perception* can then be seen as conditioning this program on some observed output image and inferring the scenes most likely to have given rise to it.
 
-When interacting with other people, we observe their actions, which result from a planning processes, and often want to guess their desires, beliefs, or future actions. Planning can be modeled as a program that take as input an agent's mental states (beliefs and desires) and produces action sequences---for a rational agent, these will be actions that are likely to produce the agent's desired states as reliably or efficiently as possible, given the agent's beliefs.  A rational agent can *plan* their actions by conditional inference to infer what steps would be most likely to achieve their desired state.  *Action understanding*, or interpreting an agent's observed behavior, can be expressed as conditioning a planning program (a "theory of mind") on observed actions to infer the mental states that most likely gave rise to those actions, and to predict how the agent is likely to act in the future.
+When interacting with other people, we observe their actions, which result from a planning process, and often want to guess their desires, beliefs, or future actions. Planning can be modeled as a program that takes as input an agent's mental states (beliefs and desires) and produces action sequences---for a rational agent, these will be actions that are likely to produce the agent's desired states as reliably or efficiently as possible, given the agent's beliefs.  A rational agent can *plan* their actions by conditional inference to infer what steps would be most likely to achieve their desired state.  *Action understanding*, or interpreting an agent's observed behavior, can be expressed as conditioning a planning program (a "theory of mind") on observed actions to infer the mental states that most likely gave rise to those actions, and to predict how the agent is likely to act in the future.
 
 
 # Hypothetical Reasoning with `query`
@@ -96,7 +96,7 @@ Going beyond the basic intuition of "hypothetical reasoning", the `query` operat
 
 ## Rejection Sampling
 
-How can we imagine answering a hypothetical such as those above? We have already seen how to get a sample from a generative model, without constraint, by simply running the evaluation process "forward"  (i.e. simulating the process). We can get conditional samples by forward sampling the entire query, including both the query expression and conditioner, but only keeping the sample if the value returned by the conditioner expression is *true*. For instance, to sample from the above model "A given that D is greater that 1" we could:
+How can we imagine answering a hypothetical such as those above? We have already seen how to get a sample from a generative model, without constraint, by simply running the evaluation process "forward"  (i.e. simulating the process). We can get conditional samples by forward sampling the entire query, including both the query expression and conditioner, but only keeping the sample if the value returned by the conditioner expression is *true*. For instance, to sample from the above model "A given that D is greater than 2" we could:
 
 ~~~~
 (define (take-sample)
@@ -330,7 +330,7 @@ We can form many complex queries from this simple model. We could ask how likely
 
 # Example: Inverse intuitive physics
 
-We previously saw how a generative model of physics---a noisy, intuitive version of Newtonian mechanics---could be used to make judgements about the final state of physical worlds from initial conditions. We showed how this forward simulation could be used to models judgements about stability. We can also use a physics model to reason backward: from final to initial states.
+We previously saw how a generative model of physics---a noisy, intuitive version of Newtonian mechanics---could be used to make judgements about the final state of physical worlds from initial conditions. We showed how this forward simulation could be used to model judgements about stability. We can also use a physics model to reason backward: from final to initial states.
 
 Imagine that we drop a block from a random position at the top of a world with two fixed obstacles:
 
