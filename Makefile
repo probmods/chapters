@@ -79,11 +79,11 @@ chapterlist.html : .chapters.txt
 # HT http://unix.stackexchange.com/questions/20322/replace-string-with-contents-of-a-file-using-sed#comment54953_20324	
 # HT http://stackoverflow.com/a/1909390/351392 for the stuff
 %.html : .%.html chapterlist.html
-	$(eval CHAPTERNUM = $(shell grep "$*" .chapters.txt | cut -d ":" -f1 | sed -e 's/\([0-9]\)\+/\1./g')) 
-	@echo "- $*"
+	$(eval CHAPTERNUM = $(shell grep "$*" .chapters.txt | cut -d ":" -f1 ))
+	@echo "- $* $(CHAPTERNUM)"
 	@ sed -e "/<!-- _chapterlist_ -->/{r chapterlist.html" \
 	-e "d}" \
-	-e "s/<!-- _chapternum_ -->/$(CHAPTERNUM)/g" \
+	-e "s/<!-- _chapternum_ -->/$(CHAPTERNUM)./g" \
 	"$<" > "$@"
 
 .index.html: index.md index.template
