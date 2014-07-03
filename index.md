@@ -16,7 +16,7 @@ This book contains many exercises where you will write and run Church code direc
 
 ## How to cite
 
-Please cite this book as: N. D. Goodman and J. B. Tenenbaum (electronic). Probabilistic Models of Cognition.
+Please cite this book as: N. D. Goodman and J. B. Tenenbaum (electronic). Probabilistic Models of Cognition. Retrieved \<Date\> from http://probmods.org.
 
 ## How to help
 
@@ -24,9 +24,16 @@ Send any errors to <u>probmods@<span style='display:none'>REMOVETHIS</span>gmail
 
 This book is open source. We use Github to host the repositories for the [book content](http://github.com/probmods/chapters), the [accounts infrastructure](http://github.com/probmods/accounts), and the [WebChurch engine](http://github.com/probmods/webchurch), which supports running Church programs in the browser. We welcome issues and pull requests.
 
-
 ## Acknowledgements
 
 We are grateful to the following people, who contributed content or technical expertise: Timothy J. O'Donnell, Andreas Stuhlmuller, Tomer Ullman, John McCoy, Long Ouyang, Julius Cheng.
 
-The construction and ongoing support of this tutorial are made possible by grants from the Office of Naval Research, the James S. McDonnell Foundation, the National Science Foundation, and the Stanford VPOL.
+The construction and ongoing support of this tutorial are made possible by grants from the Office of Naval Research, the James S. McDonnell Foundation, the Stanford VPOL, and the Center for Brains, Minds, and Machines (funded by NSF STC award CCF-1231216).
+
+## Technical notes
+
+Code examples are based on the [WebChurch](https://github.com/probmods/webchurch) system. Examples are best viewed in recent versions of Chrome, Firefox, or Safari on a laptop or desktop computer. Error messages will be most useful when viewed with Chrome.
+
+This book contains many technical exercises that run directly in your web browser. At the end of some chapters, we present some extended exercises as homework problems. To save your progress on homework problems, you can register an account; this also helps us improve the book by tracking what kinds of programs users run and what kinds of errors they encounter. <a href="/login">Login</a> or <a href="/register">register an account</a>
+
+

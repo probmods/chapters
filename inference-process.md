@@ -331,7 +331,7 @@ To get this all to work we need a way to identify random choices across differen
 
 ## Biases of MCMC
 
-An MCMC sampler is guaranteed to take unbiased samples from its stationary distribution ''in the limit'' of arbitrary time between samples. In practice MCMC will have characteristic biases in the form of long burn-in and slow mixing. 
+An MCMC sampler is guaranteed to take unbiased samples from its stationary distribution "in the limit" of arbitrary time between samples. In practice MCMC will have characteristic biases in the form of long burn-in and slow mixing. 
 
 We already saw an example of slow mixing above: the first Markov chain we used to sample from the uniform distribution would take (on average) several iterations to switch from `a` or `b` to `c` or `d`. In order to get approximately independent samples, we needed to wait longer than this time between taking iterations. In contrast, the more efficient Markov chain (with uniform transition function) let us take sample with little lag. In this case poor mixing was the result of a poorly chosen transition function. Poor mixing is often associated with multimodal distributions.
 
@@ -341,7 +341,7 @@ We already saw an example of slow mixing above: the first Markov chain we used t
 
 In the [previous chapter](inference-about-inference.html) we saw how inference about inference could be modeled by using nested-queries. For the examples in that chapter we used rejection sampling, because it is straightforward and well-behaved. Of course, rejection sampling will become unacceptably slow if the probability of the condition in any level of query becomes small---this happens very quickly for nested-query models when the state space grows. Each of the other types of query can, in principle, also be nested, but some special care is needed to get good performance.
 
-To explore alliterative algorithms for nested-query, let's start with a simple example:
+To explore alternative algorithms for nested-query, let's start with a simple example:
 
 ~~~~
 (define (inner x)

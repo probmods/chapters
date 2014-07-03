@@ -222,7 +222,7 @@ This version thinks that alternating sequences are non-random, but there are oth
 
 # Hidden Markov Models
 
-Another popular model in computational linguistics is the hidden Markov model (HMM). The HMM extends the Markov model by assuming that the "actual" states aren't observable. Instead there is an ''observation model'' that generates an observation from each "hidden state". We use the same construction as above to generate an unknown observation model.
+Another popular model in computational linguistics is the hidden Markov model (HMM). The HMM extends the Markov model by assuming that the "actual" states aren't observable. Instead there is an "observation model" that generates an observation from each "hidden state". We use the same construction as above to generate an unknown observation model.
 
 ~~~~
 (define states '(s1 s2 s3 s4 s5 s6 s7 s8 stop))
@@ -259,6 +259,8 @@ The models above generate sequences of words, but lack constituent structure (or
 Probabilistic context-free grammars (PCFGs) are a straightforward (and canonical) way to generate sequences of words with constituent structure. There are many ways to write a PCFG in Church. One especially direct way (inspired by Prolog programming) is to let each non-terminal be represented by a Church procedure; here constituency is embodied by one procedure calling another---that is by causal dependence.
 
 ~~~~
+(define (sample distribution) (distribution))
+
 (define (terminal t) (lambda () t))
 
 (define D (lambda ()
@@ -309,8 +311,7 @@ Probabilistic context-free grammars (PCFGs) are a straightforward (and canonical
 (S)
 ~~~~
 
-We have used the procedure `sample`, which applies a thunk (to no arguments), resulting in a sample. `sample` is in fact trivial---it can be defined by:
-`(define (sample distribution) (distribution))`.
+We have definied a utility procedure `sample`, which applies a thunk (to no arguments), resulting in a sample.
 
 Now, let's look at one of the procedures defining our PCFG in detail.
 
@@ -411,7 +412,7 @@ The PCFG can't be written with `unfold` because it builds a tree (nested list) r
 Note that this samples a hierarchical (or "parenthesized") sequence of terminals. How would you "flatten" this to return a sequence without parentheses?
 
 
-# Excercises
+# Exercises
 
 <!-- Write a version of the preceding PCFG that draws the RHS distributions from a Dirichlet distribution (as in the hierarchical n-gram model).-->
 
