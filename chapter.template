@@ -10,6 +10,7 @@
     <script src="scripts/cookies-0.3.1.min.js"></script>
     <script src="scripts/gg.js"></script>
     <script src="scripts/md5.js"></script>
+    <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
