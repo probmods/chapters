@@ -43,7 +43,8 @@ ul#nav {
 }
 
 /* used to make li elements have no number before them
-e.g., the "index" item in the list of chapters  */
+e.g., the "index" item in the list of chapters
+  */
 .nonum {
 list-style-type: none
 }
@@ -267,63 +268,49 @@ h1 > a > code, h2 > a > code, h3 > a > code, h4 > a > code, h5 > a > code, li > 
 
 /* codeboxes */
 
-.code-controls {
-    position: absolute;
-    top: 0px;
-    right: 1px;
-    margin: 0;
-    padding: 0;
-    z-index: 999;
-}
-
-.code-settings {
-    float: right;
-    margin: 0;
-    padding: 0;
-    list-style-type: none;
-    opacity: 0
-}
-
-.code-settings > li {
-    display: none;
-} 
-
-.code-settings li.cog {
-    display: inline;
-}
-
-.code-settings li.cog button {
-    background: none;
-    border: none;
-    padding-right: 0;
-}
-
-.code-settings li.cog img {
-    opacity: 0.3;
-}
-
-.code-settings:hover .cog img {
-    opacity: 1;
-}
-
-.code-settings:hover li {
-    display: inline;
-}
-
-button.run {
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    z-index: 1000;
-    opacity: 0;
-}
-
 .CodeMirror-focused {
     /* transition: left 0.2s, top 0.2s; */
     transition: box-shadow 0.1s;
     box-shadow: 3px 3px 3px #99ccff;
     /* left: -3px; */
     /* top: -3px */
+}
+
+.code-controls {
+    position: absolute;
+    bottom: 0; 
+    right: 0;
+    opacity: 0;
+    z-index: 1000
+}
+
+.code-settings {
+    z-index: 999;
+    position: absolute;
+    top: 0;
+    right: 0;
+    font-size: 16px;
+    list-style-type: none;
+    margin: 2px
+}
+
+.code-settings li {
+    display: none;
+}
+
+.code-settings .settings-icon {
+    display: inline;
+    color: gray;
+    padding: 0px 1px 0px 1px;
+    border-radius: 2px
+}
+
+.code-settings:hover li {
+    display: inline
+}
+
+.CodeMirror:hover .code-controls, .CodeMirror-focused .code-controls {
+    opacity: 1
 }
 
 .CodeMirror:hover button.run, .CodeMirror:hover .code-settings, .CodeMirror-focused button.run, .CodeMirror-focused .code-settings {
@@ -399,3 +386,4 @@ td {
 border: 1px solid #afafaf;
 padding: 0 0.5em 0 0.5em;
 }
+
