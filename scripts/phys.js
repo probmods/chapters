@@ -61,13 +61,35 @@ var listToArray = function(list, recurse) {
 	}
 };
 
-function arrayToList(arr) {
-	if (arr.length == 0) {
-		return the_empty_list;
+var arrayToList = function(arr, mutate) {
+	if (mutate) {
+		arr.push(null);	
 	} else {
-		return [arr[0], arrayToList(arr.slice(1))];
+		arr = arr.concat(null);
 	}
-}
+	return arr;
+};
+
+
+// function listToArray(list, recurse) {
+// 	var array = [];
+// 	while (list.length > 0) {
+// 		var left = list[0];
+// 		array.push((Array.isArray(left) && recurse) ? listToArray(left) : left);
+// 		list = list[1];
+// 	}
+// 	return array;
+// }
+
+var the_empty_list = [];
+
+// function arrayToList(arr) {
+// 	if (arr.length == 0) {
+// 		return the_empty_list;
+// 	} else {
+// 		return [arr[0], arrayToList(arr.slice(1))];
+// 	}
+// }
 
 function clearWorld() {
   var count = world.GetBodyCount();
