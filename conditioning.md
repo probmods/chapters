@@ -1,5 +1,7 @@
 % Conditioning
 
+<script src="scripts/box2d.uglified.js"></script>
+<script src="scripts/phys.js"></script>
 
 # Cognition and conditioning
 
