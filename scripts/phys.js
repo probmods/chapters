@@ -53,17 +53,13 @@ fixDef.restitution = 0.1;
 var bodyDef = new b2BodyDef;
 bodyDef.angle = 0;
 
-function listToArray(list, recurse) {
-	var array = [];
-	while (list.length > 0) {
-		var left = list[0];
-		array.push((Array.isArray(left) && recurse) ? listToArray(left) : left);
-		list = list[1];
+var listToArray = function(list, recurse) {
+	if (recurse) {
+		return list.slice(0, -1).map(function (x) {return Array.isArray(x) ? listToArray(x) : x});
+	} else {
+		return list.slice(0, -1);
 	}
-	return array;
-}
-
-var the_empty_list = [];
+};
 
 function arrayToList(arr) {
 	if (arr.length == 0) {
