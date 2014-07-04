@@ -15,7 +15,10 @@
 * misrepresented as being the original software.
 * 3. This notice may not be removed or altered from any source distribution.
 */
+
+(function() {
 var Box2D = {};
+window['Box2D'] = Box2D;
 
 (function (a2j, undefined) {
 
@@ -10865,3 +10868,5 @@ Box2D.postDefs = [];
 var i;
 for (i = 0; i < Box2D.postDefs.length; ++i) Box2D.postDefs[i]();
 delete Box2D.postDefs;
+
+})();
