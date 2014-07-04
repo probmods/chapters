@@ -315,39 +315,42 @@ animatePhysics = function(steps, initialWorld) {
 
     requestId = requestAnimationFrame(function() {update(0);});
   }
-  
-  return function($div) {
-    stopAnim(); //stop previous update thread..
-    setTimeout(stopAnim, mspf); //make absolutely sure previous update thread is stopped
-    var $physicsDiv = $("<div>").appendTo($div);
-    $physicsDiv.append("<br/>");
-    var $canvas = $("<canvas/>").appendTo($physicsDiv);
-    $canvas.attr("width", worldWidth)
-           .attr("style", "background-color:#333333;")
-           .attr("height", worldHeight);
-    $physicsDiv.append("<br/>");
-    //var initializeStep = true;
-    //simulate($canvas, 0, initializeStep);
-    simulate($canvas, 0);
-    //initializeStep = false;
-    var $button = $("<button>Simulate</button>").appendTo($physicsDiv);
-    $button.click(function() {
-      //simulate($canvas, steps, initializeStep);
-      
-      stopAnim(); //stop previous update thread..
-      simulate($canvas, steps);
-      //initializeStep = true;
+
+    sideEffects.push({
+        type: 'function',
+        data: function($div) {
+            stopAnim(); //stop previous update thread..
+            setTimeout(stopAnim, mspf); //make absolutely sure previous update thread is stopped
+            var $physicsDiv = $("<div>").appendTo($div);
+            $physicsDiv.append("<br/>");
+            var $canvas = $("<canvas/>").appendTo($physicsDiv);
+            $canvas.attr("width", worldWidth)
+                .attr("style", "background-color:#333333;")
+                .attr("height", worldHeight);
+            $physicsDiv.append("<br/>");
+            //var initializeStep = true;
+            //simulate($canvas, 0, initializeStep);
+            simulate($canvas, 0);
+            //initializeStep = false;
+            var $button = $("<button>Simulate</button>").appendTo($physicsDiv);
+            $button.click(function() {
+                //simulate($canvas, steps, initializeStep);
+                
+                stopAnim(); //stop previous update thread..
+                simulate($canvas, steps);
+                //initializeStep = true;
+            });
+            var $clearButton = $("<button>Delete Animation Window</button>")
+            $clearButton.appendTo($physicsDiv);
+            $clearButton.click(function() {
+                var count = world.GetBodyCount();
+                for (var i=0; i<count; i++) {
+                    var body = world.GetBodyList();
+                    world.DestroyBody(body);
+                }
+                $physicsDiv.remove();
+            });
+            return "";
+        }
     });
-    var $clearButton = $("<button>Delete Animation Window</button>")
-    $clearButton.appendTo($physicsDiv);
-    $clearButton.click(function() {
-      var count = world.GetBodyCount();
-      for (var i=0; i<count; i++) {
-        var body = world.GetBodyList();
-        world.DestroyBody(body);
-      }
-      $physicsDiv.remove();
-    });
-    return "";
-  };
 }
