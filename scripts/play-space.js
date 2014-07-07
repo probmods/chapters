@@ -1,121 +1,128 @@
-/* global $, location, Cookies, console, _ */
+/* global $, location, Cookies, console, _, editors */
 
-var fileNames = [];
+var fileNames = ['scratch'];
+var chapterName = "play-space";
 
-// var chapterName = _(location.href.split("/")).last().replace(".html","").split("#")[0];
-window.chapterName = "play-space";
+var ed;
 
-var save = function(name) {
-  if (typeof name === "undefined") {
-    name = $("#code-names :selected").text();
-  }
-  var editor = $(".CodeMirror")[0].CodeMirror;
-  
-  var exerciseName = [chapterName, name].join(".");
-  editor.id = exerciseName;
-  editor.exerciseName = exerciseName;
-  
-  var newCode = editor.getValue(),
-      newEngine = editor.engine;
-  
-  // unset editor.codeId
-  editor.codeId = false;
-  
-  // asynchronously POST church code to /code/{exercise_name}
-  $.ajax({
-    type: "POST",
-    url: "/code/" + exerciseName,
-    data: {
-      'code': newCode,
-      'engine': newEngine,
-      'isRevert': null,
-      'csrfmiddlewaretoken': Cookies.get('csrftoken')
-    },
-    success: function(codeId) {
-      console.log("POST to /code/" + exerciseName + ": success");
-      editor.codeId = codeId;
-      editor.exerciseName = exerciseName;
-      if (fileNames.indexOf(name) > -1) {
-        $("#code-names").val(exerciseName); // use exerciseName b/c it has the prefix 
-      } else {
-        $("#code-names").prepend(
-          "<option value='" + exerciseName + "' selected>" + name + "</option>"
-        );
-      }
-      // $("#displayname").text(exerciseName.split('.').pop());
-    },
-    error: function() {
-      console.log("POST to /code/" + exerciseName + ": failure");
-    }
-  });
-}
+$(document).ready(function() {
+    // this is set from new-injector.js
+    ed = editors[0];
+    ed.set('exerciseName','play-space.scratch');
 
-
-var saveAs = function() {
-  var name = prompt("Please enter a name", "");
-
-  save(name);
-  
-}
-
-var loadFrom = function(name) {
-  var editor = $(".CodeMirror")[0].CodeMirror;
-  
-  var shortName = name.replace(chapterName + ".", "");
-  //var exerciseName = [chapterName, name].join(".");
-
-  $(editor.display.wrapper).css("opacity", "0.1");
-  $("pre.results").css("display", "none");
-  
-  $.ajax({
-    url: "/code/" + name,
-    success: function(json) {
-      
-      //           // overwrite defaults
-      // _(editor.options).extend({
-      //   text: json.code,
-      //   engine: json.engine
-      // });
-      // TODO: switch engines
-      editor.setValue(json.code);
-      editor.exerciseName = name;
-      $(editor.display.wrapper).css("opacity", "");
-      // $("#displayname").text(exerciseName.split('.').pop());
-    },
-    error: function() {
-      alert("failed to load " + shortName);
-      console.log("failure loading exercise " + name + ", using default");
-    }
-  }); 
-};
-
-$("#code-names").change(function(x) {
-  //console.log( $(x.target));
-  var selectedName = $(this).find("option:selected").val();
-  loadFrom(selectedName); 
-});
-
-$.ajax({
-  url: "/code/_all",
-  success: function(json) {
-    //           // overwrite defaults
-    //           _(editor.options).extend({
-    //                                   text: json.code,
-    //                                   engine: json.engine
-    //                                   });
-
-    $("#code-names").append(
-      json.map(function(x) {
-        var trueName = x.exercise_id__name,
-            displayName = trueName.replace("play-space.","");
-
-        fileNames.push( displayName );
+    // get rid of reset button 
+    ed.display.$resetButton.remove();
+    
+    var loadFrom = function(fullName) {
         
-        return "<option value='" + trueName + "'" +
-          ( displayName == "scratch" ? " selected" : "") +
-          ">" + displayName + "</option>";
-      })
-    );
-  }
-  
+        var shortName = fullName.replace(chapterName + ".", "");
+        //var exerciseName = [chapterName, name].join(".");
+
+        $(ed.display.wrapper).css("opacity", "0.1");
+        $("pre.results").css("display", "none");
+        
+        $.ajax({
+            url: "/code/" + fullName,
+            success: function(json) {
+                ed.set({code: json.code,
+                        engine: json.engine,
+                        initialOptions: {
+                            code: json.code,
+                            engine: json.engine
+                        }
+                       },
+                       {programmatic: true}) 
+                
+                $(ed.display.wrapper).css("opacity", "");
+                // $("#displayname").text(exerciseName.split('.').pop());
+            },
+            error: function() {
+                alert("failed to load " + shortName);
+                console.log("failure loading exercise " + fullName + ", using default");
+            }
+        }); 
+    }
+
+    window.save = function(shortName) {
+        if (typeof shortName === "undefined") {
+            shortName = $("#code-names :selected").text();
+        }
+
+        ed.set('exerciseName', 'play-space.' + shortName); 
+        ed.sendCode(); 
+    }
+    
+    window.saveAs = function() {
+        var shortName = prompt("Please enter a name", ""); 
+
+        // user didn't enter name but clicked ok
+        if (shortName === "") {
+            alert('Please enter a non-empty name');
+            setTimeout(saveAs, 0);
+            return;
+        }
+
+        // user clicked cancel
+        if (shortName === null) {
+            return;
+        }
+
+        // warn if supplied name conflicts with an existing name
+        var isExistingName = _(fileNames).contains(shortName);        
+        if (isExistingName) {
+            var overwriteExisting = window.confirm(
+                shortName + " already exists - do you want to overwrite it?");
+            if (!overwriteExisting) {
+                return;
+            }
+        } 
+
+        save(shortName);
+        
+        // if file name doesn't exist yet, create a new create a new <option></option> tag in the file selector and switch to it
+        // otherwise, just switch to it
+        if (!isExistingName) {
+            $("#code-names").append(
+                "<option value=\"play-space." + shortName + "\"" + " selected" + ">" + shortName); 
+        } else {
+            $("#code-names").find('option[value="play-space.' + shortName + '"]').attr("selected",true);
+        }
+        
+    }
+
+    // when the file selector changes,
+    // change exerciseName and load it from the database
+    $("#code-names").change(function(x) {
+        ed.display.$results.html('').hide();
+        var fullName = $(this).find("option:selected").val();
+        loadFrom(fullName); 
+        ed.set('exerciseName', fullName);
+    }); 
+
+    $.ajax({
+        url: "/code/_all",
+        success: function(json) {
+            json.forEach(function(x) {
+                    var trueName = x.exercise_id__name,
+                        displayName = trueName.replace("play-space.","");
+
+                fileNames.push( displayName ) ;
+                
+            });
+
+            fileNames = _(fileNames).unique().sort(); 
+            
+            $("#code-names").append(
+                fileNames.map(function(name) {
+                    return "<option value=\"play-space." + name + "\"" +
+                        ( name == "scratch" ? " selected" : "") +
+                        ">" + name + "</option>";
+
+                })
+            );
+        }
+        
+    });
+
+    
 });
