@@ -80,7 +80,7 @@ chapterlist.html : .chapters.txt
 # HT http://stackoverflow.com/a/1909390/351392 for the stuff
 %.html : .%.html chapterlist.html
 	$(eval CHAPTERNUM = $(shell grep "$*" .chapters.txt | cut -d ":" -f1 | sed -e 's/\([0-9]*\)/\1./g' ))
-	@echo "- $* $(CHAPTERNUM)"
+	@echo "- $(CHAPTERNUM) $*"
 	@ sed -e "/<!-- _chapterlist_ -->/{r chapterlist.html" \
 	-e "d}" \
 	-e "s/<!-- _chapternum_ -->/$(CHAPTERNUM)/g" \
