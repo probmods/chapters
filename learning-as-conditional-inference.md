@@ -121,7 +121,7 @@ Experiment with different data sets, varying both the number of flips and the re
 
 When studying learning as conditional inference, that is when considering an *ideal learner model*, we are particularly interested in the dynamics of how inferred hypotheses change as a function of amount of data (often thought of as time the learner spends acquiring data). We can map out the *trajectory* of learning by plotting a summary of the posterior distribution over hypotheses as a function of the amount of observed data. Here we plot the mean of the samples of the coin weight (the *expected* weight) in the above example (NOTE: for now this must be run using MIT-Church):
 
-~~~~ {.mit-church data-engine="mit-church"}
+~~~~ {data-engine="mit-church"}
 (define make-coin (lambda (weight) (lambda () (if (flip weight) 'h 't))))
 
 (define (samples data)

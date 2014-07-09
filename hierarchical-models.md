@@ -44,7 +44,7 @@ Run the code above multiple times.  Each run creates a single bag of marbles wit
 
 Now let's add a few twists: we will generate three different bags, and try to learn about their respective color prototypes by conditioning on observations. We represent the results of learning in terms of the *posterior predictive* distribution for each bag: a single hypothetical draw from the bag, using the expression `(draw-marbles 'bag 1)`.  We will also draw a sample from the posterior predictive distribution on a new bag, for which we have had no observations.
 
-~~~~ {.mit-church}
+~~~~ {data-engine="mit-church"}
 (define colors '(black blue green orange red))
 
 (define samples
@@ -82,7 +82,7 @@ This generative model describes the prototype mixtures in each bag, but it does 
 
 Now let us introduce another level of abstraction: a global prototype that provides a prior on the specific prototype mixtures of each bag.
 
-~~~~ {.mit-church}
+~~~~ {data-engine="mit-church"}
 (define colors '(black blue green orange red))
 
 (define samples
@@ -129,7 +129,7 @@ Learning about shared structure at a higher level of abstraction also supports i
 
 Now let's investigate the relative learning speeds at different levels of abstraction.  Suppose that we have a number of bags that all have identical prototypes: they mix red and blue in proportion 2:1.  But the learner doesn't know this.  She observes only one ball from each of N bags.  What can she learn about an individual bag versus the population as a whole as the number of bags changes? (**Note: this example is too slow to run on Churchserv. Results are shown below.**)
 
-~~~~ {.mit-church}
+~~~~ {data-engine="mit-church"}
 (define colors '(red blue))
 
 (define (sample-bags obs-draws)
@@ -228,7 +228,7 @@ In general, the blessing of abstraction can be surprising because our intuitions
 
 old blessing of abstraction stuff
 
-~~~~ {.mit-church}
+~~~~ {data-engine="mit-church"}
 (mh-query
     100 100
 
@@ -251,7 +251,7 @@ old blessing of abstraction stuff
 There are several things to vary in this setup: how many samples are observed overall? How many samples are observed from each bag? In particular, what happens when there are many different bags, but only one sample is observed from each bag? You should find that the overall prototype is learned while the specific prototypes still have a fair amount of uncertainty. Going back to our *dogs* example, this suggests that a child could be quite confident in the prototype of "dog" while having little idea of the prototype for any specific kind of dog&mdash;learning more quickly at the abstract level than the specific level, but then using this abstract knowledge to constrain expectations about the specific level.
 --><!--
 
-~~~~ {.mit-church}
+~~~~ {data-engine="mit-church"}
 (define vector-sum (lambda (a b)
     (list->vector (map (lambda (x y) (+ x y)) (vector->list a) (vector->list b)))))
 (define num-samples 200)
@@ -339,7 +339,7 @@ This abstract knowledge about what animal kinds are like can be extremely useful
 
 We can study a simple version of this phenomenon by modifying our bags of marbles example, articulating more structure to the hierarchical model as follows.  We now have two higher-level parameters: `phi` describes the expected proportions of marble colors across bags of marbles, while `alpha`, a real number, describes the strength of the learned prior -- how strongly we expect any newly encountered bag to conform to the distribution for the population prototype `phi`.  For instance, suppose that we observe that `bag-1` consists of all blue marbles, `bag-2` consists of all green marbles, `bag-3` all red, and so on. This doesn't tell us to expect a particular color in future bags, but it does suggest that bags are very regular&mdash;that all bags consist of marbles of only one color.
 
-~~~~ {.mit-church}
+~~~~ {data-engine="mit-church"}
 (define colors '(black blue green orange red))
 
 (define samples
@@ -412,7 +412,7 @@ One well studied overhypothesis in cognitive development is the 'shape bias': th
 
 We now consider a model of learning the shape bias which uses the compound dirichlet-multinomial model that we have been discussing in the context of bags of marbles. This model for the shape bias is from Kemp et al (2007) (Kemp, C., Perfors, A., and Tenenbaum, J. B. Learning overhypotheses with hierarchical Bayesian models. Developmental Science 10(3), 307-321). Rather than bags of marbles we now have object categories and rather than observing marbles we now observe the features of an object (e.g. its shape, color, and texture) drawn from one of the object categories. Suppose that a feature from each dimension of an object is generated independently of the other dimensions and there are separate values of alpha and phi for each dimension. Importantly, one needs to allow for more values along each dimension than appear in the training data so as to be able to generalize to novel shapes, colors, etc. To test the model we can feed it training data to allow it to learn the values for the alphas and phis corresponding to each dimension. We can then give it a single instance of some new category and then ask what the probability is that the various choice objects also come from the same new category. The church code below shows a model for the shape bias, conditioned on the same training data used in the Smith et al experiment. We can then ask both for draws from some category which we've seen before, and from some new category which we've seen a single instance of. One small difference from the previous models we've seen for the example case is that the alpha hyperparameter is now drawn from an exponential distribution with inverse mean 1, rather than a Gamma distribution. This is simply for consistency with the model given in the Kemp et al (2007) paper.
 
-~~~~ {.mit-church}
+~~~~ {data-engine="mit-church"}
 (define shapes (iota 11))
 (define colors (iota 11))
 (define textures (iota 11))
@@ -481,7 +481,7 @@ Again, we can use the compound dirichlet-multinomial model we have been working 
 So far, we've been using the compound dirichlet-multinomial to do one shot learning, by learning low values for the alpha hyperparameter. This causes the Dirichlet distribution at the second level to have parameters less than 1, and so to be 'spiky'. While such a Dirichlet distribution can lead to one shot learning, we're not explicitly learning about the variance of
 the categories in the model. We might imagine a similar model in which we handle continuous quantities and directly represent hyperparameters for the mean and variance of various related groups.
 
-~~~~ {.mit-church}
+~~~~ {data-engine="mit-church"}
  (define results
     (mh-query
     50 1000
