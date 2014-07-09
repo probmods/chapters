@@ -176,7 +176,7 @@ drawn from a Dirichlet prior. For each of the $N$ topics
 drawn for the document, a word is sampled from the corresponding
 multinomial distribution. This is shown in the Church code below.
 
-~~~~ {.mit-church}
+~~~~ {data-engine="mit-church"}
 (define vocabulary (append '(DNA evolution)'(parsing phonology)))
 
 (define topics '(topic1 topic2)) (define doc-length 10)
@@ -243,7 +243,7 @@ distributions over words.
 
 <img src='Maye.png' />
 
-~~~~ {."mit-church"}
+~~~~ {data-engine="mit-church"}
 (define (noisy=? x y) (and (flip (expt 0.1 (abs (- (first x) (first y)))))
                            (flip (expt 0.1 (abs (- (rest x) (rest y)))))))
 (define samples
