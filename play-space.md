@@ -1,5 +1,7 @@
 % Play space
 
+[Church Reference](webchurch/refs.html)
+
 Currently editing: <select id="code-names"></select>
 
 ~~~~ {data-exercise="scratch"}
