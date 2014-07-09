@@ -11,7 +11,7 @@ Imagine a child who enters the world and begins to see objects. She can't begin 
 
 To formalize this learning problem, we begin by adapting the bags-of-marbles examples from the [[Hierarchical Models]] section. However, we now assume that the bag that each marble is drawn from is *unobserved* and must be inferred.
 
-~~~~ {.mit-church}
+~~~~
 (define colors '(blue green red))
 
 (define samples
@@ -55,7 +55,7 @@ We see that it is likely that `obs1` and `obs2` came from the same bag, but quit
 
 Instead of assuming that a marble is equally likely to come from each bag, we could instead learn a distribution over bags where each bag has a different probability. This is called a *mixture distribution* over the bags:
 
-~~~~ {.mit-church}
+~~~~
 (define colors '(blue green red))
 
 (define samples
@@ -296,7 +296,7 @@ distributions over words.
 
 Human perception is often skewed by our expectations. A common example of this is called *categorical perception* -- when we perceive objects as being more similar to the category prototype than they really are. In phonology this is been particularly important and is called the perceptual magnet effect: Hearers regularize a speech sound into the category that they think it corresponds to. Of course this category isn't known a priori, so a hearer must be doing a simultaneous inference of what category the speech sound corresponded to, and what the sound must have been. In the below code we model this as a mixture model over the latent categories of sounds, combined with a noisy observation process.
 
-~~~~ {.mit-church}
+~~~~ {data-engine="mit-church"}
 (define (noisy= target value variance)
   (= 0 (gaussian (- target value) variance)))
 
@@ -367,7 +367,7 @@ The models above describe how a learner can simultaneously learn which category 
 
 The simplest way to address this problem, which we call *unbounded* models, is be to simply place uncertainty on the number of categories in the form of a hierarchical prior. Let's warm up with a simple example of this: inferring whether one or two coins were responsible for a set of outcomes (i.e. imagine a friend is shouting each outcome from the next room--"heads, heads, tails..."--is she using a fair coin, or two biased coins?).
 
-~~~~ {.mit-church}
+~~~~
 (define actual-obs (list true true true true false false false false))
 
 (define samples
@@ -391,11 +391,11 @@ How does the inferred number of coins change as the amount of data grows? Why?
 
 We could extend this model by allowing it to infer that there are more than two coins. However, no evidence requires us to posit three or more coins (we can always explain the data as "a heads coin and a tails coin"). Instead, let us apply the same idea to the marbles examples above:
 
-~~~~ {.mit-church}
+~~~~
 (define colors '(blue green red))
 
 (define samples
- (mh-query
+  (mh-query
    200 100
 
    (define phi (dirichlet '(1 1 1)))
@@ -406,7 +406,10 @@ We could extend this model by allowing it to infer that there are more than two 
 
    ;;unknown number of categories (created with placeholder names):
    (define num-bags (+ 1 (poisson 1.0)))
-   (define bags (repeat num-bags gensym))
+
+   (define my-gensym (make-gensym))
+
+   (define bags (repeat num-bags my-gensym))
 
    ;;each observation (which is named for convenience) comes from one of the bags:
    (define obs->bag
@@ -438,15 +441,15 @@ For the prior on `num-bags` we used the [*Poisson distribution*](http://en.wikip
 Each evaluation of `gensym` results in a unique (although cryptic) symbol:
 
 ~~~~
-(list (gensym) (gensym) (gensym))
+(define my-gensym (make-gensym))
+(list (my-gensym) (my-gensym) (my-gensym))
 ~~~~
 
 Importantly, these symbols can be used as identifiers, because two different calls to gensym will never be equal:
 
-~~~~ {.mit-church}
-(equal? (gensym) (gensym))
+~~~~
+(define my-gensym (make-gensym))
+(equal? (my-gensym) (my-gensym))
 ~~~~
 
 Unbounded models give a straightforward way to represent uncertainty over the number of categories in the world. However, inference in these models often presents difficulties. In the next section we describe another method for allowing an unknown number of things: In an unbounded model, there are a finite number of categories whose number is drawn from an unbounded prior distribution, such as the Poisson prior that we just examined. In an 'infinite model' we construct distributions assuming a truly infinite numbers of objects.
-
-
