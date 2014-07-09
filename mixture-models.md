@@ -100,13 +100,13 @@ Instead of assuming that a marble is equally likely to come from each bag, we co
 
 Models of this kind are called **mixture models** because the observations are a "mixture" of several categories. Mixture models are widely used in modern probabilistic modeling because they describe how to learn the unobservable categories which underlie observable properties in the world.
 
-The observation distribution associated with each mixture *component* (i.e., kind or category) can be any distribution we like. For example, here is a mixture model with *Gaussian* components.
+The observation distribution associated with each mixture *component* (i.e., kind or category) can be any distribution we like. For example, here is a mixture model with *Gaussian* components (note: runs in MIT-Church):
 
 <!--
 
 FIXME:doesn't burn in fast enough...-->
 
-~~~~ {.mit-church}
+~~~~ {data-engine="mit-church"}
 (define (noisy=? x y) (and (flip (expt 0.1 (abs (- (first x) (first y)))))
                            (flip (expt 0.1 (abs (- (rest x) (rest y)))))))
 (define samples
