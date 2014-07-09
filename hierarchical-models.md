@@ -158,9 +158,8 @@ Now let's investigate the relative learning speeds at different levels of abstra
                                    (draw-marbles (first bag) (length (rest bag)))))
              obs-draws))))
 
-
-;;;;;;;;;end of the model, below is code to make plots of learning speed for this model.
-
+;;; visualization code
+;;;fold:
 ;;compute the mean squared deviation of samples from truth:
 (define (mean-dev true samples)
   (mean (map (lambda (s) (expt (- true s) 2)) samples)))
@@ -196,13 +195,14 @@ Now let's investigate the relative learning speeds at different levels of abstra
 (lineplot-value (pair 9 (/ (mean-dev 0.66 (map first samples)) initial-specific))
                 "specific learning")
 (lineplot-value (pair 9 ((/ (mean-dev 0.66 (map second samples)) initial-global))
-                "general learning")
+                "general learning"))
 
 (define samples (sample-bags '((bag1 red) (bag2 red) (bag3 blue) (bag4 red) (bag5 red) (bag6 blue) (bag7 red) (bag8 red) (bag9 blue) (bag10 red) (bag11 red) (bag12 blue))))
 (lineplot-value (pair 12 (/ (mean-dev 0.66 (map first samples)) initial-specific))
                       "specific learning")
 (lineplot-value (pair 12 (/ (mean-dev 0.66 (map second samples)) initial-global))
                 "general learning")
+;;;
 
 'done
 ~~~~
