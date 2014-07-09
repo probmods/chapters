@@ -553,7 +553,7 @@ The fact that languages show consistency in head directionality could be of grea
 
 The following ChurchServ window shows a highly simplified model of X-Bar structure.
 
-~~~~ {.mit-church}
+~~~~
 (define data '((D N)))
 
 ;;the "grammar": a set of phrase categories, and an associating of the complement to each head category:
@@ -577,7 +577,8 @@ The following ChurchServ window shows a highly simplified model of X-Bar structu
     (define language-direction (beta 1 1))
 
     (define head->phrase-direction
-       (mem (lambda (head) (first (dirichlet language-direction)))))
+       (mem (lambda (head) (first (dirichlet (list language-direction
+                                                   (- 1 language-direction)))))))
 
     (define (generate-phrase head)
       (if (equal? (head->comp head) 'none)
