@@ -312,7 +312,7 @@ For instance, consider the one-dimensional Ising model:
             bits
             (all (map noisy-equal? (rest bits) (all-but-last bits)))))
 
-(apply multiviz samples)
+(table samples)
 ~~~~
 
 Here the state is a list of Boolean values (shown as 0/1 for readability). We can use an MH recipe with proposals that change a single element of this list at a time--indeed, if you look at the list of samples returned, you will notice that this is what the Church MH algorithm does.
