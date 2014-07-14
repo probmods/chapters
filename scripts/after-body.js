@@ -7,7 +7,6 @@
     var mathjax = document.createElement('script'); 
     var mjPath = "//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
     mathjax.src = (isLocal ? "http:" : "") + mjPath;
-    mathjax.async = true;
 
     document.getElementsByTagName('head')[0].appendChild(mathjax); 
 
