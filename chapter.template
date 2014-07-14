@@ -11,6 +11,7 @@
     <link rel="stylesheet" type="text/css" href="webchurch/css/d3.css">
     <script src="scripts/underscore-min.js"></script>
     <script src="scripts/jquery.js"></script>
+    <script src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script src="scripts/cookies-0.3.1.min.js"></script>
     <script src="scripts/gg.js"></script>
     <script src="scripts/nav.js"></script>

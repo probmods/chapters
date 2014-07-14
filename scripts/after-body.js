@@ -3,12 +3,12 @@
 (function() {
     var isLocal = /file/.test(location.protocol);
 
-    // load mathjax
-    var mathjax = document.createElement('script'); 
-    var mjPath = "//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
-    mathjax.src = (isLocal ? "http:" : "") + mjPath;
-
-    document.getElementsByTagName('head')[0].appendChild(mathjax); 
+    // load mathjax if we're in a local repository
+    if (isLocal) {
+        var mathjax = document.createElement('script'); 
+        mathjax.src = "http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+        document.getElementsByTagName('head')[0].appendChild(mathjax); 
+    }
 
     // load google analytics
     if (!isLocal & "probmods.org".match(location.hostname)) {
