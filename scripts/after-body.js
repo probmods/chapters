@@ -22,11 +22,9 @@
         ga('send', 'pageview');
     }
 
-})()
+})();
 
-
-
-(function() {
+$(document).ready(function() {
     $("#references ~ p > span:first-child")
         .addClass("citekey")
         .map(function(index, el) {
@@ -60,4 +58,4 @@
                 }
             }); 
         });    
-})()
+});
