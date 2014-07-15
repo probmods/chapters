@@ -46,7 +46,7 @@ private : $(private)
 	  pandoc --toc \
 		--smart \
 		--template chapter.template \
-		--read markdown+text_math_dollars \
+		--read markdown+tex_math_dollars \
 		--mathjax \
 		--write html5 \
 		--csl apa.csl \
