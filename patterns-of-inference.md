@@ -198,7 +198,7 @@ The relationships between causal structure and statistical dependence becomes pa
 
 ## Screening off
 
-*Screening off* refers to a pattern of statistical inference that is quite common in both scientific and intuitive reasoning.  If the statistical dependence between two events A and B is only indirect, mediated strictly by one or more other events C, then conditioning on (observing) C should render A and B statistically independent.  This can occur if A and B are connected by one or more causal chains, and all such chains run through the set of events C, or if C comprises one or more common causes of A and B.  
+*Screening off* refers to a pattern of statistical inference that is quite common in both scientific and intuitive reasoning.  If the statistical dependence between two events A and B is only indirect, mediated strictly by one or more other events C, then conditioning on (observing) C should render A and B statistically independent.  This can occur if A and B are connected by one or more causal chains, and all such chains run through the set of events C, or if C comprises one or more common causes of A and B.
 
 For instance, let's look again at our common cause example, this time assuming that we *already* know the value of `C`:
 
@@ -219,7 +219,7 @@ For instance, let's look again at our common cause example, this time assuming t
 
 We see that `A` an `B` are statistically *independent* given knowledge of `C`. (Note: it can be tricky to diagnose statistical *in*dependence from samples, such as returned by `mh-query`, since natural variation due to random sampling can look like differences between conditions.)
 
-Screening off is a purely statistical phenomenon.  When we observe C, the event(s) that mediate an indirect causal relation between A and B, A and B are still causally dependent in our model of the world: it is just our beliefs about the states of A and B that become uncorrelated.  There is also an analogous causal phenomenon.  If we can actually manipulate or *intervene* on the causal system, and set the value of C to some known value, then A and B become both statistically and causally independent.  
+Screening off is a purely statistical phenomenon. For example, consider the the causal chain model, where A directly causes C, which in turn directly causes B. Here, when we observe C -- the event that mediates an *indirect* causal relation between A and B -- A and B are still causally dependent in our model of the world: it is just our beliefs about the states of A and B that become uncorrelated. There is also an analogous causal phenomenon.  If we can actually manipulate or *intervene* on the causal system, and set the value of C to some known value, then A and B become both statistically and causally independent (by intervening on C, we break the causal link between A and C).
 
 ## Explaining away
 
