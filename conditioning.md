@@ -130,9 +130,7 @@ While many implementations of `query` are possible, and others are discussed lat
 ## Conditional Distributions
 
 The formal definition of *conditional probability* in probability theory is
-
 $$ P(A=a \mid B=b)=\frac{ P(A=a,B=b)}{P(B=b)} $$
-
 Here $P(A=a \mid B=b)$ is the probability that "event" $A$ has value $a$ given that $B$ has value $b$. (The meaning of events $A$ and $B$ must be given elsewhere in this notation, unlike a Church program, which contains the full model specification within the query.)
 The *joint probability*, $P(A=a,B=b)$,  is the probability that $A$ has value $a$ and $B$ has value $b$.
 So the conditional probability is simply the ratio of the joint probability to the probability of the condition.
