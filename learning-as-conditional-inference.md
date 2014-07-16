@@ -231,7 +231,7 @@ Experiment with this model: when does it conclude that a causal relation is like
 
 # Grammar-based Concept Induction
 
-An important worry about Bayesian models of learning is that the Hypothesis space must either be too simple, as in the models above, specified in a rather ad-hoc way, or both. There is a tension here: human representations of the world are enormously complex and so the space of possible representations must be correspondingly big, and yet we would like to understand the representational resources in simple and uniform terms. How can we construct very large (possibly infinite) hypothesis spaces, and priors over them, with limited tools? One possibility is to use a grammar to specify a *hypothesis language*: a small grammar can generate an infinite array of potential hypotheses. because grammars are themselves generative processes, a prior is provided as well.
+An important worry about Bayesian models of learning is that the Hypothesis space must either be too simple, as in the models above, specified in a rather ad-hoc way, or both. There is a tension here: human representations of the world are enormously complex and so the space of possible representations must be correspondingly big, and yet we would like to understand the representational resources in simple and uniform terms. How can we construct very large (possibly infinite) hypothesis spaces, and priors over them, with limited tools? One possibility is to use a grammar to specify a *hypothesis language*: a small grammar can generate an infinite array of potential hypotheses. Because grammars are themselves generative processes, a prior is provided as well.
 
 ## Example: Inferring an Arithmetic Expression
 
