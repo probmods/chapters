@@ -108,9 +108,8 @@ The following program computes conditional inferences about the weight of a coin
    
    (equal? observed-data (repeat num-flips coin))))
 
-(multiviz 
- (hist prior-samples "Coin weight, prior to observing data")
- (hist samples "Coin weight, conditioned on observed data"))
+(hist prior-samples "Coin weight, prior to observing data")
+(hist samples "Coin weight, conditioned on observed data")
 ~~~~
 
 Because the output of inference is a set of conditional samples, and each sample is drawn from the uncountable interval $[0,1]$, we cannot expect that any of these samples will correspond exactly to the true coin weight or the single most likely value.  
@@ -174,9 +173,8 @@ What if we would like to learn about the weight of a coin, or any parameters of 
    
    (equal? observed-data (repeat num-flips coin))))
 
-(multiviz
- (hist prior-samples "Coin weight, prior to observing data")
- (hist samples "Coin weight, conditioned on observed data"))
+(hist prior-samples "Coin weight, prior to observing data")
+(hist samples "Coin weight, conditioned on observed data")
 ~~~~
 
 Is the family of Beta distributions sufficient to represent all of people's intuitive prior knowledge about the weights of typical coins?  It would be mathematically appealing if so, but unfortunately people's intuitions are too rich to be summed up with a single Beta distribution.  To see why, imagine that you flip this quarter fresh from the bank and flip it 25 times, getting heads every single time!  Using a Beta prior with pseudo-counts of 100, 100 or 1000, 1000 seems reasonable to explain why seeing 7 out of 10 heads does not move our conditional estimate of the weight very much at all from its prior value of 0.5, but this doesn't fit at all what we think if we see 25 heads in a row.  Try running the program above with a coin weight drawn from $Beta(100,100)$ and an observed data set of 25 heads and no tails.  The most likely coin weight in the conditional inference now shifts slightly towards a heads-bias, but it is far from what you would actually think given these (rather surprising!) data.  No matter how strong your initial belief that the bank roll was filled with fair coins, you'd think: "25 heads in a row without a single tail?  Not a chance this is a fair coin.  Something fishy is going on... This coin is almost surely going to come up heads forever!"  As unlikely as it is that someone at the bank has accidentally or deliberately put a trick coin in your fresh roll of quarters, that is not nearly as unlikely as flipping a fair coin 25 times and getting no tails.
@@ -256,7 +254,7 @@ Consider the following Church program, which induces an arithmetic function from
  
  (= (my-proc 1) 3)))
 
-(apply multiviz (repeat 20 sample))
+(apply display (repeat 20 sample))
 ~~~~
 
 The query asks for an arithmetic expression on variable `x` such that it evaluates to `3` when `x` is `1`. In this example there are many extensionally equivalent ways to satisfy the condition, for instance the expressions `3`, `(+ 1 2)`, and `(+ x 2)`, but because the more complex expressions require more choices to generate, they are chosen less often. What happens if we observe more data? For instance, try changing the condition in the above query to `(and (= (my-proc 1) 3) (= (my-proc 2) 4))`. Using `eval` can be rather slow, so here's another formulation that directly builds the arithmetic function by random combination of subfunctions:
@@ -318,7 +316,7 @@ This query has a very "strict" condition: the function must give 3 when applied 
   (and (noisy= (my-proc 1) 3)
        (noisy= (my-proc 3) 5) )  ))
 
-(apply multiviz samples)
+(apply display samples)
 ~~~~
 
 Try adding in more data consistent with the (+ x 2) rule, e.g., ` (noisy= (my-proc 4) 6) `, ` (noisy= (my-proc 9) 11) `. How do the results of querying on the arithmetic expression change as more consistent data points are observed, and why?  

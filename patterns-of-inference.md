@@ -39,10 +39,9 @@ For example, consider a simpler variant of our medical diagnosis scenario:
    
    cough))
 
-(multiviz 
- (hist (map first samples) "cold")
- (hist (map second samples) "lung-disease")
- (hist samples "cold, lung-disease"))
+(hist (map first samples) "cold")
+(hist (map second samples) "lung-disease")
+(hist samples "cold, lung-disease")
 ~~~~
 
 Here, `cough` depends causally on both `lung-disease` and `cold`, while `fever` depends causally on `cold` but not `lung-disease`.  We can see that `cough` depends causally on `smokes` but only indirectly: although `cough` does not call `smokes` directly, in order to evaluate whether a patient coughs, we first have to evaluate the expression `lung-disease` that must itself evaluate `smokes`. 
@@ -86,9 +85,8 @@ For example, this code represents whether a patient is likely to have a cold or 
 
 (define samples (repeat 200 sample))
 
-(multiviz   
- (hist (map first samples) "cough")
- (hist (map second samples) "cold"))
+(hist (map first samples) "cough")
+(hist (map second samples) "cold")
 ~~~~
 
 Imagine we now *give* our hypothetical patient a  cold---for example, by exposing him to a strong cocktail of cold viruses. 
@@ -110,10 +108,9 @@ Instead we implement intervention by directly editing the program: first do `(de
   (list cough cold))
 
 (define samples (repeat 200 sample))
-
-(multiviz   
- (hist (map first samples) "cough")
- (hist (map second samples) "cold"))
+  
+(hist (map first samples) "cough")
+(hist (map second samples) "cold")
 ~~~~
 
 You should see that the distribution on `cough` changes: coughing becomes more likely if we know that a patient has been given a cold by external intervention.  But the reverse is not true.  Try forcing the patient to have a  cough (e.g., with some unusual drug or by exposure to some cough-inducing dust) by writing `(define cough true)`: the distribution on `cold` is unaffected.
@@ -142,9 +139,8 @@ Diagnosing statistical dependence using query is similar to diagnosing causal de
    A
    (eq? B B-val)))
 
-(multiviz
- (hist (samples true) "A if B is true.")
- (hist (samples false) "A if B is false."))
+(hist (samples true) "A if B is true.")
+(hist (samples false) "A if B is false.")
 ~~~~
 
 Because the two distributions on `A` (when we have different information about `B`) are different, we can conclude that `A` statistically depends on `B`. Do the same procedure for testing if `B` statistically depends on `A`. How is this similar (and different) from the causal dependence between these two?
@@ -162,9 +158,8 @@ Correlation is not just a symmetrized version of causality.  Two events may be s
    A
    (eq? B B-val)))
 
-(multiviz
- (hist (samples true) "A if B is true.")
- (hist (samples false) "A if B is false."))
+(hist (samples true) "A if B is true.")
+(hist (samples false) "A if B is false.")
 ~~~~
 
 Situations like this are extremely common. In the medical example above, `cough` and `fever` are not causally dependent but they are statistically dependent, because they both depend on `cold`; likewise for `chest-pain` and `shortness-of-breath` which both depend on `lung-disease`.  Here we can read off these facts from the program definitions, but more generally all of these relations can be diagnosed by reasoning using `query`.  
@@ -212,9 +207,8 @@ For instance, let's look again at our common cause example, this time assuming t
    A
    (and C (eq? B B-val))))
 
-(multiviz
- (hist (samples true) "A if B is true.")
- (hist (samples false) "A if B is false."))
+(hist (samples true) "A if B is true.")
+(hist (samples false) "A if B is false.")
 ~~~~
 
 We see that `A` an `B` are statistically *independent* given knowledge of `C`. (Note: it can be tricky to diagnose statistical *in*dependence from samples, such as returned by `mh-query`, since natural variation due to random sampling can look like differences between conditions.)
@@ -235,9 +229,8 @@ Screening off is a purely statistical phenomenon.  When we observe C, the event(
     A
    (and C (eq? B B-val))))
 
-(multiviz
- (hist (samples true) "A if B is true.")
- (hist (samples false) "A if B is false."))
+(hist (samples true) "A if B is true.")
+(hist (samples false) "A if B is false.")
 ~~~~
 
 As with screening off, we only induce statistical dependence from learning about `C`, not causal dependence: when we observe `C`, `A` and `B` remain causally independent in our model of the world; it is our beliefs about A and B that become correlated.
@@ -281,9 +274,8 @@ Suppose we condition on observing the sum of two integers drawn uniformly from 0
 
 (define samples (repeat 500 take-sample))
 
-(multiviz
- (scatter samples "A and B, conditioned on A + B = 9")
- (hist samples "A, B"))
+(scatter samples "A and B, conditioned on A + B = 9")
+(hist samples "A, B")
 ~~~~
 
 This gives perfect anti-correlation in conditional inferences for `A` and `B`.  But suppose we instead condition on observing that `A` and `B` are equal:
@@ -300,9 +292,8 @@ This gives perfect anti-correlation in conditional inferences for `A` and `B`.  
 
 (define samples (repeat 500 take-sample))
 
-(multiviz
- (scatter samples "A and B, conditioned on A = B")
- (hist samples "A, B"))
+(scatter samples "A and B, conditioned on A = B")
+(hist samples "A, B")
 ~~~~
 
 Now, of course, A and B go from being independent a priori to being perfectly correlated in the conditional distribution.  Try out these other conditioners to see other possible patterns of conditional dependence for a priori independent functions:
@@ -400,10 +391,9 @@ To illustrate, observe how the probabilities of `cold` and `lung-disease` change
 
    cough))
    
-(multiviz
-  (hist (map first samples) "cold")
-  (hist (map second samples) "lung-disease")
-  (hist samples "cold, lung-disease"))
+(hist (map first samples) "cold")
+(hist (map second samples) "lung-disease")
+(hist samples "cold, lung-disease")
 ~~~~
 
 Both cold and lung disease are now far more likely that their baseline probability: the probability of having a cold increases from 2% to around 50%; the probability of having lung disease also increases from 1 in a 1000 to around 50%.
@@ -427,10 +417,9 @@ Now suppose we learn that the patient does *not* have a cold.
 
    (and cough (not cold))))
    
-(multiviz
-  (hist (map first samples) "cold")
-  (hist (map second samples) "lung-disease")
-  (hist samples "cold, lung-disease"))
+(hist (map first samples) "cold")
+(hist (map second samples) "lung-disease")
+(hist samples "cold, lung-disease")
 ~~~~
 
 The probability of having lung disease increases dramatically.  If instead we had observed that the patient does have a cold, the probability of lung cancer returns to its very low base rate of 1 in a 1000.
@@ -452,10 +441,9 @@ The probability of having lung disease increases dramatically.  If instead we ha
 
    (and cough cold)))
    
-(multiviz
-  (hist (map first samples) "cold")
-  (hist (map second samples) "lung-disease")
-  (hist samples "cold, lung-disease"))
+(hist (map first samples) "cold")
+(hist (map second samples) "lung-disease")
+(hist samples "cold, lung-disease")
 ~~~~
 
 This is the conditional statistical dependence between lung disease and cold, given cough: Learning that the patient does in fact have a cold "explains away" the observed cough, so the alternative of lung disease decreases to a much lower value --- roughly back to its 1 in a 1000 rate in the general population.
@@ -502,10 +490,9 @@ A familiar example comes from reasoning about the causes of students' success an
 
    (not pass?)))
 
-(multiviz
-  (hist samples "Joint: Student Does Homework?, Exam Fair?")
-  (hist (map first samples) "Student Does Homework")
-  (hist (map second samples) "Exam Fair"))
+(hist samples "Joint: Student Does Homework?, Exam Fair?")
+(hist (map first samples) "Student Does Homework")
+(hist (map second samples) "Exam Fair")
 ~~~~
 
 Now what if you have evidence from several students and several exams? We first re-write the above model to allow many students and exams:
@@ -527,10 +514,9 @@ Now what if you have evidence from several students and several exams? We first 
 
    (not (pass? 'bill 'exam1))))
 
-(multiviz
-  (hist samples "Joint: Student Does Homework?, Exam Fair?")
-  (hist (map first samples) "Student Does Homework")
-  (hist (map second samples) "Exam Fair"))
+(hist samples "Joint: Student Does Homework?, Exam Fair?")
+(hist (map first samples) "Student Does Homework")
+(hist (map second samples) "Exam Fair")
 ~~~~
 
 Initially we observe that Bill failed exam 1.  A priori, we assume that most students do their homework and most exams are fair, but given this one observation it becomes somewhat likely that either the student didn't study or the exam was unfair.
@@ -637,8 +623,8 @@ The presence of the cylinder is providing evidence that the illumination of squa
 
     (= luminance (gaussian observed-luminance 0.1))))
 
-(multiviz "Mean reflectance: " (mean samples)
-          (hist samples "Reflectance"))
+(display (list "Mean reflectance:" (mean samples)))
+(hist samples "Reflectance")
 ~~~~
 
 Now let's condition on the presence of the cylinder, by conditioning on the presence of it's "shadow" (i.e. lower illumination than expected *a priori*):
@@ -659,35 +645,9 @@ Now let's condition on the presence of the cylinder, by conditioning on the pres
     (condition (= luminance (gaussian observed-luminance 0.1)))
     (condition (= illumination (gaussian 0.5  0.1)))))
 
-(multiviz "Mean reflectance: " (mean samples)
-          (hist samples "Reflectance"))
+(display (list "Mean reflectance:" (mean samples)))
+(hist samples "Reflectance")
 ~~~~
-<!-- FIXME: need webchurch to recognize `and` and commute with condition... otherwise have to write these two conditions explicitly. -->
-
-<!-- This code will run (and do what the previous code was supposed to):
-
-~~~~
-(define observed-luminance 3.0)
-
-(define samples
-   (mh-query
-    1000 10
-
-    (define shadow (flip))
-    (define reflectance (gaussian 1 1))
-    (define illumination
-      (if shadow (gaussian 0.5 0.1) (gaussian 3 0.5)))
-    (define luminance (* reflectance illumination))
-
-    reflectance
-
-    (and (= luminance (gaussian observed-luminance 0.1))
-         shadow)))
-
-(multiviz "Mean reflectance: " (mean samples)
-          (hist samples "Reflectance"))
-~~~~
- -->
 
 The variables `reflectance` and `illumination` are conditionally independent in the generative model, but after we condition on `luminance` they become dependent: changing one of them affects the probability of the other. This phenomenon has important consequences for cognitive science.  Although the model of (our knowledge of) the world has a certain kind of modularity implied by conditional independence, as soon as we start using the model to do conditional inference on some data, formerly modularly isolated variables can become dependent.
 

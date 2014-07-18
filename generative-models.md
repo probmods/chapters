@@ -133,10 +133,9 @@ The higher-order function `make-coin` takes in a weight and outputs a function (
 (define trick-coin (make-coin 0.95))
 (define bent-coin (make-coin 0.25))
 
-(multiviz
- (hist (repeat 20 fair-coin) "20 fair coin flips")
- (hist (repeat 20 trick-coin) "20 trick coin flips")
- (hist (repeat 20 bent-coin) "20 bent coin flips") )
+(hist (repeat 20 fair-coin) "20 fair coin flips")
+(hist (repeat 20 trick-coin) "20 trick coin flips")
+(hist (repeat 20 bent-coin) "20 bent coin flips")
 ~~~~
 
  We can also define a higher-order function that takes a "coin" and "bends it":
@@ -562,11 +561,9 @@ Were you often right? Were there some cases of 'surprisingly stable' towers?  @H
   (define finalWorld (runPhysics 1000 initialWorld))
   (doesTowerFall initialWorld finalWorld))
 
-(multiviz
- (hist (repeat 10 runStableTower) "stable")
- (hist (repeat 10 runAlmostUnstableTower) "almost unstable")
- (hist (repeat 10 runUnstableTower) "unstable")
-)
+(hist (repeat 10 runStableTower) "stable")
+(hist (repeat 10 runAlmostUnstableTower) "almost unstable")
+(hist (repeat 10 runUnstableTower) "unstable")
 
 ;uncomment any of these that you'd like to see for yourself
 ;(animatePhysics 1000 stableWorld)
@@ -753,14 +750,13 @@ Directly compute the probability of the bent coin in the example. Check your ans
       (define finalWorld (runPhysics 1000 initialWorld))
       (define measureValue (measureFunction initialWorld finalWorld))
 
-      (multiviz
-       (list "Stability measure: "
+      (display (list "Stability measure: "
                                     (decimals measureValue 2) "//"
                                     "Initial height: "
                                     (decimals (getTowerHeight initialWorld) 2) "//"
                                     "Final height: "
-                                    (decimals (getTowerHeight finalWorld) 2))
-       (animatePhysics 1000 initialWorld)))
+                                    (decimals (getTowerHeight finalWorld) 2)))
+      (animatePhysics 1000 initialWorld))
 
     ;; visualize doesTowerFall measure
     ;;(visualizeStabilityMeasure doesTowerFall)

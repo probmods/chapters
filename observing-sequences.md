@@ -19,9 +19,8 @@ If the observations have *nothing* to do with each other, except that they have 
 
 (define sequences (repeat 1000 sequence))
 
-(multiviz 
- (hist (map first sequences) "first flip")
- (hist (map second sequences) "second flip"))
+(hist (map first sequences) "first flip")
+(hist (map second sequences) "second flip")
 ~~~~
 
 Now let's check that the first and second flips are independent, by conditioning on the first and seeing that the distribution of the second is (approximately) unchanged:
@@ -34,9 +33,8 @@ Now let's check that the first and second flips are independent, by conditioning
    (second s)
    (equal? (first s) first-val)))
 
-(multiviz 
- (hist (sequences true)  "second if first is true")
- (hist (sequences false) "second if first is false"))
+(hist (sequences true)  "second if first is true")
+(hist (sequences false) "second if first is false")
 ~~~~
 
 It is easy to build other i.i.d. sequences in Church, we simply construct a stochastic thunk (which, recall, represents a distribution) and evaluate it several times. For instance, here is an extremely simple model for the words in a sentence:
@@ -73,10 +71,9 @@ While the sequence looks very similar, the words are not independent: learning a
    (define s (repeat 10 myflip))
    (second s)
    (equal? (first s) first-val)))
-
-(multiviz 
- (hist (sequences true)  "second if first is true")
- (hist (sequences false) "second if first is false"))
+ 
+(hist (sequences true)  "second if first is true")
+(hist (sequences false) "second if first is false")
 ~~~~
 
 Conditioning on the first value tells us something about the second. This model is thus not i.i.d., but it does have a slightly weaker property: it is [exchangeable](http://en.wikipedia.org/wiki/Exchangeable_random_variables), meaning that the probability of a sequence is the same in any order.
@@ -181,9 +178,8 @@ The preferred sequences included 00101, 00110, 01100, and 01101.
    (condition (equal? sequence (repeat 5 coin)))))
 
 
-(multiviz
- (hist (samples (list false false true false true)) "00101 is fair?")
- (hist (samples (list false false false false false)) "00000 is fair?"))
+(hist (samples (list false false true false true)) "00101 is fair?")
+(hist (samples (list false false false false false)) "00000 is fair?")
 ~~~~
 
 This model posits that when considering randomness, as well as when imagining random sequences, people are more concerned with distinguishing a "truly random" generative process from a trick process. This version of the model doesn't think 01010 looks any less random than 01100 (try it), because even its "trick process" is i.i.d. and hence does not distinguish order.
@@ -212,9 +208,8 @@ We could extend the model to consider a Markov model as the alternative (trick) 
    (condition (equal? sequence (markov (flip) 5)))))
 
 
-(multiviz
- (hist (samples (list false true false true false)) "01010 is fair?")
- (hist (samples (list true false false true false)) "01100 is fair?"))
+(hist (samples (list false true false true false)) "01010 is fair?")
+(hist (samples (list true false false true false)) "01100 is fair?")
 ~~~~
 
 This version thinks that alternating sequences are non-random, but there are other non-uniform generative processes (such as all-true) that it doesn't detect. How could we extend this model to detect more non-random sequences?

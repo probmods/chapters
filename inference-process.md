@@ -92,11 +92,10 @@ Here is a Markov chain:
       state
       (chain (transition state) (- n 1))))
 
-(multiviz
- (hist (repeat 2000 (lambda () (chain 'a 10))) "10 steps, starting at a.")
- (hist (repeat 2000 (lambda () (chain 'c 10))) "10 steps, starting at c.")
- (hist (repeat 2000 (lambda () (chain 'a 30))) "30 steps, starting at a.")
- (hist (repeat 2000 (lambda () (chain 'c 30))) "30 steps, starting at c."))
+(hist (repeat 2000 (lambda () (chain 'a 10))) "10 steps, starting at a.")
+(hist (repeat 2000 (lambda () (chain 'c 10))) "10 steps, starting at c.")
+(hist (repeat 2000 (lambda () (chain 'a 30))) "30 steps, starting at a.")
+(hist (repeat 2000 (lambda () (chain 'c 30))) "30 steps, starting at c.")
 ~~~~
 
 Notice that the distribution of states after only a few steps is highly influenced by the starting state. In the long run the distribution looks the same from any starting state: this long-run distribution is the called the *stable distribution* (also known as *stationary distribution*). For the chain above, the stable distribution is uniform---we have another (fairly baroque!) way to sample from the uniform distribution on `'(a b c d)`!
@@ -112,11 +111,10 @@ Of course we could have sampled from the uniform distribution using other Markov
       state
       (chain (transition state) (- n 1))))
 
-(multiviz 
- (hist (repeat 2000 (lambda () (chain 'a 2))) "a 2")
- (hist (repeat 2000 (lambda () (chain 'c 2))) "c 2")
- (hist (repeat 2000 (lambda () (chain 'a 10))) "a 10")
- (hist (repeat 2000 (lambda () (chain 'c 10))) "c 10"))
+(hist (repeat 2000 (lambda () (chain 'a 2))) "a 2")
+(hist (repeat 2000 (lambda () (chain 'c 2))) "c 2")
+(hist (repeat 2000 (lambda () (chain 'a 10))) "a 10")
+(hist (repeat 2000 (lambda () (chain 'c 10))) "c 10")
 ~~~~
 
 Notice that this chain converges much more quickly to the uniform distribution---after only one step.
@@ -312,7 +310,7 @@ For instance, consider the one-dimensional Ising model:
             bits
             (all (map noisy-equal? (rest bits) (all-but-last bits)))))
 
-(apply multiviz samples)
+(apply display samples)
 ~~~~
 
 Here the state is a list of Boolean values (shown as 0/1 for readability). We can use an MH recipe with proposals that change a single element of this list at a time--indeed, if you look at the list of samples returned, you will notice that this is what the Church MH algorithm does.

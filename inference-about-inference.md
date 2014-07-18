@@ -339,9 +339,8 @@ In the above models of goal and preference inference, we have assumed that the s
         (equal? (choose-action goal? vending-machine 'state) 'b) )))
 
 (define samples (repeat 500 sample))
-(multiviz
- "mean: " (mean samples)
- (hist samples "Probability that b gives cookie"))
+(display (list "mean:" (mean samples)))
+(hist samples "Probability that b gives cookie")
 ~~~~
 
 Here we have conditioned on Sally wanting the cookie and Sally choosing to press button b. Thus, we have no *direct* evidence of the effects of pressing the buttons on the machine. What happens if you condition instead on the action and outcome, but not the intentional choice of this outcome (that is, change the condition to `(equal? (vending-machine 'state 'b) 'cookie)`)?
@@ -376,9 +375,8 @@ Now imagine a vending machine that has only one button, but it can be pressed ma
    ))
 
 (define samples (repeat 500 sample))
-(multiviz
- (hist (map first samples) "Probability that (a a) gives cookie")
- (hist (map second samples) "Probability that (a) gives cookie"))
+(hist (map first samples) "Probability that (a a) gives cookie")
+(hist (map second samples) "Probability that (a) gives cookie")
 ~~~~
 
 Compare the inferences that result if Sally presses the button twice to those if she only presses the button once. Why can we draw much stronger inferences about the machine when Sally chooses to press the button twice? When Sally does press the button twice, she could have done the "easier" (or rather, a priori more likely) action of pressing the button just once. Since she doesn't, a single press must have been unlikely to result in a cookie. This is an example of the *principle of efficiency*---all other things being equal, an agent will take the actions that require least effort (and hence, when an agent expends more effort all other things must not be equal). 
@@ -420,10 +418,9 @@ In social cognition, we often make joint inferences about two kinds of mental st
    ))
 
 (define samples (repeat 500 sample))
-(multiviz
- (hist (map first samples) "Probability that (a a) gives cookie")
- (hist (map second samples) "Probability that (a) gives cookie")
- (hist (map third samples) "Goal probabilities"))
+(hist (map first samples) "Probability that (a a) gives cookie")
+(hist (map second samples) "Probability that (a) gives cookie")
+(hist (map third samples) "Goal probabilities")
 ~~~~
 
 Notice the U-shaped distribution for the effect of pressing the button just once. Without any direct evidence about what happens when the button is pressed just once, we can infer that it probably won't give a cookie---because her goal is likely to have been a cookie but she didn't press the button just once---but there is a small chance that her goal was actually not to get a cookie, in which case pressing the button once could result in a cookie. This very complex (and hard to describe!) inference comes naturally from joint inference of goals and knowledge.
@@ -649,9 +646,8 @@ Single step, utility-based decision problem.
 
 (define utility-function '(1 2 3 4 5))
 (define b 1)
-(multiviz
 (hist (repeat 1000 (lambda () (match utility-function))) "matching")
-(hist (repeat 1000 (lambda () (softmax utility-function 1))) "softmax"))
+(hist (repeat 1000 (lambda () (softmax utility-function 1))) "softmax")
 ~~~~
 
 Multi-step, suboptimal planning as inference
