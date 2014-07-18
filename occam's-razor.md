@@ -112,7 +112,7 @@ The size principle is related to an influential proposal in linguistics known as
 
 To illustrate the power of the size principle in inferring the most parsimonious explanation of data, consider learning a rectangle "concept" <ref>Tenenbaum, 2000</ref>. The data are a set of point in the plane, that we assume to be randomly sampled from within some unknown rectangle.  Given the examples, what is the rectangle they came from?  We can model this learning as conditional of the rectangle given the points. We plot the sampled rectangles as well as the posterior mean:
 
-~~~~ {.mit-church}
+~~~~ {data-engine="mit-church"}
 ;;observed points:
 (define obs-data '((0.4 0.7) (0.5 0.4) (0.46 0.63) (0.43 0.51)))
 
@@ -189,7 +189,7 @@ Explore how the concept learned varies as a function of the number and distribut
 
 Compare this to the results of a slightly different causal process for the same observations, known as *weak sampling*:
 
-~~~~ {.mit-church}
+~~~~ {data-engine="mit-church"}
 ;;observed points (now points and in/out labels):
 (define obs-data '((0.4 0.7 #t) (0.5 0.4 #t) (0.46 0.63 #t) (0.43 0.51 #t)))
 
@@ -270,7 +270,7 @@ Importantly, the Size Principle tells us that the prior distribution on hypothes
 
 In our example above we have illustrated Bayes Occam's razor with examples based strictly on the "size" of the hypotheses involved, however, the principle is more general. Bayes'  Occam razor says that all else being equal the hypothesis that assigns the highest likelihood to the data will dominate the posterior. Because of the law of conservation of belief, assigning higher likelihood to the observed data requires assigning lower likelihood to other possible data. Consider the following example
 
-~~~~ {.mit-church}
+~~~~ {data-engine="mit-church"}
 (define observed-letters '(a b a b c d b b))
 
 (define samples
@@ -299,7 +299,7 @@ In this example, unlike the size principle cases above, both hypotheses lead to 
 
 Similar effects emerge if hypothesis B is not uniform, but favors different examples that hypothesis A:
 
-~~~~ {.mit-church}
+~~~~ {data-engine="mit-church"}
 (define observed-letters '(a b a c d))
 
 (define samples
@@ -344,7 +344,7 @@ the model is to produce data that look more or less like our observations.  To s
 In the previous section we considered learning about the weight of a coin, and noted that a simple prior on weights seemed unable to capture our more discrete intuition that we first decide if the coin if fair or not, and only then worry about its weight.
 This example shows how our inferences about coin flipping can be explained in terms of model selection guided by the Bayesian Occam's razor.  Imagine a coin that you take out of a freshly unwrapped roll of quarters straight from the bank.  Almost surely this coin is fair... But how does that sense change when you see more or less anomalous sequences of flips? We can simultaneously ask if the coin is fair, and what is its weight.
 
-~~~~ {.mit-church}
+~~~~ {data-engine="mit-church"}
 (define observed-data '(h h t h t h h h t h))
 (define num-flips (length observed-data))
 (define num-samples 1000)
@@ -392,7 +392,7 @@ Try these cases and see if the inferences accord with your intuitions:
 
 Now let's look at the learning trajectories for this model:
 
-~~~~ {.mit-church}
+~~~~ {data-engine="mit-church"}
 (define make-coin (lambda (weight) (lambda () (if (flip weight) 'h 't))))
 
 (define fair-prior 0.999)
@@ -464,7 +464,7 @@ The two models now have the same number of free parameters (the unfair coin weig
 This example shows how the Bayesian Occam's Razor can be used to select the right order of a polynomial fit.
 This Church program samples polynomials up to order 3 that are (noisily) consistent with the observed data, then graphs the mean polynomial of each order.
 
-~~~~ {.mit-church}
+~~~~ {data-engine="mit-church"}
 ;;first a helper function that makes a polynomial function, given the coefficients:
 (define (make-poly c)
   (lambda (x) (apply + (map (lambda (a b) (* a (expt x b))) c (iota (length c))))))
@@ -577,7 +577,7 @@ And one day you see this 1x2 red patch... is it one 1x2 block or two 1x1 blocks?
 
 We can model this inference by building a generative model of scenes. To do so we use simple models of geometry and of rendering geometric objects to an image (in this case by layering them):
 
-~~~~ {.mit-church}
+~~~~ {data-engine="mit-church"}
 ;;take an object and "render" it into an image (represented as a list of lists):
 (define (object-appearance object)
   (map (lambda (pixel-y)
@@ -635,7 +635,7 @@ There is a slight preference for one object over two.
 
 Now let's see what happens if we see the two "halves" moving together. We use a simple random drift model of motion: an object randomly moves right or left or stays in place. Critically, the motion of each object is independent of other objects.
 
-~~~~ {.mit-church}
+~~~~ {data-engine="mit-church"}
 ;;take an object and "render" it into an image (represented as a list of lists):
 (define (object-appearance object)
   (map (lambda (pixel-y)

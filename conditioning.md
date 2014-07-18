@@ -130,9 +130,7 @@ While many implementations of `query` are possible, and others are discussed lat
 ## Conditional Distributions
 
 The formal definition of *conditional probability* in probability theory is
-
 $$ P(A=a \mid B=b)=\frac{ P(A=a,B=b)}{P(B=b)} $$
-
 Here $P(A=a \mid B=b)$ is the probability that "event" $A$ has value $a$ given that $B$ has value $b$. (The meaning of events $A$ and $B$ must be given elsewhere in this notation, unlike a Church program, which contains the full model specification within the query.)
 The *joint probability*, $P(A=a,B=b)$,  is the probability that $A$ has value $a$ and $B$ has value $b$.
 So the conditional probability is simply the ratio of the joint probability to the probability of the condition.
@@ -595,9 +593,9 @@ disease by changing the prior probability of the disease such that it is always 
     A) In English, what does the posterior probability $p(h \mid \textrm{win})$ represent?
     B) Manually compute $p(h \mid \textrm{win})$ for each hypothesis (Excel or something like it is helpful here). Remember to normalize - make sure that summing all your $p(h \mid \textrm{win})$ values gives you 1.
 
-    Now, we're going to write this model in Church using the `cosh` engine. Here is some starter code for you:
+    Now, we're going to write this model in Church using `enumeration-query`. Here is some starter code for you:
 
-    ~~~~ {data-engine="cosh" data-exercise="ex5"}
+    ~~~~ {data-exercise="ex5"}
     ;; define some variables and utility functions
     (define letters '(a b c d e f g h i j k l m n o p q r s t u v w x y z) )
     (define (vowel? letter) (if (member letter '(a e i o u y)) #t #f))
@@ -606,26 +604,29 @@ disease by changing the prior probability of the disease such that it is always 
     (define (my-list-index needle haystack counter)
       (if (null? haystack)
           'error
-          (if (equal? needle (first haystack))
-              counter
-              (my-list-index needle (rest haystack) (+ 1 counter)))))
+        (if (equal? needle (first haystack))
+            counter
+          (my-list-index needle (rest haystack) (+ 1 counter)))))
     
     (define (get-position letter) (my-list-index letter letters 1))
     
     ;; actually compute p(h | win)
-    (rejection-query
-     (define my-letter (multinomial letters letter-probabilities))
+    (define distribution
+      (enumeration-query
+       (define my-letter (multinomial letters letter-probabilities))
+       
+       (define my-position (get-position my-letter))
+       (define my-win-probability (/ 1.0 (* my-position my-position)))
+       (define win? ...)
+       
+       ;; query
+       ...
+       
+       ;; condition
+       ...
+       ))
     
-     (define my-position (get-position my-letter))
-     (define my-win-probability (/ 1.0 (* my-position my-position)))
-     (define win? ...)
-    
-     ;; query
-     ...
-    
-     ;; condition
-     ...
-    )
+    (barplot distribution)
     ~~~~
 
     Note that you don't need to explicitly use `hist` or `repeat` here. In cosh, function calls directly correspond to *distributions* and histograms are built for you automatically (whereas in webchurch, function calls correspond only to *samples* and you have to build the data for histograms manually.)

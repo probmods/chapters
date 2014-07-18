@@ -33,7 +33,3 @@ The construction and ongoing support of this tutorial are made possible by grant
 ## Technical notes
 
 Code examples are based on the [WebChurch](https://github.com/probmods/webchurch) system. Examples are best viewed in recent versions of Chrome, Firefox, or Safari on a laptop or desktop computer. Error messages will be most useful when viewed with Chrome.
-
-This book contains many technical exercises that run directly in your web browser. At the end of some chapters, we present some extended exercises as homework problems. To save your progress on homework problems, you can register an account; this also helps us improve the book by tracking what kinds of programs users run and what kinds of errors they encounter. <a href="/login">Login</a> or <a href="/register">register an account</a>
-
-

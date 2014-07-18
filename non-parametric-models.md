@@ -8,17 +8,19 @@ In the section on [[Mixture models]] we saw a simple way to construct a model wi
 
 In Church the discrete distribution is a primitive---you can simply call `(discrete '(0.2 0.3 0.1 0.4))`. If it wasn't built-in, if the only random primitive you could use was `flip`, how could you sample from discrete? One solution is to recursively walk down the list of probabilities, deciding whether to stop on each step. For instance, in `(discrete '(0.2 0.3 0.1 0.4))` there is a 0.2 probability we will stop on 1, after that there is a 0.3/0.8 probability we will stop on 2,... We can start by turning the list of probabilities into a list of *residual* probabilities---the probability we will stop on each step, given we haven't stopped yet:
 
-~~~~ {.jschurch}
+~~~~
 (define (residuals probs)
   (if (null? probs)
       '()
       (pair (/ (first probs) (sum probs))
             (residuals (rest probs)))))
+
+(residuals '(0.2 0.3 0.1 0.4))
 ~~~~
 
 Now to sample from the discrete distribution we simply walk down this list, deciding when to stop:
 
-~~~~ {.bher}
+~~~~
 (define (residuals probs)
   (if (null? probs)
       '()
@@ -43,18 +45,14 @@ This would solve the problem of "running out of categories," because there would
 Just as the Dirchlet distribution defines a prior on parameters for a multinomial with $K$ possible outcomes, the *Dirichlet process* defines a prior on parameters for a multinomial with $K = \infty$&mdash;an infinite number of possible outcomes.
 
 First, we imagine drawing an infinite sequence of samples from a beta distribution with parameters $1,\ \alpha$ (recall that a beta distribution defines  a distribution on the interval $[0,1]$). We write this infinite set of draws as $\left\{\beta'_k\right\}_{k=1}^{\infty}$.
-
 $$\beta'_k \sim \mathrm{Beta}\left(1,\alpha\right)$$
-
 Ultimately we would like to define a distribution on an infinite set of discrete outcomes that will represent our categories or mixture components, but we start by defining a distribution on the natural numbers. The probability of the natural number $k$ is given by:
-
 $$\beta_k = \prod_{i=1}^{k-1}\left(1-\beta'_i\right)\cdot\beta'_k$$
-
 How can this be interpreted as a generative process? Imagine "walking" down the natural numbers in order, flipping a coin with weight $\beta'_i$  for each one; if the coin comes up `false`, we continue to the next natural number; if the coin comes up `true`,  we stop and return the current natural number. Convince yourself that the probability of getting natural number $k$ is given by $\beta_k$ above.
 
 To formalize this as a Church program, we define a procedure, `pick-a-stick`, that walks down the list of $\beta'_k$s (called *sticks* in the statistics and machine learning literatures) and flips a coin at each one: if the coin comes up `true`, it returns the index associated with that stick, if the coin comes up `false` the procedure recurses to the next natural number.
 
-<pre>
+~~~~
 (define (pick-a-stick sticks J)
   (if (flip (sticks J))
       J
@@ -62,7 +60,7 @@ To formalize this as a Church program, we define a procedure, `pick-a-stick`, th
 
 (define sticks
  (mem (lambda (index) (beta 1 alpha))))
-</pre>
+~~~~
 
 `pick-a-stick` is a higher-order procedure that takes another procedure called `sticks`, which returns the stick weight for each stick. (`pick-a-stick` is also a *recursive* function&mdash;one that calls itself&mdash;we will explore recursive functions more in the section [[Recursive Models]].)
 
@@ -70,14 +68,14 @@ Notice that `sticks` uses `mem` to associate a particular draw from `beta` with 
 
 We can put these ideas together in a procedure called `make-sticks` which takes the $\alpha$ parameter as an input and returns a procedure which samples stick indices.
 
-~~~~ {.mit-church}
+~~~~
 (define (pick-a-stick sticks J)
   (if (flip (sticks J))
       J
       (pick-a-stick sticks (+ J 1))))
 
 (define (make-sticks alpha)
-  (let ((sticks (mem (lambda (x) (first (beta 1.0 alpha))))))
+  (let ((sticks (mem (lambda (x) (beta 1.0 alpha)))))
     (lambda () (pick-a-stick sticks 1))))
 
 (define my-sticks (make-sticks 1))
@@ -97,14 +95,14 @@ There are many other ways of defining a Dirichlet Process, one of which&mdash;th
 
 The above construction of the Dirichlet process defines a distribution over the infinite set of natural numbers. We quite often want a distribution not over the natural numbers themselves, but over an infinite set of samples from some other distribution (called the *base distribution*): we can generalize the Dirichlet process to this setting by using `mem` to associate to each natural number a draw from the base distribution.
 
-~~~~ {.mit-church}
+~~~~
 (define (pick-a-stick sticks J)
   (if (flip (sticks J))
       J
       (pick-a-stick sticks (+ J 1))))
 
 (define (make-sticks alpha)
-  (let ((sticks (mem (lambda (x) (first (beta 1.0 alpha))))))
+  (let ((sticks (mem (lambda (x) (beta 1.0 alpha)))))
     (lambda () (pick-a-stick sticks 1))))
 
 (define (DPthunk alpha base-dist)
@@ -120,14 +118,14 @@ The above construction of the Dirichlet process defines a distribution over the 
 
 We can do a similar transformation to *any* church procedure: we associate to every argument and natural number pair a sample from the procedure, then use the Dirichlet process to define a new procedure with the same signature. In Church this useful higher-order distribution is called `DPmem`:
 
-~~~~ {.mit-church}
+~~~~
 (define (pick-a-stick sticks J)
   (if (flip (sticks J))
       J
       (pick-a-stick sticks (+ J 1))))
 
 (define (make-sticks alpha)
-  (let ((sticks (mem (lambda (x) (first (beta 1.0 alpha))))))
+  (let ((sticks (mem (lambda (x) (beta 1.0 alpha)))))
     (lambda () (pick-a-stick sticks 1))))
 
 (define (DPmem alpha base-dist)
@@ -161,7 +159,7 @@ Here we have defined the procedure `DPmem`. `DPmem` takes two arguments, the fir
 
 A procedure in Church defines a distribution. When we wrap such a procedure in `DPmem` the resulting procedure defines a new Dirichlet process distribution. The underlying distribution associated with `proc` in the code above is called the *base measure* of the Dirichlet process and is often written $\mu$ or sometimes $G_0$. In the following example we stochastically memoize a normal distribution.
 
-~~~~ {.mit-church}
+~~~~
 (define memoized-normal (DPmem 1.0 (lambda () (gaussian 0 1.0))))
 
 (hist (repeat 100 memoized-normal) "DPmem normal")
@@ -170,7 +168,7 @@ A procedure in Church defines a distribution. When we wrap such a procedure in `
 
 The DP is said to *concentrate* the base measure.  Draws from a normal distribution are real-valued. However, draws from a DP are discrete (with probability one). By probabilistically memoizing a normal distribution we take the probability mass that the Gaussian spreads across the real line and *concentrate* it into a countable number of specific points. Compare the result of the previous computation with the result of sampling from a normal distribution itself.
 
-~~~~ {.mit-church}
+~~~~
 (define memoized-gaussian (DPmem 1.0 gaussian))
 
 (hist (repeat 1000 (lambda () (gaussian 0.0 1.0))) 100 "Base Distribution")
@@ -188,7 +186,7 @@ When we use the DP to construct `DPmem` the memoized function will therefore ten
 
 We now return to the problem of categorization with an unknown number of categories. We can use the Dirichlet process to construct a distribution over an infinite set of (potential) bags:
 
-~~~~ {.mit-church}
+~~~~
 (define colors '(blue green red))
 
 (define samples
@@ -230,24 +228,24 @@ We now return to the problem of categorization with an unknown number of categor
 ~~~~
 A model like this is called an **infinite mixture model**; in this case an infinite dirichlet-multinomial mixture model, since the observations (the colors) come from a multinomial distribution with Dirichlet prior. The essential addition in this model is that we have `DPmem`'d `gensym` to provide a collection of reusable category (bag) labels:
 
-~~~~ {.mit-church}
-(define reusable-categories (DPmem 1.0 gensym))
+~~~~
+(define reusable-categories (DPmem 1.0 (make-gensym)))
 
-(repeat 20 reusable-categories)
+(hist (repeat 20 reusable-categories))
 ~~~~
 To generate our observation in this infinite mixture model we first sample a category label from the memoized `gensym`.  Since the Dirichlet process tends to reuse earlier choices (more than later ones), our data will tend to cluster together in earlier components. However, there is no a priori bound on the number of latent classes, rather there is just a bias towards fewer classes.
 The strength of this bias is controlled by the DP concentration parameter $\alpha$. When $\alpha$ is high, we will tolerate a larger number of classes, when it is low we will strongly favor fewer classes. In general, the number of classes grows proportional to $\alpha\ \log(N)$ where $N$ is the number of observations.
 
 We can use this basic template to create infinite mixture models with any type of observation distribution. For instance here is an infinite *gaussian* mixture model:
 
-~~~~ {.mit-church}
-(define class-distribution (DPmem 1.0 gensym))
+~~~~
+(define class-distribution (DPmem 1.0 (make-gensym)))
 
 (define object->class
   (mem (lambda (object) (class-distribution))))
 
 (define class->gaussian-parameters
-  (mem (lambda (class) (list  (gaussian 65 10) (gaussian 0 8)))))
+  (mem (lambda (klass) (list  (gaussian 65 10) (gaussian 0 8)))))
 
 (define (observe object)
   (apply gaussian (class->gaussian-parameters (object->class object))))
@@ -262,7 +260,6 @@ There are, of course, many possible observation models that can be used in the i
 If you have looked at the literature on Bayesian models of cognition in the last few years, you will have seen many uses of a prior distribution known as the *Chinese restaurant process*.  The Chinese restaurant process is an alternate, but equivalent, way to construct the Dirichlet process. The CRP is usually described as a sequential sampling scheme using the metaphor of a restaurant.
 
 We imagine a restaurant with an infinite number of tables. The first customer enters the restaurant and sits at the first unoccupied table.  The ($N+1$)th customer enters the restaurant and sits at either an already occupied table or a new, unoccupied table, according to the following distribution.
-
 $$\tau^{(N+1)} |  \tau^{(1)},..., \tau^{(N)},\alpha \sim \sum_{i=1}^{K}   \frac{
   				y_i
 			}{
@@ -273,7 +270,6 @@ $$\tau^{(N+1)} |  \tau^{(1)},..., \tau^{(N)},\alpha \sim \sum_{i=1}^{K}   \frac{
 			}{
 				N + \alpha
 			} \delta_{\tau_{K+1}}$$
-
 $N$ is the total number of customers in the restaurant. $K$ is the total number of occupied tables, indexed by $1 \geq i \geq K$. $\tau^{(j)}$ refers to the table chosen by the $j$th customer. $\tau_i$ refers to $i$th occupied table in the restaurant. $y_i$ is the number of customers seated at table $\tau_i$; $\delta_{\tau}$ is the $\delta$-distribution which puts all of its mass on table $\tau$.  $\alpha \geq 0$ is the *concentration parameter* of the model.
 
 In other words, customers sit at an already-occupied table with probability proportional to the number of individuals at that table, or at a new table with probability controlled by the parameter $\alpha$.
@@ -293,19 +289,10 @@ Another way of understanding the CRP is to think of it as defining a distributio
 The probability of a particular partition of $N$ customers over $K$ tables is the product of the probabilities of the $N$ choices made in seating those customers.  It can easily be confirmed that the order in which elements are added to the partition components does not affect the probability of the final partition (i.e.  the terms of the product can be rearranged in any order). Thus the distribution defined by a CRP is exchangeable.
 
 The probability of a particular CRP partition can also be written down in closed form as follows.
-
-
 $$P(\vec{y})=\frac{\alpha^{K}\Gamma[\alpha]\prod_{j=0}^{K}\Gamma[y_{j}]}{\Gamma[\alpha+\sum_{j=0}^{K}y_{j}]}$$
+Where $\vec{y}$ is the vector of counts of customers at each table and $\Gamma(\cdot)$ is the gamma function, a continuous generalization of the factorial function. This shows that for a CRP the vector of counts is sufficient.
 
-Where $\overrightarrow{y}$ is the vector of counts of customers at
-each table and $\Gamma(\cdot)$ is the gamma function, a continuous
-generalization of the factorial function. This shows that for a CRP
-the vector of counts is sufficient.
-
-As a distribution, the CRP has a number of useful properties. In particular, it implements a simplicity bias. It assigns a higher probability to partitions which:
-:#have fewer customers
-:#have fewer tables
-:#for a fixed number of customers $N$, assign them to the smallest number of tables.
+As a distribution, the CRP has a number of useful properties. In particular, it implements a simplicity bias. It assigns a higher probability to partitions which (1) have fewer customers, (2) have fewer tables, and (3) for a fixed number of customers $N$, assign them to the smallest number of tables.
 
 Thus the CRP favors simple restaurants and implements a rich-get-richer scheme. Tables with more customers have higher probability of being chosen by later customers. These properties mean that, all else being equal, when we use the CRP as a stochastic memoizer we favor reuse of previously computed values.
 
@@ -338,7 +325,7 @@ Church provides a higher-order procedure which implements CRP based stochastic m
 ::Goldwater, S., Griffiths, T. L., and Johnson, M. (2009). A Bayesian framework for word segmentation: Exploring the effects of context. Cognition, 112:21–54.
 </FONT>
 
-~~~~ {.mit-church}
+~~~~
 (define phones '(a e i o u k t p g d b s th f))
 (define phone-weights (dirichlet (make-list (length phones) 1)))
 
@@ -365,7 +352,8 @@ Church provides a higher-order procedure which implements CRP based stochastic m
 # Example: Infinite Hidden Markov Models 
 
 Just as when we considered the [[Mixture and Non-Parametric Models#Infinite Mixture Models | unknown latent categories]], we may wish to have a hidden Markov model over an unknown number of latent symbols. We can do this by again using a reusable source of state symbols:
-<church engine=mit-church>
+
+~~~~
 (define vocabulary '(chef omelet soup eat work bake))
 
 (define (get-state) (DPmem 0.5 gensym))
@@ -388,8 +376,9 @@ Just as when we considered the [[Mixture and Non-Parametric Models#Infinite Mixt
       (pair (observation last-state) (sample-words (transition last-state)))))
 
 (sample-words 'start)
-</church>
-This model is known as the ''infinite hidden Markov model''. Notice how the transition model uses a separate DPmemoized function for each latent state: with some probability it will reuse a transition from this state, otherwise it will transition to a new state drawn from the globally shared source or state symbols&mdash;a DPmemoized <tt>gensym</tt>.
+~~~~
+
+This model is known as the "infinite hidden Markov model". Notice how the transition model uses a separate DPmemoized function for each latent state: with some probability it will reuse a transition from this state, otherwise it will transition to a new state drawn from the globally shared source or state symbols&mdash;a DPmemoized `gensym`.
 
 
 # Example: The Infinite Relational Model
@@ -412,7 +401,7 @@ $
 
 Given some relational data, the IRM learns to cluster objects into classes such that whether or not the relation holds depends on the *pair* of object classes. For instance, we can imagine trying to infer social groups from the relation of who talks to who:
 
-~~~~ {.mit-church}
+~~~~
 (define samples
   (mh-query
    300 100
@@ -423,7 +412,7 @@ Given some relational data, the IRM learns to cluster objects into classes such 
      (mem (lambda (object) (class-distribution))))
 
    (define classes->parameters
-     (mem (lambda (class1 class2) (first (beta 0.5 0.5)))))
+     (mem (lambda (class1 class2) (beta 0.5 0.5))))
 
    (define (talks object1 object2)
      (flip (classes->parameters (object->class object1) (object->class object2))))
@@ -470,8 +459,8 @@ These features depend on different systems of categories that foods fall into, f
                            "served with coffee" "served with wine" "water added"))
 -->
 
-~~~~ {.mit-church}
-(define kind-distribution (DPmem 1.0 gensym))
+~~~~
+(define kind-distribution (DPmem 1.0 (make-gensym)))
 
 (define feature->kind
   (mem (lambda (feature) (kind-distribution))))
@@ -483,7 +472,7 @@ These features depend on different systems of categories that foods fall into, f
   (mem (lambda (kind object) (sample (kind->class-distribution kind)))))
 
 (define class->parameters
-  (mem (lambda (object-class) (first (beta 1 1)))))
+  (mem (lambda (object-class) (beta 1 1))))
 
 (define (observe object feature)
   (flip (class->parameters (feature-kind/object->class (feature->kind feature) object))))
@@ -500,7 +489,6 @@ The Dirichlet Process is the best known example of a *non-parametric distributio
 Many models in the literature use a small generalization of the CRP known as the Pitman-Yor process (PYP). The Pitman-Yor process is identical to the CRP except for having an extra parameter, $a$, which introduces a dependency between the probability of sitting at a new table and the number of tables already occupied in the restaurant.
 
 The process is defined as follows. The first customer enters the restaurant and sits at the first table. The ($N+1$)th customer enters the restaurant and sits at either an already occupied table or a new one, according to the following distribution.
-
 $$
   \tau^{(N+1)} |  \tau^{(1)},...,\tau^{(N)}, a, b \sim \sum_{i=1}^{K}  \frac{
   				y_i - a
@@ -513,11 +501,9 @@ $$
 				N + b
 			} \delta_{\tau_{K+1}}
 $$
-
 Here all variables are the same as in the CRP, except for $a$ and $b$.  $b \geq 0$ corresponds to the CRP $\alpha$ parameter. $0 \leq a \leq 1$ is a new *discount* parameter which moves a fraction of a unit of probability mass from each occupied table to the new table. When it is $1$, every customer will sit at their own table. When it is $0$ the distribution becomes the single-parameter CRP. The $a$ parameter can be thought of as controlling the *productivity* of a restaurant: how much sitting at a new table depends on how many tables already exist. On average, $a$ will be the limiting proportion of tables in the restaurant which have only a single customer. The $b$ parameter controls the rate of growth of new tables in relation to the total number of customers $N$ as before.
 
 Like the CRP, the sequential sampling scheme outlined above generates a distribution over partitions for unbounded numbers of objects. Given some vector of table counts $\vec{y}$, A closed-form expression for this probability can be given as follows. First, define the following generalization of the factorial function, which multiples $m$ integers in increments of size $a$ starting at $x$.
-
 $$
 	[x]_{m,s} =
 	\begin{cases}
@@ -525,15 +511,10 @@ $$
 		x(x+s)...(x+(m-1)s)& \textrm{for }  m > 0
 	\end{cases}
 $$
-
-Note that $[1]_{m,1} = m!$.
-
-The probability of the partition given by the count vector, $\vec{y}$, is defined by:
-
+Note that $[1]_{m,1} = m!$. The probability of the partition given by the count vector, $\vec{y}$, is defined by:
 $$
 	P( \vec{y} \mid a, b) = \frac{[b+a]_{K-1,a}}{[b+1]_{N-1,1}} \prod_{i=1}^{K}[1-a]_{y_i-1,1}
 $$
-
 It is easy to confirm that in the special case of $a = 0$ and $b >0$, this reduces to the closed form for CRP by noting that $[1]_{m,1} = m!  = \Gamma[m+1]$. In what follows, we will assume that we have a higher-order function `PYmem` which takes three arguments `a`, `b`, and `proc` and returns the PYP-memoized version of `proc`.
 
 
@@ -572,19 +553,19 @@ Systems 16.</ref> The idea behind the nCRP is that tables in a
 CRP&mdash;which typically represent categories&mdash;can refer to
 *other restaurants*, representing lower-level categories.
 
+~~~~
+(define my-gensym (make-gensym))
 
-~~~~ {.mit-church}
-(define top-level-category  (DPmem 1.0 gensym))
+(define top-level-category  (DPmem 1.0 my-gensym))
 
 (define subordinate-category
   (DPmem 1.0
          (lambda (parent-category)
-           (pair (gensym) parent-category))))
+           (pair (my-gensym) parent-category))))
 
 (define (sample-category) (subordinate-category (top-level-category)))
 
 (repeat 10 sample-category)
-
 ~~~~
 
 Each call to `sample-category` returns a pair which consists of
@@ -597,18 +578,19 @@ The nCRP gives us a way of constructing unbounded sets of
 hierarchically nested categories, but how can we use such structured
 categories to generate data? The Church code below shows one way.
 
-~~~~ {.mit-church}
+~~~~
+(define my-gensym (make-gensym))
+
 (define possible-observations '(a b c d e f g))
 
-(define top-level-category  (DPmem 1.0 gensym))
+(define top-level-category  (DPmem 1.0 my-gensym))
 (define top-level-category->parameters
   (mem  (lambda (cat) (dirichlet (make-list (length possible-observations) 1.0)))))
-
 
 (define subordinate-category
   (DPmem 1.0
          (lambda (parent-category)
-           (pair (gensym) parent-category))))
+           (pair (my-gensym) parent-category))))
 
 (define subordinate-category->parameters
   (mem  (lambda (cat) (dirichlet (top-level-category->parameters (rest cat))))))
@@ -681,9 +663,10 @@ sample an unbounded set of hierarchically structured categories, and
 the HDP can be used to make these categories share observations in
 interesting ways.
 
-
 ~~~~
-(define top-level-category  (DPmem 1.0 gensym))
+(define my-gensym (make-gensym))
+
+(define top-level-category  (DPmem 1.0 my-gensym))
 
 (define root-category (DPmem 10.0 (lambda () (poisson 20))))
 
@@ -692,7 +675,7 @@ interesting ways.
 (define subordinate-category
   (DPmem 1.0
          (lambda (parent-category)
-           (pair (gensym) parent-category))))
+           (pair (my-gensym) parent-category))))
 
 (define (sample-category) (subordinate-category (top-level-category)))
 
@@ -762,10 +745,8 @@ comparison with all of these forms.
 Both prototype and exemplar theories are based on similarity, and the
 probability that an observation is assigned to category $c_{N}
 $ can be given by
-
 $$p(c_{N} \mid x_N, \vec{x}_{N-1}, \vec{c}_{N-1}) =
 \frac{\eta_{N,j}\beta_{N,j}}{\sum_{c} \eta_{N,c}\beta_{N,c}}$$
-
 where $\eta_{N,i}$ is the similarity between observation
 $N$ and category $i$, and
 $\beta_{N,i}$ is the response bias for the category (i.e.,
@@ -774,14 +755,14 @@ its prior weight).
 Exemplar models treat the similarity between observation
 $N$ and a category as a sum over all members of the
 category.
-
-$$\eta_{N,i} = \sum_{i \mid c_{i} = j } \eta_{N,i}$$
-
+$$
+\eta_{N,i} = \sum_{i \mid c_{i} = j } \eta_{N,i}
+$$
 Prototype models treat the similarity as the similarity between
 observation $N$ and the single stored prototype.
-
-$$\eta_{N,i} = \eta_{N,p_i} $$
-
+$$
+\eta_{N,i} = \eta_{N,p_i}
+$$
 Notice that these two models can be seen as opposite ends of a
 spectrum, one estimates the category based on every member, while the
 other estimates based on a single member. There are clearly many

@@ -120,7 +120,7 @@ Experiment with different data sets, varying both the number of flips and the re
 
 When studying learning as conditional inference, that is when considering an *ideal learner model*, we are particularly interested in the dynamics of how inferred hypotheses change as a function of amount of data (often thought of as time the learner spends acquiring data). We can map out the *trajectory* of learning by plotting a summary of the posterior distribution over hypotheses as a function of the amount of observed data. Here we plot the mean of the samples of the coin weight (the *expected* weight) in the above example (NOTE: for now this must be run using MIT-Church):
 
-~~~~ {.mit-church data-engine="mit-church"}
+~~~~ {data-engine="mit-church"}
 (define make-coin (lambda (weight) (lambda () (if (flip weight) 'h 't))))
 
 (define (samples data)
@@ -229,7 +229,7 @@ Experiment with this model: when does it conclude that a causal relation is like
 
 # Grammar-based Concept Induction
 
-An important worry about Bayesian models of learning is that the Hypothesis space must either be too simple, as in the models above, specified in a rather ad-hoc way, or both. There is a tension here: human representations of the world are enormously complex and so the space of possible representations must be correspondingly big, and yet we would like to understand the representational resources in simple and uniform terms. How can we construct very large (possibly infinite) hypothesis spaces, and priors over them, with limited tools? One possibility is to use a grammar to specify a *hypothesis language*: a small grammar can generate an infinite array of potential hypotheses. because grammars are themselves generative processes, a prior is provided as well.
+An important worry about Bayesian models of learning is that the Hypothesis space must either be too simple, as in the models above, specified in a rather ad-hoc way, or both. There is a tension here: human representations of the world are enormously complex and so the space of possible representations must be correspondingly big, and yet we would like to understand the representational resources in simple and uniform terms. How can we construct very large (possibly infinite) hypothesis spaces, and priors over them, with limited tools? One possibility is to use a grammar to specify a *hypothesis language*: a small grammar can generate an infinite array of potential hypotheses. Because grammars are themselves generative processes, a prior is provided as well.
 
 ## Example: Inferring an Arithmetic Expression
 

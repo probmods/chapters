@@ -46,7 +46,8 @@ private : $(private)
 	  pandoc --toc \
 		--smart \
 		--template chapter.template \
-		--read markdown \
+		--read markdown+tex_math_dollars \
+		--mathjax \
 		--write html5 \
 		--csl apa.csl \
 		--bibliography dev.bib \
@@ -56,7 +57,8 @@ private : $(private)
 		pandoc --toc \
 		--smart \
 		--template chapter.template \
-		--read markdown \
+		--read markdown+tex_math_dollars \
+    --mathjax \
 		--write html5 \
 		--output "$@" \
 		"$<"; \
