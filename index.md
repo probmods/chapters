@@ -7,7 +7,7 @@ In this book, we explore the probabilistic approach to cognitive science, which 
 
 ### Resources
 - [Play space](play-space.html): a scratch pad for quickly prototyping models.
-- [forestdb.org](forestdb.org): a repository of generative models.
+- [Forest](http://forestdb.org): a repository for generative models.
 
 ## How to use
 

@@ -70,26 +70,24 @@ Core Model
 (define (empirical-weight-prior)
   (multinomial '(.0005 .1 .2 0.3 0.4 0.5 0.6 0.7 0.8 .9 .9995) '(.3 3 1 .3 1 1 1 .3 1 3 .3)))
 ;;;
-;;;
 
 ;;; zach model ;;;
 
+;; zach model ;;
 (define zachs-choice
-(mem (lambda
-    obs reliable nsamples)
-  (enumeration-query
+  (mem (lambda (obs reliable nsamples)
+         (enumeration-query
 
-   (define weight (empirical-weight-prior))
-   (define act (act-prior))
-   (define result (if reliable
-                      (my-round weight)
-                      (if (flip) 1 0)))
+          (define weight (empirical-weight-prior))
+          (define act (act-prior))
+          (define result (if reliable
+                             (my-round weight)
+                             (if (flip) 1 0)))
 
-   act
+          act
 
-   (and (observe weight nsamples obs)
-        (equal? act result))))
-
+          (and (observe weight nsamples obs)
+               (equal? act result))))))
 
 ;;; ss' model ;;;
 (define (ss-model ss-obs zach-nsamples zach-reliable)
@@ -176,8 +174,6 @@ Effect of learner's observations (k<sub>l</sub>) and number of Zach's observatio
 ;;;
 
 ;;;fold: Core Model
-;; zach model ;;
-
 
 ;; zach model ;;
 (define zachs-choice
@@ -1024,6 +1020,7 @@ Infer Zach's Reliability Model
 
 ### Figure 12
 When Zach is seen to act inconsistently with his observations, how does this effect learner's assessment of his reliability and how influential is he subsequently?
+
 ~~~
 ;;;fold: helper functions
 (define (factorial n)
