@@ -49,7 +49,7 @@ An important idea here is that `flip` can be thought of in two different ways. F
 
 The `flip` function is the simplest XRP in Church, but you will find other XRPs corresponding to familiar probability distributions, such as `gaussian`, `gamma`, `dirichlet`, and so on.
 <!-- TODO: Many but not all of the XRPs and other basic functions implemented in Church can be found on the church reference appendix. -->
-Using these XRPs we can construct more complex expressions that describe more complicated sampling processes. For instance here we describe a process that samples a number by multiplying two samples from a Guassian distribution:
+Using these XRPs we can construct more complex expressions that describe more complicated sampling processes. For instance here we describe a process that samples a number by multiplying two samples from a gaussian distribution:
 
 ~~~~
 (* (gaussian 0 1) (gaussian 0 1) )
