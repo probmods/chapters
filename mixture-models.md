@@ -106,7 +106,7 @@ The observation distribution associated with each mixture *component* (i.e., kin
 
 FIXME:doesn't burn in fast enough...-->
 
-~~~~ {data-engine="mit-church"}
+~~~~
 (define (noisy=? x y) (and (flip (expt 0.1 (abs (- (first x) (first y)))))
                            (flip (expt 0.1 (abs (- (rest x) (rest y)))))))
 (define samples
@@ -176,7 +176,7 @@ drawn from a Dirichlet prior. For each of the $N$ topics
 drawn for the document, a word is sampled from the corresponding
 multinomial distribution. This is shown in the Church code below.
 
-~~~~ {data-engine="mit-church"}
+~~~~
 (define vocabulary (append '(DNA evolution)'(parsing phonology)))
 
 (define topics '(topic1 topic2)) (define doc-length 10)
@@ -296,10 +296,7 @@ distributions over words.
 
 Human perception is often skewed by our expectations. A common example of this is called *categorical perception* -- when we perceive objects as being more similar to the category prototype than they really are. In phonology this is been particularly important and is called the perceptual magnet effect: Hearers regularize a speech sound into the category that they think it corresponds to. Of course this category isn't known a priori, so a hearer must be doing a simultaneous inference of what category the speech sound corresponded to, and what the sound must have been. In the below code we model this as a mixture model over the latent categories of sounds, combined with a noisy observation process.
 
-~~~~ {data-engine="mit-church"}
-(define (noisy= target value variance)
-  (= 0 (gaussian (- target value) variance)))
-
+~~~~
 (define (count-by start end increment)
   (if (> start end)
       '()
@@ -335,8 +332,10 @@ Human perception is often skewed by our expectations. A common example of this i
 
     (abs (- target-1 target-2))
 
-    (and (noisy= stimulus-1 obs-1  0.001) (noisy= stimulus-2 obs-2  0.001))
-    )))
+    ;;Condition on the targets being equal to the stimuli through a gaussian noise process
+    (and 
+      (= stimulus-1 (gaussian target-1 0.2))
+      (= stimulus-2 (gaussian target-2 0.2))))))
 
 (define (compute-perceptual-pairs list)
   (if (< (length list) 2)
@@ -378,11 +377,13 @@ The simplest way to address this problem, which we call *unbounded* models, is b
 
    (define coin->weight (mem (lambda (c) (uniform 0 1))))
 
-   (define (observe) (flip (coin->weight (uniform-draw coins))))
+   (define (observe values)
+     (map (lambda (v)
+       (condition (equal? (flip (coin->weight (uniform-draw coins))) v))) values))
 
    (length coins)
 
-   (equal? actual-obs (repeat (length actual-obs) observe))))
+   (observe actual-obs)))
 
 (hist samples "number of coins")
 'done
@@ -411,26 +412,13 @@ We could extend this model by allowing it to infer that there are more than two 
 
    (define bags (repeat num-bags my-gensym))
 
-   ;;each observation (which is named for convenience) comes from one of the bags:
-   (define obs->bag
-     (mem (lambda (obs-name)
-            (uniform-draw bags))))
-
-   (define draw-marble
-     (mem (lambda (obs-name)
-            (multinomial colors (bag->prototype (obs->bag obs-name))))))
+   (define (observe marbles)
+     (map (lambda (m) (condition (equal? (multinomial colors (bag->prototype (uniform-draw bags))) m))) marbles))
 
    ;;how many bags are there?
    num-bags
 
-   (and
-    (equal? 'red (draw-marble 'obs1))
-    (equal? 'red (draw-marble 'obs2))
-    (equal? 'blue (draw-marble 'obs3))
-    (equal? 'blue (draw-marble 'obs4))
-    (equal? 'red (draw-marble 'obs5))
-    (equal? 'blue (draw-marble 'obs6))
-    )))
+   (observe '(red red blue blue red blue))))
 
 (hist samples "how many bags?")
 'done

@@ -42,34 +42,37 @@ Note that we are using the operator `mem` that we introduced in the first part o
 
 Run the code above multiple times.  Each run creates a single bag of marbles with its characteristic distribution of marble colors, and then draws four samples of 50 marbles each.  Intuitively, you can see how each sample is sufficient to learn a lot about what that bag is like; there is typically a fair amount of similarity between the empirical color distributions in each of the four samples from a given bag.  In contrast, you should see a lot more variation across different runs of the code -- samples from different bags.
 
-Now let's add a few twists: we will generate three different bags, and try to learn about their respective color prototypes by conditioning on observations. We represent the results of learning in terms of the *posterior predictive* distribution for each bag: a single hypothetical draw from the bag, using the expression `(draw-marbles 'bag 1)`.  We will also draw a sample from the posterior predictive distribution on a new bag, for which we have had no observations.
+Now let's add a few twists: we will generate three different bags, and try to learn about their respective color prototypes by conditioning on observations. We represent the results of learning in terms of the *posterior predictive* distribution for each bag: a single hypothetical draw from the bag, using the expression `(draw-marble 'bag)`.  We will also draw a sample from the posterior predictive distribution on a new bag, for which we have had no observations.
 
-~~~~ {data-engine="mit-church"}
+~~~~
 (define colors '(black blue green orange red))
 
 (define samples
  (mh-query
-   200 100
+  200 100
 
   (define bag->prototype
     (mem (lambda (bag) (dirichlet '(1 1 1 1 1)))))
 
-  (define (draw-marbles bag num-draws)
-    (repeat num-draws
-            (lambda () (multinomial colors (bag->prototype bag)))))
+  (define (draw-marble bag) (multinomial colors (bag->prototype bag)))
+
+  (define (observe-bag bag values)
+    (map (lambda (v)
+        (condition (equal? (multinomial colors (bag->prototype bag)) v)))
+      values))
 
   ;;predict the next sample from each observed bag, and a new one:
-  (list (draw-marbles 'bag-1 1)
-        (draw-marbles 'bag-2 1)
-        (draw-marbles 'bag-3 1)
-        (draw-marbles 'bag-n 1))
+  (list (draw-marble 'bag-1)
+        (draw-marble 'bag-2)
+        (draw-marble 'bag-3)
+        (draw-marble 'bag-n))
 
   ;;condition on observations from three bags:
-  (and
-   (equal? (draw-marbles 'bag-1 6) '(blue blue black blue blue blue))
-   (equal? (draw-marbles 'bag-2 6) '(blue green blue blue blue red))
-   (equal? (draw-marbles 'bag-3 6) '(blue blue blue blue blue orange))
-   )))
+  (observe-bag 'bag-1 '(blue blue black blue blue blue))
+  (observe-bag 'bag-2 '(blue green blue blue blue red))
+  (observe-bag 'bag-3 '(blue blue blue blue blue orange))))
+
+samples
 
 (hist (map first samples) "bag one posterior predictive")
 (hist (map second samples) "bag two posterior predictive")
@@ -82,34 +85,38 @@ This generative model describes the prototype mixtures in each bag, but it does 
 
 Now let us introduce another level of abstraction: a global prototype that provides a prior on the specific prototype mixtures of each bag.
 
-~~~~ {data-engine="mit-church"}
+~~~~
 (define colors '(black blue green orange red))
 
 (define samples
  (mh-query
-   200 100
+  200 100
 
-   ;;we make a global prototype which is a dirichlet sample scaled to total 5.
-   (define prototype (map (lambda (x) (* 5 x)) (dirichlet '(1 1 1 1 1))))
+  ;;we make a global prototype which is a dirichlet sample scaled to total 5.
+  (define prototype (map (lambda (x) (* 5 x)) (dirichlet '(1 1 1 1 1))))
 
    ;;the prototype for each bag uses the global prototype as parameters.
-   (define bag->prototype
-     (mem (lambda (bag) (dirichlet prototype))))
+  (define bag->prototype
+    (mem (lambda (bag) (dirichlet prototype))))
 
-   (define (draw-marbles bag num-draws)
-     (repeat num-draws
-             (lambda () (multinomial colors (bag->prototype bag)))))
+  (define (draw-marble bag)
+    (multinomial colors (bag->prototype bag)))
 
-   (list (draw-marbles 'bag-1 1)
-         (draw-marbles 'bag-2 1)
-         (draw-marbles 'bag-3 1)
-         (draw-marbles 'bag-n 1))
+  (define (observe-bag bag values)
+    (map (lambda (v)
+        (condition (equal? (multinomial colors (bag->prototype bag)) v)))
+      values))
 
-   (and
-    (equal? (draw-marbles 'bag-1 6) '(blue blue black blue blue blue))
-    (equal? (draw-marbles 'bag-2 6) '(blue green blue blue blue red))
-    (equal? (draw-marbles 'bag-3 6) '(blue blue blue blue blue orange))
-    )))
+  (list (draw-marble 'bag-1)
+        (draw-marble 'bag-2)
+        (draw-marble 'bag-3)
+        (draw-marble 'bag-n))
+
+  ;;condition on observations from three bags:
+  (observe-bag 'bag-1 '(blue blue black blue blue blue))
+  (observe-bag 'bag-2 '(blue green blue blue blue red))
+  (observe-bag 'bag-3 '(blue blue blue blue blue orange))))
+
 
 (hist (map first samples) "bag one posterior predictive")
 (hist (map second samples) "bag two posterior predictive")
@@ -129,7 +136,7 @@ Learning about shared structure at a higher level of abstraction also supports i
 
 Now let's investigate the relative learning speeds at different levels of abstraction.  Suppose that we have a number of bags that all have identical prototypes: they mix red and blue in proportion 2:1.  But the learner doesn't know this.  She observes only one ball from each of N bags.  What can she learn about an individual bag versus the population as a whole as the number of bags changes? (**Note: this example is too slow to run on Churchserv. Results are shown below.**)
 
-~~~~ {data-engine="mit-church"}
+~~~~
 (define colors '(red blue))
 
 (define (sample-bags obs-draws)
@@ -161,8 +168,42 @@ Now let's investigate the relative learning speeds at different levels of abstra
 ;;; visualization code
 ;;;fold:
 ;;compute the mean squared deviation of samples from truth:
-(define (mean-dev true samples)
-  (mean (map (lambda (s) (expt (- true s) 2)) samples)))
+(define colors '(red blue))
+
+(define (sample-bags obs-draws)
+ (mh-query
+   300 100
+
+   ;;we make a global prototype which is a dirichlet sample scaled to total 2:
+   (define phi (dirichlet '(1 1)))
+   (define global-prototype (map (lambda (x) (* 2 x)) phi))
+
+   ;;the prototype for each bag uses the global prototype as parameters.
+   (define bag->prototype
+     (mem (lambda (bag) (dirichlet global-prototype))))
+
+   (define (draw-marbles bag num-draws)
+     (repeat num-draws
+             (lambda () (multinomial colors (bag->prototype bag)))))
+
+   (define (observe-bag bag values)
+     (map (lambda (v)
+         (condition (equal? (multinomial colors (bag->prototype bag)) v)))
+       values))
+
+   ;;query the inferred bag1 and global prototype:
+   (list (first (bag->prototype (first (first obs-draws))))
+         (first phi))
+
+   ;;condition on getting the right observations from each bag.
+   ;;obs-draws is a list of lists of draws from each bag (first is bag name).
+   (map (lambda (bag-and-values) (observe-bag (first bag-and-values) (rest bag-and-values))) obs-draws)))
+
+;;; visualization code
+;;;fold:
+;;compute the mean squared deviation of samples from truth:
+(define (mean-dev truth samples)
+  (mean (map (lambda (s) (expt (- truth s) 2)) samples)))
 
 ;;now we generate learning curves! we take a single sample from each bag.
 ;;plot the mean-squared error normalized by the no-observations error.
@@ -170,39 +211,16 @@ Now let's investigate the relative learning speeds at different levels of abstra
 (define samples (sample-bags '((bag1))))
 (define initial-specific (mean-dev 0.66 (map first samples)))
 (define initial-global (mean-dev 0.66 (map second samples)))
-(lineplot-value (pair 0 1) "specific learning")
-(lineplot-value (pair 0 1) "general learning")
 
-(define samples (sample-bags '((bag1 red))))
-(lineplot-value (pair 1 (/ (mean-dev 0.66 (map first samples)) initial-specific))
-                "specific learning")
-(lineplot-value (pair 1 (/ (mean-dev 0.66 (map second samples)) initial-global))
-                "general learning")
+(define observations '((bag1 red) (bag2 red) (bag3 blue) (bag4 red) (bag5 red) (bag6 blue) (bag7 red) (bag8 red) (bag9 blue) (bag10 red) (bag11 red) (bag12 blue)))
+(define num-obs '(1 3 6 9 12))
 
-(define samples (sample-bags '((bag1 red) (bag2 red) (bag3 blue))))
-(lineplot-value (pair 3 (/ (mean-dev 0.66 (map first samples)) initial-specific))
-                "specific learning")
-(lineplot-value (pair 3 (/ (mean-dev 0.66 (map second samples)) initial-global))
-                "general learning")
+(define all-samples (map (lambda (num) (sample-bags (take observations num))) num-obs))
+(define mse-specific (map (lambda (samples) (/ (mean-dev 0.66 (map first samples)) initial-specific)) all-samples))
+(define mse-general (map (lambda (samples) (/ (mean-dev 0.66 (map second samples)) initial-specific)) all-samples))
 
-(define samples (sample-bags '((bag1 red) (bag2 red) (bag3 blue) (bag4 red) (bag5 red) (bag6 blue))))
-(lineplot-value (pair 6 (/ (mean-dev 0.66 (map first samples)) initial-specific))
-                "specific learning")
-(lineplot-value (pair 6 (/ (mean-dev 0.66 (map second samples)) initial-global))
-                "general learning")
-
-(define samples (sample-bags '((bag1 red) (bag2 red) (bag3 blue) (bag4 red) (bag5 red) (bag6 blue) (bag7 red) (bag8 red) (bag9 blue))))
-(lineplot-value (pair 9 (/ (mean-dev 0.66 (map first samples)) initial-specific))
-                "specific learning")
-(lineplot-value (pair 9 ((/ (mean-dev 0.66 (map second samples)) initial-global))
-                "general learning"))
-
-(define samples (sample-bags '((bag1 red) (bag2 red) (bag3 blue) (bag4 red) (bag5 red) (bag6 blue) (bag7 red) (bag8 red) (bag9 blue) (bag10 red) (bag11 red) (bag12 blue))))
-(lineplot-value (pair 12 (/ (mean-dev 0.66 (map first samples)) initial-specific))
-                      "specific learning")
-(lineplot-value (pair 12 (/ (mean-dev 0.66 (map second samples)) initial-global))
-                "general learning")
-;;;
+(lineplot (pair '(0 1) (zip num-obs mse-specific)) "specific learning")
+(lineplot (pair '(0 1) (zip num-obs mse-general)) "general learning")
 
 'done
 ~~~~
@@ -339,7 +357,7 @@ This abstract knowledge about what animal kinds are like can be extremely useful
 
 We can study a simple version of this phenomenon by modifying our bags of marbles example, articulating more structure to the hierarchical model as follows.  We now have two higher-level parameters: `phi` describes the expected proportions of marble colors across bags of marbles, while `alpha`, a real number, describes the strength of the learned prior -- how strongly we expect any newly encountered bag to conform to the distribution for the population prototype `phi`.  For instance, suppose that we observe that `bag-1` consists of all blue marbles, `bag-2` consists of all green marbles, `bag-3` all red, and so on. This doesn't tell us to expect a particular color in future bags, but it does suggest that bags are very regular&mdash;that all bags consist of marbles of only one color.
 
-~~~~ {data-engine="mit-church"}
+~~~~
 (define colors '(black blue green orange red))
 
 (define samples
@@ -358,30 +376,32 @@ We can study a simple version of this phenomenon by modifying our bags of marble
    (define bag->prototype
      (mem (lambda (bag) (dirichlet prototype))))
 
-   (define (draw-marbles bag num-draws)
-     (repeat num-draws
-             (lambda () (multinomial colors (bag->prototype bag)))))
+   (define (draw-marble bag)
+     (multinomial colors (bag->prototype bag)))
 
-   (list (draw-marbles 'bag-1 1)
-         (draw-marbles 'bag-2 1)
-         (draw-marbles 'bag-3 1)
-         (draw-marbles 'bag-4 1)
-         (draw-marbles 'bag-n 1)
-         (log alpha))
+   (define (observe-bag bag values)
+     (map (lambda (v)
+         (condition (equal? (multinomial colors (bag->prototype bag)) v)))
+       values))
 
-   (and
-    (equal? (draw-marbles 'bag-1 6) '(blue blue blue blue blue blue))
-    (equal? (draw-marbles 'bag-2 6) '(green green green green green green))
-    (equal? (draw-marbles 'bag-3 6) '(red red red red red red))
-    (equal? (draw-marbles 'bag-4 1) '(orange))
-    )))
+   (list (draw-marble 'bag-1)
+         (draw-marble 'bag-2)
+         (draw-marble 'bag-3)
+         (draw-marble 'bag-4)
+         (draw-marble 'bag-n)
+         (log alpha)) 
+
+  (observe-bag 'bag-1 '(blue blue blue blue blue blue))
+  (observe-bag 'bag-2 '(green green green green green green))
+  (observe-bag 'bag-3 '(red red red red red red))
+  (observe-bag 'bag-4 '(orange))))
 
 (hist (map first samples) "bag one posterior predictive")
 (hist (map second samples) "bag two posterior predictive")
 (hist (map third samples) "bag three posterior predictive")
 (hist (map fourth samples) "bag four posterior predictive")
 (hist (map fifth samples) "bag n posterior predictive")
-(hist (map sixth samples) 10 "consistency across bags (log alpha)")
+(hist (map sixth samples) "consistency across bags (log alpha)")
 'done
 ~~~~
 
@@ -412,7 +432,7 @@ One well studied overhypothesis in cognitive development is the 'shape bias': th
 
 We now consider a model of learning the shape bias which uses the compound dirichlet-multinomial model that we have been discussing in the context of bags of marbles. This model for the shape bias is from Kemp et al (2007) (Kemp, C., Perfors, A., and Tenenbaum, J. B. Learning overhypotheses with hierarchical Bayesian models. Developmental Science 10(3), 307-321). Rather than bags of marbles we now have object categories and rather than observing marbles we now observe the features of an object (e.g. its shape, color, and texture) drawn from one of the object categories. Suppose that a feature from each dimension of an object is generated independently of the other dimensions and there are separate values of alpha and phi for each dimension. Importantly, one needs to allow for more values along each dimension than appear in the training data so as to be able to generalize to novel shapes, colors, etc. To test the model we can feed it training data to allow it to learn the values for the alphas and phis corresponding to each dimension. We can then give it a single instance of some new category and then ask what the probability is that the various choice objects also come from the same new category. The church code below shows a model for the shape bias, conditioned on the same training data used in the Smith et al experiment. We can then ask both for draws from some category which we've seen before, and from some new category which we've seen a single instance of. One small difference from the previous models we've seen for the example case is that the alpha hyperparameter is now drawn from an exponential distribution with inverse mean 1, rather than a Gamma distribution. This is simply for consistency with the model given in the Kemp et al (2007) paper.
 
-~~~~ {data-engine="mit-church"}
+~~~~
 (define shapes (iota 11))
 (define colors (iota 11))
 (define textures (iota 11))
@@ -440,20 +460,27 @@ We now consider a model of learning the shape bias which uses the compound diric
    (define category->prototype
      (mem (lambda (bag) (list (dirichlet prototype-shapes) (dirichlet prototype-colors) (dirichlet prototype-textures) (dirichlet prototype-sizes)))))
 
-   (define (draw-object category num-draws)
-     (repeat num-draws
-             (lambda () (map (lambda (dim proto) (multinomial dim proto)) (list shapes colors textures sizes) (category->prototype category)))))
+   (define (draw-object category)
+     (map (lambda (dim proto) (multinomial dim proto)) (list shapes colors textures sizes) (category->prototype category)))
 
-   (draw-object 'cat-5 1)
+   (define (observe-object category observed-shapes)
+     (map (lambda (shape)
+          (map
+            (lambda (dim proto feature) (condition (equal? (multinomial dim proto) feature)))
+            (list shapes colors textures sizes) 
+            (category->prototype category)
+            shape))
+        observed-shapes))
 
-   (and
-    (equal? (draw-object 'cat-1 2) '((1 1 1 1) (1 2 2 2)))
-    (equal? (draw-object 'cat-2 2) '((2 3 3 1) (2 4 4 2)))
-    (equal? (draw-object 'cat-3 2) '((3 5 5 1) (3 6 6 2)))
-    (equal? (draw-object 'cat-4 2) '((4 7 7 1) (4 8 8 2)))
-    (equal? (draw-object 'cat-5 1) '((5 9 9 1)))
-    )))
-(pretty-print samples)
+   (draw-object 'cat-5)
+
+   (observe-object 'cat-1 '((1 1 1 1) (1 2 2 2)))
+   (observe-object 'cat-2 '((2 3 3 1) (2 4 4 2)))
+   (observe-object 'cat-3 '((3 5 5 1) (3 6 6 2)))
+   (observe-object 'cat-4 '((4 7 7 1) (4 8 8 2)))
+   (observe-object 'cat-5 '((5 9 9 1)))))
+
+samples
 ~~~~
 
 The church program above gives us draws from some novel category for which we've seen a single instance. In the experiments with children, they had to choose one of three choice objects which varied according to the dimension they matched the example object from the category. We show below model predictions (from Kemp et al (2007)) for performance on the shape bias task which show the probabilities (normalized) that the choice object belongs to the same category as the test exemplar. The model predictions reproduce the general pattern of the experimental results of Smith et al in that shape matches are preferred in both the first and second order generalization case, and more strong in the first order generalization case. The model also helps to explain the childrens' vocabulary growth in that it shows how the shape bias can be generally learned, as seen by the differing values learned for the various alpha parameters, and so used outside the lab.
@@ -481,33 +508,35 @@ Again, we can use the compound dirichlet-multinomial model we have been working 
 So far, we've been using the compound dirichlet-multinomial to do one shot learning, by learning low values for the alpha hyperparameter. This causes the Dirichlet distribution at the second level to have parameters less than 1, and so to be 'spiky'. While such a Dirichlet distribution can lead to one shot learning, we're not explicitly learning about the variance of
 the categories in the model. We might imagine a similar model in which we handle continuous quantities and directly represent hyperparameters for the mean and variance of various related groups.
 
-~~~~ {data-engine="mit-church"}
+~~~~
  (define results
     (mh-query
-    50 1000
+      50 1000
 
-    (define overall-variance (gamma 1 1))
-    (define overall-shape (gamma 2 2))
-    (define overall-scale (gamma 2 2))
+      (define overall-variance (gamma 1 1))
+      (define overall-shape (gamma 2 2))
+      (define overall-scale (gamma 2 2))
 
-    (define group->variance
-      (mem (lambda (group) (gamma overall-shape overall-scale))))
+      (define group->variance
+        (mem (lambda (group) (gamma overall-shape overall-scale))))
 
-    (define group->mean
-      (mem (lambda (group) (gaussian 1 overall-variance))))
+      (define group->mean
+        (mem (lambda (group) (gaussian 1 overall-variance))))
 
-    (define (draw-observations group num-draws)
-      (repeat num-draws
-              (lambda () (gaussian (group->mean group) (group->variance group)))))
+      (define (draw-observation group)
+        (lambda () (gaussian (group->mean group) (group->variance group))))
 
-    (group->variance 'new)
+      (define (observe-group group values)
+        (map (lambda (v) (condition (equal? (gaussian (group->mean group) (group->variance group)) v)))
+          values))
 
-    (and (equal? (draw-observations 'one 3) '(1.001 1.001 1.001))
-         (equal? (draw-observations 'two 3) '(1.05 1.05 1.05))
-         (equal? (draw-observations 'three 3) '(1.1 1.1 1.1))
-         (equal? (draw-observations 'four 1) '(1.003))))
+      (group->variance 'new)
 
-)
+      (observe-group 'one '(1.001 1.001 1.001))
+      (observe-group 'two '(1.05 1.05 1.05))
+      (observe-group 'three '(1.1 1.1 1.1))
+      (observe-group 'four '(1.003))))
+
 (define (mean mylist)
   (/ (apply + mylist) (length mylist)))
 

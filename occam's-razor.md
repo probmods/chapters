@@ -112,7 +112,15 @@ The size principle is related to an influential proposal in linguistics known as
 
 To illustrate the power of the size principle in inferring the most parsimonious explanation of data, consider learning a rectangle "concept" <ref>Tenenbaum, 2000</ref>. The data are a set of point in the plane, that we assume to be randomly sampled from within some unknown rectangle.  Given the examples, what is the rectangle they came from?  We can model this learning as conditional of the rectangle given the points. We plot the sampled rectangles as well as the posterior mean:
 
-~~~~ {data-engine="mit-church"}
+~~~~
+;;observed points:
+(define obs-data '((0.4 0.7) (0.5 0.4) (0.46 0.63) (0.43 0.51)))
+
+;;parameters and helper functions:
+(define noise 0.001)
+(define num-examples (length obs-data))
+
+;;infer the rectangle given the observed points:
 ;;observed points:
 (define obs-data '((0.4 0.7) (0.5 0.4) (0.46 0.63) (0.43 0.51)))
 
@@ -140,7 +148,8 @@ To illustrate the power of the size principle in inferring the most parsimonious
 
     (list x1 x2 y1 y2)
 
-    (equal? obs-data (repeat num-examples concept)))
+    (map (lambda (example) (condition (equal? (uniform x1 x2) (first example)))) obs-data)
+    (map (lambda (example) (condition (equal? (uniform y1 y2) (second example)))) obs-data))
 
   100))
 
@@ -189,7 +198,7 @@ Explore how the concept learned varies as a function of the number and distribut
 
 Compare this to the results of a slightly different causal process for the same observations, known as *weak sampling*:
 
-~~~~ {data-engine="mit-church"}
+~~~~
 ;;observed points (now points and in/out labels):
 (define obs-data '((0.4 0.7 #t) (0.5 0.4 #t) (0.46 0.63 #t) (0.43 0.51 #t)))
 
@@ -218,12 +227,12 @@ Compare this to the results of a slightly different causal process for the same 
                  (< (second p) y2)
                  (> (second p) y1))))
 
-    ;;an observation comes from using the concept to classify a random point
-    (define (observe) (concept (list (uniform 0 1) (uniform 0 1))))
-
     (list x1 x2 y1 y2)
 
-    (equal? obs-data (repeat num-examples observe)))
+    ;;condition on all the observed points being in the rectangle
+    (all
+      (map (lambda (datum) (equal? (third (concept (list (first datum) (second datum)))) (third datum)))
+        obs-data)))
 
   100))
 
@@ -270,25 +279,31 @@ Importantly, the Size Principle tells us that the prior distribution on hypothes
 
 In our example above we have illustrated Bayes Occam's razor with examples based strictly on the "size" of the hypotheses involved, however, the principle is more general. Bayes'  Occam razor says that all else being equal the hypothesis that assigns the highest likelihood to the data will dominate the posterior. Because of the law of conservation of belief, assigning higher likelihood to the observed data requires assigning lower likelihood to other possible data. Consider the following example
 
-~~~~ {data-engine="mit-church"}
+~~~~
 (define observed-letters '(a b a b c d b b))
 
 (define samples
    (mh-query
     100 100
 
-    (define (hypothesis->parameters  hyp)
-      (if (equal? hyp  'A)
+    (define (hypothesis->parameters hyp)
+      (if (equal? hyp 'A)
           (list '(a b c d) '(0.375 0.375 0.125 0.125))
           (list '(a b c d) '(0.25 0.25 0.25 0.25))))
 
-    (define hypothesis  (if (flip) 'A 'B))
+    (define hypothesis (if (flip) 'A 'B))
 
-    (define (observe) (apply multinomial (hypothesis->parameters hypothesis)))
+    (define (observe observed-letters)
+      (map (lambda (letter) (condition (equal? (multinomial
+              (first (hypothesis->parameters hypothesis))
+              (second (hypothesis->parameters hypothesis)))
+            letter)))
+        observed-letters))
 
     hypothesis
 
-    (equal? observed-letters (repeat (length observed-letters) observe))
+    (observe observed-letters)
+
     )
    )
 
@@ -299,25 +314,31 @@ In this example, unlike the size principle cases above, both hypotheses lead to 
 
 Similar effects emerge if hypothesis B is not uniform, but favors different examples that hypothesis A:
 
-~~~~ {data-engine="mit-church"}
+~~~~
 (define observed-letters '(a b a c d))
 
 (define samples
    (mh-query
     100 100
 
-    (define (hypothesis->parameters  hyp)
-       (if (equal? hyp  'A)
-           (list '(a b c d) '(0.375 0.375 0.125 0.125))
-           (list '(a b c d) '(0.125 0.125 0.375 0.375))))
+    (define (hypothesis->parameters hyp)
+      (if (equal? hyp 'A)
+          (list '(a b c d) '(0.375 0.375 0.125 0.125))
+          (list '(a b c d) '(0.25 0.25 0.25 0.25))))
 
-    (define hypothesis  (if (flip) 'A 'B))
+    (define hypothesis (if (flip) 'A 'B))
 
-    (define (observe) (apply multinomial (hypothesis->parameters hypothesis)))
+    (define (observe observed-letters)
+      (map (lambda (letter) (condition (equal? (multinomial
+              (first (hypothesis->parameters hypothesis))
+              (second (hypothesis->parameters hypothesis)))
+            letter)))
+        observed-letters))
 
     hypothesis
 
-    (equal? observed-letters (repeat (length observed-letters) observe))
+    (observe observed-letters)
+
     )
    )
 
@@ -344,7 +365,7 @@ the model is to produce data that look more or less like our observations.  To s
 In the previous section we considered learning about the weight of a coin, and noted that a simple prior on weights seemed unable to capture our more discrete intuition that we first decide if the coin if fair or not, and only then worry about its weight.
 This example shows how our inferences about coin flipping can be explained in terms of model selection guided by the Bayesian Occam's razor.  Imagine a coin that you take out of a freshly unwrapped roll of quarters straight from the bank.  Almost surely this coin is fair... But how does that sense change when you see more or less anomalous sequences of flips? We can simultaneously ask if the coin is fair, and what is its weight.
 
-~~~~ {data-engine="mit-church"}
+~~~~
 (define observed-data '(h h t h t h h h t h))
 (define num-flips (length observed-data))
 (define num-samples 1000)
@@ -355,7 +376,7 @@ This example shows how our inferences about coin flipping can be explained in te
    (repeat num-samples
      (lambda () (if (flip fair-prior)
                      0.5
-                    (first (beta (first pseudo-counts) (second pseudo-counts)))))))
+                    (beta (first pseudo-counts) (second pseudo-counts))))))
 
 (define samples
    (mh-query
@@ -364,20 +385,19 @@ This example shows how our inferences about coin flipping can be explained in te
      (define fair-coin? (flip fair-prior))
      (define coin-weight (if fair-coin?
                              0.5
-                             (first (beta (first pseudo-counts) (second pseudo-counts)))))
+                             (beta (first pseudo-counts) (second pseudo-counts))))
 
      (define make-coin (lambda (weight) (lambda () (if (flip weight) 'h 't))))
-     (define coin (make-coin coin-weight))
 
      (list (if fair-coin? 'fair 'unfair) coin-weight)
 
-     (equal? observed-data (repeat num-flips coin))
+     (map (lambda (datum) (condition (equal? (flip coin-weight) (equal? datum 'h)))) observed-data)
    )
 )
 
 (hist (map first samples) "Fair coin?")
-(hist (append '(0) '(1) prior-samples) 10 "Coin weight, prior to observing data")
-(hist (append '(0) '(1) (map second samples)) 10 "Coin weight, conditioned on observed data")
+(hist (append '(0) '(1) prior-samples) "Coin weight, prior to observing data")
+(hist (append '(0) '(1) (map second samples)) "Coin weight, conditioned on observed data")
 ~~~~
 
 Try these cases and see if the inferences accord with your intuitions:
@@ -392,7 +412,7 @@ Try these cases and see if the inferences accord with your intuitions:
 
 Now let's look at the learning trajectories for this model:
 
-~~~~ {data-engine="mit-church"}
+~~~~
 (define make-coin (lambda (weight) (lambda () (if (flip weight) 'h 't))))
 
 (define fair-prior 0.999)
@@ -404,13 +424,13 @@ Now let's look at the learning trajectories for this model:
      (define fair-coin? (flip fair-prior))
      (define coin-weight (if fair-coin?
                              0.5
-                             (first (beta (first pseudo-counts) (second pseudo-counts)))))
+                            (beta (first pseudo-counts) (second pseudo-counts))))
 
      (define coin (make-coin coin-weight))
 
      coin-weight
 
-     (equal? data (repeat (length data) coin))
+     (map (lambda (datum) (condition (equal? (flip coin-weight) (equal? datum 'h)))) data)
    )
 )
 
@@ -418,9 +438,10 @@ Now let's look at the learning trajectories for this model:
 (define full-data-set (repeat 100 true-coin))
 (define observed-data-sizes '(1 3 6 10 20 30 50 70 100))
 (define (estimate N) (mean (samples (take full-data-set N))))
-(map (lambda (N)
-       (lineplot-value (pair N (estimate N)) "Learning trajectory"))
-     observed-data-sizes)
+
+(lineplot (map (lambda (N)
+       (list N (estimate N)))
+     observed-data-sizes))
 ~~~~
 In general (though not on every run) the learning trajectory stays near 0.5 initially&mdash;favoring the simpler hypothesis that the coin is fair&mdash;then switches fairly abruptly to near 0.9&mdash;as it infers that it is an unfair coin and likely has high weight. Here the Bayesian Occam's razor penalizes the hypothesis with the flexibility to learn any coin weight: we automatically get a notion of comparing the complexity of very differently-structure models.
 
@@ -450,7 +471,7 @@ When statisticians suggest methods for model selection, they often include a pen
 
      (list (if fair-coin? 'fair 'unfair) coin-weight)
 
-     (equal? observed-data (repeat (length observed-data) coin))
+     (map (lambda (datum) (condition (equal? (flip coin-weight) (equal? datum 'h)))) observed-data)
    )
 )
 
@@ -464,7 +485,7 @@ The two models now have the same number of free parameters (the unfair coin weig
 This example shows how the Bayesian Occam's Razor can be used to select the right order of a polynomial fit.
 This Church program samples polynomials up to order 3 that are (noisily) consistent with the observed data, then graphs the mean polynomial of each order.
 
-~~~~ {data-engine="mit-church"}
+~~~~
 ;;first a helper function that makes a polynomial function, given the coefficients:
 (define (make-poly c)
   (lambda (x) (apply + (map (lambda (a b) (* a (expt x b))) c (iota (length c))))))
@@ -577,7 +598,7 @@ And one day you see this 1x2 red patch... is it one 1x2 block or two 1x1 blocks?
 
 We can model this inference by building a generative model of scenes. To do so we use simple models of geometry and of rendering geometric objects to an image (in this case by layering them):
 
-~~~~ {data-engine="mit-church"}
+~~~~
 ;;take an object and "render" it into an image (represented as a list of lists):
 (define (object-appearance object)
   (map (lambda (pixel-y)
@@ -635,7 +656,7 @@ There is a slight preference for one object over two.
 
 Now let's see what happens if we see the two "halves" moving together. We use a simple random drift model of motion: an object randomly moves right or left or stays in place. Critically, the motion of each object is independent of other objects.
 
-~~~~ {data-engine="mit-church"}
+~~~~
 ;;take an object and "render" it into an image (represented as a list of lists):
 (define (object-appearance object)
   (map (lambda (pixel-y)
