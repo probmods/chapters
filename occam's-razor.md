@@ -451,7 +451,7 @@ Now let's look at the learning trajectories for this model:
        (list N (estimate N)))
      observed-data-sizes))
 ~~~~
-In general (though not on every run) the learning trajectory stays near 0.5 initially&mdash;favoring the simpler hypothesis that the coin is fair&mdash;then switches fairly abruptly to near 0.9&mdash;as it infers that it is an unfair coin and likely has high weight. Here the Bayesian Occam's razor penalizes the hypothesis with the flexibility to learn any coin weight: we automatically get a notion of comparing the complexity of very differently-structure models.
+In general (though not on every run) the learning trajectory stays near 0.5 initially&mdash;favoring the simpler hypothesis that the coin is fair&mdash;then switches fairly abruptly to near 0.9&mdash;as it infers that it is an unfair coin and likely has high weight. Here the Bayesian Occam's Razor penalizes the hypothesis with the flexibility to learn any coin weight: we automatically get a notion of comparing the complexity of very differently-structured models.
 
 ## The Effect of Unused Parameters
 
@@ -732,7 +732,8 @@ Now let's see what happens if we see the two "halves" moving together. We use a 
 (hist samples "Number of objects, moving image")
 ~~~~
 
-We see that there is a much stronger preference for the one object interpretation. It is a much bigger coincidence (as measured by Bayes Occam's razor) for the two halves to move together if they are unconnected, than if they are connected, or if they are merely seen statically next to each other.
+We see that there is a much stronger preference for the one object interpretation.
+It is a much bigger coincidence (as measured by Bayes Occam's Razor) for the two halves to move together if they are unconnected, than if they are connected, or if they are merely seen statically next to each other.
 
 We see from these examples that several of the gestalt principles for perceptual grouping emerge from this probabilistic scene inference setup (in this case "good continuation" and "common fate"). However, these are graded inferences, rather than hard rules: in this case we found that the information available in a static image was much weaker that the information in a moving image (and hence good continuation was weaker than common fate). This effect may have important developmental implications: the psychologist Elizabeth Spelke has found that young infants do not group objects by any static features (such as good continuation) but they do group them by common motion (see Spelke, 1990, Cognitive Science).
 
