@@ -1,12 +1,10 @@
 % Non-parametric models
 
->***Note: This chapter has not been revised for the new format and Church engine. Some content may be incomplete! Some example may not work!***
-
-In the section on [[Mixture models]] we saw a simple way to construct a model with an unbounded number of categories---simply place uncertainty over the number of categories that are 'actually' in the world. In this section we describe another approach which instead posits an infinite number of (mostly unused) categories actually in the world. The *non-parametric*, or *infinite*, models have a number of useful mathematical properties.
+In the chapter on [Mixture Models](mixture-models.html) we saw a simple way to construct a model with an unbounded number of categories---simply place uncertainty over the number of categories that are 'actually' in the world. In this section we describe another approach which instead posits an infinite number of (mostly unused) categories actually in the world. The *non-parametric*, or *infinite*, models have a number of useful mathematical properties.
 
 # Prelude: sampling from a discrete distribution
 
-In Church the discrete distribution is a primitive---you can simply call `(discrete '(0.2 0.3 0.1 0.4))`. If it wasn't built-in, if the only random primitive you could use was `flip`, how could you sample from discrete? One solution is to recursively walk down the list of probabilities, deciding whether to stop on each step. For instance, in `(discrete '(0.2 0.3 0.1 0.4))` there is a 0.2 probability we will stop on 1, after that there is a 0.3/0.8 probability we will stop on 2,... We can start by turning the list of probabilities into a list of *residual* probabilities---the probability we will stop on each step, given we haven't stopped yet:
+In Church the discrete distribution is a primitive---you can simply call `(discrete '(0.2 0.3 0.1 0.4))`. If it wasn't built-in and the only random primitive you could use was `flip`, how could you sample from discrete? One solution is to recursively walk down the list of probabilities, deciding whether to stop on each step. For instance, in `(discrete '(0.2 0.3 0.1 0.4))` there is a 0.2 probability of stopping on the first flip, a 0.3/0.8 probability of stopping on the second flip (given that we didn't stop on the first), and so on. We can start by turning the list of probabilities into a list of *residual* probabilities---the probability we will stop on each step, given that we haven't stopped yet:
 
 ~~~~
 (define (residuals probs)
@@ -34,7 +32,7 @@ Now to sample from the discrete distribution we simply walk down this list, deci
           1
           (+ 1 (discrete (rest resid))))))
 
-(hist (repeat 5000 (lambda () (discrete (residuals '(0.2 0.3 0.1 0.4))))) "discrete?")
+(hist (repeat 5000 (lambda () (discrete (residuals '(0.2 0.3 0.1 0.4))))) "stop?" )
 ~~~~
 
 # Infinite Discrete Distributions: The Dirichlet Processes
@@ -62,7 +60,7 @@ To formalize this as a Church program, we define a procedure, `pick-a-stick`, th
  (mem (lambda (index) (beta 1 alpha))))
 ~~~~
 
-`pick-a-stick` is a higher-order procedure that takes another procedure called `sticks`, which returns the stick weight for each stick. (`pick-a-stick` is also a *recursive* function&mdash;one that calls itself&mdash;we will explore recursive functions more in the section [[Recursive Models]].)
+`pick-a-stick` is a higher-order procedure that takes another procedure called `sticks`, which returns the stick weight for each stick. `pick-a-stick` is also a *recursive* function---one that calls itself.
 
 Notice that `sticks` uses `mem` to associate a particular draw from `beta` with each natural number. When we call it again with the same index we will get back the same stick weight. This (crucially) means that we construct the $\beta'_k$s only "lazily" when we need them&mdash;even though we started by imagining an infinite set of "sticks" we only ever construct a finite subset of them.
 
@@ -112,8 +110,8 @@ The above construction of the Dirichlet process defines a distribution over the 
 
 
 (define memoized-gaussian (DPthunk 1.0 (lambda () (gaussian 0.0 1.0))))
-(hist (repeat 1000 (lambda () (gaussian 0.0 1.0))) "Base Distribution")
-(hist (repeat 1000 memoized-gaussian) "Dirichlet Process")
+(density (repeat 10000 (lambda () (gaussian 0.0 1.0))) "Base Distribution" true)
+(density (repeat 10000 memoized-gaussian) "Dirichlet Process" true)
 ~~~~
 
 We can do a similar transformation to *any* church procedure: we associate to every argument and natural number pair a sample from the procedure, then use the Dirichlet process to define a new procedure with the same signature. In Church this useful higher-order distribution is called `DPmem`:
@@ -142,8 +140,8 @@ We can do a similar transformation to *any* church procedure: we associate to ev
 
 (define memoized-gaussian (DPmem 1.0 gaussian))
 
-(hist (repeat 1000 (lambda () (gaussian 0.0 1.0))) "Base Distribution")
-(hist (repeat 1000 (lambda () (memoized-gaussian 0.0 1.0))) "Dirichlet Process")
+(density (repeat 10000 (lambda () (gaussian 0.0 1.0))) "Base Distribution" true)
+(density (repeat 10000 (lambda () (memoized-gaussian 0.0 1.0))) "Dirichlet Process" true)
 ~~~~
 
 In a probabilistic setting a procedure applied to some inputs may evaluate to a different value on each execution. By wrapping such a procedure in `mem` we associate a randomly sampled value with each combination of arguments. We have seen how this is useful in defining *random world* style semantics, by persistently associating individual random draws with particular `mem`'d values. However, it is also natural to consider generalizing the notion of memoization itself to the stochastic case. Since `DPmem` is a higher-order procedure that transforms a procedure into one that *sometimes* reuses it's return values we call it a **stochastic memoizer**<ref>Goodman, Mansighka, Roy, Bonawaitz, Tenenbaum, 2008</ref>.
@@ -162,8 +160,7 @@ A procedure in Church defines a distribution. When we wrap such a procedure in `
 ~~~~
 (define memoized-normal (DPmem 1.0 (lambda () (gaussian 0 1.0))))
 
-(hist (repeat 100 memoized-normal) "DPmem normal")
-'done
+(density (repeat 100 memoized-normal) "DPmem normal")
 ~~~~
 
 The DP is said to *concentrate* the base measure.  Draws from a normal distribution are real-valued. However, draws from a DP are discrete (with probability one). By probabilistically memoizing a normal distribution we take the probability mass that the Gaussian spreads across the real line and *concentrate* it into a countable number of specific points. Compare the result of the previous computation with the result of sampling from a normal distribution itself.
@@ -171,8 +168,8 @@ The DP is said to *concentrate* the base measure.  Draws from a normal distribut
 ~~~~
 (define memoized-gaussian (DPmem 1.0 gaussian))
 
-(hist (repeat 1000 (lambda () (gaussian 0.0 1.0))) "Base Distribution")
-(hist (repeat 1000 (lambda () (memoized-gaussian 0.0 1.0))) "Dirichlet Process")
+(density (repeat 10000 (lambda () (gaussian 0.0 1.0))) "Base Distribution")
+(density (repeat 10000 (lambda () (memoized-gaussian 0.0 1.0))) "Dirichlet Process")
 ~~~~
 
 The way that the DP concentrates the underlying base measure is illustrated in the following figure.
@@ -199,8 +196,8 @@ We now return to the problem of categorization with an unknown number of categor
 
    (define bag->prototype (mem (lambda (bag) (dirichlet prototype))))
 
-   ;;the prior distribution on bags is simply a DPmem of gensym:
-   (define get-bag (DPmem 1.0 gensym))
+   ;;the prior distribution on bags is simply a DPmem of a gensym function:
+   (define get-bag (DPmem 1.0 (make-gensym)))
 
    ;;each observation comes from one of the bags:
    (define obs->bag (mem (lambda (obs-name) (get-bag))))
@@ -224,9 +221,8 @@ We now return to the problem of categorization with an unknown number of categor
 
 (hist (map first samples) "obs1 and obs2 same category?")
 (hist (map second samples) "obs1 and obs3 same category?")
-'done
 ~~~~
-A model like this is called an **infinite mixture model**; in this case an infinite dirichlet-multinomial mixture model, since the observations (the colors) come from a multinomial distribution with Dirichlet prior. The essential addition in this model is that we have `DPmem`'d `gensym` to provide a collection of reusable category (bag) labels:
+A model like this is called an **infinite mixture model**; in this case an infinite Dirichlet-multinomial mixture model, since the observations (the colors) come from a multinomial distribution with Dirichlet prior. The essential addition in this model is that we have `DPmem`'d a `gensym` function to provide a collection of reusable category (bag) labels:
 
 ~~~~
 (define reusable-categories (DPmem 1.0 (make-gensym)))
@@ -234,9 +230,9 @@ A model like this is called an **infinite mixture model**; in this case an infin
 (hist (repeat 20 reusable-categories))
 ~~~~
 To generate our observation in this infinite mixture model we first sample a category label from the memoized `gensym`.  Since the Dirichlet process tends to reuse earlier choices (more than later ones), our data will tend to cluster together in earlier components. However, there is no a priori bound on the number of latent classes, rather there is just a bias towards fewer classes.
-The strength of this bias is controlled by the DP concentration parameter $\alpha$. When $\alpha$ is high, we will tolerate a larger number of classes, when it is low we will strongly favor fewer classes. In general, the number of classes grows proportional to $\alpha\ \log(N)$ where $N$ is the number of observations.
+The strength of this bias is controlled by the DP concentration parameter $\alpha$. When $\alpha$ is high, we will tolerate a larger number of classes, when it is low we will strongly favor fewer classes. In general, the number of classes grows proportional to $\alpha \log(N)$ where $N$ is the number of observations.
 
-We can use this basic template to create infinite mixture models with any type of observation distribution. For instance here is an infinite *gaussian* mixture model:
+We can use this basic template to create infinite mixture models with any type of observation distribution. For instance here is an infinite Gaussian mixture model:
 
 ~~~~
 (define class-distribution (DPmem 1.0 (make-gensym)))
@@ -257,7 +253,7 @@ There are, of course, many possible observation models that can be used in the i
 
 # Another View of the DP: The Chinese Restaurant Process
 
-If you have looked at the literature on Bayesian models of cognition in the last few years, you will have seen many uses of a prior distribution known as the *Chinese restaurant process*.  The Chinese restaurant process is an alternate, but equivalent, way to construct the Dirichlet process. The CRP is usually described as a sequential sampling scheme using the metaphor of a restaurant.
+If you have looked at the literature on Bayesian models of cognition in the last few years, you will have seen many uses of a prior distribution known as the *Chinese Restaurant Process*.  The Chinese Restaurant Process is an alternate, but equivalent, way to construct the Dirichlet process. The CRP is usually described as a sequential sampling scheme using the metaphor of a restaurant.
 
 We imagine a restaurant with an infinite number of tables. The first customer enters the restaurant and sits at the first unoccupied table.  The ($N+1$)th customer enters the restaurant and sits at either an already occupied table or a new, unoccupied table, according to the following distribution.
 $$\tau^{(N+1)} |  \tau^{(1)},..., \tau^{(N)},\alpha \sim \sum_{i=1}^{K}   \frac{
@@ -278,8 +274,7 @@ Each table has a *dish* associated with it. Each dish $v$ is a label on the tabl
 
 The following animation demonstrates the Chinese restaurant process (click on it).
 
-:::<flash>file=CRP.swf|width=400|height=400|quality=best|scale=exactfit</flash>
-
+<center><embed width="512" height="384" src="CRP.swf" style='border: 1px solid black'></center>
 
 The CRP can be used to define a stochastic memoizer just as the Dirichlet process. We let the dish at each table be drawn from the underlying procedure. When we seat a customer we emit the dish labeling the table where the customer sat. To use a CRP as a memoization distribution we associate our underlying procedure with a set of restaurants---one for each combination of a procedure with its arguments. We let customers represent particular instances in which a procedure is evaluated, and we let the dishes labeling each table represent the values that result from those procedure applications. The base distribution which generates dishes corresponds to the underlying procedure which we have memoized.
 
@@ -321,9 +316,7 @@ Church provides a higher-order procedure which implements CRP based stochastic m
 
 ## Example: Goldwater Model 1
 
-<FONT size="1">
-::Goldwater, S., Griffiths, T. L., and Johnson, M. (2009). A Bayesian framework for word segmentation: Exploring the effects of context. Cognition, 112:21–54.
-</FONT>
+(Adapted from Goldwater, S., Griffiths, T. L., and Johnson, M. (2009). A Bayesian framework for word segmentation: Exploring the effects of context. Cognition, 112:21–54)
 
 ~~~~
 (define phones '(a e i o u k t p g d b s th f))
@@ -351,12 +344,12 @@ Church provides a higher-order procedure which implements CRP based stochastic m
 
 # Example: Infinite Hidden Markov Models 
 
-Just as when we considered the [[Mixture and Non-Parametric Models#Infinite Mixture Models | unknown latent categories]], we may wish to have a hidden Markov model over an unknown number of latent symbols. We can do this by again using a reusable source of state symbols:
+Just as when we considered a mixture model over an unknown number of latent categories, we may wish to have a hidden Markov model over an unknown number of latent symbols. We can do this by again using a reusable source of state symbols:
 
 ~~~~
 (define vocabulary '(chef omelet soup eat work bake))
 
-(define (get-state) (DPmem 0.5 gensym))
+(define (get-state) (DPmem 0.5 (make-gensym)))
 
 (define state->transition-model
   (mem (lambda (state) (DPmem 1.0 (get-state)))))
@@ -520,81 +513,63 @@ It is easy to confirm that in the special case of $a = 0$ and $b >0$, this reduc
 
 ## The Indian Buffet Process
 
-The indian buffet process is an infinite distribution on *sets* of draws from a base measure (rather than a single draw as in the CRP).
+The Indian Buffet Process is an infinite distribution on *sets* of draws from a base measure (rather than a single draw as in the CRP).
 
 # Hierarchical Combinations of Non-parametric Processes 
 
-In the section on [[Hierarchical Models]] we explored how additional
-levels of abstraction can lead to important effects in learning
-dynamics, such as transfer learning and the blessing of abstraction.
-In this section, we talk about two ways in which hierarchical
-non-parametric models can be built.
+In the [Hierarchical Models](hierarchical-models.html) chapter, we explored how additional levels of abstraction can lead to important effects in learning dynamics, such as transfer learning and the blessing of abstraction. In this section, we talk about two ways in which hierarchical non-parametric models can be built.
 
 ## The Nested Chinese Restaurant Process
 
-We have seen how the Dirichlet/Chinese Restaurant Process can be used
-to learn mixture models where the number of categories is infinite.
-However, the categories associated with each  table or stick in the
-DP/CRP are unstructured&mdash;real life categories have complex
-relationships with one another. For example, they are often organized
-into hierarchies: a **German shepherd**  is a type of **dog**, which is a
-type of **animal**, which is type of **living thing**, and so on.
+We have seen how the Dirichlet Process/CRP can be used to learn mixture models where the number of categories is infinite.
+However, the categories associated with each table or stick in the DP/CRP are unstructured, whereas real life categories have complex relationships with one another.
+For example, they are often organized into hierarchies: a German shepherd is a type of dog, which is a type of animal, which is type of living thing, and so on.
 
-In [[Example: One-shot learning of visual categories]], we already saw
-how such hierarchies of categories could lead to efficient one-shot
-learning, however, we did not talk about how such a hierarchy itself
-could be learned.
-
-The *Nested Chinese Restaurant Process* (nCRP) is one way of doing
-this.<ref>Blei, D. M., Griffiths, T. L., Jordan, M. I., and Tenenbaum,
-J. B. (2004). Hierarchical topic models and the nested chinese
-restaurant process. In Advances in Neural Information Processing
-Systems 16.</ref> The idea behind the nCRP is that tables in a
-CRP&mdash;which typically represent categories&mdash;can refer to
-*other restaurants*, representing lower-level categories.
+In [Example: One-shot learning of visual categories](hierarchical-models.html#example-one-shot-learning-of-visual-categories), we saw how such hierarchies  could lead to efficient one-shot learning, but we did not talk about how such a hierarchy itself could be learned.
+The *Nested Chinese Restaurant Process* (nCRP) is one way of doing this. (Blei, D. M., Griffiths, T. L., Jordan, M. I., and Tenenbaum, J. B, 2004. Hierarchical topic models and the nested chinese restaurant process. In Advances in Neural Information Processing Systems 16).
+The idea behind the nCRP is that tables in a CRP, which typically represent categories, can refer to *other restaurants* that represent lower-level categories.
 
 ~~~~
-(define my-gensym (make-gensym))
+(define top-gensym (make-gensym "t"))
+(define top-level-category (DPmem 1.0 top-gensym))
 
-(define top-level-category  (DPmem 1.0 my-gensym))
-
+(define subordinate-gensym (make-gensym "s"))
 (define subordinate-category
   (DPmem 1.0
          (lambda (parent-category)
-           (pair (my-gensym) parent-category))))
+           (list (subordinate-gensym) parent-category))))
 
 (define (sample-category) (subordinate-category (top-level-category)))
 
-(repeat 10 sample-category)
+(table (pair (list "subordinate" "top")
+             (repeat 10 sample-category)))
 ~~~~
 
-Each call to `sample-category` returns a pair which consists of
-a subordinate-level category followed by the corresponding top-level.
+Each call to `sample-category` returns a list that consists of a subordinate-level category followed by the corresponding top-level category.
 These categories are represented by gensyms, and, because they are
 drawn from a DP-memoized version of gensym, there is no *a priori*
 limit on the number of possible categories at each level.
 
 The nCRP gives us a way of constructing unbounded sets of
 hierarchically nested categories, but how can we use such structured
-categories to generate data? The Church code below shows one way.
+categories to generate data? The code below shows one way:
 
 ~~~~
-(define my-gensym (make-gensym))
-
+(define top-gensym (make-gensym "t"))
 (define possible-observations '(a b c d e f g))
 
-(define top-level-category  (DPmem 1.0 my-gensym))
+(define top-level-category (DPmem 1.0 top-gensym))
 (define top-level-category->parameters
-  (mem  (lambda (cat) (dirichlet (make-list (length possible-observations) 1.0)))))
+  (mem (lambda (cat) (dirichlet (make-list (length possible-observations) 1.0)))))
 
+(define subordinate-gensym (make-gensym "s"))
 (define subordinate-category
   (DPmem 1.0
          (lambda (parent-category)
-           (pair (my-gensym) parent-category))))
+           (list (subordinate-gensym) parent-category))))
 
 (define subordinate-category->parameters
-  (mem  (lambda (cat) (dirichlet (top-level-category->parameters (rest cat))))))
-
+  (mem (lambda (cat) (dirichlet (top-level-category->parameters (second cat)))))) 
 
 (define (sample-category) (subordinate-category (top-level-category)))
 
@@ -603,32 +578,13 @@ categories to generate data? The Church code below shows one way.
 (repeat 10 sample-observation)
 ~~~~
 
-This code shows a model where each category is associated with a
-multinomial distribution over the following possible observations:
-`(a b c d e f g)`. This distribution is drawn from a Dirichlet
-prior for each subordinate-level category. However, the
-*pseudocounts* for the Dirichlet distribution for each
-subordinate-level category are drawn from another Dirichlet
-distribution which is associated with the **top-level**
-category&mdash;all of the subordinate level categories which share a
-top-level category also have similar distributions over observations.
+This code shows a model where each category is associated with a multinomial distribution over the following possible observations: `(a b c d e f g)`. This distribution is drawn from a Dirichlet prior for each subordinate-level category. However, the *pseudocounts* for the Dirichlet distribution for each subordinate-level category are drawn from another Dirichlet distribution which is associated with the **top-level** category&mdash;all of the subordinate level categories which share a top-level category also have similar distributions over observations.
 
-In fact, the model presented in
-[[Example: One-shot learning of visual categories]] works in the
-same way, except that each category is associated with Gaussian
-distribution and the mean and variance parameters are shared between
-subordinate level categories.
+In fact, the model presented in [Example: One-shot learning of visual categories](hierarchical-models.html#example-one-shot-learning-of-visual-categories) works in the same way, except that each category is associated with Gaussian distribution and the mean and variance parameters are shared between subordinate level categories.
 
 ## The Hierarchical Dirichlet Process
 
-In the last section, we saw an example where subordinate-level
-categories drew their hyperparameters from a shared Dirichlet
-distribution. It is also possible to build a similar model using a
-Dirichlet Process at each level. This model is known as the
-*Hierarchical Dirichlet Process* (HDP).<ref>Teh, Y. W., Jordan, M.
-I., Beal, M. J., and Blei, D. M. (2006). Hierarchical dirichlet
-processes. Journal of the American Statistical Association,
-101(476):1566–1581.</ref>
+In the last section, we saw an example where subordinate-level categories drew their hyperparameters from a shared Dirichlet distribution. It is also possible to build a similar model using a Dirichlet Process at each level. This model is known as the *Hierarchical Dirichlet Process* (HDP). (Teh, Y. W., Jordan, M. I., Beal, M. J., and Blei, D. M. (2006). Hierarchical dirichlet processes. Journal of the American Statistical Association, 101(476):1566–1581.)
 
 ~~~~
 (define base-measure (lambda () (poisson 20)))
@@ -639,43 +595,31 @@ processes. Journal of the American Statistical Association,
            (top-level))))
 
 (hist (repeat 1000 base-measure) "Draws from Base Measure (poisson 20)")
+(hist (repeat 1000 top-level) "Draws from Top Level DP")
 (hist (repeat 1000 (lambda () (sample-observation 'component1))) "Draws from Component DP 1")
 (hist (repeat 1000 (lambda () (sample-observation 'component2))) "Draws from Component DP 2")
 (hist (repeat 1000 (lambda () (sample-observation 'component3))) "Draws from Component DP 3")
-(hist (repeat 1000 top-level) "Draws from Top Level DP")
-'done
 ~~~~
 
-In an HDP, there are several component Dirichlet Processes (labeled
-here as `component1`, `component2`, etc.). These
-component DPs all share another DP (called `top-level`)
-as their base measure.
+In an HDP, there are several component Dirichlet Processes (labeled here as `component1`, `component2`, etc.). These component DPs all share another DP (called `top-level`) as their base measure.
 
-In the example above, we have used a `poisson` distribution as
-the base measure. The top-level DP concentrates this distribution into
-a number of points. Each of the component DPs then further concentrate
-this distribution&mdash;sharing the points chosen by the top-level DP,
-but further conctrating it, each in their own way.
+In the example above, we have used a `poisson` distribution as the base measure. The top-level DP concentrates this distribution into a number of points. Each of the component DPs then further concentrate this distribution---sharing the points chosen by the top-level DP, but further concentrating it, each in their own way.
 
-
-A natural move is to combine the nCRP and HDP: the nCRP can be used to
-sample an unbounded set of hierarchically structured categories, and
-the HDP can be used to make these categories share observations in
-interesting ways.
+A natural move is to combine the nCRP and HDP: the nCRP can be used to sample an unbounded set of hierarchically structured categories, and the HDP can be used to make these categories share observations in interesting ways.
 
 ~~~~
-(define my-gensym (make-gensym))
-
-(define top-level-category  (DPmem 1.0 my-gensym))
+(define top-gensym (make-gensym "t"))
+(define top-level-category (DPmem 1.0 top-gensym))
 
 (define root-category (DPmem 10.0 (lambda () (poisson 20))))
 
-(define sample-from-top-level-category  (DPmem 1.0 (lambda (cat) (root-category))))
+(define sample-from-top-level-category (DPmem 1.0 (lambda (cat) (root-category))))
 
+(define subordinate-gensym (make-gensym "s"))
 (define subordinate-category
   (DPmem 1.0
          (lambda (parent-category)
-           (pair (my-gensym) parent-category))))
+           (list (subordinate-gensym) parent-category))))
 
 (define (sample-category) (subordinate-category (top-level-category)))
 
@@ -684,17 +628,19 @@ interesting ways.
          (lambda (cat)
            (sample-from-top-level-category (rest cat)))))
 
-(repeat 10
+(repeat
+ 10
  (lambda ()
-   (let ((category (sample-category)))
-     (hist (repeat 1000 (lambda () (sample-observation category)))
-           (string-append  "Top Level: " (symbol->string (rest category))
-                           ", Subordinate Level: " (symbol->string (first category))))
-     (hist (repeat 1000 (lambda () (sample-from-top-level-category (rest category))))
-           (string-append  "Top Level: " (symbol->string (rest category))))
-     (hist (repeat 1000 (lambda () (sample-observation category)))
-           "Root Category"))))
-'done
+   (let* ([category (sample-category)]
+          [subordinate (first category)]
+          [top (second category)]
+          [h1 (hist (repeat 1000 (lambda () (sample-observation category)))
+                    (string-append  "Top Level: " top ", Subordinate Level: " subordinate))]
+          [h2 (hist (repeat 1000 (lambda () (sample-from-top-level-category top)))
+                    (string-append  "Top Level: " top))]
+          [h3 (hist (repeat 1000 (lambda () (sample-observation category)))
+                    "Root Category")])
+     'dummy)))
 ~~~~
 
 Note that the nCRP and the HDP represent very different ways to
@@ -719,8 +665,8 @@ the possibility that two members of the category can share *no*
 feature in common, instead, each sharing features with *other*
 members of the category.
 
-The philosopher Wittgensteing&mdash;who introduced the concept of
-Family Resemblance Categories&mdash;famously discussed the example of
+The philosopher Wittgenstein---who introduced the concept of
+Family Resemblance Categories---famously discussed the example of
 *games*. There are many different kinds of games: ball games,
 drinking games, children's playground games, card games, video games,
 role-playing games, etc. It is not clear that there is a single list
@@ -728,66 +674,32 @@ of features which they all share and which can uniquely identify them
 all as **game** (See: *Murphy, G. L. 2004. The Big Book of Concepts. The MIT Press.*
 For an in-depth discussion of many issues surrounding concepts.).
 
-Two theories have emerged to explain FRCs (and other related
-phenomena): *prototype* theories and *exemplar* theories. In
-prototype theories, concepts are considered to be based on a single
-stored prototype. People judge whether something is an example of a
-concept by comparing to this stored representation. For example, the
-prototype for **dog** might include features such as *furry*,
-*barks*, etc. An object is a member of a category (concept) to the
-degree that it matches the single stored prototype.
+Two theories have emerged to explain FRCs (and other related phenomena): *prototype* theories and *exemplar* theories.
+In prototype theories, concepts are considered to be based on a single stored prototype.
+People judge whether something is an example of a concept by comparing to this stored representation.
+For example, the prototype for **dog** might include features such as *furry*, *barks*, etc. An object is a member of a category (concept) to the degree that it matches the single stored prototype.
 
-In *exemplar theories*, by contrast, it is assumed that people store
-all examples of a particular concept, rather than a single summary
-representation in prototype forms. A new object is classified by
-comparison with all of these forms.
+In *exemplar theories*, by contrast, it is assumed that people store all examples of a particular concept, rather than a single summary representation in prototype forms.
+A new object is classified by comparison with all of these forms.
 
-Both prototype and exemplar theories are based on similarity, and the
-probability that an observation is assigned to category $c_{N}
-$ can be given by
-$$p(c_{N} \mid x_N, \vec{x}_{N-1}, \vec{c}_{N-1}) =
-\frac{\eta_{N,j}\beta_{N,j}}{\sum_{c} \eta_{N,c}\beta_{N,c}}$$
-where $\eta_{N,i}$ is the similarity between observation
-$N$ and category $i$, and
-$\beta_{N,i}$ is the response bias for the category (i.e.,
-its prior weight).
+Both prototype and exemplar theories are based on similarity, and the probability that an observation is assigned to category $c_{N}$ can be given by
+$$p(c_{N} \mid x_N, \vec{x}_{N-1}, \vec{c}_{N-1}) = \frac{\eta_{N,j}\beta_{N,j}}{\sum_{c} \eta_{N,c}\beta_{N,c}}$$
+where $\eta_{N,i}$ is the similarity between observation $N$ and category $i$, and $\beta_{N,i}$ is the response bias for the category (i.e., its prior weight).
 
-Exemplar models treat the similarity between observation
-$N$ and a category as a sum over all members of the
-category.
-$$
-\eta_{N,i} = \sum_{i \mid c_{i} = j } \eta_{N,i}
-$$
+Exemplar models treat the similarity between observation $N$ and a category as a sum over all members of the category:
+$$\eta_{N,i} = \sum_{i \mid c_{i} = j } \eta_{N,i}$$
 Prototype models treat the similarity as the similarity between
-observation $N$ and the single stored prototype.
-$$
-\eta_{N,i} = \eta_{N,p_i}
-$$
-Notice that these two models can be seen as opposite ends of a
-spectrum, one estimates the category based on every member, while the
-other estimates based on a single member. There are clearly many
-intermediate points where each category can be viewed as a mixture
-over $K$ clusters.
+observation $N$ and the single stored prototype:
+$$\eta_{N,i} = \eta_{N,p_i}$$
+Notice that these two models can be seen as opposite ends of a spectrum; one estimates the category based on every member, while the other estimates based on a single member.
+There are clearly many intermediate points where each category can be viewed as a mixture over $K$ clusters.
 
-Griffiths et al. (2007) show how a large number of different models of
-categorization can be unified by viewing them all as special cases of
-a HDP which learns how many clusters each category should be
-represented by.<ref>Griffiths, T. L., Canini, K. R., Sanborn, A. N.,
-and Navarro, D. J. (2007). Unifying rational models of categorization
-via the hierarchical dirichlet process. In Proceedings of the
-Twenty-Ninth Annual Conference of the Cognitive Science Society.</ref>
+Griffiths et al. (2007) show how a large number of different models of categorization can be unified by viewing them all as special cases of a HDP which learns how many clusters each category should be represented by. (Griffiths, T. L., Canini, K. R., Sanborn, A. N., and Navarro, D. J. (2007). Unifying rational models of categorization via the hierarchical dirichlet process. In Proceedings of the Twenty-Ninth Annual Conference of the Cognitive Science Society.)
 
-In particular, Griffiths et al. (2007) examine the data from Smith and
-Minda (1998), which shows how learners undergo a transition from
-ptototype to exemplar representations during the course of
-learning.<ref>Smith, J. D. and Minda, J. P. (1998). Prototypes in the
-mist: The early epochs of category learning. Journal of Experimental
-Psychology: Learning, Memory, and Cognition.</ref>
+In particular, Griffiths et al. (2007) examine the data from Smith and Minda (1998), which shows how learners undergo a transition from ptototype to exemplar representations during the course of learning. (Smith, J. D. and Minda, J. P. (1998). Prototypes in the mist: The early epochs of category learning. Journal of Experimental Psychology: Learning, Memory, and Cognition)
 
 The results are shown below.
 
-<img src='images/unifying-table.png' width='500' />
+<center><img src='images/unifying-table.png' width='500' /></center>
 
-<img src='images/unifying.png' width='600' />
-
-
+<center><img src='images/unifying.png' width='600' /></center>
