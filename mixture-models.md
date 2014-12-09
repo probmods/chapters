@@ -2,14 +2,13 @@
 
 >***Note: This chapter has not been revised for the new format and Church engine. Some content may be incomplete! Some example may not work!***
 
-In the section on [[Hierarchical Models]] we saw the power of probabilistic inference in learning about the latent structure underlying different kinds of observations: the mixture of colors in different bags of marbles, or the prototypical features of categories of animals. In that discussion we always assumed that we knew what kind each observation belonged to&mdash;the bag that each marble came from, or the subordinate, basic, and superordinate category of each object. Knowing this allowed us to pool the information from each observation for the appropriate latent variables. What if we don't know *a priori* how to divide up our observations?
-
-In this section we explore the problem of simultaneously discovering kinds and their properties -- this can be done using *mixture models*.
+In the chapter on [Hierarchical Models](hierarchical-models.html), we saw the power of probabilistic inference in learning about the latent structure underlying different kinds of observations: the mixture of colors in different bags of marbles, or the prototypical features of categories of animals. In that discussion we always assumed that we knew what kind each observation belonged to---the bag that each marble came from, or the subordinate, basic, and superordinate category of each object. Knowing this allowed us to pool the information from each observation for the appropriate latent variables. What if we don't know *a priori* how to divide up our observations? In this chapter we explore the problem of simultaneously discovering kinds and their properties -- this can be done using *mixture models*.
 
 # Learning Categories
-Imagine a child who enters the world and begins to see objects. She can't begin by learning the typical features of cats or mice, because she doesn't yet know that there are such kinds of objects as cats and mice. Yet she may quickly notice that some of the objects all tend to purr and have claws, while other objects are small and run fast&mdash;she can *cluster* the objects together on the basis of common features and thus form categories (such as cats and mice), whose typical features she can then learn.
+Imagine a child who enters the world and begins to see objects. She can't begin by learning the typical features of cats or mice, because she doesn't yet know that there are such kinds of objects as cats and mice. Yet she may quickly notice that some of the objects all tend to purr and have claws, while other objects are small and run fast---she can
+ *cluster* the objects together on the basis of common features and thus form categories (such as cats and mice), whose typical features she can then learn.
 
-To formalize this learning problem, we begin by adapting the bags-of-marbles examples from the [[Hierarchical Models]] section. However, we now assume that the bag that each marble is drawn from is *unobserved* and must be inferred.
+To formalize this learning problem, we begin by adapting the bags-of-marbles examples from the [Hierarchical Models](hierarchical-models.html) chapter. However, we now assume that the bag that each marble is drawn from is *unobserved* and must be inferred.
 
 ~~~~
 (define colors '(blue green red))
@@ -51,7 +50,7 @@ To formalize this learning problem, we begin by adapting the bags-of-marbles exa
 'done
 ~~~~
 
-We see that it is likely that `obs1` and `obs2` came from the same bag, but quite unlikely that `obs3` did. Why? Notice that we have set alpha small, indicating a belief that the marbles in a bag will tend to all be the same color. How do the results change if you make alpha larger? Why?  Note that we have queried on whether observed marbles came out of the same bag, instead of directly querying on the bag number that an observation came from. This is because the bag number by itself is meaningless---it is only useful in its role of determining which objects have similar properties. Formally, the model we have defined above is symmetric in the bag labels (if you permute all the labels you get a new state with the same probability).
+We see that it is likely that `obs1` and `obs2` came from the same bag, but quite unlikely that `obs3` did. Why? Notice that we have set `alpha` small, indicating a belief that the marbles in a bag will tend to all be the same color. How do the results change if you make `alpha` larger? Why?  Note that we have queried on whether observed marbles came out of the same bag, instead of directly querying on the bag number that an observation came from. This is because the bag number by itself is meaningless---it is only useful in its role of determining which objects have similar properties. Formally, the model we have defined above is symmetric in the bag labels (if you permute all the labels you get a new state with the same probability).
 
 Instead of assuming that a marble is equally likely to come from each bag, we could instead learn a distribution over bags where each bag has a different probability. This is called a *mixture distribution* over the bags:
 
