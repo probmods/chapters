@@ -367,6 +367,22 @@ This example shows how our inferences about coin flipping can be explained in te
 
 ~~~~
 (define observed-data '(h h t h t h h h t h))
+
+;; fair coin, probability of H = 0.5
+;; (define observed-data (h h t h t h h h t h))
+
+;; ?? suspicious coincidence, probability of H = 0.5 ..?
+;; (define observed-data (h h h h h h h h h h))
+
+;; probably unfair coin, probability of H near 1 
+;; (define observed-data (h h h h h h h h h h h h h h h))
+
+;; definitely unfair coin, probability of H near 1
+;; (define observed-data (h h h h h h h h h h h h h h h h h h h h))
+
+;; unfair coin, probability of H = 0.85
+;; (define observed-data (h h h h h h t h t h h h h h t h h t h h h h h t h t h h h h h t h h h h h h h h h t h h h h t h h h h h h h))
+
 (define num-flips (length observed-data))
 (define num-samples 1000)
 (define fair-prior 0.999)
@@ -396,19 +412,11 @@ This example shows how our inferences about coin flipping can be explained in te
 )
 
 (hist (map first samples) "Fair coin?")
-(hist (append '(0) '(1) prior-samples) "Coin weight, prior to observing data")
-(hist (append '(0) '(1) (map second samples)) "Coin weight, conditioned on observed data")
+(density (append '(0) '(1) prior-samples) "Coin weight, prior to observing data")
+(density (append '(0) '(1) (map second samples)) "Coin weight, conditioned on observed data")
 ~~~~
 
-Try these cases and see if the inferences accord with your intuitions:
-
-~~~~ {.norun}
-(h h t h t h h h t h) ;; fair coin, probability of H = 0.5
-(h h h h h h h h h h) ;; ?? suspicious coincidence, probability of H = 0.5 ..?
-(h h h h h h h h h h h h h h h) ;; probably unfair coin, probability of H near 1 
-(h h h h h h h h h h h h h h h h h h h h) ;; definitely unfair coin, probability of H near 1
-(h h h h h h t h t h h h h h t h h t h h h h h t h t h h h h h t h h h h h h h h h t h h h h t h h  h h h h h) ;; unfair coin, probability of H = 0.85
-~~~~
+Try some of the other cases that we've commented out above and see if the inferences accord with your intuitions.
 
 Now let's look at the learning trajectories for this model:
 
