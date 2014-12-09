@@ -351,8 +351,13 @@ Human perception is often skewed by our expectations. A common example of this i
 (define stimulus-distances (compute-stimuli-pairs stimuli))
 (define perceptual-distances (compute-perceptual-pairs stimuli))
 
-(barplot (map (lambda (a b) (pair a b)) (iota (- (length stimuli) 1)) stimulus-distances) "Acoustic Distances")
-(barplot (map (lambda (a b) (pair a b)) (iota (- (length stimuli) 1)) perceptual-distances) "Perceptual Distances")
+(scatter (map pair (iota (- (length stimuli) 1))
+              stimulus-distances)
+         "Stimulus Distances")
+
+(scatter (map pair (iota (- (length stimuli) 1))
+              perceptual-distances)
+         "Perceptual Distances")
 ~~~~
 
 Notice that the perceived distances between input sounds are skewed relative to the actual acoustic distances – that is they are attracted towards the category centers.
