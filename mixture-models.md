@@ -429,7 +429,7 @@ We could extend this model by allowing it to infer that there are more than two 
 ~~~~
 Vary the amount of evidence and see how the inferred number of bags changes.
 
-For the prior on `num-bags` we used the [*Poisson distribution*](http://en.wikipedia.org/wiki/Poisson_distribution) which is a distribution on  non-negative integers. It is convenient, though implies strong prior knowledge (perhaps too strong for this example). We have also used the special function `gensym`, which returns a fresh symbol every time it is called. It can be used to generate an unbounded set of labels for things like classes, categories and mixture components.
+For the prior on `num-bags` we used the [*Poisson distribution*](http://en.wikipedia.org/wiki/Poisson_distribution) which is a distribution on  non-negative integers. It is convenient, though implies strong prior knowledge (perhaps too strong for this example). We have created `gensym` functions using `make-gensym`; a `gensym` function returns a fresh symbol every time it is called. It can be used to generate an unbounded set of labels for things like classes, categories and mixture components.
 Each evaluation of `gensym` results in a unique (although cryptic) symbol:
 
 ~~~~
