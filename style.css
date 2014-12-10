@@ -1,3 +1,8 @@
+@font-face {
+  font-family: 'Inconsolata';
+  src: url('webchurch/online/inconsolata.woff') format('woff'); /* IE9 Compat Modes */
+}
+
 html {
     padding: 0;
     margin: 0;
@@ -180,6 +185,7 @@ h1 a:visited, h2 a:visited, h3 a:visited, h4 a:visited, h5 a:visited, h6 a:visit
 }
 
 li > code {
+    font-family: Inconsolata;
     border-radius: 2px;
     background-color: #fafafa;
     border: 1px solid #dfdfdf;
@@ -244,10 +250,11 @@ span.citation {
 /* code settings */
 
 p > code {
+    font-family: Inconsolata;
     border-radius: 2px;
     background-color: #fafafa;
     border: 1px solid #dfdfdf;
-    font-size: 12px;
+    font-size: 14px;
     padding: 0 2px 0 2px;
 }
 
