@@ -99,57 +99,49 @@ Instead of assuming that a marble is equally likely to come from each bag, we co
 
 Models of this kind are called **mixture models** because the observations are a "mixture" of several categories. Mixture models are widely used in modern probabilistic modeling because they describe how to learn the unobservable categories which underlie observable properties in the world.
 
-The observation distribution associated with each mixture *component* (i.e., kind or category) can be any distribution we like. For example, here is a mixture model with *Gaussian* components (note: runs in MIT-Church):
-
-<!--
-
-FIXME:doesn't burn in fast enough...-->
+The observation distribution associated with each mixture *component* (i.e., kind or category) can be any distribution we like. For example, here is a mixture model with *Gaussian* components:
 
 ~~~~
-(define (noisy=? x y) (and (flip (expt 0.1 (abs (- (first x) (first y)))))
-                           (flip (expt 0.1 (abs (- (rest x) (rest y)))))))
 (define samples
- (mh-query
+  (mh-query
    200 100
 
-   (define bag-mixture (dirichlet '(1 1 1)))
+   (define bag-mixture (dirichlet '(1 1)))
 
-   (define obs->cat
-     (mem (lambda (obs-name)
-            (multinomial '(bag1 bag2 bag3) bag-mixture))))
+   (define obs->cat 
+     (mem (lambda (obs-name) 
+            (multinomial '(bag1 bag2) bag-mixture))))
 
    (define cat->mean (mem (lambda (cat) (list (gaussian 0.0 1.0) (gaussian 0.0 1.0)))))
 
-   (define observe
-     (mem (lambda (obs-name)
-            (pair (gaussian (first (cat->mean (obs->cat obs-name))) 0.01)
-                  (gaussian (second (cat->mean (obs->cat obs-name))) 0.01)))))
+   (define (observe-point obs-name value) 
+     (map (lambda (x-mean y) (condition (equal? (gaussian x-mean 0.01) y)))
+          (cat->mean (obs->cat obs-name))
+          value))
 
-   ;;sample a new observations and its category
-   (list (obs->cat 't) (observe 't))
+   ;; look at where bag1 and bag2 centers are
+   (map cat->mean '(bag1 bag2))
 
-   (no-proposals
-   (and
-    (noisy=? '(0.5 . 0.5) (observe 'a1))
-    (noisy=? '(0.6 . 0.5) (observe 'a2))
-    (noisy=? '(0.5 . 0.4) (observe 'a3))
-    (noisy=? '(0.55 . 0.55) (observe 'a4))
-    (noisy=? '(0.45 . 0.45) (observe 'a5))
-    (noisy=? '(0.5 . 0.5) (observe 'a6))
-    (noisy=? '(0.7 . 0.6) (observe 'a7))
+   ;; one cluster of points in the top right quadrant
+   (observe-point 'a1 '(0.5 0.5))
+   (observe-point 'a2 '(0.6 0.5))   
+   (observe-point 'a3 '(0.5 0.4))   
+   (observe-point 'a4 '(0.55 0.55)) 
+   (observe-point 'a5 '(0.45 0.45)) 
+   (observe-point 'a6 '(0.5 0.5))   
+   (observe-point 'a7 '(0.7 0.6))    
 
+   ;; another cluster of points in the lower left quadrant
+   (observe-point 'b1 '(-0.5 -0.5))
+   (observe-point 'b2 '(-0.7 -0.4)) 
+   (observe-point 'b3 '(-0.5 -0.6)) 
+   (observe-point 'b4 '(-0.55 -0.55))
+   (observe-point 'b5 '(-0.5 -0.45))
+   (observe-point 'b6 '(-0.6 -0.5))
+   (observe-point 'b7 '(-0.6 -0.4))))
 
-    (noisy=? '(-0.5 . -0.5) (observe 'b1))
-    (noisy=? '(-0.7 . -0.4) (observe 'b2))
-    (noisy=? '(-0.5 . -0.6) (observe 'b3))
-    (noisy=? '(-0.55 . -0.55) (observe 'b4))
-    (noisy=? '(-0.5 . -0.45) (observe 'b5))
-    (noisy=? '(-0.6 . -0.5) (observe 'b6))
-    (noisy=? '(-0.6 . -0.4) (observe 'b7))
-    ))))
-
-(scatter (map second samples) "predictive")
-'done
+(scatter (map first samples) "bag 1 mean")
+(scatter (map second samples) "bag 2 mean")
 ~~~~
 
 ## Example: Topic Models
