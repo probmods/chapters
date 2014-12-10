@@ -439,7 +439,7 @@ We now consider a model of learning the shape bias which uses the compound diric
 (define sizes (iota 11))
 (define samples
  (mh-query
-   50 100
+   250 100
    ;;Rather than defining variables for each dimension, we could make more use of abstraction.
    (define phi-shapes (dirichlet (make-list (length shapes) 1)))
    (define phi-colors (dirichlet (make-list (length colors) 1)))
@@ -472,7 +472,7 @@ We now consider a model of learning the shape bias which uses the compound diric
             shape))
         observed-shapes))
 
-   (draw-object 'cat-5)
+   (first (draw-object 'cat-5))
 
    (observe-object 'cat-1 '((1 1 1 1) (1 2 2 2)))
    (observe-object 'cat-2 '((2 3 3 1) (2 4 4 2)))
@@ -480,12 +480,12 @@ We now consider a model of learning the shape bias which uses the compound diric
    (observe-object 'cat-4 '((4 7 7 1) (4 8 8 2)))
    (observe-object 'cat-5 '((5 9 9 1)))))
 
-samples
+(hist samples "First dimension of object drawn from cat-5")
 ~~~~
 
 The program above gives us draws from some novel category for which we've seen a single instance. In the experiments with children, they had to choose one of three choice objects which varied according to the dimension they matched the example object from the category. We show below model predictions (from Kemp et al (2007)) for performance on the shape bias task which show the probabilities (normalized) that the choice object belongs to the same category as the test exemplar. The model predictions reproduce the general pattern of the experimental results of Smith et al in that shape matches are preferred in both the first and second order generalization case, and more strong in the first order generalization case. The model also helps to explain the childrens' vocabulary growth in that it shows how the shape bias can be generally learned, as seen by the differing values learned for the various alpha parameters, and so used outside the lab.
 
-<img src='images/shape_bias_results_model.png' width='400' />
+<center><img src='images/shape_bias_results_model.png' width='400' /></center>
 
 The model can be extended to learn to apply the shape bias only to the relevant ontological kinds, for example to object categories but not to substance categories. The  Kemp et al (2007) paper discusses such an extension to the model which learns the hyperparameters separately for each kind and further learns what categories belong to each kind and how many kinds there are. This involves the use of a non-parametric prior, called the Chinese Restaurant Process, which will be discussed in the section on non-parametric models.
 
