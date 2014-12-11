@@ -11,7 +11,7 @@
 
 
 The line between "reasoning" and "learning" is unclear in cognition.
-Just as reasoning can be seen as a form of conditional inference, so can learning: discovering persistent facts about the world (for example, causal processes or causal properties of objects).  
+Just as reasoning can be seen as a form of conditional inference, so can learning: discovering persistent facts about the world (for example, causal processes or causal properties of objects).
 By saying that we are learning "persistent" facts we are indicating that there is something to infer which we expect to be relevant to many observations over time. 
 Thus, we will formulate learning as inference in a model that (1) has a fixed latent value of interest, the *hypothesis*, and (2) has a sequence of observations, the *data points*. This will be a special class of [models for sequences of observations](observing-sequences.html)---those that fit the pattern of [Bayes rule](conditioning.html#bayes-rule):
 
@@ -27,29 +27,27 @@ This function expresses our prior knowledge about how the process we observe is 
 The `observe` function describes how a data point is generated given the hypothesis.
 What can be inferred about the hypothesis given a certain subset of the observed data? How much more can we learn as the size of the observed data set increases---what is the *learning curve*?
 
-
 # Example: Learning About Coins
 
-As a simple illustration of learning, imagine that a friend pulls a coin out of her pocket and offers it to you to flip.  You flip it five times and observe a set of all heads,
+As a simple illustration of learning, imagine that a friend pulls a coin out of her pocket and offers it to you to flip.  You flip it five times and observe a set of all heads:
 
-  `(H H H H H)`.
+`(H H H H H)`.
 
 Does this seem at all surprising?  To most people, flipping five heads in a row is a minor coincidence but nothing to get excited about.  But suppose you flip it five more times and continue to observe only heads.  Now the data set looks like this:
 
-  `(H H H H H H H H H H)`.
+`(H H H H H H H H H H)`.
 
 Most people would find this a highly suspicious coincidence and begin to suspect that perhaps their friend has rigged this coin in some way -- maybe it's a weighted coin that always comes up heads no matter how you flip it.  This inference could be stronger or weaker, of course, depending on what you believe about your friend or how she seems to act; did she offer a large bet that you would flip more heads than tails?  Now you continue to flip five more times and again observe nothing but heads -- so the data set now consists of 15 heads in a row:
 
-  `(H H H H H H H H H H H H H H H).`
+`(H H H H H H H H H H H H H H H)`.
 
 Regardless of your prior beliefs, it is almost impossible to resist the inference that the coin is a trick coin.
 
-This "learning curve" reflects a highly systematic and rational process of conditional inference.  
+This "learning curve" reflects a highly systematic and rational process of conditional inference.
 <!--
 Here's how to describe it using a probabilistic program<ref>following on Griffiths and Tenenbaum, "From mere coincidences to meaningful discoveries", Cognition, 2007, who present a more in-depth rational analysis and empirical study of people's sense of coincidence</ref>.  Recall how earlier we used stochastic functions with no inputs, or *thunks*, to describe coins of different weights.  Each such function now represents a hypothesis about the process generating our observations.  In the program below, the function `coin` represents these hypotheses.  The higher-order function `make-coin` takes one input, `weight`, and returns a `coin` thunk with that weight embedded in its definition.
 -->
-For simplicity let's consider only two hypotheses, two possible definitions of `coin`, representing a fair coin and a trick coin that produces heads 95% of the time.  
-A priori, how likely is any coin offered up by a friend to be a trick coin?  Of course there is no objective or universal answer to that question, but for the sake of illustration let's assume that the *prior probability* of seeing a trick coin is 1 in a 1000, versus 999 in 1000 for a fair coin.  These probabilities determine the weight passed to `make-coin`.  Now to inference:
+For simplicity let's consider only two hypotheses, two possible definitions of `coin`, representing a fair coin and a trick coin that produces heads 95% of the time. A priori, how likely is any coin offered up by a friend to be a trick coin?  Of course there is no objective or universal answer to that question, but for the sake of illustration let's assume that the *prior probability* of seeing a trick coin is 1 in a 1000, versus 999 in 1000 for a fair coin.  These probabilities determine the weight passed to `make-coin`.  Now to inference:
 
 ~~~~
 (define observed-data '(h h h h h))
@@ -107,8 +105,8 @@ The following program computes conditional inferences about the weight of a coin
    
    (equal? observed-data (repeat num-flips coin))))
 
-(hist prior-samples "Coin weight, prior to observing data")
-(hist samples "Coin weight, conditioned on observed data")
+(density prior-samples "Coin weight, prior to observing data")
+(density samples "Coin weight, conditioned on observed data")
 ~~~~
 
 Because the output of inference is a set of conditional samples, and each sample is drawn from the uncountable interval $[0,1]$, we cannot expect that any of these samples will correspond exactly to the true coin weight or the single most likely value.  
@@ -172,8 +170,8 @@ What if we would like to learn about the weight of a coin, or any parameters of 
    
    (equal? observed-data (repeat num-flips coin))))
 
-(hist prior-samples "Coin weight, prior to observing data")
-(hist samples "Coin weight, conditioned on observed data")
+(density prior-samples "Coin weight, prior to observing data")
+(density samples "Coin weight, conditioned on observed data")
 ~~~~
 
 Is the family of Beta distributions sufficient to represent all of people's intuitive prior knowledge about the weights of typical coins?  It would be mathematically appealing if so, but unfortunately people's intuitions are too rich to be summed up with a single Beta distribution.  To see why, imagine that you flip this quarter fresh from the bank and flip it 25 times, getting heads every single time!  Using a Beta prior with pseudo-counts of 100, 100 or 1000, 1000 seems reasonable to explain why seeing 7 out of 10 heads does not move our conditional estimate of the weight very much at all from its prior value of 0.5, but this doesn't fit at all what we think if we see 25 heads in a row.  Try running the program above with a coin weight drawn from $Beta(100,100)$ and an observed data set of 25 heads and no tails.  The most likely coin weight in the conditional inference now shifts slightly towards a heads-bias, but it is far from what you would actually think given these (rather surprising!) data.  No matter how strong your initial belief that the bank roll was filled with fair coins, you'd think: "25 heads in a row without a single tail?  Not a chance this is a fair coin.  Something fishy is going on... This coin is almost surely going to come up heads forever!"  As unlikely as it is that someone at the bank has accidentally or deliberately put a trick coin in your fresh roll of quarters, that is not nearly as unlikely as flipping a fair coin 25 times and getting no tails.
@@ -408,14 +406,13 @@ Is it possible to get graded effects from rule-based concepts? Perhaps these eff
 
 Goodman, et al, have used to this model to capture a variety of classic categorization effects [@Goodman:2008p865]. Thus probabilistic induction of (deterministic) rules can capture many of the graded effects previously taken as evidence against rule-based models.
 
-This style of compositional concept induction model, can be naturally extended to more complex hypothesis spaces For example: 
+This style of compositional concept induction model, can be naturally extended to more complex hypothesis spaces. For examples, see: 
 
 * Compositionality in rational analysis: Grammar-based induction for concept learning. N. D. Goodman, J. B. Tenenbaum, T. L. Griffiths, and J. Feldman (2008). In M. Oaksford and N. Chater (Eds.). The probabilistic mind: Prospects for Bayesian cognitive science. 
 
 * A Bayesian Model of the Acquisition of Compositional Semantics. S. T. Piantadosi, N. D. Goodman, B. A. Ellis, and J. B. Tenenbaum (2008). Proceedings of the Thirtieth Annual Conference of the Cognitive Science Society.
 
-
-It has been used to model theory acquisition, learning natural numbers concepts, etc. Further, there is no reason that the concepts need to be deterministic: in Church stochastic functions can be constructed compositionally and learned by induction:
+It has been used to model theory acquisition, learning natural numbers concepts, etc. Further, there is no reason that the concepts need to be deterministic; in Church stochastic functions can be constructed compositionally and learned by induction:
 
 * Learning Structured Generative Concepts. A. Stuhlmueller, J. B. Tenenbaum, and N. D. Goodman (2010). Proceedings of the Thirty-Second Annual Conference of the Cognitive Science Society.
 

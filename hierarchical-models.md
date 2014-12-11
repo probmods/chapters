@@ -405,7 +405,7 @@ We can study a simple version of this phenomenon by modifying our bags of marble
 
 This model uses the *gamma distribution* as a prior on the regularity parameter. Gamma is a useful continuous distribution on the non-negative numbers; here are some examples of Gamma with different parameter values:
 
-<img src='images/Gamma-dist.png' width='400' />
+<center><img src='images/Gamma-dist.png' width='400' /></center>
 
 We have queried on the mixture of colors in a fourth bag, for which only one marble has been observed (orange), and we see is very strong posterior predictive distribution focused on orange&mdash;a "one-shot" generalization.  This posterior is much stronger than the single observation for that bag can justify on its own.  Instead, it reflects the learned overhypothesis that bags tend to be uniform in color.
 
@@ -415,12 +415,12 @@ The above code shows a histogram of the inferred values of `alpha` (actually, it
 
 Now change the conditioning statement (the data) in the above code example as follows:
 
-  (and
-    (equal? (draw-marbles 'bag-1 6) '(blue red green black red blue))
-    (equal? (draw-marbles 'bag-2 6) '(green red black black blue green))
-    (equal? (draw-marbles 'bag-3 6) '(red green blue blue black green))
-    (equal? (draw-marbles 'bag-4 1) '(orange))
-   )))
+~~~~ {.norun}
+(observe-bag 'bag-1 '(blue red green black red blue))
+(observe-bag 'bag-2 '(green red black black blue green))
+(observe-bag 'bag-3 '(red green blue blue black green))
+(observe-bag 'bag-4 '(orange))
+~~~~
 
 Intuitively, the observations for bags one, two and three should now suggest a very different overhypothesis: that marble color, instead of being homogeneous within bags but variable across bags, is instead variable within bags to about the same degree that it varies in the population as a whole.  We can see this inference represented via two coupled effects.  First, the inferred value of `alpha` is now significantly *greater* than 1 (log value greater than 0), asserting that the population distribution as a whole, `phi`, now exerts a strong constraint on what any individual bag looks like.  Second, for a new `'bag-4` which has been observed only once, with a single orange marble, that draw is now no longer very influential on the color distribution we expect to see from that bag; the broad distribution in `phi` exerts a much stronger influence than the single observation.
 
@@ -428,7 +428,7 @@ Intuitively, the observations for bags one, two and three should now suggest a v
 
 One well studied overhypothesis in cognitive development is the 'shape bias': the inductive bias which develops by 24 months and which is the preference to generalize a novel label for some object to other objects of the same shape, rather than say the same color or texture. Studies by Smith and colleagues (Smith, L.B., Jones, S.S., Landau, B., Gershkoff-Stowe, L., & Samuelson, L. (2002). Object name learning provides on-the- job training for attention. Psychological Science, 13(1), 13-19) have shown that this bias can be learned with very little data. They trained 17 month old children, over eight weeks, on four pairs of novel objects where the objects in each pair had the same shape but differed in color and texture and were consistently given the same novel name. First order generalization was tested by showing children an object from one of the four trained categories and asking them to choose another such object from three choice objects that matched the shown object in exactly one feature. Children preferred the shape match. Second order generalization was also tested by showing children an object from a novel category and again children preferred the choice object which matched in shape. Smith and colleagues further found an increase in real-world vocabulary as a result of this training such that children who had been trained began to use more object names. Children had thus presumably learned something like 'shape is homogeneous within object categories' and were able to apply this inductive bias to word learning outside the lab.
 
-We now consider a model of learning the shape bias which uses the compound dirichlet-multinomial model that we have been discussing in the context of bags of marbles. This model for the shape bias is from Kemp et al (2007) (Kemp, C., Perfors, A., and Tenenbaum, J. B. Learning overhypotheses with hierarchical Bayesian models. Developmental Science 10(3), 307-321). Rather than bags of marbles we now have object categories and rather than observing marbles we now observe the features of an object (e.g. its shape, color, and texture) drawn from one of the object categories. Suppose that a feature from each dimension of an object is generated independently of the other dimensions and there are separate values of alpha and phi for each dimension. Importantly, one needs to allow for more values along each dimension than appear in the training data so as to be able to generalize to novel shapes, colors, etc. To test the model we can feed it training data to allow it to learn the values for the alphas and phis corresponding to each dimension. We can then give it a single instance of some new category and then ask what the probability is that the various choice objects also come from the same new category. The church code below shows a model for the shape bias, conditioned on the same training data used in the Smith et al experiment. We can then ask both for draws from some category which we've seen before, and from some new category which we've seen a single instance of. One small difference from the previous models we've seen for the example case is that the alpha hyperparameter is now drawn from an exponential distribution with inverse mean 1, rather than a Gamma distribution. This is simply for consistency with the model given in the Kemp et al (2007) paper.
+We now consider a model of learning the shape bias which uses the compound Dirichlet-multinomial model that we have been discussing in the context of bags of marbles. This model for the shape bias is from Kemp et al (2007) (Kemp, C., Perfors, A., and Tenenbaum, J. B. Learning overhypotheses with hierarchical Bayesian models. Developmental Science 10(3), 307-321). Rather than bags of marbles we now have object categories and rather than observing marbles we now observe the features of an object (e.g. its shape, color, and texture) drawn from one of the object categories. Suppose that a feature from each dimension of an object is generated independently of the other dimensions and there are separate values of alpha and phi for each dimension. Importantly, one needs to allow for more values along each dimension than appear in the training data so as to be able to generalize to novel shapes, colors, etc. To test the model we can feed it training data to allow it to learn the values for the alphas and phis corresponding to each dimension. We can then give it a single instance of some new category and then ask what the probability is that the various choice objects also come from the same new category. The church code below shows a model for the shape bias, conditioned on the same training data used in the Smith et al experiment. We can then ask both for draws from some category which we've seen before, and from some new category which we've seen a single instance of. One small difference from the previous models we've seen for the example case is that the alpha hyperparameter is now drawn from an exponential distribution with inverse mean 1, rather than a Gamma distribution. This is simply for consistency with the model given in the Kemp et al (2007) paper.
 
 ~~~~
 (define shapes (iota 11))
@@ -478,7 +478,7 @@ We now consider a model of learning the shape bias which uses the compound diric
    (observe-object 'cat-4 '((4 7 7 1) (4 8 8 2)))
    (observe-object 'cat-5 '((5 9 9 1)))))
 
-(hist samples "First dimension of object drawn from cat-5")
+(hist samples "Shape of object drawn from cat-5")
 ~~~~
 
 The program above gives us draws from some novel category for which we've seen a single instance. In the experiments with children, they had to choose one of three choice objects which varied according to the dimension they matched the example object from the category. We show below model predictions (from Kemp et al (2007)) for performance on the shape bias task which show the probabilities (normalized) that the choice object belongs to the same category as the test exemplar. The model predictions reproduce the general pattern of the experimental results of Smith et al in that shape matches are preferred in both the first and second order generalization case, and more strong in the first order generalization case. The model also helps to explain the childrens' vocabulary growth in that it shows how the shape bias can be generally learned, as seen by the differing values learned for the various alpha parameters, and so used outside the lab.
@@ -491,52 +491,53 @@ The model can be extended to learn to apply the shape bias only to the relevant 
 
 In a 1983 paper, Nisbett and colleagues (Nisbett, R.E., Krantz, D.H., Jepson, C., & Kunda, Z. The use of statistical heuristics in everyday inductive reasoning. Psychological Review, 90 (4), 339–363) examined how, and under what conditions, people made use of statistical heuristics when reasoning. One question they considered was how and when people generalized from a few instances. They showed that to what extent people generalise depends on beliefs about the homogeneity of the group that the object falls in with respect to the property they are being asked to generalize about. In one study, they asked subjects the following question:
 
-"Imagine that you are an explorer who has landed on a little known island in the Southeastern Pacific. You encounter several new animals, people, and objects. You observe the properties of your "samples" and you need to make guesses about how common these properties would be in other animals,people or objects of the same type."
+> *Imagine that you are an explorer who has landed on a little known island in the Southeastern Pacific. You encounter several new animals, people, and objects. You observe the properties of your "samples" and you need to make guesses about how common these properties would be in other animals, people, or objects of the same type.*
 
-The number of encountered instances of an object were varied (one, three, or twenty instances) as well as the type and property of the objects. For example,
+The number of encountered instances of an object were varied (one, three, or twenty instances) as well as the type and property of the objects. For example:
 
-"Suppose you encounter a native, who is a member of a tribe he calls the Barratos. He is obese. What percent of the male Barratos do you expect to be obese?" and "Suppose the Barratos man is brown in color. What percent of male Barratos do you expect to be brown (as opposed to red, yellow, black or white)?".
+> *Suppose you encounter a native, who is a member of a tribe he calls the Barratos. He is obese. What percent of the male Barratos do you expect to be obese?*
+
+> and 
+
+> *Suppose the Barratos man is brown in color. What percent of male Barratos do you expect to be brown (as opposed to red, yellow, black or white)?*
 
 Results for two questions of the experiment are shown below. The results accord both with the beliefs of the experimenters about how heterogeneous different groups would be, and subjects stated reasons for generalizing in the way they did for the different instances (which were coded for beliefs about how homogeneous objects are with respect to some property).
 
-Again, we can use the compound dirichlet-multinomial model we have been working with throughout to model this task, following Kemp et al (2007). In the context of the question about members of the Barratos tribe, replace bags of marbles with tribes and the color of marbles with skin color, or the property of being obese. Observing data such that skin color is consistent within tribes but varies between tribes will cause a low value of the alpha corresponding to skin color to be learned, and so seeing a single example from some new tribe will result in a sharply peaked predictive posterior distribution for the new tribe. Conversely, given data that obesity varies within a tribe the model will learn a higher value of the alpha corresponding to obesity and so will not generalize nearly as much from a single instance from a new tribe. Note that again it's essential to have learning at the level of hyperparameters in order to capture this phenomenon. It is only by being able to learn appropriate values of the hyperparameters from observing a number of previous tribes that the model behaves reasonably when given a single observation from a new tribe. Human and model results for the two questions above are shown below.
+<center><img src='images/nisbett_model_humans.png' width='400' /></center>
 
-<img src='images/nisbett_model_humans.png' width='400' />
+Again, we can use the compound Dirichlet-multinomial model we have been working with throughout to model this task, following Kemp et al (2007). In the context of the question about members of the Barratos tribe, replace bags of marbles with tribes and the color of marbles with skin color, or the property of being obese. Observing data such that skin color is consistent within tribes but varies between tribes will cause a low value of the alpha corresponding to skin color to be learned, and so seeing a single example from some new tribe will result in a sharply peaked predictive posterior distribution for the new tribe. Conversely, given data that obesity varies within a tribe the model will learn a higher value of the alpha corresponding to obesity and so will not generalize nearly as much from a single instance from a new tribe. Note that again it's essential to have learning at the level of hyperparameters in order to capture this phenomenon. It is only by being able to learn appropriate values of the hyperparameters from observing a number of previous tribes that the model behaves reasonably when given a single observation from a new tribe.
 
-So far, we've been using the compound dirichlet-multinomial to do one shot learning, by learning low values for the alpha hyperparameter. This causes the Dirichlet distribution at the second level to have parameters less than 1, and so to be 'spiky'. While such a Dirichlet distribution can lead to one shot learning, we're not explicitly learning about the variance of
+So far, we've been using the compound Dirichlet-multinomial to do one shot learning, by learning low values for the alpha hyperparameter. This causes the Dirichlet distribution at the second level to have parameters less than 1, and so to be 'spiky'. While such a Dirichlet distribution can lead to one shot learning, we're not explicitly learning about the variance of
 the categories in the model. We might imagine a similar model in which we handle continuous quantities and directly represent hyperparameters for the mean and variance of various related groups.
 
 ~~~~
- (define results
-    (mh-query
-      50 1000
+(define results
+  (mh-query
+   50 1000
 
-      (define overall-variance (gamma 1 1))
-      (define overall-shape (gamma 2 2))
-      (define overall-scale (gamma 2 2))
+   (define overall-variance (gamma 1 1))
+   (define overall-shape (gamma 2 2))
+   (define overall-scale (gamma 2 2))
 
-      (define group->variance
-        (mem (lambda (group) (gamma overall-shape overall-scale))))
+   (define group->variance
+     (mem (lambda (group) (gamma overall-shape overall-scale))))
 
-      (define group->mean
-        (mem (lambda (group) (gaussian 1 overall-variance))))
+   (define group->mean
+     (mem (lambda (group) (gaussian 1 overall-variance))))
 
-      (define (draw-observation group)
-        (lambda () (gaussian (group->mean group) (group->variance group))))
+   (define (draw-observation group)
+     (lambda () (gaussian (group->mean group) (group->variance group))))
 
-      (define (observe-group group values)
-        (map (lambda (v) (condition (equal? (gaussian (group->mean group) (group->variance group)) v)))
+   (define (observe-group group values)
+     (map (lambda (v) (condition (equal? (gaussian (group->mean group) (group->variance group)) v)))
           values))
 
-      (group->variance 'new)
+   (group->variance 'new)
 
-      (observe-group 'one '(1.001 1.001 1.001))
-      (observe-group 'two '(1.05 1.05 1.05))
-      (observe-group 'three '(1.1 1.1 1.1))
-      (observe-group 'four '(1.003))))
-
-(define (mean mylist)
-  (/ (apply + mylist) (length mylist)))
+   (observe-group 'one '(1.001 1.001 1.001))
+   (observe-group 'two '(1.05 1.05 1.05))
+   (observe-group 'three '(1.1 1.1 1.1))
+   (observe-group 'four '(1.003))))
 
 (define new-var (mean results))
 new-var
@@ -548,7 +549,7 @@ In the next section, we will discuss a more complicated example of 'learning to 
 
 Humans are able to categorize objects (in a space with a huge number of dimensions) after seeing just one example of a new category. For example, after seeing a single wildebeest people are able to identify other wildebeest, perhaps by drawing on their knowledge of other animals. The model in Salakhutdinov et al (2010),<ref>Salakhutdinov, R., Tenenbaum, J. and Torralba, A. One-Shot Learning with a Hierarchical Nonparametric Bayesian Model, MIT Technical Report MIT-CSAIL-TR-2010-052</ref> uses abstract knowledge learned from other categories as a prior on the mean and covariance matrix of new categories.
 
-<img src='images/russ_model_graphical.png' width='400' />
+<center><img src='images/russ_model_graphical.png' width='400' /></center>
 
 Suppose, first that the model is given an assignment of objects to basic categories and basic categories to superordinate categories. Objects are represented as draws from a multivariate Gaussian and the mean and covariance of each basic category
 is determined by hyperparameters attached to the corresponding superordinate category. The parameters
@@ -556,7 +557,7 @@ of the superordinate categories are all drawn from a common set of hyperparamete
 
 The model in the Salakhutdinov et al (2010) paper is not actually given the assignment of objects to categories and basic categories to superordinate categories, but rather learns this from the data by putting a non-parametric prior over the tree of object and category assignments.
 
-<img src='images/russ_results_categories.png' width='400' />
+<center><img src='images/russ_results_categories.png' width='400' /></center>
 
 Results are shown for this model when run on the MSR Cambridge dataset which contains images in 24 different basic level categories. Specifically, the model is given a single instance of a cow and asked to retrieve other cow images. Shown are ROC curves for classifying test images belonging to a novel category versus the rest based on observing a single instance of the novel category. The red curve shows model results using a Euclidean metric, the blue curve results from the model described above, and the black curve from an Oracle model which uses the best possible metric. Also shown is a typical partition the model discovers of basic categories into superordinate categories.
 
@@ -576,9 +577,7 @@ Where $X$ is a lexical (or functional) category such as $N$ (noun), $V$ (verb), 
 
 An important way in which languages vary is the order in which heads appear with respect to their complements (and specifiers). Within a language there tends to be a dominant order, often with exceptions for some category types. For instance, English is primarily a head-initial language. In verb phrases, for example, the direct object (complement noun phrase) of a verb appears to the right of the head. However, there are exceptional cases such as the order of (simple) adjective and nouns: adjectives appear before the noun rather than after it (although more complex complement types such as relative clauses appear after the noun).
 
-The fact that languages show consistency in head directionality could be of great advantage to the learner; after encountering a relatively small number of phrase types and instances the learner of a consistent language can learn the dominant head direction in their language, transferring this knowledge to new phrase types. The fact that within many languages there are exceptions suggests that this generalization cannot be deterministic, however, and, furthermore means that a learning approach will have to be robust to  within-language variability.
-
-The following ChurchServ window shows a highly simplified model of X-Bar structure.
+The fact that languages show consistency in head directionality could be of great advantage to the learner; after encountering a relatively small number of phrase types and instances the learner of a consistent language can learn the dominant head direction in their language, transferring this knowledge to new phrase types. The fact that within many languages there are exceptions suggests that this generalization cannot be deterministic, however, and, furthermore means that a learning approach will have to be robust to  within-language variability. Here is a highly simplified model of X-Bar structure:
 
 ~~~~
 (define data '((D N)))
@@ -626,14 +625,13 @@ The following ChurchServ window shows a highly simplified model of X-Bar structu
 
 First, try increasing the number of copies of `(D N)` observed. What happens? Now, try changing the data to `'((D N) (T V) (V Adv))`. What happens if you condition on additional instance of `(V Adv)` how about `(Adv V)`?
 
-What we see in this example is a simple probabilistic model capturing a version of the "principles and parameters" theory. Because it is probabilistic, systematic inferences will be drawn despite exceptional sentences or even phrase types. More importantly, due to the blessing of abstraction, the overall headedness of the language can be inferred from very little data&mdash;before the learner is very confident in the headedness of individual phrase types.
-
+What we see in this example is a simple probabilistic model capturing a version of the "principles and parameters" theory. Because it is probabilistic, systematic inferences will be drawn despite exceptional sentences or even phrase types. More importantly, due to the blessing of abstraction, the overall headedness of the language can be inferred from very little data---before the learner is very confident in the headedness of individual phrase types.
 
 # Thoughts on Hierarchical Models
 
-We have just seen several examples of **hierarchical Bayesian models**: generative models in which there are several levels of latent random choices that affect the observed data. In particular a hierarchical model is usually one in which there is a branching structure in the dependence diagram, such that the "deepest" choices affect all the data, but they only do so through a set of more shallow choices which each affect some of the data, and so on.
+We have just seen several examples of *hierarchical Bayesian models*: generative models in which there are several levels of latent random choices that affect the observed data. In particular a hierarchical model is usually one in which there is a branching structure in the dependence diagram, such that the "deepest" choices affect all the data, but they only do so through a set of more shallow choices which each affect some of the data, and so on.
 
-Many examples of hierarchical models are even simpler than the categorization examples above. The [[Occam's_Razor#Example:_Fair_or_unfair_coin.3F | fair vs unfair coin model selection example]] was already a simple hierarchical model. In this example we saw an abrupt (non-linear) transition from believing in a coin weight near 0.5 to one near 0.9. Such relatively abrupt transitions, and more generally complex non-linear learning curves, are characteristic of hierarchical models.
+Many examples of hierarchical models are even simpler than the categorization examples above. The [fair vs. unfair model selection example](occam\'s-razor.html#example-fair-or-unfair-coin) was already a simple hierarchical model; this example exhibits an abrupt (non-linear) transition from believing in a coin weight near 0.5 to one near 0.9. Such relatively abrupt transitions, and more generally complex non-linear learning curves, are characteristic of hierarchical models.
 
 Hierarchical model structures will generally give rise to a number of important learning phenomena: transfer learning (or learning-to-learn), the blessing of abstraction, and fairly abrupt transitions.
 
@@ -644,7 +642,3 @@ We have spoken of the earlier choices in a hierarchical model as being more "abs
 There is a third notion of abstraction in a generative model which may explain the relation between these two: if we have a designated set of observations (or more generally a function that we think of as generating "perceptual" data) we can say that a random choice is abstract if it is far from the data. More specifically the degree of abstraction of an expression in a probabilistic program is the number of immediate causal dependencies (edges) from the expression to the designated observation expression (note that this is a partial, not strict, ordering on the random choices).
 
 In a hierarchically structured model the deeper random choices are more abstract in this sense of causal distance from the data. More subtly, when a procedure is created with `lambda` the expressions inside this procedure will tend to be more causally distant from the data (since the procedure must be applied before these expressions can be used), and hence greater depth of lambda abstraction will tend to lead to greater abstraction in the causal distance sense.
-
-
-
-

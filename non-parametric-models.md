@@ -144,7 +144,7 @@ We can do a similar transformation to *any* church procedure: we associate to ev
 (density (repeat 10000 (lambda () (memoized-gaussian 0.0 1.0))) "Dirichlet Process" true)
 ~~~~
 
-In a probabilistic setting a procedure applied to some inputs may evaluate to a different value on each execution. By wrapping such a procedure in `mem` we associate a randomly sampled value with each combination of arguments. We have seen how this is useful in defining *random world* style semantics, by persistently associating individual random draws with particular `mem`'d values. However, it is also natural to consider generalizing the notion of memoization itself to the stochastic case. Since `DPmem` is a higher-order procedure that transforms a procedure into one that *sometimes* reuses it's return values we call it a **stochastic memoizer**<ref>Goodman, Mansighka, Roy, Bonawaitz, Tenenbaum, 2008</ref>.
+In a probabilistic setting a procedure applied to some inputs may evaluate to a different value on each execution. By wrapping such a procedure in `mem` we associate a randomly sampled value with each combination of arguments. We have seen how this is useful in defining *random world* style semantics, by persistently associating individual random draws with particular `mem`'d values. However, it is also natural to consider generalizing the notion of memoization itself to the stochastic case. Since `DPmem` is a higher-order procedure that transforms a procedure into one that *sometimes* reuses it's return values we call it a *stochastic memoizer*<ref>Goodman, Mansighka, Roy, Bonawaitz, Tenenbaum, 2008</ref>.
 <!--
 A stochastic memoizer wraps a stochastic procedure in another distribution, called the *memoization distribution* which tells us whether to reuse one of the previously computed values or to compute a fresh value from the underlying procedure. To accomplish this we generalize the notion of a memoization such that it we associate a **distribution** with each argument combination that we pass to the procedure.
 Since, in general, a probabilistic procedure may define a distribution over an unbounded number of observations (in general an uncountable number) we need a memoization distribution that is also unbounded. This distribution should also be exchangeable. These factors lead us to define `DPmem` a stochastic generalization of `mem` which uses the Dirichlet process as a memoization distribution.
@@ -222,7 +222,7 @@ We now return to the problem of categorization with an unknown number of categor
 (hist (map first samples) "obs1 and obs2 same category?")
 (hist (map second samples) "obs1 and obs3 same category?")
 ~~~~
-A model like this is called an **infinite mixture model**; in this case an infinite Dirichlet-multinomial mixture model, since the observations (the colors) come from a multinomial distribution with Dirichlet prior. The essential addition in this model is that we have `DPmem`'d a `gensym` function to provide a collection of reusable category (bag) labels:
+A model like this is called an *infinite mixture model*; in this case an infinite Dirichlet-multinomial mixture model, since the observations (the colors) come from a multinomial distribution with Dirichlet prior. The essential addition in this model is that we have `DPmem`'d a `gensym` function to provide a collection of reusable category (bag) labels:
 
 ~~~~
 (define reusable-categories (DPmem 1.0 (make-gensym)))
@@ -654,7 +654,7 @@ An important debate in psychology and philosophy has concerned the
 nature of *concepts*. The classical theory of concepts holds that
 they can defined in terms of  necessary and sufficient conditions.
 For example, the concept **dog** might consist of a list of
-features&mdash;such as, **furry*', *'barks**, etc. If an object in
+features--- such as **furry**, **barks**, etc. If an object in
 the world matches the right  features, then it is a dog.
 
 However, it appears that, at least for some concepts, the classical

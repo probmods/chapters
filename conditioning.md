@@ -145,10 +145,10 @@ Try using the above formula for conditional probability to compute the probabili
 
 ## Bayes Rule
 
-One of the most famous rules of probability is *Bayes' rule*, which looks like this:
+One of the most famous rules of probability is *Bayes' rule*, which states:
 $$P(h \mid d) = \frac{P(d \mid h)P(h)}{P(d)}$$
 It is first worth noting that this follows immediately from the definition of conditional probability:
-$$P(h|d) = \frac{P(h,d)}{P(d)} = \frac{\frac{P(d,h)P(h)}{P(h)}}{P(d)} = \frac{P(d|h)P(h)}{P(d)}$$
+$$P(h \mid d) = \frac{P(h,d)}{P(d)} = \frac{\frac{P(d,h)P(h)}{P(h)}}{P(d)} = \frac{P(d \mid h)P(h)}{P(d)}$$
 
 Next we can ask what this rule means in terms of sampling processes. Consider the Church program:
 
@@ -169,7 +169,7 @@ Next we can ask what this rule means in terms of sampling processes. Consider th
  (equal? data observed-data))
 ~~~~
 
-We have generated a value, the *hypothesis*, from some distribution called the *prior*, then used an observation function which generates data given this hypothesis, the probability of such an observation function is called the *likelihood*. Finally we have queried the hypothesis conditioned on the observation being equal to some observed data---this conditional distribution is called the *posterior*. This is a typical setup in which Bayes' rule is used. Notice that in this case the conditional distribution $P(data \mid hypothesis)$ is just the probability distribution on return values from the `observe` function given an input value.
+We have generated a value, the *hypothesis*, from some distribution called the *prior*, then used an observation function which generates data given this hypothesis, the probability of such an observation function is called the *likelihood*. Finally we have queried the hypothesis conditioned on the observation being equal to some observed data---this conditional distribution is called the *posterior*. This is a typical setup in which Bayes' rule is used. Notice that in this case the conditional distribution $P(\textrm{data} \mid \textrm{hypothesis})$ is just the probability distribution on return values from the `observe` function given an input value.
 
 <!--
 If we replace the conditioner with `true` in the code above, that is equivalent to observing no data.  Then query draws samples from the prior distribution, rather than the posterior.
@@ -235,7 +235,7 @@ Consider the following Church `query`:
 (hist samples "Value of A, given that the sum is greater than or equal to 2")
 ~~~~
 
-This query has the same meaning as the example above, but the formulation is importantly different. We have defined a generative model that samples 3 instances of `0`/`1` digits, then we have directly conditioned on the complex assumption that the sum of these random variables is greater than or equal to 2. This involves a new random variable, `(>= (+ A B C) 2)`. This latter random variable *did not appear* anywhere in the generative model (the definitions). In the traditional presentation of conditional probabilities we usually think of conditioning as *observation*: it explicitly enforces random variables to take on certain values. For example, when we say $P(A|B=b)$ we explicitly require $B = b$. In order to express the above query in this way, we could add the complex variable to the generative model, then condition on it. However this intertwines the hypothetical assumption (condition) with the generative model knowledge (definitions), and this is not what we want: we want a simple model which supports many queries, rather than a complex model in which only a prescribed set of queries is allowed.
+This query has the same meaning as the example above, but the formulation is importantly different. We have defined a generative model that samples 3 instances of `0`/`1` digits, then we have directly conditioned on the complex assumption that the sum of these random variables is greater than or equal to 2. This involves a new random variable, `(>= (+ A B C) 2)`. This latter random variable *did not appear* anywhere in the generative model (the definitions). In the traditional presentation of conditional probabilities we usually think of conditioning as *observation*: it explicitly enforces random variables to take on certain values. For example, when we say $P(A \mid B=b)$ we explicitly require $B = b$. In order to express the above query in this way, we could add the complex variable to the generative model, then condition on it. However this intertwines the hypothetical assumption (condition) with the generative model knowledge (definitions), and this is not what we want: we want a simple model which supports many queries, rather than a complex model in which only a prescribed set of queries is allowed.
 
 Writing models in Church allows the flexibility to build complex random expressions like this as needed, making assumptions that are phrased as complex propositions, rather than simple observations.  Hence the effective number of queries we can construct for most programs will not merely be a large number but countably infinite, much like the sentences in a natural language.  The `query` function (in principle, though with variable efficiency) supports correct conditional inference for this infinite array of situations.
 
@@ -447,7 +447,7 @@ Gigerenzer (along with Cosmides, Tooby and other colleagues) has argued that thi
 
 However, the basic idea that the mind is good at manipulating frequencies of situations, but bad at arithmetic on continuous probability values, can be extended to cope with novel situations if the frequencies that are manipulated can be frequencies of *imagined* situations. Recall that Church programs explicitly give instructions for sampling imagined situations, and only implicitly specify probability distributions. If human inference is similar to a Church query then it would readily create and manipulate imagined situations, and this could explain both why the frequency framing of Bayesian probability judgment is natural to people and how people cope with rarer and more novel situations.  The numbers given in the frequency formulation (or close approximations thereof) can be read off a tree of evaluation histories for 1000 calls of the Church program that specifies the causal model for this problem:
 
-![](images/Cancer-world-tree.png)
+<center><img src="images/Cancer-world-tree.png" width="40%" height="40%" ></center>
 
 Each path from root to leaf of this tree represents a sequence of random choices made in evaluating the above program (the first flip for breast-cancer, the second for positive-mammogram), with the number of traversals and the sampled value labeling each edge. (Because this is 1000 *random* samples, the number are close (but not exactly) those in the Gigerenzer, et al, story.) Selecting just the 106 hypothetical cases of women with a positive mammogram, and computing the fraction of those who also have breast cancer (7/106), corresponds exactly to `rejection-query`. Thus, we have used the causal representation in the above church program to manufacture frequencies which can be used to arrive at the inference that relatively few women with positive mammograms actually have breast cancer.
 
