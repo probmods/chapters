@@ -1,14 +1,12 @@
 % Occam's Razor
 
->***Note: This chapter has not been revised for the new format and Church engine. Some content may be incomplete! Some example may not work!***
-
-> Entities should not be multiplied without necessity. -- William of Ockham
+> *Entities should not be multiplied without necessity.* --William of Ockham
 
 In learning, perceiving or thinking about the world, we are fitting models to the data of experience. Typically our hypothesis space will span models varying greatly in complexity: some models will have many more free parameters or degrees of freedom than others.  Under traditional approaches to model fitting where we adjust each model's parameters until it fits best, then choose the best-fitting model &mdash; a model with strictly more free parameters will tend to be preferred regardless of whether it actually comes closer to describing the true processes that generated the data.  But this is not the way the mind works.  We assess models with a natural eye for complexity, balancing fit to the data with model complexity in subtle ways that will not inevitably prefer the most complex model. Instead we often seem to judge models using Occam's razor: we choose the least complex hypothesis that fits the data well. In doing so we avoid "over-fitting" our data in order to support successful generalizations and predictions.
 
 Fitting curves (or smooth functions) to sparsely sampled, noisy data provides a familiar example of the problem.
 
-<img src='images/Curve_fitting.png' width='600' />
+<center><img src='images/Curve_fitting.png' width='600' /></center>
 
 The figure above shows three polynomial fits: a 1st-order (linear), a 2nd-order (quadratic), and a 12th-order polynomial.  How do our minds decide which of these functions provides the best account of the data?  The 1st-order model captures the rough trend of the data but seems too coarse; it attributes some of the variation that we see as "signal" to "noise".   The 2nd-order model seems best; it seems to be just complex enough to fit the main shape of the data without over-fitting the noise.  The 12th-order model seems ridiculously over-fit; with 13 data points, the parameters can be adjusted so as to make the curve pass exactly through every data point, thus taking as "signal" all of what we see as "noise".   Again we can think of this as a causal inference problem: each function represents a hypothesis about the causal process that gave rise to the observed data, including the shape of the function from inputs to outputs, as well as the level of noise added to the output.
 
@@ -109,6 +107,8 @@ So we see that the the posterior distribution over hypotheses in this case is ju
 The size principle is related to an influential proposal in linguistics known as the *subset principle*. Intuitively, the subset principle suggests that when two grammars both account for the same data, the grammar that generates a smaller language should be preferred.^[The term *subset principle* is usually used in linguistics to refer to the notion that a grammar that generates a smaller language should be preferred to one that generates a larger language. However, the name originally was introduced by Bob Berwick to refer to a result due to Dana Angluin giving necessary and sufficient conditions for Gold-style learnability of a class of languages. Essentially it states that a class of languages is learnable in the limit using this principle if every language in the class has a *characteristic subset*.]
 
 ## Example: The Rectangle Game
+
+> **Note: This example is still being ported from the old tutorial; it does not currently run**
 
 To illustrate the power of the size principle in inferring the most parsimonious explanation of data, consider learning a rectangle "concept" <ref>Tenenbaum, 2000</ref>. The data are a set of point in the plane, that we assume to be randomly sampled from within some unknown rectangle.  Given the examples, what is the rectangle they came from?  We can model this learning as conditional of the rectangle given the points. We plot the sampled rectangles as well as the posterior mean:
 
@@ -489,6 +489,8 @@ When statisticians suggest methods for model selection, they often include a pen
 The two models now have the same number of free parameters (the unfair coin weight), but we will still favor the simpler hypothesis, as we did above. Why? The Bayesian Occam's razor penalizes models not for having more parameters (or longer code) but for too much flexibility &mdash; being able to fit too many other potential observations. Unused parameters (or parameters with very little effect) don't increase this flexibility, and hence aren't penalized. The Bayesian Occam's razor only penalizes complexity that matters for prediction, and only to the extent that it matters.
 
 ## Example: Curve Fitting
+
+> **Note: This example is still being ported from the old tutorial; it does not currently run**
 
 This example shows how the Bayesian Occam's Razor can be used to select the right order of a polynomial fit.
 This Church program samples polynomials up to order 3 that are (noisily) consistent with the observed data, then graphs the mean polynomial of each order.
