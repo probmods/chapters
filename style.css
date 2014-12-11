@@ -13,31 +13,33 @@ html {
 body {
     padding: 0;
     margin: 0;
+    font-family: Crimson Text, Crimson, Georgia;
 }
 
 #header {
     background-color: #4ECC77;
     width: 52em;
-    padding-top: 2em;
-    padding-bottom: 1.5em;
+    padding-top: 1em;
+    padding-bottom: 1em;
     padding-left: 2em;
     padding-right: 1em;
     color: white;
-    border-bottom: 1px solid black;
 }
 
-#logotype {
-    font-size: 28px;
-    font-family: Palatino;
-    font-style: italic;
+#logotype a {
+    font-size: 32px;
+    color: white;
+    text-decoration: none;
+    padding: 5px 20px 5px 20px;
     float: left;
+    text-shadow: 1px 1px 2px #555;
 }
 
 /* navigation links */
 
 ul#nav {
     float: right;
-    margin-top: 0.6em;
+    margin-top: 1.6em;
     font-family: helvetica, arial, sans-serif;
     font-size: 80%;
 }
@@ -124,15 +126,18 @@ li.show ol, .nav0:hover ol {
 }
 
 #chapter {
-    width: 45em;
+    width: 760px;
     margin-top: 0;
     margin-bottom: 3em;
     background-color: white;
-    padding: 5em;
-    padding-top: 2em;
-    font-family: Baskerville, Times;
-    font-size: 16px;
+    padding: 60px;
+    padding-top: 1px;
+    font-size: 17px;
     line-height: 125%; 
+}
+
+#chapter p {
+    text-align: justify
 }
 
 #chapter > ul li {
@@ -181,7 +186,7 @@ h1 a:visited, h2 a:visited, h3 a:visited, h4 a:visited, h5 a:visited, h6 a:visit
 }
 
 #chapter-title {
-    font-weight: 600;
+    font-weight: 700;
 }
 
 li > code {
@@ -191,15 +196,6 @@ li > code {
     border: 1px solid #dfdfdf;
     font-size: 12px;
     padding: 0 2px 0 2px;
-}
-
-#chapter p {
-    text-align: justify
-}
-
-/* baskerville bold is a bit too bold */
-strong {
-    font-weight: 600
 }
 
 #exercises ~ ol {
@@ -258,7 +254,25 @@ p > code {
     padding: 0 2px 0 2px;
 }
 
+.norun {
+    border-radius: 2px;
+    background-color: #fafafa;
+    border: 1px solid #dfdfdf;
+    padding: 0 2px 0 2px;
+}
+
+.norun > code {
+    font-family: Inconsolata;
+    font-size: 14px ;
+}
+
+.results {
+    background-color: #fafafa;
+}
+
+
 h1 > a > code, h2 > a > code, h3 > a > code, h4 > a > code, h5 > a > code, li > a > code {
+    font-family: Inconsolata;
     border-radius: 2px;
     background-color: #fafafa;
     border: 1px solid #dfdfdf;

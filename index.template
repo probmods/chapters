@@ -3,6 +3,7 @@
   <head>
     <title>$title$</title>
     <link rel="stylesheet" type="text/css" href="style.css?1">
+    <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Crimson+Text:400,400italic,600,600italic">
     <style>
       ol {
       font-size: 1.25em;
@@ -13,20 +14,27 @@
       border-bottom: 1px dotted #99ccff;
       }
       #header {
-      width: 55em;
+      width: 100%;
       padding: 1.5em 0em 1.5em 0em;
       text-align: center;
+      margin-bottom: 0;
+      color: white
       }
+      
       #title {
-      font-family:  Baskerville, Palatino Linotype, Palatino;
+      font-family: 'Crimson Text', Crimson, Times, serif;
       font-size: 50px;
-      text-shadow: 1px 1px black
+      text-shadow: 1px 1px 2px #666;
       }
 
       #authors {
-      font-family: Baskerville, Palatino Linotype, Palatino;
+      font-family: 'Crimson Text', Crimson, Times, serif;
       font-size: 20px;
-      text-shadow: 1px 1px black
+      /* text-shadow: 1px 1px black */
+      }
+
+      #chapter {
+      padding-top: 1px
       }
 
     </style>
@@ -43,9 +51,9 @@
   </head>
   <body>
     <div id="chapter-wrapper">
-      <div id='header' >
+      <div id='header'>
         <span id='title'>Probabilistic Models of Cognition</span><br>
-        <span id='authors'><i>by</i> Noah D. Goodman and Joshua B. Tenenbaum</span>
+        <span id='authors'><i style='opacity: 0.5'>by</i> Noah D. Goodman <i style='opacity: 0.5'>and</i> Joshua B. Tenenbaum</span>
       </div>
       <div id="chapter"> 
 $body$
