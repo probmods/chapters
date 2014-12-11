@@ -1,7 +1,5 @@
 % Mixture models
 
->***Note: This chapter has not been revised for the new format and Church engine. Some content may be incomplete! Some example may not work!***
-
 In the chapter on [Hierarchical Models](hierarchical-models.html), we saw the power of probabilistic inference in learning about the latent structure underlying different kinds of observations: the mixture of colors in different bags of marbles, or the prototypical features of categories of animals. In that discussion we always assumed that we knew what kind each observation belonged to---the bag that each marble came from, or the subordinate, basic, and superordinate category of each object. Knowing this allowed us to pool the information from each observation for the appropriate latent variables. What if we don't know *a priori* how to divide up our observations? In this chapter we explore the problem of simultaneously discovering kinds and their properties -- this can be done using *mixture models*.
 
 # Learning Categories
@@ -170,11 +168,13 @@ multinomial distribution. This is shown in the Church code below.
 ~~~~
 (define vocabulary (append '(DNA evolution)'(parsing phonology)))
 
-(define topics '(topic1 topic2)) (define doc-length 10)
+(define topics '(topic1 topic2))
+(define doc-length 10)
 
 (define samples
   (mh-query
-   200 100
+   200
+   100
 
    (define document->length (mem (lambda (doc-id) doc-length)))
    (define document->mixture-params (mem (lambda (doc-id) (dirichlet (make-list (length topics) 1.0)))))
@@ -189,23 +189,43 @@ multinomial distribution. This is shown in the Church code below.
                                                         (multinomial vocabulary (topic->mixture-params topic)))
                                                       (document->topics doc-id)))))
 
-   ;;get the distributions over words for the two topics
-   (pair (topic->mixture-params 'topic1) (topic->mixture-params 'topic2))
+   (define (observe-document doc-id words)
+     (define topics (document->topics doc-id))
+     (define topic-mixtures (map topic->mixture-params topics)) 
+     (map
+      (lambda (topic-mixture word) (condition (equal? (multinomial vocabulary topic-mixture) word)))
+      topic-mixtures words))
 
-   (no-proposals
-    (and
-     (equal? (document->words 'doc1)  '(DNA evolution DNA evolution DNA evolution DNA evolution DNA evolution))
-     (equal? (document->words 'doc2)  '(parsing phonology parsing phonology parsing phonology parsing phonology parsing phonology))
-     (equal? (document->words 'doc4)  '(DNA evolution DNA evolution DNA evolution DNA evolution DNA evolution))
-     (equal? (document->words 'doc5)  '(parsing phonology parsing phonology parsing phonology parsing phonology parsing phonology))
-     (equal? (document->words 'doc7)  '(DNA evolution DNA evolution DNA evolution DNA evolution DNA evolution))
-     (equal? (document->words 'doc8)  '(parsing phonology parsing phonology parsing phonology parsing phonology parsing phonology))
-     (equal? (document->words 'doc9)  '(DNA evolution DNA evolution DNA evolution DNA evolution DNA evolution))
-     (equal? (document->words 'doc10)  '(parsing phonology parsing phonology parsing phonology parsing phonology parsing phonology))
-     ))))
+   ;; get the distributions over words for the two topics
+   (list (topic->mixture-params 'topic1) (topic->mixture-params 'topic2))
 
-(barplot (map (lambda (a b) (pair a b)) vocabulary (first (last samples))) "Distribution over words for Topic 1")
-(barplot (map (lambda (a b) (pair a b)) vocabulary (rest (last samples))) "Distribution over words for Topic 2")
+   (observe-document 'a1 '(DNA evolution DNA evolution DNA evolution DNA evolution DNA evolution))
+   (observe-document 'a2 '(DNA evolution DNA evolution DNA evolution DNA evolution DNA evolution))
+   (observe-document 'a3 '(DNA evolution DNA evolution DNA evolution DNA evolution DNA evolution))
+   
+   (observe-document 'b1 '(parsing phonology parsing phonology parsing phonology parsing phonology parsing phonology))
+   (observe-document 'b2 '(parsing phonology parsing phonology parsing phonology parsing phonology parsing phonology))
+   (observe-document 'b3 '(parsing phonology parsing phonology parsing phonology parsing phonology parsing phonology))
+   ))
+
+(define (list-add x y)
+  (map + x y))
+
+;; add rows of a list of lists (i.e., matrix)
+(define (mat-row-sum m)
+  (if (= (length m) 1)
+      (first m)
+      (mat-row-sum (pair (list-add (first m) (second m))
+                         (rest (rest m))))))
+
+;; get mean of a list of lists (i.e., matrix)
+(define (mat-row-mean m)
+  (define n (length m))
+  (map (lambda (x) (/ x n))
+       (mat-row-sum m))) 
+            
+(barplot (list vocabulary (mat-row-mean (map first samples))) "Distribution over words for Topic 1")
+(barplot (list vocabulary (mat-row-mean (map second samples))) "Distribution over words for Topic 2")
 ~~~~
 
 In this simple example, there are two topics `topic1` and
