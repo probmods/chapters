@@ -9,7 +9,6 @@
     -conjugate vs length prior
 -->
 
-
 The line between "reasoning" and "learning" is unclear in cognition.
 Just as reasoning can be seen as a form of conditional inference, so can learning: discovering persistent facts about the world (for example, causal processes or causal properties of objects).
 By saying that we are learning "persistent" facts we are indicating that there is something to infer which we expect to be relevant to many observations over time. 
@@ -115,32 +114,36 @@ By binning the samples, however, we can get a meaningful estimate of how likely 
 -->
 Experiment with different data sets, varying both the number of flips and the relative proportion of heads and tails.  How does the shape of the conditional distribution change?  The location of its peak reflects a reasonable "best guess" about the underlying coin weight.  It will be roughly equal to the proportion of heads observed, reflecting the fact that our prior knowledge is basically uninformative; a priori, any value of `coin-weight` is equally likely.  The spread of the conditional distribution reflects a notion of confidence in our beliefs about the coin weight.  The distribution becomes more sharply peaked as we observe more data, because each flip, as an independent sample of the process we are learning about, provides additional evidence the process's unknown parameters.
 
-When studying learning as conditional inference, that is when considering an *ideal learner model*, we are particularly interested in the dynamics of how inferred hypotheses change as a function of amount of data (often thought of as time the learner spends acquiring data). We can map out the *trajectory* of learning by plotting a summary of the posterior distribution over hypotheses as a function of the amount of observed data. Here we plot the mean of the samples of the coin weight (the *expected* weight) in the above example (NOTE: for now this must be run using MIT-Church):
+When studying learning as conditional inference, that is when considering an *ideal learner model*, we are particularly interested in the dynamics of how inferred hypotheses change as a function of amount of data (often thought of as time the learner spends acquiring data). We can map out the *trajectory* of learning by plotting a summary of the posterior distribution over hypotheses as a function of the amount of observed data. Here we plot the mean of the samples of the coin weight (the *expected* weight) in the above example:
 
-~~~~ {data-engine="mit-church"}
+~~~~
 (define make-coin (lambda (weight) (lambda () (if (flip weight) 'h 't))))
 
 (define (samples data)
-  (mh-query 400 10
+  (mh-query
+   400 10
 
-     (define coin-weight (uniform 0 1))
+   (define coin-weight (uniform 0 1))
 
-     (define coin (make-coin coin-weight))
+   (define coin (make-coin coin-weight))
 
-     coin-weight
-
-     (equal? data (repeat (length data) coin))
-   )
-)
+   coin-weight
+   
+   ;; use factor statement to simulate flipping the coin and obtaining each observation
+   (factor (sum (map
+                 (lambda (obs) (if (equal? obs 'h)
+                                   (log coin-weight)
+                                   (log (- 1 coin-weight))))
+                 
+                 data)))))
 
 (define true-weight 0.9)
 (define true-coin (make-coin true-weight))
 (define full-data-set (repeat 100 true-coin))
 (define observed-data-sizes '(1 3 6 10 20 30 50 70 100))
 (define (estimate N) (mean (samples (take full-data-set N))))
-(map (lambda (N)
-       (lineplot-value (pair N (estimate N)) "Learning trajectory"))
-     observed-data-sizes)
+(lineplot (map (lambda (N) (list N (estimate N)))
+               observed-data-sizes))
 ~~~~
 
 Try plotting different kinds of statistics, e.g., the absolute difference between the true mean and the estimated mean (using the function `abs`), or a confidence measure like the standard error of the mean.
