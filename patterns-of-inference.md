@@ -1,4 +1,4 @@
-% Patterns of Inference
+% Patterns of inference
 
 # Causal Dependence
 <!--A probabilistic program describes a stochastic procedure for generating possible worlds, and each world can be characterized by the sequence of individual stochastic choices, or random function calls, made in deriving it.  The individual functions comprising a program (or more precisely, the individual function calls comprising a specific

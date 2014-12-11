@@ -1,5 +1,4 @@
-% Learning as Conditional Inference
-
+% Learning as conditional inference
 
 <!--
 -revise learning as induction section:
