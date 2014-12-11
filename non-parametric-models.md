@@ -399,7 +399,7 @@ Given some relational data, the IRM learns to cluster objects into classes such 
   (mh-query
    300 100
 
-   (define class-distribution (DPmem 1.0 gensym))
+   (define class-distribution (DPmem 1.0 (make-gensym)))
 
    (define object->class
      (mem (lambda (object) (class-distribution))))
@@ -459,7 +459,7 @@ These features depend on different systems of categories that foods fall into, f
   (mem (lambda (feature) (kind-distribution))))
 
 (define kind->class-distribution
-  (mem (lambda (kind) (DPmem 1.0 gensym))))
+  (mem (lambda (kind) (DPmem 1.0 (make-gensym)))))
 
 (define feature-kind/object->class
   (mem (lambda (kind object) (sample (kind->class-distribution kind)))))
