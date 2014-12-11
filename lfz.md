@@ -1,13 +1,14 @@
-% Models for Learn from Zach Paper
-[Church Reference](webchurch/refs.html)
+% Models that Reason about Social Sources to Learn from Actions and Outcomes
 
+[Church Reference](webchurch/refs.html)
+<script>$('#header').hide()</script>
 Keyboard shortcuts:
 
 <code>Cmd + .</code> or <code>Ctrl + .</code> -- Fold code</acronym> (start foldable segments with <code>;;;fold:</code> and end with <code>;;;</code> )
 
 <code>Cmd + ;</code> or <code>Ctrl + ;</code> -- Comment selection section
 
-# Simulations
+
 # Results
 ## Experiment 1
 Core Model
@@ -102,11 +103,13 @@ Core Model
    (and (observe ss-weight ss-nsamples ss-obs)
         (equal? 1 (apply multinomial zach)))))
 
+;; example trial ;;
+(ss-model 4 10 0)
 ~~~
 
 
 ### Figure 8
-Effect of learner's observations (k<sub>l</sub>) and number of Zach's observations (n<sub>z</sub>) on learner's estimate of horse x's skill. What happens when Zach get's more knowledgeable?
+Effect of learner's observations (k<sub>l</sub>) and number of Zach's observations (n<sub>z</sub>) on learner's estimate of horse _x_'s skill. What happens when Zach gets more knowledgeable?
 
 ~~~
 ;;;fold: helper functions
@@ -233,7 +236,7 @@ Effect of learner's observations (k<sub>l</sub>) and number of Zach's observatio
   (map (lambda (rel unrel)
          (pair (expectation
                 (list (list (first rel) (first unrel))
-                      '(.75 .25))) ;;measured in experiment
+                      '(.74 .26))) ;;measured in experiment
                (rest rel)))
        reliable unreliable))
 
@@ -248,15 +251,15 @@ Effect of learner's observations (k<sub>l</sub>) and number of Zach's observatio
 
 ~~~
 
-#### Resulting Model vs. Data Plot (R<sup>2</sup> = .94)
+#### Resulting Model vs. Data Plot (R<sup>2</sup> = .96)
 
-<img src='images/djh/252.png' width='500' />
+<img src='images/djh/E1P1.png' width='500' />
 
 
 
 ### Figure 9
 
-Effect of learner's estimate of Zach's reliability (&alpha;<sub>z</sub>), learner's observations (k<sub>l</sub>), and number of Zach's observations (n<sub>z</sub>) on learner's estimate of horse x's skill. Is there a attributed reliability by knowledgeability interaction?
+Effect of learner's estimate of Zach's reliability (&alpha;<sub>z</sub>), learner's observations (k<sub>l</sub>), and number of Zach's observations (n<sub>z</sub>) on learner's estimate of horse _x_'s skill. Is there a attributed reliability by knowledgeability interaction?
 
 ~~~
 ;;;fold: helper functions
@@ -384,14 +387,14 @@ Effect of learner's estimate of Zach's reliability (&alpha;<sub>z</sub>), learne
                (string-append
                 "Model's predictions when it sees "
                 (number->string (second (first reliable)))
-                "/5 and thinks Zach is sees either reliable(1) or unreliable(0)"))
+                "/5 and Zach is thought to be {reliable(1)/unreliable(0)}"))
 
 ~~~
 
 
-#### Resulting Model vs. Data Plot (R<sup>2</sup> = .90)
+#### Resulting Model vs. Data Plot (R<sup>2</sup> = .88)
 
-<img src='images/djh/197.png' width='500' />
+<img src='images/djh/E1P2.png' width='500' />
 
 ## Experiment 2
 
@@ -461,7 +464,7 @@ Confidence Model
 ;;;
 
 ;;;fold: set data and priors
-  (define reliable-prior .85)
+  (define reliable-prior .83)
 
   (define ss-nsamples 5)
 
@@ -497,6 +500,8 @@ Confidence Model
                  (else "low")))
 
          (list action confidence conf-number)))
+
+
 ;;;
 
 ;; zach model ;;
@@ -528,10 +533,14 @@ Confidence Model
         (equal? 1 (first zach))
         (equal? zach-confidence (second zach)))))
 
+
+
+;; example trial ;;
+(ss-model 2 'high' 1)
 ~~~
 
 ### Figure 10
-Effect of Zach's confidence (c<sub>z</sub>) on learner's estimate of horse x's skill (at different levels of learner's observations (k<sub>l</sub>). How does confidence effect the influence of Zach?
+Effect of Zach's confidence (c<sub>z</sub>) on learner's estimate of horse _x_'s skill (at different levels of learner's observations (k<sub>l</sub>). How does confidence effect Zach's influence?
 
 ~~~
 ;;;fold: helper functions
@@ -603,7 +612,7 @@ Effect of Zach's confidence (c<sub>z</sub>) on learner's estimate of horse x's s
 ;;;
 
 ;;;fold: set data and priors
-  (define reliable-prior .85)
+  (define reliable-prior .83)
 
   (define ss-nsamples 5)
 
@@ -707,21 +716,18 @@ Effect of Zach's confidence (c<sub>z</sub>) on learner's estimate of horse x's s
 (barplot (list (map third mixed) (map first mixed)) (string-append
                                                    "Model's predictions when it sees "
                                                    (number->string (second (first mixed)))
-                                                   "/5 and Zach is either has high or low confidence in  his bet"))
+                                                   "/5 and Zach bets with {low/high} confidence"))
 
 
 ~~~
 
-#### Resulting Model vs. Data Plot (R<sup>2</sup> = .92)
+#### Resulting Model vs. Data Plot (R<sup>2</sup> = .99)
 
-<img src='images/djh/194.png' width='500' />
+<img src='images/djh/E2P1.png' width='500' />
 
 
 ### Figure 11
-Effect of learner's estimate of Zach's reliability on learner's estimate of horse x's skill (at different levels of learner's observations (k<sub>l</sub> and Zach's confidence (c<sub>z</sub>)). Is there a confidence by reliability interaction?
-
-
-See Model Predictions for the effect of zach's confidence at different values of zach's reliability
+Effect of learner's estimate of Zach's reliability on learner's estimate of horse _x_'s skill (at different levels of learner's observations (k<sub>l</sub> and Zach's confidence (c<sub>z</sub>)). Is there a confidence by reliability interaction?
 
 ~~~
 ;;;fold: helper functions
@@ -795,7 +801,7 @@ See Model Predictions for the effect of zach's confidence at different values of
 ;;;
 
 ;;;fold: set data and priors
-(define reliable-prior .85)
+(define reliable-prior .83)
 
 (define ss-nsamples 5)
 
@@ -891,19 +897,20 @@ See Model Predictions for the effect of zach's confidence at different values of
               (string-append
                "Model's predictions when it sees "
                (number->string (second (first reliable)))
-               "/5 and thinks Zach is sees either reliable(1) or unreliable(0)"))
+               "/5 and Zach bets with {low/high} confidence and is thought to be {reliable(1)/unreliable(0)}"))
+
 ~~~
 
 #### Resulting Model vs. Data Plot (R<sup>2</sup> = .99)
 
-<img src='images/djh/124.png' width='500' />
+<img src='images/djh/E2P2.png' width='500' />
 
 ## Experiment 3
 
 Infer Zach's Reliability Model
 
 ~~~
-;;;fold: helper functions
+;;;fold: helper functions ;;;
 (define (factorial n)
   (if (eq? n 0)
       1
@@ -967,26 +974,24 @@ Infer Zach's Reliability Model
 
 ;;;fold: set parameters and priors ;;;
 
-(define zach-reliable-prior .85)
+(define zach-reliable-prior .77)
 
 (define ss-nsamples 5)
 
 (define (act-prior)
   (uniform-draw '(0 1)))
 
-(define (weight-prior) (uniform-draw '(.0005 .1 .3 .5 .7 .9 .9995)))
-
 (define (empirical-weight-prior)
   (multinomial '(.0005 .1 .2 0.3 0.4 0.5 0.6 0.7 0.8 .9 .9995) '(.3 3 1 .3 1 1 1 .3 1 3 .3)))
 ;;;
 
-;; zach model ;;
+  ;;; zach model ;;;
 (define zachs-choice
   (mem
    (lambda (obs reliable nsamples)
      (enumeration-query
 
-      (define weight (weight-prior))
+      (define weight (empirical-weight-prior))
       (define act (act-prior))
       (define result (if reliable
                          (my-round weight)
@@ -998,31 +1003,30 @@ Infer Zach's Reliability Model
            (equal? act result))))))
 
 
-;; ss' model ;;
+  ;;; ss' model ;;;
 (define (ss-model ss-obs zach-nsamples zach-obs1 zach-acts-reliable)
   (enumeration-query
 
    (define zach-reliable (if (flip zach-reliable-prior) 1 0))
    (define zach1 (zachs-choice zach-obs1 zach-reliable zach-nsamples))
 
-   (define ss-weight (empirical-weight-prior))
-   (define zach-obs2 (binomial ss-weight zach-nsamples))
-   (define zach2 (zachs-choice zach-obs2 zach-reliable zach-nsamples))
 
-   (list ss-weight zach-reliable)
+   zach-reliable
 
    ;;assuming our observations and zach's choice:
-   (and (observe ss-weight ss-nsamples ss-obs)
-        (equal? zach-acts-reliable (apply multinomial zach1))
-        (equal? 1 (apply multinomial zach2)))))
+   (equal? zach-acts-reliable (apply multinomial zach1))))
 
+
+;; What are the model predictions when Zach bets inconsistently with his evidence?
+(ss-model 1 10 8 0)
 ~~~
 
 ### Figure 12
-When Zach is seen to act inconsistently with his observations, how does this effect learner's assessment of his reliability and how influential is he subsequently?
+When Zach is observed acting (in)consistently with his observations, how does this effect the learner's assessment of his reliability and how influential is he subsequently?
+
 
 ~~~
-;;;fold: helper functions
+;;;fold: helper functions ;;;
 (define (factorial n)
   (if (eq? n 0)
       1
@@ -1084,9 +1088,9 @@ When Zach is seen to act inconsistently with his observations, how does this eff
   (map (lambda (xp) (append (marginalize-each (apply model xp)) xp)) params))
 ;;;
 
-;;;fold: set parameters and priors
+;;;fold: set parameters and priors ;;;
 
-(define zach-reliable-prior .85)
+(define zach-reliable-prior .77)
 
 (define ss-nsamples 5)
 
@@ -1094,15 +1098,15 @@ When Zach is seen to act inconsistently with his observations, how does this eff
   (uniform-draw '(0 1)))
 
 
-(define (weight-prior) (uniform-draw '(.0005 .1 .3 .5 .7 .9 .9995)))
+(define (weight-prior)
+  (uniform-draw '(.0005 .1 .3 .5 .7 .9 .9995)))
 
 (define (empirical-weight-prior)
   (multinomial '(.0005 .1 .2 0.3 0.4 0.5 0.6 0.7 0.8 .9 .9995) '(.3 3 1 .3 1 1 1 .3 1 3 .3)))
 ;;;
 
 ;;;fold: infer reliability model
-
-;; zach model ;;
+  ;;; zach model ;;;
 (define zachs-choice
   (mem
    (lambda (obs reliable nsamples)
@@ -1120,51 +1124,74 @@ When Zach is seen to act inconsistently with his observations, how does this eff
            (equal? act result))))))
 
 
-;; ss' model ;;
-(define (ss-model ss-obs zach-nsamples zach-obs1 zach-acts-reliable)
+  ;;; ss' model (inferred) ;;;
+(define (ss-model-infer-reliability ss-obs zach-nsamples zach-obs1 zach-acts-reliable)
   (enumeration-query
 
    (define zach-reliable (if (flip zach-reliable-prior) 1 0))
    (define zach1 (zachs-choice zach-obs1 zach-reliable zach-nsamples))
 
-   (define ss-weight (empirical-weight-prior))
-   (define zach-obs2 (binomial ss-weight zach-nsamples))
-   (define zach2 (zachs-choice zach-obs2 zach-reliable zach-nsamples))
 
-   (list ss-weight zach-reliable)
+   zach-reliable
+
+   ;;assuming our observations and zach's choice:
+   (equal? zach-acts-reliable (apply multinomial zach1))))
+
+
+ ;;; ss' model (core) ;;;
+(define (ss-model-core ss-obs zach-nsamples zach-reliable)
+  (enumeration-query
+   (define ss-weight (weight-prior))
+   (define zach-obs (binomial ss-weight zach-nsamples))
+   (define zach (zachs-choice zach-obs zach-reliable zach-nsamples))
+
+   ss-weight
 
    ;;assuming our observations and zach's choice:
    (and (observe ss-weight ss-nsamples ss-obs)
-        (equal? zach-acts-reliable (apply multinomial zach1))
-        (equal? 1 (apply multinomial zach2)))))
-
+        (equal? 1 (apply multinomial zach)))))
 ;;;
 
 
-(define params
-  (cartesian-product
-   '(1 0) ;zach-acts-reliable
-   '(2) ;zach-obs
-   '(10) ;zach-nsamples
-   '(2))) ;ss-obs
 
-(define results
-  (run-model-multi ss-model params))
+;; What are the model predictions for ss who thought Zach was unreliable?
+(define unreliable
+  (expectation (ss-model-core 1 10 0)))
 
-(barplot (list
-          (apply append
-                 (map (lambda (x)
-                        (let ([zach-acts (if (fifth x)
-                                             "zach-acts-reliable"
-                                             "zach-acts-unreliable")])
-                          (list (list "chance-estimate" zach-acts)
-                                (list "zach_reliable_estimate" zach-acts))))
-                      results))
-          (flatten (map first results)))
+;; What are the model predictions for ss who thought Zach was reliable?
+(define reliable
+  (expectation (ss-model-core 1 10 1)))
+
+
+;; What are the model predictions for the aggregate data if the population
+;; was a mixture of reliable and unreliable ss in the proportion measured in
+;; the exit questionnaire of the experiment?
+(define (mixed reliability)
+  (expectation
+   (list (list reliable unreliable)
+         (list reliability (- 1 reliability)))))
+
+
+
+(define zach-reliability-inconsistent (second (second (ss-model-infer-reliability 1 10 8 0))))
+(define zach-reliability-consistent (second (second (ss-model-infer-reliability 1 10 8 1))))
+(define chance-estimate-when-zach-consistent (mixed zach-reliability-consistent))
+(define chance-estimate-when-zach-inconsistent (mixed zach-reliability-inconsistent))
+
+
+(barplot (list (list "Zach's reliability when he acted inconsistently"
+                     "Zach's reliability when he acted consistently"
+                     "Chance Estimate when he acted inconsistently"
+                     "Chance Estimate when he acted consistently"
+                     )
+               (list zach-reliability-inconsistent
+                     zach-reliability-consistent
+                     chance-estimate-when-zach-inconsistent
+                     chance-estimate-when-zach-consistent))
           "Model's predictions inferring Zach's reliability given his actions")
 ~~~
 
 
-#### Resulting Model vs. Data Plot (R<sup>2</sup> = .92)
+#### Resulting Model vs. Data Plot (R<sup>2</sup> = .98)
 
-<img src='images/djh/103.png' width='500' />
+<img src='images/djh/E3P1.png' width='500' />
