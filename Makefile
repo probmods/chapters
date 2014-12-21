@@ -11,7 +11,7 @@ prefix := $(if $(dir), $(addsuffix /,$(dir)),)
 
 chapterlist = $(addprefix $(prefix), chapters.txt)
 
-REQUIRES_CITEPROC_HS := $(shell pandoc --version | head -1 | grep 1.12) 
+REQUIRES_CITEPROC_HS := $(shell pandoc --version | head -1 | grep "1.1[2-9]") 
 
 # List files to be made by finding all *.md files and changing them to .html
 # HT http://stackoverflow.com/q/6767413/351392 for the $(shell) syntax
@@ -88,8 +88,9 @@ chapterlist.html : .chapters.txt
 	-e "s/<!-- _chapternum_ -->/$(CHAPTERNUM)/g" \
 	"$<" > "$@"
 
+## strangely doesn't work with pandoc 1.13 we use --output flag rather than "> .index.html"
 .index.html: index.md index.template
-	@pandoc --smart --mathjax --template index.template index.md -o .index.html
+	@pandoc --smart --mathjax --template index.template index.md > .index.html
 
 $(prefix)index.html: $(prefix).index.html $(prefix)chapterlist.html
 	@echo "* index.html"
