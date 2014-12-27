@@ -6,8 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
-    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Crimson+Text:400,400italic,700,700italic">
-    <link rel="stylesheet" type="text/css" href="style.css?1">
+    <link rel="stylesheet" type="text/css" href="style.css">
     <link rel="stylesheet" type="text/css" href="webchurch/css/codemirror.css">
     <link rel="stylesheet" type="text/css" href="webchurch/css/d3.css">
     <link rel="shortcut icon" href="favicon.ico" />
