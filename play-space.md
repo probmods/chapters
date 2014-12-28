@@ -1,6 +1,6 @@
 % Play space
 
-[Church Reference](webchurch/refs.html)
+[Church Reference](webchurch/online/ref.html)
 
 Keyboard shortcuts:
 

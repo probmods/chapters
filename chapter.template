@@ -7,8 +7,8 @@
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
     <link rel="stylesheet" type="text/css" href="style.css">
-    <link rel="stylesheet" type="text/css" href="webchurch/css/codemirror.css">
-    <link rel="stylesheet" type="text/css" href="webchurch/css/d3.css">
+    <link rel="stylesheet" type="text/css" href="webchurch/online/css/codemirror.css">
+    <link rel="stylesheet" type="text/css" href="webchurch/online/css/d3.css">
     <link rel="shortcut icon" href="favicon.ico" />
     <script src="scripts/underscore-min.js"></script>
     <script src="scripts/jquery.js"></script>
