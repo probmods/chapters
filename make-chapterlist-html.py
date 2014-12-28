@@ -18,7 +18,7 @@ for line in open("chapters.txt"):
 
     chapters.append( (url, chapter_title) )
 
-chapters.append( ("webchurch/refs", "Church Reference") )
+chapters.append( ("webchurch/online/ref", "Church Reference") )
 
 lis = []
 
