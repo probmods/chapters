@@ -197,7 +197,7 @@ We now return to the problem of categorization with an unknown number of categor
    (define bag->prototype (mem (lambda (bag) (dirichlet prototype))))
 
    ;;the prior distribution on bags is simply a DPmem of a gensym function:
-   (define get-bag (DPmem 1.0 (make-gensym)))
+   (define get-bag (DPmem 1.0 gensym))
 
    ;;each observation comes from one of the bags:
    (define obs->bag (mem (lambda (obs-name) (get-bag))))
@@ -225,17 +225,17 @@ We now return to the problem of categorization with an unknown number of categor
 A model like this is called an *infinite mixture model*; in this case an infinite Dirichlet-multinomial mixture model, since the observations (the colors) come from a multinomial distribution with Dirichlet prior. The essential addition in this model is that we have `DPmem`'d a `gensym` function to provide a collection of reusable category (bag) labels:
 
 ~~~~
-(define reusable-categories (DPmem 1.0 (make-gensym)))
-
+(define reusable-categories (DPmem 1.0 gensym))
 (hist (repeat 20 reusable-categories))
 ~~~~
+
 To generate our observation in this infinite mixture model we first sample a category label from the memoized `gensym`.  Since the Dirichlet process tends to reuse earlier choices (more than later ones), our data will tend to cluster together in earlier components. However, there is no a priori bound on the number of latent classes, rather there is just a bias towards fewer classes.
 The strength of this bias is controlled by the DP concentration parameter $\alpha$. When $\alpha$ is high, we will tolerate a larger number of classes, when it is low we will strongly favor fewer classes. In general, the number of classes grows proportional to $\alpha \log(N)$ where $N$ is the number of observations.
 
 We can use this basic template to create infinite mixture models with any type of observation distribution. For instance here is an infinite Gaussian mixture model:
 
 ~~~~
-(define class-distribution (DPmem 1.0 (make-gensym)))
+(define class-distribution (DPmem 1.0 gensym))
 
 (define object->class
   (mem (lambda (object) (class-distribution))))
@@ -349,7 +349,7 @@ Just as when we considered a mixture model over an unknown number of latent cate
 ~~~~
 (define vocabulary '(chef omelet soup eat work bake))
 
-(define (get-state) (DPmem 0.5 (make-gensym)))
+(define (get-state) (DPmem 0.5 gensym))
 
 (define state->transition-model
   (mem (lambda (state) (DPmem 1.0 (get-state)))))
@@ -371,7 +371,7 @@ Just as when we considered a mixture model over an unknown number of latent cate
 (sample-words 'start)
 ~~~~
 
-This model is known as the "infinite hidden Markov model". Notice how the transition model uses a separate DPmemoized function for each latent state: with some probability it will reuse a transition from this state, otherwise it will transition to a new state drawn from the globally shared source or state symbols&mdash;a DPmemoized `gensym`.
+This model is known as the "infinite hidden Markov model". Notice how the transition model uses a separate DPmemoized function for each latent state: with some probability it will reuse a transition from this state, otherwise it will transition to a new state drawn from the globally shared source or state symbols---a DPmemoized `gensym`.
 
 
 # Example: The Infinite Relational Model
@@ -399,7 +399,7 @@ Given some relational data, the IRM learns to cluster objects into classes such 
   (mh-query
    300 100
 
-   (define class-distribution (DPmem 1.0 (make-gensym)))
+   (define class-distribution (DPmem 1.0 gensym))
 
    (define object->class
      (mem (lambda (object) (class-distribution))))
@@ -453,13 +453,13 @@ These features depend on different systems of categories that foods fall into, f
 -->
 
 ~~~~
-(define kind-distribution (DPmem 1.0 (make-gensym)))
+(define kind-distribution (DPmem 1.0 (make-gensym "kind")))
 
 (define feature->kind
   (mem (lambda (feature) (kind-distribution))))
 
 (define kind->class-distribution
-  (mem (lambda (kind) (DPmem 1.0 (make-gensym)))))
+  (mem (lambda (kind) (DPmem 1.0 (make-gensym "class")))))
 
 (define feature-kind/object->class
   (mem (lambda (kind object) (sample (kind->class-distribution kind)))))

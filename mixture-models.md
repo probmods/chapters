@@ -424,9 +424,7 @@ We could extend this model by allowing it to infer that there are more than two 
    ;;unknown number of categories (created with placeholder names):
    (define num-bags (+ 1 (poisson 1.0)))
 
-   (define my-gensym (make-gensym))
-
-   (define bags (repeat num-bags my-gensym))
+   (define bags (repeat num-bags gensym))
 
    (define (observe marbles)
      (map (lambda (m) (condition (equal? (multinomial colors (bag->prototype (uniform-draw bags))) m))) marbles))
@@ -445,15 +443,20 @@ For the prior on `num-bags` we used the [*Poisson distribution*](http://en.wikip
 Each evaluation of `gensym` results in a unique (although cryptic) symbol:
 
 ~~~~
-(define my-gensym (make-gensym))
-(list (my-gensym) (my-gensym) (my-gensym))
+(list (gensym) (gensym) (gensym))
 ~~~~
 
 Importantly, these symbols can be used as identifiers, because two different calls to gensym will never be equal:
 
 ~~~~
-(define my-gensym (make-gensym))
-(equal? (my-gensym) (my-gensym))
+(equal? (gensym) (gensym))
+~~~~
+
+For clarity, you can use the `make-gensym` to create a `gensym` function with a custom prefix:
+
+~~~~
+(define my-gensym (make-gensym "foo"))
+(list (my-gensym) (my-gensym) (my-gensym))
 ~~~~
 
 Unbounded models give a straightforward way to represent uncertainty over the number of categories in the world. However, inference in these models often presents difficulties. In the next section we describe another method for allowing an unknown number of things: In an unbounded model, there are a finite number of categories whose number is drawn from an unbounded prior distribution, such as the Poisson prior that we just examined. In an 'infinite model' we construct distributions assuming a truly infinite numbers of objects.
