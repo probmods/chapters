@@ -1,6 +1,13 @@
 @font-face {
   font-family: 'Inconsolata';
-  src: url('webchurch/online/inconsolata.woff') format('woff'); /* IE9 Compat Modes */
+  font-style: normal;
+  font-weight: 400;
+  src: url('webchurch/online/fonts/inconsolata-regular.eot'); /* IE9 Compat Modes */
+  src: local('Inconsolata'),
+       url('webchurch/online/fonts/inconsolata-regular.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('webchurch/online/fonts/inconsolata-regular.woff') format('woff'), /* Modern Browsers */
+       url('webchurch/online/fonts/inconsolata-regular.ttf')  format('truetype'), /* Safari, Android, iOS */
+       url('webchurch/online/fonts/inconsolata-regular.svg#Inconsolata') format('svg'); /* Legacy iOS */
 }
 
 /* crimson-text-regular */
