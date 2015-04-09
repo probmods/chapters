@@ -629,7 +629,7 @@ disease by changing the prior probability of the disease such that it is always 
     (barplot distribution)
     ~~~~
 
-    Note that you don't need to explicitly use `hist` or `repeat` here. In cosh, function calls directly correspond to *distributions* and histograms are built for you automatically (whereas in webchurch, function calls correspond only to *samples* and you have to build the data for histograms manually.)
+    Note that you don't use `hist` or `repeat` here. With `enumeration-query`, function calls directly correspond to *distributions* (whereas with `rejection-query` or `mh-query`, function calls correspond only to *samples* and you have to build the data for histograms manually). If you have a distribution, you call `barplot`.
 
 
     C) What does the `my-list-index` function do? What would happen if you ran `(my-list-index 'mango '(apple banana) 1)`?
