@@ -3,7 +3,7 @@
 var app = {
     protocol: location.protocol,
     loggedIn: Cookies.get('gg') || false,
-    chapterName: typeof chapterName !== 'undefined' ? chapterName : location.href.split("/").pop().replace(".html","").split("#")[0] 
+    chapterName: typeof chapterName !== 'undefined' ? chapterName : location.href.split("/").pop().replace(".html","").split("#")[0]
 };
 
 var editors = [];
@@ -16,9 +16,9 @@ $(document).ready(function() {
 
         var rawExerciseName = $(item).data('exercise');
         var exerciseName;
-        
-        var defaultEngine = $(item).attr("data-engine") || 'webchurch'; 
-        var defaultCode = $(item).text(); 
+
+        var defaultEngine = $(item).attr("data-engine") || 'webchurch';
+        var defaultCode = $(item).text();
 
         // if the codebox doesn't declare an exercise name, compute one
         if (rawExerciseName === undefined) {
@@ -34,8 +34,7 @@ $(document).ready(function() {
                 // HACK: hard code the format for play-space names
                 [app.chapterName, exerciseName].join(".") :
                 [app.chapterName, index, exerciseName].join(".")
-        };    
-
+        };
 
         var ed = new EditorModel(edOptions);
 
@@ -81,7 +80,7 @@ $(document).ready(function() {
                     console.log("POST to /code/" + exerciseName + ": success");
                     ed.codeId = codeId;
                     ed.trigger('code.sent');
-                    
+
                 },
                 error: function() {
                     console.log("POST to /code/" + exerciseName + ": failure");
@@ -93,22 +92,22 @@ $(document).ready(function() {
         // this assumes that ed.code_id and ed.get('results') are available
         ed.sendResult = function() {
             var exerciseName = ed.get('exerciseName');
-            
-            
+
+
             var data = {'exercise_id': exerciseName,
                         'csrfmiddlewaretoken': Cookies.get('csrftoken'),
                         'forest_results': ed.get('result'),
                         'forest_errors': JSON.stringify(ed.get('error')),
                         'code_id': ed.codeId
-                       }; 
-                
+                       };
+
             $.ajax({
                 type: "POST",
                 url: "/result",
                 data: data,
                 success: function() { console.log("POST to /result/" + exerciseName + ": success");},
                 error: function() { console.log("POST to /result/" + exerciseName + ": failure");}
-            }); 
+            });
         }
 
         ed.on('run.start', function() {
@@ -120,8 +119,8 @@ $(document).ready(function() {
         // send result to the server if runStatus == 2
         // runStatus gets incremented once when we have the result
         // and once again when we get a code id back from the server
-        // (we don't know in advance the order of these events) 
-        var trySendResult = function() {            
+        // (we don't know in advance the order of these events)
+        var trySendResult = function() {
             ed.runStatus++;
             // if we've both got the result and the code id from the server
             // then send the result
