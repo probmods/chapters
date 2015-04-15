@@ -44,25 +44,30 @@ $(document).ready(function() {
         // (i.e., is not a homework assignment), then just insert the dom element.
         // otherwise, do a network action to get the code contents and then insert
         // the dom element
-        if (!app.loggedIn || !rawExerciseName) {
-            ed.replaceDomEl(item);
-        } else {
-            // get code 
-            $.ajax({
-                url: "/code/" + ed.get('exerciseName'),
-                success: function(json) {
-                    ed.set({code: json.code,
-                            engine: json.engine},
-                           {programmatic: true}); 
-                },
-                error: function() {
-                    console.log("failure loading exercise " + ed.get('exerciseName') + ", using default");
-                },
-                complete: function() {
-                    ed.replaceDomEl(item);
-                }
-            })
-        }
+        if (!app.loggedIn // || !rawExerciseName
+           ) {
+               ed.replaceDomEl(item);
+           } else {
+               // get code
+               $.ajax({
+                   url: "/code/" + ed.get('exerciseName'),
+                   success: function(json) {
+                       ed.set({code: json.code,
+                               engine: json.engine},
+                              {programmatic: true});
+
+                       if (json.code !== defaultCode) {
+                           $(ed.display.wrapper).find(".code-settings").prepend($("<span>(modified)</span>"))
+                       }
+                   },
+                   error: function() {
+                       console.log("failure loading exercise " + ed.get('exerciseName') + ", using default");
+                   },
+                   complete: function() {
+                       ed.replaceDomEl(item);
+                   }
+               })
+           }
 
         // attach a method to the editor instance for sending code to the db
         ed.sendCode = function() {
@@ -136,9 +141,11 @@ $(document).ready(function() {
         });
 
         ed.on('reset', function() {
+
+            $(ed.display.wrapper).find(".code-settings > span ").remove();
             var initialOptions = ed.get('initialOptions'),
                 exerciseName = ed.get('exerciseName');
-            
+
             $.ajax({
                 type: "POST",
                 url: "/code/" + exerciseName,

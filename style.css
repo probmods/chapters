@@ -134,12 +134,12 @@ list-style-type: none
     border: 1px solid gray;
     border-radius: 2px;
     padding: 0;
-    margin: 0; 
+    margin: 0;
     margin-top: 3px;
     margin-left: -5em;
     width: 20em;
     display: none;
-    position: absolute; 
+    position: absolute;
     list-style-position: inside;
     z-index: 999999;
     color: black;
@@ -150,7 +150,7 @@ list-style-type: none
     padding: 5px 10px 5px 10px;
     font-weight: normal;
     color: black
-} 
+}
 
 #nav ol li:hover {
     background-color: #12858C !important;
@@ -178,7 +178,7 @@ li.show ol, .nav0:hover ol {
 #chapter-wrapper {
     width: 55em;
     margin: 0 auto;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 1); 
+    box-shadow: 0 0 15px rgba(0, 0, 0, 1);
 }
 
 #chapter {
@@ -189,7 +189,7 @@ li.show ol, .nav0:hover ol {
     padding: 60px;
     padding-top: 1px;
     font-size: 17px;
-    line-height: 125%; 
+    line-height: 125%;
 }
 
 #chapter p {
@@ -341,7 +341,7 @@ h1 > a > code, h2 > a > code, h3 > a > code, h4 > a > code, h5 > a > code, li > 
     background-color: #f2efc2;
     padding: 5px;
     border: 1px solid #f3ce00;
-} 
+}
 
 /* codeboxes */
 
@@ -355,7 +355,7 @@ h1 > a > code, h2 > a > code, h3 > a > code, h4 > a > code, h5 > a > code, li > 
 
 .code-controls {
     position: absolute;
-    bottom: 0; 
+    bottom: 0;
     right: 0;
     opacity: 0;
     z-index: 1000
@@ -366,9 +366,10 @@ h1 > a > code, h2 > a > code, h3 > a > code, h4 > a > code, h5 > a > code, li > 
     position: absolute;
     top: 0;
     right: 0;
-    font-size: 16px;
+    font-size: 12px;
     list-style-type: none;
-    margin: 2px
+    margin: 2px;
+    color: gray
 }
 
 .code-settings li {
@@ -437,12 +438,12 @@ h1 > a > code, h2 > a > code, h3 > a > code, h4 > a > code, h5 > a > code, li > 
 }
 
 .bar,
-.point { 
+.point {
     fill: steelblue;
     shape-rendering: crispEdges;
 }
 
-.lineplot { 
+.lineplot {
     stroke: steelblue;
     stroke-width: 2px;
     shape-rendering: crispEdges;
@@ -463,4 +464,3 @@ td {
 border: 1px solid #afafaf;
 padding: 0 0.5em 0 0.5em;
 }
-
