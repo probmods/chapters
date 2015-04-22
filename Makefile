@@ -3,15 +3,15 @@
 # FIXME
 # if a directory is specified (e.g., make dir=book1 all)
 # then prefix all filenames with that directory name
-# this is work in progress: 
+# this is work in progress:
 # 1. i can't figure out how to address $(prefix)chapters.txt
-# 2.  it's not clear where assets like chapter templates, 
+# 2.  it's not clear where assets like chapter templates,
 # javascript, and css should be stored
 prefix := $(if $(dir), $(addsuffix /,$(dir)),)
 
 chapterlist = $(addprefix $(prefix), chapters.txt)
 
-REQUIRES_CITEPROC_HS := $(shell pandoc --version | head -1 | grep "1.1[2-9]") 
+REQUIRES_CITEPROC_HS := $(shell pandoc --version | head -1 | grep "1.1[2-9]")
 
 # List files to be made by finding all *.md files and changing them to .html
 # HT http://stackoverflow.com/q/6767413/351392 for the $(shell) syntax
@@ -78,7 +78,7 @@ chapterlist.html : .chapters.txt
 
 # inside .%.html, replace the <!-- _chapterlist_ --> string with the contents of chapterlist.html
 # and <!-- _chapternum_ --> with the chapter num, which we compute manually from chapters.txt
-# HT http://unix.stackexchange.com/questions/20322/replace-string-with-contents-of-a-file-using-sed#comment54953_20324	
+# HT http://unix.stackexchange.com/questions/20322/replace-string-with-contents-of-a-file-using-sed#comment54953_20324
 # HT http://stackoverflow.com/a/1909390/351392 for the stuff
 %.html : .%.html chapterlist.html
 	$(eval CHAPTERNUM = $(shell grep "$*" .chapters.txt | cut -d ":" -f1 | sed -e 's/\([0-9]*\)/\1./g' ))
@@ -96,7 +96,7 @@ $(prefix)index.html: $(prefix).index.html $(prefix)chapterlist.html
 	@echo "* index.html"
 	@ sed -e '/<!-- _chapterlist_ -->/{r chapterlist.html' \
 	-e 'd}' \
-	.index.html > index.html 
+	.index.html > index.html
 
 # Remove all html outputs
 clean :
