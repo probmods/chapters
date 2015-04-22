@@ -13,11 +13,18 @@
     <script src="scripts/underscore-min.js"></script>
     <script src="scripts/jquery.js"></script>
     <script src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+      "HTML-CSS": {
+      minScaleAdjust: 100
+      }
+      });
+    </script>
     <script src="scripts/cookies-0.3.1.min.js"></script>
     <script src="scripts/gg.js"></script>
     <script src="scripts/nav.js"></script>
     <script src="scripts/cosmetics.js"></script>
-    <script src="scripts/md5.js"></script> 
+    <script src="scripts/md5.js"></script>
     <script src="webchurch/online/webchurch.js"></script>
     <script src="globals.js"></script>
     <script src="webchurch/online/vega.min.js"></script>
@@ -35,15 +42,15 @@
       <!-- <a class="nav0" href="/profile"><li id="profile-link" style='display: none'>Profile</li></a>  -->
       <a class="nav0" href="/logout"><li id="logout-link" style='display: none'>Logout</li></a>
     </ul>
-    <div class="clear"></div> 
+    <div class="clear"></div>
   </div>
 
   <div id="chapter">
-    <h1 id="chapter-title"><!-- _chapternum_ --> $title$</h1> 
+    <h1 id="chapter-title"><!-- _chapternum_ --> $title$</h1>
   $toc$
 $body$
    </div>
-</div> 
+</div>
 </body>
 
 <script src="scripts/after-body.js"></script>
