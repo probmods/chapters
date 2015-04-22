@@ -464,3 +464,10 @@ td {
 border: 1px solid #afafaf;
 padding: 0 0.5em 0 0.5em;
 }
+
+/* for smartphones */
+@media only screen and (max-device-width: 480px) {
+    .math {
+        font-size: 140%
+    }
+}
