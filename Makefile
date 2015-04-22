@@ -26,11 +26,11 @@ all : wc $(public) $(private)
 
 # in an ideal world, we would recompile this whenever any of the
 # webchurch files changed, but this would require manually curating
-# a list of dependencies for building webchurch.js 
+# a list of dependencies for building webchurch.js
 # maybe we can use grunt-watchify to do this automatically
-wc : webchurch/online/webchurch.js
+wc : webchurch/online/webchurch.min.js
 
-webchurch/online/webchurch.js :
+webchurch/online/webchurch.min.js :
 	@echo 'making webchurch'
 	@cd webchurch; ./compile.sh
 
