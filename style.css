@@ -143,6 +143,7 @@ list-style-type: none
     list-style-position: inside;
     z-index: 999999;
     color: black;
+    box-shadow: 0px 0px 33px 3px #568ec7;
 }
 
 #nav ol li {
@@ -157,16 +158,14 @@ list-style-type: none
     color: white
 }
 
-#nav ol li a {
+#nav ol a {
     color: black;
     text-decoration: none
 }
 
-#nav ol li:hover a, #nav ol li:hover a:visited {
+#nav ol a:hover {
     color: white
 }
-
-
 
 /* show the list of all chapters when the show class is
    applied */

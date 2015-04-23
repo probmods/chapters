@@ -6,7 +6,7 @@ def tag(t, content, props = {}):
     substitutes["props"] = " ".join( map(lambda (x, y): x + "=\"" + str(y) + "\"", props.items()) )
     if len(substitutes["props"]) > 0:
         substitutes["props"] = " " + substitutes["props"]
-    return "<%(tag)s%(props)s>%(content)s</%(tag)s>" % substitutes 
+    return "<%(tag)s%(props)s>%(content)s</%(tag)s>" % substitutes
 
 chapters = [ ("index","Index") ]
 
@@ -24,14 +24,12 @@ lis = []
 
 counter = 0
 
-for url, chapter in chapters: 
-    link = tag("a", chapter, {"href": url + ".html"})
-    if counter == 0:
-        li = tag("li", link, {"class": "nonum"})
-    else:
-        li = tag("li", link)
+for url, chapter in chapters:
+    li = tag("li", chapter, {"class": "nonum"} if counter==0 else {})
+    link = tag("a", li, {"href": url + ".html"})
     counter += 1
-    lis.append(li)
+    lis.append(link)
+
 
 lis = "\n" + "\n".join(lis) + "\n"
 
