@@ -5,9 +5,9 @@
 
     // load mathjax if we're in a local repository
     if (isLocal) {
-        var mathjax = document.createElement('script'); 
+        var mathjax = document.createElement('script');
         mathjax.src = "http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
-        document.getElementsByTagName('head')[0].appendChild(mathjax); 
+        document.getElementsByTagName('head')[0].appendChild(mathjax);
     }
 
     // load google analytics
@@ -34,8 +34,8 @@ $(document).ready(function() {
             $sourceNodes.map(function(j,y) {
                 var $y = $(y);
                 var targetNode = $(el.parentNode).clone().addClass("citation-expanded");
-                targetNode.find("span").remove(); 
-                
+                targetNode.find("span").remove();
+
                 $y.append(targetNode);
 
                 // to handle touch events
@@ -53,9 +53,9 @@ $(document).ready(function() {
                         }, 30);
                     };
 
-                    
+
                     $y.one('click', clickHandler);
                 }
-            }); 
-        });    
+            });
+        });
 });
