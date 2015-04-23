@@ -121,6 +121,10 @@ ul#nav {
     font-size: 80%;
 }
 
+.all-chapters:hover {
+    cursor: pointer
+}
+
 .nav0, .nav0:visited {
     color: white;
     text-decoration: none;
