@@ -59,3 +59,13 @@ $(document).ready(function() {
             });
         });
 });
+
+// headroom.js
+
+(function() {
+  var header = document.getElementById("header");
+  var headroom = new Headroom(header, {
+    "tolerance": 15
+  });
+  headroom.init();
+})()

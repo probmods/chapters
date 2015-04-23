@@ -29,10 +29,11 @@
     <script src="globals.js"></script>
     <script src="webchurch/online/vega.min.js"></script>
     <script src="new-injector.js"></script>
+    <script src="scripts/headroom.min.js"></script>
   </head>
 <body>
 <div id="chapter-wrapper">
-  <div id='header'>
+  <div id='header' class="headroom">
     <div id='logotype'><a href="index.html">Probabilistic Models of Cognition</a></div>
     <ul id="nav">
       <span class="nav0"><li class="all-chapters">All chapters

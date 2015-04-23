@@ -80,6 +80,27 @@ body {
     padding-left: 2em;
     padding-right: 1em;
     color: white;
+    border-bottom: 1px solid #666;
+}
+
+.headroom {
+    z-index: 99999999;
+}
+
+.headroom--top {
+    transform: none !important;
+}
+
+.headroom--not-top {
+    position: fixed;
+    transition: transform 200ms linear;
+}
+
+.headroom--pinned {
+    transform: translateY(0%);
+}
+.headroom--unpinned {
+    transform: translateY(-100%);
 }
 
 #logotype a {
@@ -141,7 +162,7 @@ list-style-type: none
     display: none;
     position: absolute;
     list-style-position: inside;
-    z-index: 999999;
+    z-index: 9999999;
     color: black;
     box-shadow: 0px 0px 33px 3px #568ec7;
 }
