@@ -25,39 +25,57 @@
 })();
 
 $(document).ready(function() {
-    $("#references ~ p > span:first-child")
-        .addClass("citekey")
-        .map(function(index, el) {
-            var key = $(el).text(),
-                $sourceNodes = $('span[data-cites="' + key + '"]'); // find spans in the text that reference this
+  $("#references ~ p > span:first-child")
+    .addClass("citekey")
+    .map(function(index, el) {
+      var key = $(el).text(),
+          $sourceNodes = $('span[data-cites="' + key + '"]'); // find spans in the text that reference this
 
-            $sourceNodes.map(function(j,y) {
-                var $y = $(y);
-                var targetNode = $(el.parentNode).clone().addClass("citation-expanded");
-                targetNode.find("span").remove();
+      $sourceNodes.map(function(j,y) {
+        var $y = $(y);
+        var targetNode = $(el.parentNode).clone().addClass("citation-expanded");
+        targetNode.find("span").remove();
 
-                $y.append(targetNode);
+        // to handle touch events
+        if (true) {
+          var unclickHandler, clickHandler;
 
-                // to handle touch events
-                if (false) {
-                    var unclickHandler, clickHandler;
+          unclickHandler = function() {
+            $y.removeClass('hover').one('click', clickHandler);
 
-                    unclickHandler = function() {
-                        $y.removeClass('hover').one('click', clickHandler);
-                    };
+            $(targetNode).removeClass("citation-animate").remove();
+          };
 
-                    clickHandler = function() {
-                        $y.addClass('hover');
-                        setTimeout(function() {
-                            $(document).one('click', unclickHandler);
-                        }, 30);
-                    };
+          clickHandler = function(e) {
+            $y.addClass("hover");
+
+            $(document.body).append(targetNode);
+
+            $(targetNode)
+              .css({
+                position: "absolute",
+                left: e.pageX - ($(targetNode).width() * 0.5),
+                top: e.pageY - ($(targetNode).height() * 0.5)
+              })
+              .on('click', function(e) {
+                e.preventDefault();
+                e.stopImmediatePropagation()
+              })
+              .show();
+
+            $(targetNode)
+              .addClass("citation-animate")
+
+            setTimeout(function() {
+              $(document).one('click', unclickHandler);
+            }, 30);
+          };
 
 
-                    $y.one('click', clickHandler);
-                }
-            });
-        });
+          $y.one('click', clickHandler);
+        }
+      });
+    });
 });
 
 // headroom.js
