@@ -11,5 +11,3 @@ occam's-razor
 mixture-models
 non-parametric-models
 appendix-scheme
-appendix-language
-appendix-conjugate-exponential
