@@ -11,7 +11,7 @@ prefix := $(if $(dir), $(addsuffix /,$(dir)),)
 
 chapterlist = $(addprefix $(prefix), chapters.txt)
 
-REQUIRES_CITEPROC_HS := $(shell pandoc --version | head -1 | grep "1.1[2-9]")
+REQUIRES_CITEPROC_HS := $(shell pandoc --version | head -1 | grep "1.1[2-9]" | tr -d " ")
 
 # List files to be made by finding all *.md files and changing them to .html
 # HT http://stackoverflow.com/q/6767413/351392 for the $(shell) syntax
@@ -42,7 +42,7 @@ private : $(private)
 # make the nocl file, i.e., the HTML file without the list of chapters
 # in the navigation bar
 .%.html : %.md chapter.template dev.bib
-	@if [ "$(REQUIRES_CITEPROC_HS)" = " " ] ; then \
+	@if [ "$(REQUIRES_CITEPROC_HS)" = "" ] ; then \
 	  pandoc --toc \
 		--smart \
 		--template chapter.template \
