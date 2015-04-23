@@ -75,8 +75,8 @@ body {
 #header {
     background-color: #4ECC77;
     width: 52em;
-    padding-top: 1em;
-    padding-bottom: 1em;
+    padding-top: 0.1em;
+    padding-bottom: 0.1em;
     padding-left: 2em;
     padding-right: 1em;
     color: white;
