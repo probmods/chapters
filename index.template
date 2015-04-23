@@ -5,13 +5,19 @@
     <link rel="stylesheet" type="text/css" href="style.css">
     <link rel="shortcut icon" href="favicon.ico" />
     <style>
-      ol {
-      font-size: 1.25em;
+      li {
+      font-size: 1.1em;
       line-height: 1.5em;
       }
-      ol a  {
+      ol a, ul a {
       text-decoration: none;
-      border-bottom: 1px dotted #99ccff;
+      }
+      ul {
+      list-style-type: none;
+      padding-left: 0.5em
+      }
+      li a  {
+      text-decoration: none;
       }
       #header {
       width: 100%;
@@ -20,7 +26,7 @@
       margin-bottom: 0;
       color: white
       }
-      
+
       #title {
       font-family: 'Crimson Text', Crimson, Times, serif;
       font-size: 50px;
@@ -37,8 +43,26 @@
       padding-top: 1px
       }
 
+      .columns-container {
+      width: 100%;
+      }
+
+      .left-column {
+      width: 48%;
+      float: left;
+      }
+
+      .right-column {
+      width: 48%;
+      float: right;
+      }
+
+      .clear {
+      clear: both
+      }
+
     </style>
-    <script src="scripts/underscore-min.js"></script> 
+    <script src="scripts/underscore-min.js"></script>
     <script src="scripts/jquery.js"></script>
     <script src="scripts/cookies-0.3.1.min.js"></script>
     <script src="scripts/gg.js"></script>
@@ -55,7 +79,7 @@
         <span id='title'>Probabilistic Models of Cognition</span><br>
         <span id='authors'><i style='opacity: 0.5'>by</i> Noah D. Goodman <i style='opacity: 0.5'>and</i> Joshua B. Tenenbaum</span>
       </div>
-      <div id="chapter"> 
+      <div id="chapter">
 $body$
       </div>
     </div>
