@@ -38,7 +38,7 @@ If beliefs are causal histories of how the observed data were generated, and deg
 
 # The Size Principle
 
-A simple case of Bayes Occam's razor comes from the *size principle* @TG01: Of hypotheses which generate data uniformly, the one consistent with the data and with smallest extension is the most probable.
+A simple case of Bayes Occam's razor comes from the *size principle* [@Tenenbaum2001]: Of hypotheses which generate data uniformly, the one consistent with the data and with smallest extension is the most probable.
 
 The following Church program demonstrates the size principle with a very simple model. Here we have two hypothesized sets: `Big` has 6 elements and `Small` has 3 elements. The generative model chooses one of the hypotheses at random and samples some number of symbols from it uniformly. We then wish to infer the hypothesis given observed elements.
 
@@ -374,7 +374,7 @@ This example shows how our inferences about coin flipping can be explained in te
 ;; ?? suspicious coincidence, probability of H = 0.5 ..?
 ;; (define observed-data (h h h h h h h h h h))
 
-;; probably unfair coin, probability of H near 1 
+;; probably unfair coin, probability of H near 1
 ;; (define observed-data (h h h h h h h h h h h h h h h))
 
 ;; definitely unfair coin, probability of H near 1
@@ -598,11 +598,11 @@ These data should suggest a 1st order polynomial:
 -->
 
 # Example: Scene Inference
-Imagine you are in a world of colored blocks that typically looks something like this: 
+Imagine you are in a world of colored blocks that typically looks something like this:
 
 <img src='images/blocks-world.png' width='200' />
 
-And one day you see this 1x2 red patch... is it one 1x2 block or two 1x1 blocks? 
+And one day you see this 1x2 red patch... is it one 1x2 block or two 1x1 blocks?
 
 <img src='images/blocks.png' width='400' />
 
@@ -741,7 +741,7 @@ We see from these examples that several of the gestalt principles for perceptual
 
 # Exercises
 
-1) **Causal induction**. Write the causal support model from Griffiths and Tenenbaum (2005), "Structure and strength in causal induction" (GT05) in Church.  You don't need to compute the log likelihood ratio for P(data|Graph 1)/P(data|Graph 0) [that is, P(data|C causes E)/P(data|C and E are independent] but can simply estimate the posterior probability P(Graph 1|data) [that is, P(C causes E|data)] as in Griffiths and Tenenbaum (2009), "Theory-based causal induction" (GT09).
+1) **Causal induction**. Write the causal support model from Griffiths and Tenenbaum's [-@Griffiths2005], "Structure and strength in causal induction" (GT05) in Church.  You don't need to compute the log likelihood ratio for $P(\text{data} \mid \text{Graph 1})/P(\text{data}|\text{Graph 0})$ but can simply estimate the posterior probability P(Graph 1|data).
 
     A) Replicate the model predictions from Fig. 1 of GT05.
 
@@ -758,7 +758,7 @@ Can you modify the church program to fit curves of qualitatively different forms
 
 You should hand in the data sets you used for the informal experiment, discussion of the experimental results, and a modified church program for fitting qualitatively different forms from polynomials plus samples from running the program forward.
 
-3) **Number game**. Write the *number game* model from "Rules and similarity in concept learning", Tenenbaum (2000), in Church.
+3) **Number game**. Write the *number game* model from Tenenbaum's [-@Tenenbaum2000] "Rules and similarity in concept learning" in Church.
 
 Replicate the model predictions in Fig. 1b. You may want to start by writing out the hypotheses by hand.
 
