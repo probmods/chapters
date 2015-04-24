@@ -741,14 +741,14 @@ We see from these examples that several of the gestalt principles for perceptual
 
 # Exercises
 
-1) **Causal induction**. Write the causal support model from Griffiths and Tenenbaum's [-@Griffiths2005], "Structure and strength in causal induction" (GT05) in Church.  You don't need to compute the log likelihood ratio for $P(\text{data} \mid \text{Graph 1})/P(\text{data}|\text{Graph 0})$ but can simply estimate the posterior probability P(Graph 1|data).
+1) **Causal induction**. Write the causal support model from Griffiths and Tenenbaum's [-@Griffiths2005], "Structure and strength in causal induction" (GT05) in Church.  You don't need to compute the log likelihood ratio for $P(\text{data} \mid \text{Graph 1})/P(\text{data} \mid \text{Graph 0})$ but can simply estimate the posterior probability $P(\text{Graph 1} \mid \text{data})$.
 
     A) Replicate the model predictions from Fig. 1 of GT05.
 
     B) Show samples from the posteriors over the causal strength and background rate
 parameters, as in Fig 4 of GT05.
 
-    C) Try using different parameterizations of the function that relates the cause and the background to the effect, as described in GT09: noisy-or for generative causes, noisy-and-not for preventive causes, generic multinomial parameterization for causes that have an unknown effect.  Show their predictions for a few different data sets, including the Delta-P = 0 cases.
+    C) Try using different parameterizations of the function that relates the cause and the background to the effect, as described in a later 2009 paper [@Griffiths2009]: noisy-or for generative causes, noisy-and-not for preventive causes, generic multinomial parameterization for causes that have an unknown effect.  Show their predictions for a few different data sets, including the Delta-P = 0 cases.
 
 2) Try an informal behavioral experiment with several friends as experimental subjects to see whether the Bayesian approach to curve fitting given on the wiki page corresponds with how people actually find functional patterns in sparse noisy data.  Your experiment should consist of showing each of 4-6 people 8-10 data sets (sets of x-y values, illustrated graphically as points on a plane with x and y axes), and asking them to draw a continuous function that interpolates between the data points and extrapolates at least a short distance beyond them (as far as people feel comfortable extrapolating).  Explain to people that the data were produced by measuring y as some function of x, with the possibility of noise in the measurements.
 
