@@ -372,7 +372,7 @@ We could compute the same answer using enumeration, recall that enumeration retu
    x
    (not (apply multinomial (inner x)))))
 
-(hist (repeat 10000 (lambda () (apply multinomial (outer)))))
+(barplot (outer))
 ~~~~
 
 However, notice that this combination will recompute the inner and outer distributions every time they are encountered. Because these distributions are deterministically fixed (since they are the explicit marginal distributions, not samples), we could *cache* their values using `mem`. This technique, an example of *dynamic programming*, avoids work and so speeds up the computation:
@@ -392,7 +392,7 @@ However, notice that this combination will recompute the inner and outer distrib
           x
           (not (apply multinomial (inner x)))))))
 
-(hist (repeat 10000 (lambda () (apply multinomial (outer)))))
+(barplot (outer))
 ~~~~
 
 This enumeration-with-caching technique is extremely useful for exploring small nested-query models, but it becomes impractical when the state space of any one of the queries grows too large. As before, an alternative is MCMC. 
