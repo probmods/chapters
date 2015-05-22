@@ -232,7 +232,7 @@ Suppose that we flip two fair coins, and return the list of their values:
 ~~~~
 (list (flip) (flip))
 ~~~~
-How can we predict the return value of this program? For instance, how likely is it that we will see `(#t #f)`? A **probability** is a number between 0 and 1 that expresses the answer to such a question: it is a degree of belief that we will see a given outcome, such as `(#t #f)`. The probability if an event $A$ (such as the above program returning `(#t #f)`) is usually written as: $P(A)$.
+How can we predict the return value of this program? For instance, how likely is it that we will see `(#t #f)`? A **probability** is a number between 0 and 1 that expresses the answer to such a question: it is a degree of belief that we will see a given outcome, such as `(#t #f)`. The probability of an event $A$ (such as the above program returning `(#t #f)`) is usually written as: $P(A)$.
 
 As we did above, we can sample many times and examine the histogram of return values:
 
