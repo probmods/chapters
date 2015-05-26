@@ -537,7 +537,7 @@ Were you often right? Were there some cases of 'surprisingly stable' towers?  @H
 
 (define (noisify world)
   (define (xNoise worldObj)
-    (define noiseWidth 10) ;how many pixes away from the original xpos can we go?
+    (define noiseWidth 10) ;how many pixels away from the original xpos can we go?
     (define (newX x) (uniform (- x noiseWidth) (+ x noiseWidth)))
     (if (static? worldObj)
         worldObj
@@ -712,7 +712,7 @@ Directly compute the probability of the bent coin in the example. Check your ans
 
     (define (noisify world)
       (define (xNoise worldObj)
-        (define noiseWidth 10) ;how many pixes away from the original xpos can we go?
+        (define noiseWidth 10) ;how many pixels away from the original xpos can we go?
         (define (newX x) (uniform (- x noiseWidth) (+ x noiseWidth)))
         (if (getIsStatic worldObj)
             worldObj
