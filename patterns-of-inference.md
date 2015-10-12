@@ -182,7 +182,7 @@ More complicated generative models, which can be expressed as probabilistic prog
 
 # From *A Priori* Dependence to Conditional Dependence
 
-The relationships between causal structure and statistical dependence becomes particularly interesting and subtle when we look at the effects of additional observations or assumptions.  Events that are statistically dependent *a priori* (sometimes called *marginally* dependent) may become independent when we condition on some other observation; this is called *screening off*, or sometimes *context-specific independence*.  Also, events that are statistically independent *a priori* (marginally independent) may become dependent when we condition on other observations; this is known as *explaining away*.  The dynamics of screening off and explaining away are extremely important for understanding patterns of inference---reasoning and learning---in probabilistic models.
+The relationships between causal structure and statistical dependence become particularly interesting and subtle when we look at the effects of additional observations or assumptions.  Events that are statistically dependent *a priori* (sometimes called *marginally* dependent) may become independent when we condition on some other observation; this is called *screening off*, or sometimes *context-specific independence*.  Also, events that are statistically independent *a priori* (marginally independent) may become dependent when we condition on other observations; this is known as *explaining away*.  The dynamics of screening off and explaining away are extremely important for understanding patterns of inference---reasoning and learning---in probabilistic models.
 
 <!--
 ![](images/Marg-dep1.jpg)
