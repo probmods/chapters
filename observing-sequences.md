@@ -1,5 +1,5 @@
 % Models for sequences of observations
-% Tim O'Donnell; Noah Goodman; Josh Tenenbaum
+% Noah Goodman; Tim O'Donnell; Josh Tenenbaum
 
 <!-- Josh's HMM switching HW problem for this section? -->
 
