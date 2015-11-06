@@ -122,29 +122,29 @@ body {
     font-style: italic;
 }
 
-.toc {
-    background-color: #3399CC;
-    color: white;
-    border-radius: 4px;
-    padding: 0;
-    padding-bottom: 0.5em;
-    position: relative;
-    border: 1px solid #3399cc;
-}
+/* .toc { */
+/*     background-color: #3399CC; */
+/*     color: white; */
+/*     border-radius: 4px; */
+/*     padding: 0; */
+/*     padding-bottom: 0.5em; */
+/*     position: relative; */
+/*     border: 1px solid #3399cc; */
+/* } */
 
-.toc .name {
-    border-top-left-radius: 4px;
-    border-top-right-radius: 4px;
-    width: 100%;
-    background-color: white;
-    color: #3399cc;
-    text-indent: 0.5em;
-    font-weight: bold;
-    line-height: 100%;
-    font-size: 100%;
-    padding-top: 0.5em;
-    padding-bottom: 0.3em;
-}
+/* .toc .name { */
+/*     border-top-left-radius: 4px; */
+/*     border-top-right-radius: 4px; */
+/*     width: 100%; */
+/*     background-color: white; */
+/*     color: #3399cc; */
+/*     text-indent: 0.5em; */
+/*     font-weight: bold; */
+/*     line-height: 100%; */
+/*     font-size: 100%; */
+/*     padding-top: 0.5em; */
+/*     padding-bottom: 0.3em; */
+/* } */
 
 .toc ul {
     padding-left: 2em;
@@ -154,16 +154,16 @@ body {
     margin-top: 3px;
 }
 
-.toc code {
-    background-color: transparent;
-}
+/* .toc code { */
+/*     background-color: transparent; */
+/* } */
 
-.toc ul a {
-    color: white;
-    text-decoration: none;
-    padding-bottom: -2px !important;
-    border-bottom: 1px solid #ccc;
-}
+/* .toc ul a { */
+/*     color: white; */
+/*     text-decoration: none; */
+/*     padding-bottom: -2px !important; */
+/*     border-bottom: 1px solid #ccc; */
+/* } */
 
 /* navigation links */
 

@@ -53,7 +53,7 @@
     $endif$
     $if(toc)$
     <div class='toc'>
-      <div class='name'>Contents</div>
+      <div class='name'>Contents:</div>
       $toc$
     </div>
     $endif$
