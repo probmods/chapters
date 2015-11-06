@@ -48,7 +48,15 @@
 
   <div id="chapter">
     <h1 id="chapter-title"><!-- _chapternum_ --> $title$</h1>
-  $toc$
+    $if(author)$
+    <p class='authors'>By: $for(author)$$author$$sep$, $endfor$</p>
+    $endif$
+    $if(toc)$
+    <div class='toc'>
+      <div class='name'>Contents</div>
+      $toc$
+    </div>
+    $endif$
 $body$
    </div>
 </div>

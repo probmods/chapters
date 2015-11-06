@@ -1,4 +1,5 @@
 % Non-parametric models
+% Tim O'Donnell; Noah Goodman; Josh Tenenbaum
 
 In the chapter on [Mixture Models](mixture-models.html) we saw a simple way to construct a model with an unbounded number of categories---simply place uncertainty over the number of categories that are 'actually' in the world. In this section we describe another approach which instead posits an infinite number of (mostly unused) categories actually in the world. The *non-parametric*, or *infinite*, models have a number of useful mathematical properties.
 
