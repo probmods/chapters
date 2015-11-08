@@ -135,6 +135,33 @@ $(document).ready(function() {
             }
         }
 
+        // after running, replace svg element with img element
+        // containing the svg as a data uri so that users can
+        // right click charts and download them
+        ed.on('run.finish', function() {
+            setTimeout(function() {
+                var $svgs = $(ed.display.$results).find("svg");
+
+                var svgTemplate = _.template(
+                    '<?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg class="marks" width="<%- width %>" height="<%- height %>" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><defs><style type="text/css"></style></defs>');
+
+
+                $svgs.map(function(i, svg) {
+                    var svgText = svg.innerHTML;
+                    var svgHeader = svgTemplate({width: $(svg).width(),
+                                                 height: $(svg).height()})
+
+                    $(svg).replaceWith(
+                        $("<img>").attr({src: 'data:image/svg+xml;utf8,' +
+                                             svgHeader +
+                                             svgText + '</svg>'
+
+                                            }))
+                });
+
+            }, 0)
+        })
+
         ed.on({
             'code.sent': trySendResult,
             'run.finish': trySendResult
