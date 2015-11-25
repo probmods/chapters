@@ -11,7 +11,7 @@ def extract(key, value, fmt, meta):
     if (key == 'CodeBlock'):
         [[ident,classes,keyvals], code] = value
         value = [[ident,classes,[['test_id',str(len(code_blocks))]]],code]
-        
+
         code_blocks.append({'c': value, 't': 'CodeBlock'})
 
 if __name__ == "__main__":
@@ -26,4 +26,4 @@ if __name__ == "__main__":
     json.dump(altered, sys.stdout)
 
 
-# for CHP in `cat chapters.txt`; do pandoc --filter ./extract-codeblocks.py --to markdown $CHP.md -o code/$CHP.md; done
+# for CHP in `cat chapters.txt`; do pandoc --filter ./dev/extract-codeblocks.py --to markdown md/$CHP.md -o code/$CHP.md; done
