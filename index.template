@@ -3,7 +3,7 @@
   <head>
     <title>$title$</title>
     <link rel="stylesheet" type="text/css" href="style.css">
-    <link rel="shortcut icon" href="favicon.ico" />
+    <link rel="shortcut icon" href="images/favicon.ico" />
     <style>
       li {
       font-size: 1.1em;

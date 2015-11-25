@@ -9,7 +9,7 @@
     <link rel="stylesheet" type="text/css" href="style.css">
     <link rel="stylesheet" type="text/css" href="webchurch/online/css/codemirror.css">
     <link rel="stylesheet" type="text/css" href="webchurch/online/css/d3.css">
-    <link rel="shortcut icon" href="favicon.ico" />
+    <link rel="shortcut icon" href="images/favicon.ico" />
     <script src="scripts/underscore-min.js"></script>
     <script src="scripts/jquery.js"></script>
     <link class="katex-include" rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.5.1/katex.min.css">
