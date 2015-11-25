@@ -87,6 +87,8 @@ It turns out that exchangeable sequences can always be modeled in the form used 
 (define (thunk) (observe latent))
 
 (repeat 10 thunk)
+~~~~
+
 For example, consider the classic Polya urn model. Here, an urn contains some number of white and black balls. We draw $n$ samples as follows: we take a random ball from the urn and keep it, but add an additional $n_\textrm{replace}$ balls of the same color back into the urn. Here is this model in Church:
 
 ~~~~
