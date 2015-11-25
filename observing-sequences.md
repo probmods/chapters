@@ -87,6 +87,64 @@ It turns out that exchangeable sequences can always be modeled in the form used 
 (define (thunk) (observe latent))
 
 (repeat 10 thunk)
+For example, consider the classic Polya urn model. Here, an urn contains some number of white and black balls. We draw $n$ samples as follows: we take a random ball from the urn and keep it, but add an additional $n_\textrm{replace}$ balls of the same color back into the urn. Here is this model in Church:
+
+~~~~
+(define (urn white black replace samples)
+  (if (= samples 0)
+      '()
+
+      (let*
+        ([ball (multinomial '(w b) (list white black))]
+         [add-white (if (equal? ball 'w) (- replace 1) 0)]
+         [add-black (if (equal? ball 'b) (- replace 1) 0)])
+
+        (pair ball
+              (urn (+ white add-white)
+                    (+ black add-black)
+                    replace
+                    (- samples 1))))))
+
+(define _dist-urn
+  (enumeration-query
+   (define balls (urn 1 2 4 3))
+   (apply string-append balls)
+   true))
+
+;; reverse order of distribution entries to facilitate comparison with the next model
+(define dist-urn (list (reverse (first _dist-urn))
+(reverse (second _dist-urn))))
+
+(barplot dist-urn "Poly urn model")
+~~~~
+
+Observe that this model is exchangeable---permutations of a sequence all have the same probability (e.g., `bbw`, `bwb`, `wbb` have the same probability; `bww`, `wbw`, `wwb` do too).
+
+Next, consider the de Finetti representation of this model:
+
+~~~~
+(define (urn-deFinetti white black replace samples)
+  (define a (/ black replace))
+  (define b (/ white replace))
+  (define latent-prior (beta a b))
+  (define (thunk) (if (flip latent-prior) 'b 'w))
+  (repeat samples thunk))
+
+(define samps-deFinetti
+  (mh-query
+   30000 2
+   ;; urn starts with 1 white and 2 black.
+   ;; we will draw 3 samples, adding an additional 4 balls after each.
+   (define balls (urn-deFinetti 1 2 4 3))
+   (apply string-append balls)
+   true))
+
+(hist samps-deFinetti "de Finetti Polya urn model")
+~~~~
+
+Here, we sample a shared latent parameter -- in this case, a sample from a beta distribution -- and, using this parameter, generate $n$ samples independently.
+Up to sampling error, we obtain the same distribution on sequences of draws.
+
 ~~~~
 
 # Markov Models
