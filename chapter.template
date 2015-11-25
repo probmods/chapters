@@ -20,9 +20,9 @@
     <script src="scripts/cosmetics.js"></script>
     <script src="scripts/md5.js"></script>
     <script src="webchurch/online/webchurch.min.js"></script>
-    <script src="globals.js"></script>
+    <script src="scripts/globals.js"></script>
     <script src="webchurch/online/vega.min.js"></script>
-    <script src="new-injector.js"></script>
+    <script src="scripts/new-injector.js"></script>
     <script src="scripts/headroom.min.js"></script>
   </head>
 <body>
