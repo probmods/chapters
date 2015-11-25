@@ -96,13 +96,13 @@ With a single observed `a`, we already favor hypothesis `Small`. What happens wh
 
 As the number of data points increases, the hypothesis `Small` rapidly comes to dominate the posterior distribution.  Why is this happening? We sample observations uniformly from hypotheses, the law of conservation of belief and the symmetry between observations imply that the probability of a draw from `Big` is $\frac{1}{6}$, while the probability of a draw from `Small` is $\frac{1}{3}$. Thus, by the product rule of probabilities, the probability of drawing a set of N observations from `Big` is $(\frac{1}{6})^N$, while the probability of drawing a set of observations from `Small` is $(\frac{1}{3})^N$. The later probability decreases much more slowly than the former as the number of observations increases. Using Bayes' rule, the posterior distribution over hypotheses is given by:
 
-$$P(\textrm{hypothesis} \mid \textrm{observations}) \propto P(\textrm{observations} \mid \textrm{hypothesis})P(\textrm{hypothesis})$$
+$$P(\text{hypothesis} \mid \text{observations}) \propto P(\text{observations} \mid \text{hypothesis})P(\text{hypothesis})$$
 
 Because our hypotheses are equally probable a priori, this simplifies to:
 
-$$P(\textrm{hypothesis} \mid \textrm{observations}) \propto P(\textrm{observations} \mid \textrm{hypothesis})$$
+$$P(\text{hypothesis} \mid \text{observations}) \propto P(\text{observations} \mid \text{hypothesis})$$
 
-So we see that the the posterior distribution over hypotheses in this case is just the normalized likelihood $P(\textrm{observations} \mid \textrm{hypothesis})$.  The likelihood ratio $P(\textrm{observations} \mid \textrm{Big})/P(\textrm{observations} \mid \textrm{Small}) = (\frac{1}{2})^N$ determines how quickly the simpler hypothesis `Small` comes to dominate the posterior.
+So we see that the the posterior distribution over hypotheses in this case is just the normalized likelihood $P(\text{observations} \mid \text{hypothesis})$.  The likelihood ratio $P(\text{observations} \mid \text{Big})/P(\text{observations} \mid \text{Small}) = (\frac{1}{2})^N$ determines how quickly the simpler hypothesis `Small` comes to dominate the posterior.
 
 The size principle is related to an influential proposal in linguistics known as the *subset principle*. Intuitively, the subset principle suggests that when two grammars both account for the same data, the grammar that generates a smaller language should be preferred.^[The term *subset principle* is usually used in linguistics to refer to the notion that a grammar that generates a smaller language should be preferred to one that generates a larger language. However, the name originally was introduced by Bob Berwick to refer to a result due to Dana Angluin giving necessary and sufficient conditions for Gold-style learnability of a class of languages. Essentially it states that a class of languages is learnable in the limit using this principle if every language in the class has a *characteristic subset*.]
 

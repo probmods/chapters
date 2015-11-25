@@ -169,7 +169,7 @@ Next we can ask what this rule means in terms of sampling processes. Consider th
  (equal? data observed-data))
 ~~~~
 
-We have generated a value, the *hypothesis*, from some distribution called the *prior*, then used an observation function which generates data given this hypothesis, the probability of such an observation function is called the *likelihood*. Finally we have queried the hypothesis conditioned on the observation being equal to some observed data---this conditional distribution is called the *posterior*. This is a typical setup in which Bayes' rule is used. Notice that in this case the conditional distribution $P(\textrm{data} \mid \textrm{hypothesis})$ is just the probability distribution on return values from the `observe` function given an input value.
+We have generated a value, the *hypothesis*, from some distribution called the *prior*, then used an observation function which generates data given this hypothesis, the probability of such an observation function is called the *likelihood*. Finally we have queried the hypothesis conditioned on the observation being equal to some observed data---this conditional distribution is called the *posterior*. This is a typical setup in which Bayes' rule is used. Notice that in this case the conditional distribution $P(\text{data} \mid \text{hypothesis})$ is just the probability distribution on return values from the `observe` function given an input value.
 
 <!--
 If we replace the conditioner with `true` in the code above, that is equivalent to observing no data.  Then query draws samples from the prior distribution, rather than the posterior.
@@ -434,8 +434,8 @@ What is your intuition? Many people without training in statistical inference ju
 
 @Tversky1974 named this kind of judgment error *base rate neglect*, because in order to make the correct judgment, one must realize that the key contrast is between the *base rate* of the disease, 0.01 in this case, and the *false alarm rate* or probability of a positive mammogram given no breast cancer, 0.096.  The false alarm rate (or *FAR* for short) seems low compared to the probability of a positive mammogram given breast cancer (the *likelihood*), but what matters is that it is almost ten times higher than the base rate of the disease.  All three of these quantities are needed to compute the probability of having breast cancer given a positive mammogram using Bayes' rule for posterior conditional probability:
 
-$$P(\textrm{cancer} \mid \textrm{positive mammogram}) = \frac{P(\textrm{positive mammogram} \mid \textrm{cancer} ) \times P(\textrm{cancer})}{P(\textrm{ positive mammogram})} \\
-= \frac{0.8 \times 0.01}{0.8 \times 0.01 + 0.096 \times 0.99} = 0.078$$
+$$P(\text{cancer} \mid \text{positive mammogram}) = \frac{P(\text{positive mammogram} \mid \text{cancer} ) \times P(\text{cancer})}{P(\text{ positive mammogram})}$$
+$$= \frac{0.8 \times 0.01}{0.8 \times 0.01 + 0.096 \times 0.99} = 0.078$$
 
 @Gigerenzer1995 showed that this kind of judgment can be made much more intuitive to untrained reasoners if the relevant probabilities are presented as "natural frequencies", or the sizes of subsets of relevant possible outcomes:
 
@@ -588,10 +588,10 @@ disease by changing the prior probability of the disease such that it is always 
         ~~~~
 
 
-4) **Casino game**. Consider the following game. A machine randomly gives Bob a letter of the alphabet; it gives a, e, i, o, u, y (the vowels) with probability 0.01 each and the remaining letters (i.e., the consonants) with probability 0.047 each. The probability that Bob wins depends on which letter he got. Letting $h$ denote the letter and letting $Q(h)$ denote the numeric position of that letter (e.g., $Q(\textrm{a}) = 1, Q(\textrm{b}) = 2$, and so on), the probability of winning is $1/Q(h)^2$. Suppose that we observe Bob winning but we don't know what letter he got. How can we use the observation that he won to update our beliefs about which letter he got? Let's express this formally. Before we begin, a bit of terminology: the set of letters that Bob could have gotten, $\{a, b, c, d, \dots, y, z\}$, is called the *hypothesis space* -- it's our set of hypotheses about the letter.
+4) **Casino game**. Consider the following game. A machine randomly gives Bob a letter of the alphabet; it gives a, e, i, o, u, y (the vowels) with probability 0.01 each and the remaining letters (i.e., the consonants) with probability 0.047 each. The probability that Bob wins depends on which letter he got. Letting $h$ denote the letter and letting $Q(h)$ denote the numeric position of that letter (e.g., $Q(\text{a}) = 1, Q(\text{b}) = 2$, and so on), the probability of winning is $1/Q(h)^2$. Suppose that we observe Bob winning but we don't know what letter he got. How can we use the observation that he won to update our beliefs about which letter he got? Let's express this formally. Before we begin, a bit of terminology: the set of letters that Bob could have gotten, $\{a, b, c, d, ..., y, z\}$, is called the *hypothesis space* -- it's our set of hypotheses about the letter.
 
-    A) In English, what does the posterior probability $p(h \mid \textrm{win})$ represent?
-    B) Manually compute $p(h \mid \textrm{win})$ for each hypothesis (Excel or something like it is helpful here). Remember to normalize - make sure that summing all your $p(h \mid \textrm{win})$ values gives you 1.
+    A) In English, what does the posterior probability $p(h \mid \text{win})$ represent?
+    B) Manually compute $p(h \mid \text{win})$ for each hypothesis (Excel or something like it is helpful here). Remember to normalize - make sure that summing all your $p(h \mid \text{win})$ values gives you 1.
 
     Now, we're going to write this model in Church using `enumeration-query`. Here is some starter code for you:
 
@@ -647,9 +647,9 @@ disease by changing the prior probability of the disease such that it is always 
         (define x ...)
         ~~~~
 
-    E) Fill in the `...`'s in the code to compute $p(h \mid \textrm{win})$. Include a screenshot of the resulting graph. What letter has the highest posterior probability? In English, what does it mean that this letter has the highest posterior? Make sure that your Church answers and hand-computed answers agree -- note that this demonstrates the equivalence between the program view of conditional probability and the distributional view.
+    E) Fill in the `...`'s in the code to compute $p(h \mid \text{win})$. Include a screenshot of the resulting graph. What letter has the highest posterior probability? In English, what does it mean that this letter has the highest posterior? Make sure that your Church answers and hand-computed answers agree -- note that this demonstrates the equivalence between the program view of conditional probability and the distributional view.
 
-    F) Which is higher, $p(\text{vowel} \mid \textrm{win})$ or $p(\text{consonant} \mid \textrm{win})$? Answer this using the Church code you wrote (hint: use the `vowel?` function)
+    F) Which is higher, $p(\text{vowel} \mid \text{win})$ or $p(\text{consonant} \mid \text{win})$? Answer this using the Church code you wrote (hint: use the `vowel?` function)
 
     G) What difference do you see between your code and the mathematical notation? What are the advantages and disadvantages of each? Which do you prefer?
 

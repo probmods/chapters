@@ -546,9 +546,13 @@ border: 1px solid #afafaf;
 padding: 0 0.5em 0 0.5em;
 }
 
+.math {
+    font-size: 14px;
+}
+
 /* for smartphones */
-@media only screen and (max-device-width: 480px) {
+@media only screen and (max-device-width: 480px){
     .math {
-        font-size: 140%
+        font-size: 130%
     }
 }

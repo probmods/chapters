@@ -1,26 +1,70 @@
 /* global location */
 
+var renderMath = function() {
+  $("span.math").each(function(i,el) {
+    var innerHTML = el.innerHTML;
+    var string = el.innerText;
+    var displayMode = false;
+
+    if (/^\\\(/.test(string)) {
+      string = string.replace(/^\\\(/,"").replace(/\\\)$/,"");
+    } else if (/^\\\[/.test(string)) {
+      displayMode = true;
+      string = string.replace(/^\\\[/,"").replace(/\\\]$/,"");
+    }
+
+    try {
+      katex.render(string, el, {displayMode: displayMode});
+    } catch(e) {
+      el.innerHTML = innerHTML;
+      console.log(e)
+    }
+  });
+};
+
 (function() {
-    var isLocal = /file/.test(location.protocol);
+  var isLocal = /file/.test(location.protocol);
 
-    // load mathjax if we're in a local repository
-    if (isLocal) {
-        var mathjax = document.createElement('script');
-        mathjax.src = "http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
-        document.getElementsByTagName('head')[0].appendChild(mathjax);
-    }
+  // load katex
+  if (!isLocal) {
+    renderMath();
+  } else {
+    // on file: protocol, rewrite protocol-relative url
+    // to http
+    var newHref = 'http:' + $('link.katex-include').attr('href');
+    var newSrc =  'http:' + $('script.katex-include').attr('src');
 
-    // load google analytics
-    if (!isLocal & "probmods.org".match(location.hostname)) {
-        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-                                 m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-                                })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    $('link.katex-include').replaceWith(
+      $('<link>')
+        .addClass('katex-include')
+        .attr({href: newHref,
+               rel: 'stylesheet'
+              })
+    );
+
+    var script = document.createElement('script');
+    script.className = 'katex-include';
+    script.onload = function() { renderMath() };
+    script.src = newSrc;
+
+    // load() doesn't seem to work using the
+    // replaceWith method above
+    $('script.katex-include').remove();
+    $('head')[0].appendChild(script);
+
+  }
+
+  // load google analytics
+  if (!isLocal & "probmods.org".match(location.hostname)) {
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                             m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+                            })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
 
-        ga('create', 'UA-44328902-1', 'probmods.org');
-        ga('send', 'pageview');
-    }
+    ga('create', 'UA-44328902-1', 'probmods.org');
+    ga('send', 'pageview');
+  }
 
 })();
 
@@ -77,6 +121,7 @@ $(document).ready(function() {
       });
     });
 });
+
 
 // headroom.js
 

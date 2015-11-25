@@ -834,8 +834,8 @@ to deceive you?
     ~~~~
 
     A) Whether you should switch depends crucially on how you believe Monty chooses doors to pick. First, write the model such that the host *randomly* picks doors (for this, fill in `monty-random`). In this setting, should Alice switch? Or does it not matter? Hint: it is useful to condition on the exact doors that we discussed in the problem description.
-    
-    B) Now, fill in `monty-avoid-both` (make sure you switch your `(define monty-function ...)` alias to use `monty-avoid-both`). Here, Monty randomly picks a door that is *neither* the prize door *nor* Alice's door. For both-avoiding Monty, you'll find that Alice *should* switch. This is unintuitive  -- we know that Monty picked door 3, so why should the process he used to arrive at this choice matter? By hand, compute the probability table for $$P(\textrm{Prize } \mid \textrm{Alice picks door 1}, \textrm{Monty picks door 3}, \textrm{Door 3 is not the prize})$$ under both `monty-random` and `monty-avoid-both`. Your tables should look like:
+
+    B) Now, fill in `monty-avoid-both` (make sure you switch your `(define monty-function ...)` alias to use `monty-avoid-both`). Here, Monty randomly picks a door that is *neither* the prize door *nor* Alice's door. For both-avoiding Monty, you'll find that Alice *should* switch. This is unintuitive  -- we know that Monty picked door 3, so why should the process he used to arrive at this choice matter? By hand, compute the probability table for $$P(\text{Prize } \mid \text{Alice picks door 1}, \text{Monty picks door 3}, \text{Door 3 is not the prize})$$ under both `monty-random` and `monty-avoid-both`. Your tables should look like:
 
         Alice's door   Prize door     Monty's Door   P(Alice, Prize, Monty)
         -------------  -----------    -------------  -----------------------

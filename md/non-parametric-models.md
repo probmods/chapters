@@ -44,7 +44,7 @@ This would solve the problem of "running out of categories," because there would
 Just as the Dirchlet distribution defines a prior on parameters for a multinomial with $K$ possible outcomes, the *Dirichlet process* defines a prior on parameters for a multinomial with $K = \infty$&mdash;an infinite number of possible outcomes.
 
 First, we imagine drawing an infinite sequence of samples from a beta distribution with parameters $1,\ \alpha$ (recall that a beta distribution defines  a distribution on the interval $[0,1]$). We write this infinite set of draws as $\left\{\beta'_k\right\}_{k=1}^{\infty}$.
-$$\beta'_k \sim \mathrm{Beta}\left(1,\alpha\right)$$
+$$\beta'_k \sim \text{Beta}\left(1,\alpha\right)$$
 Ultimately we would like to define a distribution on an infinite set of discrete outcomes that will represent our categories or mixture components, but we start by defining a distribution on the natural numbers. The probability of the natural number $k$ is given by:
 $$\beta_k = \prod_{i=1}^{k-1}\left(1-\beta'_i\right)\cdot\beta'_k$$
 How can this be interpreted as a generative process? Imagine "walking" down the natural numbers in order, flipping a coin with weight $\beta'_i$  for each one; if the coin comes up `false`, we continue to the next natural number; if the coin comes up `true`,  we stop and return the current natural number. Convince yourself that the probability of getting natural number $k$ is given by $\beta_k$ above.
@@ -501,8 +501,8 @@ Like the CRP, the sequential sampling scheme outlined above generates a distribu
 $$
 	[x]_{m,s} =
 	\begin{cases}
-		1 & \textrm{for } m=0 \\
-		x(x+s)...(x+(m-1)s)& \textrm{for }  m > 0
+		1 & \text{for } m=0 \\
+		x(x+s)...(x+(m-1)s)& \text{for }  m > 0
 	\end{cases}
 $$
 Note that $[1]_{m,1} = m!$. The probability of the partition given by the count vector, $\vec{y}$, is defined by:
