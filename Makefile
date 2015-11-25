@@ -7,20 +7,23 @@
 # 1. i can't figure out how to address $(prefix)chapters.txt
 # 2.  it's not clear where assets like chapter templates,
 # javascript, and css should be stored
-prefix := $(if $(dir), $(addsuffix /,$(dir)),)
+# prefix := $(if $(dir), $(addsuffix /,$(dir)),)
+# chapterlist = $(addprefix $(prefix), chapters.txt)
 
-chapterlist = $(addprefix $(prefix), chapters.txt)
+prefix := md/
+
+chapterlist = chapters.txt
 
 REQUIRES_CITEPROC_HS := $(shell pandoc --version | head -1 | grep "1.1[2-9]" | tr -d " ")
 
 # List files to be made by finding all *.md files and changing them to .html
 # HT http://stackoverflow.com/q/6767413/351392 for the $(shell) syntax
-public := $(addprefix $(prefix), $(addsuffix .html, $(shell cat $(chapterlist))))
+public := $(addsuffix .html, $(shell cat $(chapterlist)))
 
 # compile files not specified
 # in chapters.txt and that aren't the index
 # HT http://stackoverflow.com/a/17863387/351392
-private := $(addprefix $(prefix), $(addsuffix .html, $(shell ls *.md | grep -v -f $(chapterlist) | sed -e 's/\.md//g')))
+private := $(addsuffix .html, $(shell ls md/ | grep '.md' | grep -v -f $(chapterlist) | sed -e 's/\.md//g'))
 
 all : wc $(public) $(private)
 
@@ -41,7 +44,7 @@ private : $(private)
 # Pattern rule
 # make the nocl file, i.e., the HTML file without the list of chapters
 # in the navigation bar
-.%.html : %.md chapter.template dev.bib
+.%.html : $(prefix)%.md chapter.template dev.bib
 	@if [ "$(REQUIRES_CITEPROC_HS)" = "" ] ; then \
 	  pandoc --toc \
 		--smart \
@@ -89,18 +92,18 @@ chapterlist.html : .chapters.txt
 	"$<" > "$@"
 
 ## strangely doesn't work with pandoc 1.13 we use --output flag rather than "> .index.html"
-.index.html: index.md index.template
-	@pandoc --smart --mathjax --template index.template index.md > .index.html
+.index.html: md/index.md index.template
+	@pandoc --smart --mathjax --template index.template $< > $@
 
-$(prefix)index.html: $(prefix).index.html $(prefix)chapterlist.html
+index.html: .index.html chapterlist.html
 	@echo "* index.html"
 	@ sed -e '/<!-- _chapterlist_ -->/{r chapterlist.html' \
 	-e 'd}' \
-	.index.html > index.html
+	$< > $@
 
 # Remove all html outputs
 clean :
-	rm -f $(prefix)*.html $(prefix).*.html
+	rm -f *.html .*.html
 
 rebuild : clean all
 

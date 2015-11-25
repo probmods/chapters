@@ -13,7 +13,7 @@ chapters = [ ("index","Index") ]
 for line in open("chapters.txt"):
     url = line.lstrip().rstrip()
 
-    with open(url + '.md', 'r') as f:
+    with open('md/' + url + '.md', 'r') as f:
        chapter_title  = f.readline().lstrip().rstrip().replace("% ", "")
 
     chapters.append( (url, chapter_title) )
