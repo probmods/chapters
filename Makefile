@@ -116,3 +116,7 @@ rebuild : clean all
 # http://stackoverflow.com/q/4320416/351392
 # http://sunsite.ualberta.ca/Documentation/Gnu/make-3.79/html_chapter/make_6.html
 # http://stackoverflow.com/questions/2711963/change-makefile-variable-value
+
+deploy :
+	git push origin master
+	git push linode master
