@@ -147,8 +147,6 @@ Next, consider the de Finetti representation of this model:
 Here, we sample a shared latent parameter -- in this case, a sample from a beta distribution -- and, using this parameter, generate $n$ samples independently.
 Up to sampling error, we obtain the same distribution on sequences of draws.
 
-~~~~
-
 # Markov Models
 
 Exchangeable sequences don't depend on the order of the observations, but often the order *is* important. For instance, the temperature today is highly correlated with the temperature yesterday---if we were building a model of temperature readings we would want to take this into account. 
