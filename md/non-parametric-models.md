@@ -5,7 +5,7 @@ In the chapter on [Mixture Models](mixture-models.html) we saw a simple way to c
 
 # Prelude: sampling from a discrete distribution
 
-In Church the discrete distribution is a primitive---you can simply call `(discrete '(0.2 0.3 0.1 0.4))`. If it wasn't built-in and the only random primitive you could use was `flip`, how could you sample from discrete? One solution is to recursively walk down the list of probabilities, deciding whether to stop on each step. For instance, in `(discrete '(0.2 0.3 0.1 0.4))` there is a 0.2 probability of stopping on the first flip, a 0.3/0.8 probability of stopping on the second flip (given that we didn't stop on the first), and so on. We can start by turning the list of probabilities into a list of *residual* probabilities---the probability we will stop on each step, given that we haven't stopped yet:
+In Church the discrete distribution is a primitive---you can simply call `(sample-discrete '(0.2 0.3 0.1 0.4))`. If it wasn't built-in and the only random primitive you could use was `flip`, how could you sample from discrete? One solution is to recursively walk down the list of probabilities, deciding whether to stop on each step. For instance, in `(sample-discrete '(0.2 0.3 0.1 0.4))` there is a 0.2 probability of stopping on the first flip, a 0.3/0.8 probability of stopping on the second flip (given that we didn't stop on the first), and so on. We can start by turning the list of probabilities into a list of *residual* probabilities---the probability we will stop on each step, given that we haven't stopped yet:
 
 ~~~~
 (define (residuals probs)
@@ -26,14 +26,14 @@ Now to sample from the discrete distribution we simply walk down this list, deci
       (pair (/ (first probs) (sum probs))
             (residuals (rest probs)))))
 
-(define (discrete resid)
+(define (my-sample-discrete resid)
   (if (null? resid)
       '()
       (if (flip (first resid))
           1
-          (+ 1 (discrete (rest resid))))))
+          (+ 1 (my-sample-discrete (rest resid))))))
 
-(hist (repeat 5000 (lambda () (discrete (residuals '(0.2 0.3 0.1 0.4))))) "stop?" )
+(hist (repeat 5000 (lambda () (my-sample-discrete (residuals '(0.2 0.3 0.1 0.4))))) "stop?" )
 ~~~~
 
 # Infinite Discrete Distributions: The Dirichlet Processes
