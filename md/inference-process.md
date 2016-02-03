@@ -249,7 +249,7 @@ We can use this recipe to construct a Markov chain for the conditioned geometric
 (define (target-distr x) 
   (if (< x 3) ;;the condition
       0.0     ;;prob is 0 if condition is violated
-      (* (- 1 theta) (expt theta x)))) ;;otherwise prob is (proportional to) geometric distrib.
+      (* (expt (- 1 theta) (- x 1)) theta))) ;;otherwise prob is (proportional to) geometric distrib.
 
 ;;the proposal function and distribution,
 ;;here we're equally likely to propose x+1 or x-1.
