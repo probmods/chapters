@@ -178,11 +178,13 @@ Markov chains can also be constructed over infinite state spaces. Here's a chain
 As we can see, this Markov chain has as its stationary distribution a geometric distribution conditioned to be greater than 2. We can also write it using `query` syntax:
 
 ~~~~
-(define (geometric theta) (if (flip theta) (+ 1 (geometric theta)) 1))
+(define (geometric theta) (if (not (flip theta)) ;; assume theta is prob(success)
+                              (+ 1 (geometric theta))
+                              1))
 
 (define samples
   (mh-query 2000 20
-   (define x (geometric 0.7))
+   (define x (geometric 0.3))
    x
    (> x 2)))
 
