@@ -366,22 +366,21 @@ In the previous section we considered learning about the weight of a coin, and n
 This example shows how our inferences about coin flipping can be explained in terms of model selection guided by the Bayesian Occam's razor.  Imagine a coin that you take out of a freshly unwrapped roll of quarters straight from the bank.  Almost surely this coin is fair... But how does that sense change when you see more or less anomalous sequences of flips? We can simultaneously ask if the coin is fair, and what is its weight.
 
 ~~~~
-(define observed-data '(h h t h t h h h t h))
 
 ;; fair coin, probability of H = 0.5
-;; (define observed-data (h h t h t h h h t h))
+(define observed-data '(h h t h t h h h t h))
 
 ;; ?? suspicious coincidence, probability of H = 0.5 ..?
-;; (define observed-data (h h h h h h h h h h))
+;; (define observed-data '(h h h h h h h h h h))
 
 ;; probably unfair coin, probability of H near 1
-;; (define observed-data (h h h h h h h h h h h h h h h))
+;; (define observed-data '(h h h h h h h h h h h h h h h))
 
 ;; definitely unfair coin, probability of H near 1
-;; (define observed-data (h h h h h h h h h h h h h h h h h h h h))
+;; (define observed-data '(h h h h h h h h h h h h h h h h h h h h))
 
 ;; unfair coin, probability of H = 0.85
-;; (define observed-data (h h h h h h t h t h h h h h t h h t h h h h h t h t h h h h h t h h h h h h h h h t h h h h t h h h h h h h))
+;; (define observed-data '(h h h h h h t h t h h h h h t h h t h h h h h t h t h h h h h t h h h h h h h h h t h h h h t h h h h h h h))
 
 (define num-flips (length observed-data))
 (define num-samples 1000)
