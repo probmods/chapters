@@ -1,0 +1,758 @@
+()
+()
+
+(+ 1 1)
+2
+
+(+ (* 2 3) 1)
+7
+
+(min 1 2)
+1
+
+(min 5 4 1 2 3 -100)
+-100
+
+(max 5 4 1 2 3 -100)
+5
+
+(max 1 2)
+2
+
+'()
+()
+
+(null? '())
+#t
+
+(null? '(()))
+#f
+
+(null? (cdr (list 3)))
+#t
+
+(null? 0)
+#f
+
+(null? #f)
+#f
+
+(length (list 1 2 3 4 5))
+5
+
+(length (list))
+0
+
+(length (list (list (list 1) '1a)
+              2
+              ))
+2
+
+'abc
+abc
+
+'(1 2 3)
+(1 2 3)
+
+''a
+(quote a)
+
+(first '(1 . 2))
+1
+
+(rest '(1 . 2))
+2
+
+(rest (rest '(1 2 . 3)))
+3
+
+(first '(1 2 3 4 5 6 7 8))
+1
+
+(second '(1 2 3 4 5 6 7 8))
+2
+
+(third '(1 2 3 4 5 6 7 8))
+3
+
+(fourth '(1 2 3 4 5 6 7 8))
+4
+
+(fifth '(1 2 3 4 5 6 7 8))
+5
+
+(sixth '(1 2 3 4 5 6 7 8))
+6
+
+(seventh '(1 2 3 4 5 6 7 8))
+7
+
+(length '())
+0
+
+(length '(1))
+1
+
+(length '(1 2))
+2
+
+(length '(1 (2)))
+2
+
+(length '((1 2)))
+1
+
+(reverse '())
+()
+
+(null? (reverse '()))
+#t
+
+(reverse '(a b c d e f))
+(f e d c b a)
+
+(reverse '(a b c (d e f)))
+((d e f) c b a)
+
+(make-list 3 'foo)
+(foo foo foo)
+
+(make-list 0 'a)
+()
+
+(eq? 'a 'a)
+#t
+
+(eq? 'aa 'a)
+#f
+
+(eq? 3 "3")
+#f
+
+(equal? 1 1)
+#t
+
+(equal? 'a "a")
+#t
+
+(equal? 1 1.0)
+#t
+
+(equal? '(1 2 3) '(1 2 3))
+#t
+
+(equal? '(1 2 3 (4)) '(1 2 3 (5)))
+#f
+
+(equal? '(1 2 3 ((4))) '(1 2 3 ((4))))
+#t
+
+(equal? '(1 2 3 ((4 5) 6 ((7 8 9 10))))
+        '(1 2 3 ((4 5) 6 ((7 8 9 10)))))
+#t
+
+(equal? '(1 2 3 ((4 5) 6 ((7 8 9 10))))
+        '(1 2 3 ((4 5) 6 ((7 8 9 10) 11))))
+#f
+
+(equal? '(1 2 3 ((4 5) 6 ((7 8 9 10))))
+        '(1 2 3 ((4 5) 6 ((7 8 9 10 ())))))
+#f
+
+(equal? '() ())
+#t
+
+(equal? '(()) ())
+#f
+
+(member 1 '(1 2 3))
+(1 2 3)
+
+(member '() '(1 2 3))
+#f
+
+(member '(c d) '((g h) (c d) (e f) (a b)))
+((c d) (e f) (a b))
+
+(member '() '((g h) (c d) (e f) (a b)))
+#f
+
+(member #f '(#t #f))
+(#f)
+
+(iota 1)
+(0)
+
+(iota 10)
+(0 1 2 3 4 5 6 7 8 9)
+
+(iota 5 0 -0.1)
+(0 -0.1 -0.2 -0.30000000000000004 -0.4)
+
+(iota 10 2)
+(2 3 4 5 6 7 8 9 10 11)
+
+(iota 0 2)
+()
+
+(iota 5 -6)
+(-6 -5 -4 -3 -2)
+
+(iota 10 0 20)
+(0 20 40 60 80 100 120 140 160 180)
+
+(and #t #t #t #t)
+#t
+
+(and #t #t #t #f)
+#f
+
+(and)
+#t
+
+(or)
+#f
+
+(or #f #f #f #f)
+#f
+
+(or #f #f #f #t)
+#t
+
+(all '())
+#t
+
+(all '(#t #t #t #t #t #t))
+#t
+
+(all '(#t #t #t #t #t #f))
+#f
+
+(none '())
+#t
+
+(none '(#t #t #t #t #t #t))
+#f
+
+(none '(#t #t #t #t #t #f))
+#f
+
+(none '(#f #f #f #f #f #f))
+#t
+
+(some '())
+#f
+
+(some '(#f #f #f #f #f #f))
+#f
+
+(some '(#f #f #t #f #f #f))
+#t
+
+(+ 1 1)
+2
+
+(+ (* 2 3) 1)
+7
+
+(> 3 0)
+#t
+
+(> 3 4)
+#f
+
+(>= 3.1 3)
+#t
+
+(>= 3 3)
+#t
+
+(>= 3 3.1)
+#f
+
+(<= 3 3.1)
+#t
+
+(<= 3 3)
+#t
+
+(<= 3.1 3)
+#f
+
+(<= 3.1 -100 500)
+#f
+
+(= 1 1 1 1 1)
+#t
+
+(= 4 1 1 1 1)
+#f
+
+(= 4 1 1 1 4)
+#f
+
+(=)
+#t
+
+(.>. 5 4 3 2 1)
+#t
+
+(.>. 5 4 3 2 2)
+#f
+
+(.>=. 5 4 3 2 2)
+#t
+
+(.<. 1 2 3 4 5)
+#t
+
+(.<. 1 2 3 4 4)
+#f
+
+(.<=. 1 2 3 4 4)
+#t
+
+;; check that 3 is in the range 4 plus or minus 2
+(soft-equal 3 4 2)
+#t
+
+(soft-equal 100 4 2)
+#f
+
+(soft-equal 0 4 2)
+#f
+
+'()
+()
+
+'abc
+abc
+
+'(1 2 3)
+(1 2 3)
+
+''a
+(quote a)
+
+(equal? 3 4)
+#f
+
+(equal? '(1 2) '(1 2))
+#t
+
+(equal? '((1 2)) '((1 2)))
+#t
+
+(equal? '((1 3)) '((1 2)))
+#f
+
+(equal? '(((1 2))) '((1 2)))
+#f
+
+(equal? (list 1 2 3) '(1 2))
+#f
+
+(equal? (list 1 2 3) '(1 2 4))
+#f
+
+(equal? (pair 1 2) (list 1 2))
+#f
+
+(equal? (pair 1 (pair 2 '())) (list 1 2))
+#t
+
+(first '(1 . 2))
+1
+
+(rest '(1 . 2))
+2
+
+(rest (rest '(1 2 . 3)))
+3
+
+(but-last '(1 2 3 4))
+(1 2 3)
+
+(first '(1 2 3 4 5 6 7 8))
+1
+
+(second '(1 2 3 4 5 6 7 8))
+2
+
+(third '(1 2 3 4 5 6 7 8))
+3
+
+(fourth '(1 2 3 4 5 6 7 8))
+4
+
+(fifth '(1 2 3 4 5 6 7 8))
+5
+
+(sixth '(1 2 3 4 5 6 7 8))
+6
+
+(seventh '(1 2 3 4 5 6 7 8))
+7
+
+(list-ref (iota 50) 0)
+0
+
+(list-ref (iota 50) 1)
+1
+
+(list-elt (iota 20) 20)
+19
+
+(take '(1 2 3 4 5) 3)
+(1 2 3)
+
+(take '(1 2 3 4 5) 6)
+(1 2 3 4 5)
+
+(take '(1 2 3 4 5) 0)
+()
+
+(length '(1 2 3 4 5))
+5
+
+(length '())
+0
+
+(length (make-list 123 1))
+123
+
+(apply + (iota 101))
+5050
+
+(sort '( 3 8 7 6 4 5 1 2 9 ))
+(1 2 3 4 5 6 7 8 9)
+
+;; test that sort can correctly use the comparator function argument
+(define (sort-by lst order fn)
+  (sort lst
+        (lambda (a b) (if (order (fn a) (fn b))
+                          1
+                          -1))))
+(define lst (repeat 100 (lambda () (list (uniform 0 1) (uniform 0 1)))))
+(equal? (sort (map second lst))
+        (map second (sort-by lst > second)))
+#t
+
+(unique '(a a a a a a b c c a))
+(a b c)
+
+(nub '(a a a a a a b c c a))
+(a b c)
+
+;; TODO: gensym should probably be an xrp
+(define g (make-gensym))
+(repeat 10 g)
+(g0 g1 g2 g3 g4 g5 g6 g7 g8 g9)
+
+(define g (make-gensym))
+(repeat 1 g)
+(g0)
+
+(list? (pair 1 2))
+#f
+
+(list? (pair 1 (pair 2 '())))
+#t
+
+(pair? '())
+#f
+
+(pair? 3)
+#f
+
+(pair? (list))
+#f
+
+(pair? (list 1 2 3))
+#t
+
+(pair? (list 1))
+#t
+
+;;%  make sure list? is iterative
+(list? (repeat 123456 (lambda () 1)))
+#t
+
+(list? (pair (repeat 12345 (lambda () 1)) 'a))
+#f
+
+(reverse '(1 2 3 (4 5 6) 7 8))
+(8 7 (4 5 6) 3 2 1)
+
+(filter (lambda (x) (> x 3)) '(1 2 3 4 5 6 7 8 3))
+(4 5 6 7 8)
+
+(all '())
+#t
+
+(all '(#t #t #t #t #t))
+#t
+
+(all '(#t #t #t #t #t #t #f))
+#f
+
+(none '())
+#t
+
+(none (list #t #t #t #t #t #t #f))
+#f
+
+(none '(#f #f #f #f))
+#t
+
+(filter (lambda (x) #f) '(1 2 3 4 5 6 7 8 3))
+()
+
+((lambda () 1))
+1
+
+((lambda (x) x) 1)
+1
+
+((lambda (x y) (+ x y)) 1 2)
+3
+
+((lambda () (define foo 1) foo) 1)
+1
+
+((lambda x (sum x)) 1 2 3)
+6
+
+;; make sure works on big lists
+(sum (make-list 123456 1))
+123456
+
+(mean (make-list 123456 1))
+1
+
+(variance '(1 4 7))
+6
+
+(variance '(-1 -4 -7))
+6
+
+(variance '(9 50 57 18))
+416.25
+
+(prod (make-list 123456 1))
+1
+
+(and ((lambda () true)) ((lambda () true)))
+#t
+
+(let ((x 1) (y 2)) (+ x y))
+3
+
+(let* ([x 1] [y (+ x 1)]) (list x y))
+(1 2)
+
+(letrec ([is-even? (lambda (n) (if (= n 0) true (is-odd? (- n 1))))]
+         [is-odd? (lambda (n) (if (= n 0) false (is-even? (- n 1))))])
+  (is-odd? 131))
+#t
+
+(let loop ((numbers '(3 -2 1 6 -5))
+           (nonneg '())
+           (neg '()))
+  (cond ((null? numbers) (list nonneg neg))
+        ((>= (car numbers) 0)
+         (loop (cdr numbers)
+               (cons (car numbers) nonneg)
+               neg))
+        ((< (car numbers) 0)
+         (loop (cdr numbers)
+               nonneg
+               (cons (car numbers) neg)))))
+((6 1 3) (-5 -2))
+
+(define x 1)
+x
+1
+
+(define (f) 1) (f)
+1
+
+(define (f x) x)
+(f 1)
+1
+
+(define (f x y) (* x y))
+(f 2 3)
+6
+
+(define f (lambda (x) x))
+(f 1)
+1
+
+(define (f . x) x)
+(f 1 2 3)
+(1 2 3)
+
+(if #t 1)
+1
+
+(if #t 1 2)
+1
+
+(if #f 1 2)
+2
+
+(case #t ((#t) 1))
+1
+
+(case #t ((#f) 1))
+undefined
+
+(case #t ((#f) 1) ((#t) 2) (else 3))
+2
+
+(case #t ((#f) 1) (else 2))
+2
+
+(cond (#t 1))
+1
+
+(cond (#f 1) (#t 2))
+2
+
+(cond (#f 1) (#f 2) (else 3))
+3
+
+(assoc 'a '((1 2) (a b c)))
+(a b c)
+
+(assoc 'b '((a b c)))
+#f
+
+;; variadic
+(define (f . x) x) (f 1 2 3)
+(1 2 3)
+
+(apply + (repeat 123 (lambda () (apply + (repeat 1000 (lambda () 1))))))
+123000
+
+(map (lambda (x) (* x x)) '())
+()
+
+;; nested map
+(map
+ (lambda (x) (map (lambda (y)
+                    (+ x y))
+                  '(100 200 300)))
+ '(1 2 3 4))
+((101 201 301) (102 202 302) (103 203 303) (104 204 304))
+
+(map (lambda (x y) (* x y)) '(1 2 3 4) '(5 6 7 8 9))
+(5 12 21 32)
+
+(all (map list? '(()
+                  (a)
+                  (a b)
+                  (a b c))))
+#t
+
+(fold and #t '(#t #t #f))
+#f
+
+(fold pair '() '(1 2 3))
+(3 2 1)
+
+(fold + 0 '(1 2 3) '(2 4 6))
+18
+
+(repeat 10 (lambda () 'a))
+(a a a a a a a a a a)
+
+(filter (lambda (x) (> x 3))
+        '(1 2 3 4 5 6 7 2 1 9))
+(4 5 6 7 9)
+
+(filter (lambda (x) (equal? x 'a))
+        '(a a b a c x))
+(a a a)
+
+(filter (lambda (x) (> (length x) 2))
+        '(
+          (1)
+          (1 2)
+          (1 2 3)
+          (1 2)
+          (1 2 3 4)
+          ))
+((1 2 3) (1 2 3 4))
+
+(partition (lambda (x) (> x 3))
+        '(1 2 3 4 5 6 7 2 1 9))
+((4 5 6 7 9) (1 2 3 2 1))
+
+(union '(1 2 3 2 1) '(1 2 3 4 5 6 7 2 1 9) '(1 2 6 7 9))
+(1 2 3 4 5 6 7 9)
+
+(intersection '(1 2 3 2 1) '(1 2 3 4 5 6 7 2 1 9) '(1 2 6 7 9))
+(1 2)
+
+(difference '(1 2 3 4 5) '(5 2 10))
+(1 3 4)
+
+(define f (mem (lambda (x) (gaussian 0 1)))) (= (f 'a) (f 'a))
+#t
+
+(string->number "0")
+0
+
+(string->number "0.0")
+0
+
+(string->number "123456")
+123456
+
+(string->number "-123456.789")
+-123456.789
+
+(number->string 123)
+123
+
+(number->string -123456)
+-123456
+
+(number->string (expt 10 6))
+1000000
+
+(string-split "abc.def.ghi" ".")
+(abc def ghi)
+
+(string-split "abcdefghi" ".")
+(abcdefghi)
+
+(define a 1)
+(define (f b)
+  (let ([c 3])
+    (eval '(+ a b c))))
+(f 2)
+6
+
+(repeat 5 (conditional '(enumerate)
+  (define x (if (flip) 1 0))
+  (define y (if (flip) 1 0))
+  (+ x y)
+  (and (= x 1) (= y 0))))
+(1 1 1 1 1)
+
+(repeat 5 (conditional '(mh 5)
+  (define x (if (flip) 1 0))
+  (define y (if (flip) 1 0))
+  (+ x y)
+  (and (= x 1) (= y 0))))
+(1 1 1 1 1)
+
+(repeat 5 (conditional '(rejection)
+  (define x (if (flip) 1 0))
+  (define y (if (flip) 1 0))
+  (+ x y)
+  (and (= x 1) (= y 0))))
+(1 1 1 1 1)

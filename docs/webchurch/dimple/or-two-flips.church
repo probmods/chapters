@@ -1,0 +1,15 @@
+(define foo (flip 0.81))
+(define bar (flip 0.14))
+(condition (or foo bar))
+;; p(foo = #t) = 0.968
+;; foo
+
+;; p(bar = #t) = 0.167
+bar
+
+;; p(foo = #t AND bar = #t) = 0.135
+;; NB: currently doesn't work right with vanilla BP
+;; (and foo bar)
+
+
+

@@ -1,0 +1,97 @@
+/*
+testing the nested-query pragmatics model in js
+*/
+
+//var util = require("./probabilistic/util")
+//util.openModule(util)
+//var pr = require("./probabilistic/index")
+//util.openModule(pr)
+
+
+/////////////////////////////
+////there is a useful pattern. if we have a marginalized fn:
+//var foo = marginalize(prob(function(x) { ...}))
+////and we condition on it returning a particular value:
+//condition(foo(x) == val)
+////we should avoid sampling the foo ERP... instead use isConditioned:
+//var foo = marginalizeConditioned(prob(function(x) { ...}))
+//condition(foo(x, val) == val)
+////this avoids setting and resampling the conditioned ERP. (does not work with rejection sampling!)
+/////////////////////////////
+
+var meaning = function(utterance)
+{
+    if(utterance == "foo"){return function(w){return w}} //"foo" is true only in true worlds.
+    return function(w){return true} //"bar" is always true
+}
+
+var listener = function(utterance) {
+    var world = flip(); //world prior
+    //speaker(world, utterance)
+    condition(speaker.conditionTo(utterance)(world) == utterance)
+    return world
+}
+
+
+var speaker = marginalize(
+                       function(world) {
+                          var utterance = flip() ? "foo" : "bar"
+                          //litlistener(utterance, world)
+                          condition(litlistener.conditionTo(world)(utterance) == world)
+                          return utterance
+                          }, samplefn, samplesPerLevel)
+
+
+var litlistener = marginalize(
+                            function(utterance)
+                              {
+                              var world = flip(); //world prior
+                              condition(meaning(utterance)(world)) //simple stand-in for truth-functional meaning..
+                              return world
+                              }, samplefn, samplesPerLevel)
+
+/////////////////////////////
+
+
+//means=[]
+//for(i=0;i<10;i++)
+//{
+//    var hist = distrib( ,
+//                       traceMH,
+//                       100)
+//    console.log(hist[0])
+//    means[i] = hist[0]
+//}
+
+var comp = function() {return listener("bar")}
+
+var samplefn = traceMH //bunchaRejectionSample
+
+var samplesPerLevel = 500
+
+function variance(values)
+{
+    sq = []
+    m = mean(values)
+    for(i=0; i<values.length; i++)
+    {
+        sq.push( (values[i] - m)*(values[i] - m) )
+    }
+    
+    return Math.sqrt(mean(sq))
+}
+
+function estimate() {
+    litlistener.clearCache()
+    speaker.clearCache()
+    return expectation(comp, samplefn, samplesPerLevel)
+}
+
+var runs = repeat(100, estimate)
+
+console.log( "mean: " + mean(runs) + " variance: " + variance(runs) )
+
+
+
+
+

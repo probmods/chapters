@@ -1,0 +1,35 @@
+body {
+font-family: helvetica, arial, sans-serif;
+font-size: 12px
+}
+
+.function {
+margin-bottom: 1.5em;
+}
+
+.function-name {
+font-size: 14px;
+font-weight: bold
+}
+
+.aliases {
+font-size: 13px;
+font-style: italic
+}
+
+
+code {
+font-family: courier new, mono;
+}
+
+
+.description {
+margin-top: 0.5em;
+margin-bottom: 0.5em;
+}
+
+.function td {
+padding-left: 1em;
+padding-right: 1em;
+font-size: 12px;
+}

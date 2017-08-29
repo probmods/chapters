@@ -1,0 +1,93 @@
+#!/usr/bin/env node
+
+var sys = require('sys');
+var optparse = require('optparse');
+var seedrandom = require('seedrandom');
+var shell = require('shelljs');
+var fs = require('fs');
+
+function abort(msg) {
+    console.log(msg)
+    process.exit(0);
+}
+
+var argv = process.argv;
+
+var opts = {};
+var switches = [
+    ['-p', '--precompile', 'Turn on pre-compilation'],
+    ['-a', '--program-args [MESSAGE]', 'Arguments to pass to program. MESSAGE is sent to Church is the `argstring` variable'],
+    ['-h', '--help', 'Help'],
+    ['-s', '--seed [SEED]', 'Set a random-number generator seed'],
+    ['-t', '--timed', 'Print out timing information'],
+    ['-d', '--desugar-only', 'Apply Church desugaring without execution'],
+    ['-c', '--compile-only', 'Compile to Javascript without execution'],
+    ['-u', '--unsafe-types', "Don't perform run-time typehcecking"],
+    ['-e', '--disable-church-errors', 'Disable special Church error checking and show Javascript errors instead']
+];
+
+var parser = new optparse.OptionParser(switches);
+parser.banner = 'Usage: church [options] [file]';
+
+var srcfile = argv[argv.length - 1];
+
+// if a model file is not specified or doesn't exist, bail
+// NB: if user didn't supply a filename (e.g., they just ran "church"), then srcfile will be
+// equal to the path of the current script
+if (srcfile == __filename || !shell.test("-e", srcfile)) {
+    console.log(parser.toString());
+    process.exit();
+}
+
+parser.on('precompile', function(x) {
+    opts.pc = true;
+});
+
+parser.on("program-args", function(opt, value) {
+    opts.argstring = value;
+});
+
+parser.on("timed", function() {
+    opts.timed = true;
+});
+
+parser.on("desugar-only", function() {
+    opts.desugar = true;
+});
+
+parser.on("compile-only", function() {
+    opts.compile = true;
+});
+
+parser.on("unsafe-types", function() {
+    global.unsafe_types = true;
+})
+
+parser.on("disable-church-errors", function() {
+    opts.disable_church_errors = true;
+});
+
+parser.on("seed", function(opt, value) {
+    Math.random = seedrandom(value);
+});
+
+parser.on("help", function() {
+    console.log(parser.toString());
+    process.exit()
+})
+
+parser.parse(argv)
+
+var code = fs.readFileSync(srcfile, "utf8");
+
+global["evaluate"] = require('./evaluate.js').evaluate;
+var format_result = require("./evaluate.js").format_result;
+
+var tEnd;
+try {
+    var result = format_result(evaluate(code, opts));
+    console.log(result);
+} catch (e) {
+    console.log(e.message)
+    throw e
+}

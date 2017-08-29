@@ -1,0 +1,500 @@
+var samples = 150
+var lag = 20
+var runs = 5
+var errorTolerance = 0.07
+
+var failed=[]
+
+function test(name, estimates, trueExpectation, tolerance)
+{
+	tolerance = (tolerance === undefined ? errorTolerance : tolerance)
+	console.log("test: " + name + "...")
+	var errors = estimates.map(function(est) { return Math.abs(est - trueExpectation) })
+	var meanAbsError = mean(errors)
+	if (meanAbsError > tolerance) {
+        failed.push(name)
+		console.log("      failed! True mean: " + trueExpectation + " | Test mean: " + mean(estimates))
+    }
+    else console.log("      passed.")
+}
+
+function mhtest(name, computation, trueExpectation, tolerance)
+{
+	tolerance = (tolerance === undefined ? errorTolerance : tolerance)
+	test(name, repeat(runs, function() { return expectation(computation, traceMH, samples, lag) }), trueExpectation, tolerance)
+	//test(name, repeat(runs, function() { return expectation(computation, LARJMH, samples, 0, undefined, lag) }), trueExpectation, tolerance)
+}
+
+function larjtest(name, computation, trueExpectation, tolerance)
+{
+	tolerance = (tolerance === undefined ? errorTolerance : tolerance)
+	test(name, repeat(runs, function() { return expectation(computation, LARJMH, samples, 10, undefined, lag) }), trueExpectation, tolerance)
+}
+
+function eqtest(name, estvalues, truevalues, tolerance)
+{
+	tolerance = (tolerance === undefined ? errorTolerance : tolerance)
+	console.log("test: " + name + "...")
+	if (estvalues.length !== truevalues.length) throw new Error("lengths must be equal!")
+	for (var i = 0; i < estvalues.length; i++)
+	{
+		var estv = estvalues[i]
+		var truev = truevalues[i]
+		if (Math.abs(estv - truev) > tolerance)
+		{
+            failed.push(name)
+			console.log("      failed! True value: " + truev + " | Test value: " + estv)
+			return
+		}
+	}
+	console.log("      passed.")
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+var d1 = new Date()
+
+console.log("starting tests...")
+
+/*
+ERP Tests
+*/
+
+test(
+	"flip sample",
+	repeat(runs, function() { return mean(repeat(samples, function() { return flip(0.7) }))}),
+	0.7)
+
+mhtest(
+	"flip query",
+	function() { return flip(0.7, false) },
+	0.7)
+
+test(
+	"uniform sample",
+	repeat(runs, function() { return mean(repeat(samples, function() { return uniform(0.1, 0.4) }))}),
+	0.5*(.1+.4))
+
+mhtest(
+	"uniform query",
+	function() { return uniform(0.1, 0.4, false) },
+	0.5*(.1+.4))
+
+test(
+	"multinomial sample",
+	repeat(runs, function() { return mean(repeat(samples, function() { return multinomialDraw([.2, .3, .4], [.2, .6, .2]) }))}),
+	0.2*.2 + 0.6*.3 + 0.2*.4)
+
+mhtest(
+	"multinomial query",
+	function() { return multinomialDraw([.2, .3, .4], [.2, .6, .2], false) },
+	0.2*.2 + 0.6*.3 + 0.2*.4)
+
+eqtest(
+	"multinomial lp",
+	[
+		multinomial_logprob(0, [.2, .6, .2]),
+		multinomial_logprob(1, [.2, .6, .2]),
+		multinomial_logprob(2, [.2, .6, .2])
+	],
+	[Math.log(0.2), Math.log(0.6), Math.log(0.2)])
+
+test(
+	"gaussian sample",
+	repeat(runs, function() { return mean(repeat(samples, function() { return gaussian(0.1, 0.5) }))}),
+	0.1)
+
+mhtest(
+	"gaussian query",
+	function() { return gaussian(0.1, 0.5, false) },
+	0.1)
+
+eqtest(
+	"gaussian lp",
+	[
+		gaussian_logprob(0, 0.1, 0.5),
+		gaussian_logprob(0.25, 0.1, 0.5),
+		gaussian_logprob(0.6, 0.1, 0.5)
+	],
+	[-0.2457913526447274, -0.27079135264472737, -0.7257913526447274])
+
+test(
+	"gamma sample",
+	repeat(runs, function() { return mean(repeat(samples, function() { return gamma(2, 2)/10 }))}),
+	0.4)
+
+mhtest(
+	"gamma query",
+	function() { return gamma(2, 2, false)/10 },
+	0.4)
+
+eqtest(
+	"gamma lp",
+	[
+		gamma_logprob(1, 2, 2),
+		gamma_logprob(4, 2, 2),
+		gamma_logprob(8, 2, 2)
+	],
+	[-1.8862944092546166, -2.000000048134726, -3.306852867574781])
+
+test(
+	"beta sample",
+	repeat(runs, function() { return mean(repeat(samples, function() { return beta(2, 5) }))}),
+	2.0/(2+5))
+
+mhtest(
+	"beta query",
+	function() { return beta(2, 5, false) },
+	2.0/(2+5))
+
+eqtest(
+	"beta lp",
+	[
+		beta_logprob(.1, 2, 5),
+		beta_logprob(.2, 2, 5),
+		beta_logprob(.6, 2, 5)
+	],
+	[0.677170196389683, 0.899185234324094, -0.7747911992475776])
+
+test(
+	"binomial sample",
+	repeat(runs, function() { return mean(repeat(samples, function() { return binomial(.5, 40)/40 }))}),
+	0.5)
+
+mhtest(
+	"binomial query",
+	function() { return binomial(.5, 40, false)/40 },
+	0.5)
+
+eqtest(
+	"binomial lp",
+	[
+		binomial_logprob(15, .5, 40),
+		binomial_logprob(20, .5, 40),
+		binomial_logprob(30, .5, 40)
+	],
+	[-3.3234338674089985, -2.0722579911387817, -7.2840211276953575])
+
+test(
+	"poisson sample",
+	repeat(runs, function() { return mean(repeat(samples, function() { return poisson(4)/10 }))}),
+	0.4)
+
+mhtest(
+	"poisson query",
+	function() { return poisson(4, false)/10 },
+	0.4)
+
+eqtest(
+	"poisson lp",
+	[
+		poisson_logprob(2, 4),
+		poisson_logprob(5, 4),
+		poisson_logprob(7, 4)
+	],
+	[-1.9205584583201643, -1.8560199371825927, -2.821100833226181])
+
+
+/*
+Tests adapted from Church
+*/
+
+mhtest(
+	"setting a flip",
+	function()
+	{
+		var a = 1/1000
+		condition(flip(a, false))
+		return a
+	},
+	1/1000,
+	0.000000000000001)
+
+mhtest(
+	"and conditioned on or",
+	function()
+	{
+		var a = flip(0.5, false)
+		var b = flip(0.5, false)
+		condition(a || b)
+		return (a && b)
+	},
+	1/3)
+
+mhtest(
+	"and conditioned on or, biased flip",
+	function()
+	{
+		var a = flip(0.3, false)
+		var b = flip(0.3, false)
+		condition(a || b)
+		return (a && b)
+	},
+	(0.3*0.3) / (0.3*0.3 + 0.7*0.3 + 0.3*0.7))
+
+mhtest(
+	"contitioned flip",
+	function()
+	{
+		var bitflip = function(fidelity, x)
+		{
+			return flip(x ? fidelity : 1-fidelity, false)
+		}
+		var hyp = flip(0.7, false)
+		condition(bitflip(0.8, hyp))
+		return hyp
+	},
+	(0.7*0.8) / (0.7*0.8 + 0.3*0.2))
+
+mhtest(
+	"random 'if' with random branches, unconditioned",
+	function()
+	{
+		if (flip(0.7))
+			return flip(0.2, false)
+		else
+			return flip(0.8, false)
+	},
+	0.7*0.2 + 0.3*0.8)
+
+mhtest(
+	"flip with random weight, unconditioned",
+	function()
+	{
+		return flip(flip(0.7, false) ? 0.2 : 0.8, false)
+	},
+	0.7*0.2 + 0.3*0.8)
+
+mhtest(
+	"random procedure application, unconditioned",
+	function()
+	{
+		var proc = flip(0.7) ?
+			function (x) { return flip(0.2, false) } :
+			function (x) { return flip(0.8, false) }
+		return proc(1)
+	},
+	0.7*0.2 + 0.3*0.8)
+
+mhtest(
+	"conditioned multinomial",
+	function()
+	{
+		var hyp = multinomialDraw(['b', 'c', 'd'], [0.1, 0.6, 0.3], false)
+		var observe = function (x)
+		{
+			if (flip(0.8, false))
+				return x
+			else
+				return 'b'
+		}
+		condition(observe(hyp) == 'b')
+		return (hyp == 'b')
+	},
+	0.357)
+
+mhtest(
+	"recursive stochastic fn, unconditioned (tail recursive)",
+	function()
+	{
+		var powerLaw = function (p, x)
+		{
+			if (flip(p, true))
+				return x
+			else
+				return powerLaw(p, x+1)
+		}
+		var a = powerLaw(0.3, 1)
+		return a < 5
+	},
+	0.7599)
+
+mhtest(
+	"recursive stochastic fn, unconditioned",
+	function()
+	{
+		var powerLaw = function (p, x)
+		{
+			if (flip(p, true))
+				return x
+			else
+				return 0 + powerLaw(p, x+1)
+		}
+		var a = powerLaw(0.3, 1)
+		return a < 5
+	},
+	0.7599)
+
+mhtest(
+	"memoized flip, unconditioned",
+	function()
+	{
+		var proc = mem(function (x) { return flip(0.8, false) })
+		var p11 = proc(1)
+		var p21 = proc(2)
+		var p12 = proc(1)
+		var p22 = proc(2)
+		return p11 && p21 && p12 && p22
+	},
+	0.64)
+
+mhtest(
+	"memoized flip, conditioned",
+	function()
+	{
+		var proc = mem(function (x) { return flip(0.2, false) })
+		var p11 = proc(1)
+		var p21 = proc(2)
+		var p22 = proc(2)
+		var p23 = proc(2)
+		condition(p11 || p21 || p22 || p23)
+		return proc(1)
+	},
+	0.5555555555555555)
+
+mhtest(
+	"bound symbol used inside memoizer, unconditioned",
+	function()
+	{
+		var a = flip(0.8, false)
+		var proc = mem(function (x) { return a })
+		var p11 = proc(1)
+		var p12 = proc(1)
+		return p11 && p12
+	},
+	0.8)
+
+mhtest(
+	"memoized flip with random argument, unconditioned",
+	function()
+	{
+		var proc = mem(function (x) { return flip(0.8, false) })
+		var p1 = proc(uniformDraw([1,2,3]))
+		var p2 = proc(uniformDraw([1,2,3]))
+		return p1 && p2
+	},
+	0.6933333333333334)
+
+mhtest(
+	"memoized random procedure, unconditioned",
+	function()
+	{
+		var proc = flip(0.7) ?
+					function (x) { return flip(0.2, false)} :
+					function (x) { return flip(0.8, false)}
+		var memproc = mem(proc)
+		var mp1 = memproc(1)
+		var mp2 = memproc(2)
+		return mp1 && mp2
+	},
+	0.22)
+
+mhtest(
+	"mh-query over rejection query for conditioned flip",
+	function()
+	{
+		var bitflip = function (fidelity, x)
+		{
+			return flip(x ? fidelity : 1-fidelity, false)
+		}
+		var innerQuery = function()
+		{
+			var a = flip(0.7, false)
+			condition(bitflip(0.8, a))
+			return a
+		}
+		return rejectionSample(innerQuery)
+	},
+	0.903225806451613)
+
+mhtest(
+	"trans-dimensional",
+	function()
+	{
+		var a = flip(0.9, true) ? beta(1, 5, false) : 0.7
+		var b = flip(a, false)
+		condition(b)
+		return a
+	},
+	0.417)
+
+larjtest(
+	"trans-dimensional (LARJ)",
+	function()
+	{
+		var a = flip(0.9, true) ? beta(1, 5, false) : 0.7
+		var b = flip(a, false)
+		condition(b)
+		return a
+	},
+	0.417)
+
+mhtest(
+	"memoized flip in if branch (create/destroy memprocs), unconditioned",
+	function()
+	{
+		var a = flip() ? mem(flip) : mem(flip)
+		var b = a()
+		return b
+	},
+	0.5)
+
+
+test(
+     "marginalized procedure",
+     repeat(runs,
+            function() {
+            var foo = marginalize(function foo(x) {return flip() + flip(x)}, traceMH, 500)
+            var computation = function() {return flip() + foo(0.1) + foo(0.6) + foo(0.1)}
+            return expectation(computation, traceMH, samples, lag)
+            }),
+     2.8000000000000003,
+     0.1)
+
+//mhtest("nested query",
+//       function() {
+//       ...
+//       },
+//       ?)
+
+/*
+Tests for things specific to new implementation
+*/
+
+
+mhtest(
+	"native loop",
+	function()
+	{
+		var accum = 0
+		for (var i = 0; i < 4; i++)
+			accum += flip(0.5, false)
+		return accum/4
+	},
+	0.5)
+
+mhtest(
+	"directly conditioning variable values",
+	function()
+	{
+		var accum = 0
+		for (var i = 0; i < 10; i++)
+		{
+			if (i < 5)
+				accum += flip(0.5, false, 1)
+			else
+				accum += flip(0.5, false)
+		}
+		return accum / 10
+	},
+	0.75)
+
+
+var d2 = new Date()
+console.log("time: " + (d2.getTime() - d1.getTime()) / 1000)
+
+if (failed.length == 0) {
+    console.log("tests done!")
+} else {
+    console.log("some tests failed: " + failed + "!!!")
+}

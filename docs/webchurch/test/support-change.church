@@ -1,0 +1,85 @@
+(define samps
+  (mh-query
+   10000 1
+   (define x (+ 0 (uniform-draw (if (flip) '(0) '(0 1)))))
+   x
+   true))
+(soft-equal (mean samps) 0.25 0.05)
+#t
+
+(define samps
+  (enumeration-query
+   (define x (+ 0 (uniform-draw (if (flip) '(0) '(0 1)))))
+   x
+   true
+   )
+  )
+samps
+((0 1) (0.75 0.25))
+
+(define dist
+  (enumeration-query 
+   (define use-first? (flip)) 
+   (define x (multinomial
+              (if use-first? '(a b) '(b a))
+              '(0.2 0.8)
+              )) 
+   (if use-first? 1 0) 
+   (flip (if
+          (equal? x 'b)
+          1.0
+          0.2))))
+(define probs (second dist))
+(soft-equal (first probs) 0.3 0.001)
+#t
+
+(define samps
+  (mh-query
+   5000 5
+   (define use-first? (flip)) 
+   (define x (multinomial
+              (if use-first? '(a b) '(b a))
+              '(0.2 0.8)
+              )) 
+   (if use-first? 1 0) 
+   (flip (if
+          (equal? x 'b)
+          1.0
+          0.2))))
+(soft-equal (mean samps) 0.7 0.05)
+#t
+
+(define bags '([a]
+               [a b]
+               [a b c]
+               [a b c d]))
+(define dist
+  (enumeration-query
+   (define bag (uniform-draw bags)) 
+   (define size (length bag))
+   (define observations (repeat 3 (lambda () (uniform-draw bag)))) 
+   size 
+   true))
+;; make sure that we're close enough to a uniform distribution on 4 things
+(all (map soft-equal
+          (second dist)
+          '(0.25 0.25 0.25 0.25)
+          '(0.01 0.01 0.01 0.01)))
+#t
+
+(define bags '([a]
+               [a b]
+               [a b c d]))
+(define dist
+  (enumeration-query
+   (define bag (uniform-draw bags))
+   (define size (length bag))
+   (define observations (uniform-draw bag))
+   size 
+   (equal? observations 'a)
+   )) 
+(all (map soft-equal
+          (second dist)
+          '(0.5714285714285714 0.2857142857142858 0.14285714285714285)
+          '(0.01 0.01 0.01 0.01)))
+#t

@@ -1,0 +1,24 @@
+{
+    "name": "probabilistic-js",
+    "version": "0.0.1",
+    "description": "probabilistic programming (in the browser, even!) using JS",
+    "main": "probabilistic/index.js",
+    "bin": {
+        "pjs": "bin/p.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/dritchie/probabilistic-js.git"
+    },
+    "dependencies": {
+        "esprima": "~1.0.4",
+        "escodegen": "~0.0.26",
+        "browserify": "~2.29.1"
+    },
+    "author" : {
+        "name" : "Daniel Ritchie",
+        "email" : "dritchie@stanford.edu",
+        "url" : "http://stanford.edu/~dritchie"
+    },
+    "license" : "MIT"
+}

@@ -1,0 +1,24 @@
+/* inconsolata-regular */
+@font-face {
+  font-family: 'Inconsolata';
+  font-style: normal;
+  font-weight: 400;
+  src: url('../fonts/inconsolata-regular.eot'); /* IE9 Compat Modes */
+  src: local('Inconsolata'),
+       url('../fonts/inconsolata-regular.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('../fonts/inconsolata-regular.woff') format('woff'), /* Modern Browsers */
+       url('../fonts/inconsolata-regular.ttf')  format('truetype'), /* Safari, Android, iOS */
+       url('../fonts/inconsolata-regular.svg#Inconsolata') format('svg'); /* Legacy iOS */
+}
+/* inconsolata-700 */
+@font-face {
+  font-family: 'Inconsolata';
+  font-style: normal;
+  font-weight: 700;
+  src: url('../fonts/inconsolata-700.eot'); /* IE9 Compat Modes */
+  src: local('Inconsolata Bold'), local('Inconsolata-Bold'),
+       url('../fonts/inconsolata-700.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('../fonts/inconsolata-700.woff') format('woff'), /* Modern Browsers */
+       url('../fonts/inconsolata-700.ttf')  format('truetype'), /* Safari, Android, iOS */
+       url('../fonts/inconsolata-700.svg#Inconsolata') format('svg'); /* Legacy iOS */
+}

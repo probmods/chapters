@@ -1,0 +1,11 @@
+(> (mean
+    (mh-query
+     1000
+     1
+     (define x (if (flip .5) 1 0))
+     x
+     (if x
+         (= (gaussian  10 1 10) 10)
+         (= (gaussian -10 1 10) 10))))
+   0.95)
+#t

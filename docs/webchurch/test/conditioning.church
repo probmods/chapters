@@ -1,0 +1,46 @@
+(mean
+ (mh-query
+  20 1
+  (define A (if (flip) 1 0))
+  (define B (if (flip) 1 0))
+  (define C (if (flip) 1 0))
+  (define D (+ A B C))
+  A
+  (= D 3)))
+1
+
+(soft-equal
+ (mean
+  (mh-query
+   5000 10
+   (define A (if (flip) 1 0))
+   (define B (if (flip) 1 0))
+   (define C (if (flip) 1 0))
+   (define D (+ A B C))
+   A
+   (>= D 2)))
+ 0.75
+ 0.05)
+#t
+
+;; equals conditioning
+(rejection-query (define x 0) x (condition (= (gaussian 0 1) x)))
+0
+
+(rejection-query (define x (gaussian 0 1)) x (condition (= 0 x)))
+0
+
+(rejection-query (define y 0) (define x (gaussian 0 1)) x (condition (= x y)))
+0
+
+;; x should be 0 with only very small probability
+;; HT larry muhlstein from roger and ed's class
+(> (mean (mh-query
+          2000 1
+          (define x (if (flip 0.5) 1 0))
+          x
+          (if x
+              (= (gaussian  10 1 10) 10)
+              (= (gaussian -10 1 10) 10))))
+   0.99)
+#t

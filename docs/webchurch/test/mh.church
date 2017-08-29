@@ -1,0 +1,28 @@
+;; (flip 0) inside MH
+;; https://github.com/probmods/webchurch/issues/54
+(define (get-samp)
+  (mh-query
+   1 1
+   (define x (uniform-draw '(a b c d e)))
+   x
+   (flip (if (equal? x 'a) 1 0))))
+(define n 50)
+(equal? (flatten (repeat n get-samp))
+        (make-list n 'a))
+#t
+
+;; multinomial with probability 0 inside MH
+;; https://github.com/probmods/webchurch/issues/54
+(define (get-samp) 
+  (mh-query
+   1 1
+   (define x (uniform-draw '(a b c d e f)))
+   x
+   (multinomial '(#t #f) 
+                (if (equal? x 'a)
+                    '(1 0)
+                    '(0 1)))))
+(define n 50)
+(equal? (flatten (repeat n get-samp))
+        (make-list n 'a))
+#t

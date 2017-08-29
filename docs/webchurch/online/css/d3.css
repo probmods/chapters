@@ -1,0 +1,40 @@
+.line {
+    fill: none;
+    stroke: #000;
+    stroke-width: 1.5px;
+}
+
+.chart {
+    font: 13px Helvetica, Arial, sans-serif;
+    fill: steelblue;
+    stroke: #333333;
+    text-align: right;
+    padding: 3px;
+    margin: 1px;
+    color: white;
+}
+
+.axis text {
+    stroke: none;
+    fill: black;
+}
+
+
+.axis path,
+.axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+}
+
+.bar,
+.point { 
+    fill: steelblue;
+    shape-rendering: crispEdges;
+}
+
+.lineplot { 
+    stroke: steelblue;
+    stroke-width: 2px;
+    shape-rendering: crispEdges;
+}

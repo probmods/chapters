@@ -1,0 +1,19 @@
+(define (foo)
+  (rejection-query
+   (define A (if (flip) 1 0))
+   (define B (if (flip) 1 0))
+   (define C (if (flip) 1 0))
+   (define D (+ A B C)) A
+   (condition (equal? D 2))))
+(> (mean (repeat 5000 foo)) 0.65)
+#t
+
+(define (get) (rejection-query
+               (define nice (mem (lambda (person) (flip 0.7))))
+               (define (smiles person) (if (nice person) (flip 0.8) (flip 0.5)))
+               (if (nice 'alice) 1 0)
+               (and (smiles 'alice)  (smiles 'bob) (smiles 'alice))))
+(soft-equal (mean (repeat 5000 get))
+            0.857
+            0.05)
+#t

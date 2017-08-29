@@ -1,0 +1,11 @@
+(define b1 (flip 0.8))
+(define b2 (flip 0.7))
+
+(define r1 (if b1 0.1 0.2))
+(define r2 (if b2 0.3 0.4))
+
+(define result (+ r1 r2))
+
+(condition (> result 0.4))
+
+r2

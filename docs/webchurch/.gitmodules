@@ -1,0 +1,3 @@
+[submodule "probabilistic-js"]
+	path = probabilistic-js
+	url = https://github.com/dritchie/probabilistic-js.git

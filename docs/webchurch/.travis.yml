@@ -1,0 +1,10 @@
+language: node_js
+node_js:
+  - "0.10"
+before_install:
+  - ln -s probabilistic-js/probabilistic .
+notifications:
+  email:
+    on_success: always # default: change
+    on_failure: always # default: always
+sudo: false

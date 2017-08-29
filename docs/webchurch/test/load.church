@@ -1,0 +1,4 @@
+(load "lib/loadme.js")
+(load "lib/loadme.church")
+(list (f 5) (g 5))
+(26 24)

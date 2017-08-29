@@ -1,0 +1,50 @@
+;; compute the variance of a sample
+(define (variance xs)
+  (define mu (mean xs))
+  (define n (length xs))
+  (/ (sum (map  (lambda (x) (pow (- x mu) 2)) xs))
+     (- n 1)))
+;; true mean number of clusters
+;; HT http://www.stats.ox.ac.uk/~teh/research/npbayes/Teh2010a.pdf
+(define (true-mean n alpha)
+  (define is (iota n 1))
+  (sum
+   (map 
+    (lambda (i) (/ alpha (+ alpha i -1)))
+   is)))
+;; true variance of number of clusters
+;; X = sum_i{X_i}
+;; the X_i are independent so the variance of the sum is the sum of the variances
+;; each X_i is a bernoulli, which has variance p*(1-p)
+(define (true-variance n alpha)  
+  (sum 
+   (map 
+    (lambda (i) (let ([x (/ alpha (+ alpha i -1))])
+                  (* x (- 1 x))))
+    (iota n 1))))
+;; return the number of tables that a sample from the DP allocates
+(define (get-samp n alpha)
+  (define f (DPmem alpha (make-gensym)))
+  (define xs (repeat n f))
+  (length (unique xs)))
+(define alpha 0.9)
+(define n 23)
+(define samps (repeat 50000 (lambda () (get-samp n alpha))))
+(define t-mean (true-mean n alpha))
+(define o-mean (mean samps))
+(display (string-append "mean (true):         " (number->string t-mean)))
+(display (string-append "mean (observed):     " (number->string o-mean)))
+(define t-variance (true-variance n alpha))
+(define o-variance (variance samps))
+(display "")
+(display (string-append "variance (true):     " (number->string t-variance)))
+(display (string-append "variance (observed): " (number->string o-variance))) 
+(and (soft= (mean samps)
+            (true-mean n alpha)
+            0.1
+      )
+     (soft= (variance samps)
+            (true-variance n alpha)
+            0.1
+      ))
+#t

@@ -1,0 +1,11 @@
+#!/bin/sh
+
+npm test
+# get return code
+# HT http://stackoverflow.com/a/90435/351392
+rc=$?
+
+if [[ $rc != 0 ]]
+then
+    exit 1
+fi
