@@ -1,0 +1,160 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>WebChurch</title>
+    <link rel="stylesheet" href="css/codemirror.css">
+    <link rel="stylesheet" href="css/d3.css">
+    <link rel="stylesheet" href="css/inconsolata.css">
+    <script src="store.js"></script>
+    <script src="jquery.js"></script>
+    <script src="webchurch.js"></script>
+    <script>d3 = require('d3')</script>
+    <script src="vega.min.js"></script>
+    <style>
+      body {
+        font-family: Helvetica;
+        font-size: 120%;
+      }
+
+      button {
+      /*font-size: 14px*/
+      }
+      button.reset {
+        float: right
+      }
+      button.run {
+      /*padding-top: 5px;
+        padding-bottom: 5px;*/
+      }
+      select {
+      /*font-size: 20px;*/
+      }
+      ul {
+        font-size: 12px
+      }
+      li code {
+        border: 1px solid #aaa;
+        border-radius: 2px;
+        padding: 1px 3px 1px 3px;
+        background-color: #dfdfdf
+      }
+      li {
+        padding-top: 10px
+      }
+      p.error {
+        font-size: 120%;
+      }
+
+      .code-controls {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      opacity: 0;
+      z-index: 1000
+      }
+
+      .code-settings {
+      z-index: 999;
+      position: absolute;
+      top: 0;
+      right: 0;
+      font-size: 16px;
+      list-style-type: none;
+      margin: 2px
+      }
+
+      .code-settings li {
+      display: none;
+      }
+
+      .code-settings .settings-icon {
+      display: inline;
+      opacity: 0.3;
+      }
+
+      .code-settings:hover li {
+      opacity: 1.0;
+      display: inline
+      }
+
+      .CodeMirror:hover .code-controls, .CodeMirror-focused .code-controls {
+      opacity: 1
+      }
+
+      .CodeMirror {
+      width: 48%;
+      float: left
+      }
+
+      .results {
+      width: 45%;
+      margin-top: 0;
+      margin-right: 5%;
+      float: right;
+      }
+
+      #codebox {
+      height: 100%
+      }
+    </style>
+
+  </head>
+  <body>
+    <h1>WebChurch</h1>
+
+    Keyboard shortcuts:
+    <ul>
+      <li> <code>Cmd + .</code> or <code>Ctrl + .</code> - Fold selected section (slightly buggy right now)</li>
+      <li> <code>Cmd + ;</code> or <code>Ctrl + ;</code> - Comment selection section</li>
+    </ul>
+
+    <pre id="codebox"><code>
+
+; Confidence interval demo
+(hist-ci (repeat 1000 gaussian))
+
+
+; MH score viewer demo
+(define (flip-coin p) (if (flip p) 'H 'T))
+(define (markov-init) (flip-coin 0.5))
+(define (markov-t s) (if (equal? s 'H) (flip-coin 0.9) (flip-coin 0.1)))
+
+(define samples
+  (mh-query-scored 100 1
+    (define s1 (markov-init))
+    (define s2 (markov-t s1))
+    (define s3 (markov-t s2))
+    (define s4 (markov-t s3))
+    (define s5 (markov-t s4))
+
+
+    (string-append s1 s2 s3 s4 s5)
+    (condition (equal? s4 'T))
+    (condition (equal? s5 'T))))
+
+;samples
+(viz-mh samples "Markov model")
+      </code>
+
+  </body>
+  <script>
+    var savedCode = store.get('code');
+    var code = savedCode || $("#codebox > code").text();
+
+    var EditorModel = require('./editor').EditorModel;
+    var editor = new EditorModel(
+    {
+    code: code,
+    engine: "webchurch",
+    }
+    );
+
+    editor.replaceDomEl( $("#codebox")[0] )
+
+    editor.on('run.start', function() {
+    store.set('code', this.get('code'));
+    })
+
+  </script>
+</html>

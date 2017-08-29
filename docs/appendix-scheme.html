@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>ProbMods: Appendix: Scheme basics</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="stylesheet" type="text/css" href="webchurch/online/css/codemirror.css">
+    <link rel="stylesheet" type="text/css" href="webchurch/online/css/d3.css">
+    <link rel="shortcut icon" href="images/favicon.ico" />
+    <script src="scripts/underscore-min.js"></script>
+    <script src="scripts/jquery.js"></script>
+    <link class="katex-include" rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.5.1/katex.min.css">
+    <script class="katex-include" src="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.5.1/katex.min.js"></script>
+    <script src="scripts/cookies-0.3.1.min.js"></script>
+    <script src="scripts/gg.js"></script>
+    <script src="scripts/nav.js"></script>
+    <script src="scripts/cosmetics.js"></script>
+    <script src="scripts/md5.js"></script>
+    <script src="webchurch/online/webchurch.min.js"></script>
+    <script src="scripts/globals.js"></script>
+    <script src="webchurch/online/vega.min.js"></script>
+    <script src="scripts/new-injector.js"></script>
+    <script src="scripts/headroom.min.js"></script>
+  </head>
+<body>
+<div id="chapter-wrapper">
+  <div id='header' class="headroom">
+    <div id='logotype'><a href="index.html">Probabilistic Models of Cognition</a></div>
+    <ul id="nav">
+      <span class="nav0"><li class="all-chapters">All chapters
+<ol start="0">
+<a href="index.html"><li class="nonum">Index</li></a>
+<a href="introduction.html"><li>Introduction</li></a>
+<a href="generative-models.html"><li>Generative models</li></a>
+<a href="conditioning.html"><li>Conditioning</li></a>
+<a href="patterns-of-inference.html"><li>Patterns of inference</li></a>
+<a href="observing-sequences.html"><li>Models for sequences of observations</li></a>
+<a href="inference-about-inference.html"><li>Inference about inference</li></a>
+<a href="inference-process.html"><li>Algorithms for inference</li></a>
+<a href="learning-as-conditional-inference.html"><li>Learning as conditional inference</li></a>
+<a href="hierarchical-models.html"><li>Hierarchical models</li></a>
+<a href="occam's-razor.html"><li>Occam's Razor</li></a>
+<a href="mixture-models.html"><li>Mixture models</li></a>
+<a href="non-parametric-models.html"><li>Non-parametric models</li></a>
+<a href="appendix-scheme.html"><li>Appendix: Scheme basics</li></a>
+<a href="webchurch/online/ref.html"><li>Church Reference</li></a>
+</ol>
+      </li></span>
+      <a class="nav0" href="/login"><li id="login-link">Login</li></a>
+      <!-- <a class="nav0" href="/profile"><li id="profile-link" style='display: none'>Profile</li></a>  -->
+      <a class="nav0" href="/logout"><li id="logout-link" style='display: none'>Logout</li></a>
+    </ul>
+    <div class="clear"></div>
+  </div>
+
+  <div id="chapter">
+<h1 id="chapter-title">13. Appendix: Scheme basics</h1>
+<div class='toc'>
+<div class='name'>Contents:</div>
+<ul>
+<li><a href="#computing-with-functions">Computing with functions</a></li>
+<li><a href="#building-more-complex-programs">Building More Complex Programs</a></li>
+<li><a href="#lists-and-symbols">Lists and symbols</a></li>
+<li><a href="#building-functions-lambda">Building Functions: <code>lambda</code></a></li>
+<li><a href="#useful-syntax">Useful Syntax</a></li>
+<li><a href="#higher-order-functions">Higher-Order Functions</a></li>
+<li><a href="#exercises">Exercises</a></li>
+<li><a href="#references">References</a></li>
+</ul>
+</div>
+<h1 id="computing-with-functions"><a href="#computing-with-functions">Computing with functions</a></h1>
+<p>The <span class="math">\(\lambda\)</span>-calculus formalizes the notion of computation using <em>functions</em>. Computation is performed in the <span class="math">\(\lambda\)</span>-calculus by applying functions to arguments to compute results. Function application in Church looks like this:</p>
+<pre class="bher"><code>(+ 1 1)</code></pre>
+<p>Here we see the function <code>+</code> applied to two arguments: <code>1</code> and <code>1</code>. Note that in Church the name of the function comes <em>first</em> and the parentheses go outside the function. This is sometimes called <em>Polish notation</em>. If you run this simple program above you will see the resulting <em>value</em> of this function application. Since <code>+</code> is a <em>deterministic</em> function you will always get the same return value if you run the program many times.</p>
+<p>Some functions in Church can take an arbitrary number of arguments. For instance, <code>+</code> can take just 1 argument:</p>
+<pre><code>(+ 3.1)</code></pre>
+<p>or 2 arguments:</p>
+<pre><code>(+ 3.1 2.7)</code></pre>
+<p>or 15 arguments:</p>
+<pre><code>(+ 3.1 2.7 4 5 6 7 8 9 10 11 12 13)</code></pre>
+<p>Such functions are called “variadic” functions.</p>
+<h1 id="building-more-complex-programs"><a href="#building-more-complex-programs">Building More Complex Programs</a></h1>
+<p>A Church program is syntactically composed of nested <em>expressions.</em> Roughly speaking an expression is either a simple value, or anything between parentheses <code>()</code>. In a deterministic LISP, like Scheme, all expressions without <a href="http://en.wikipedia.org/wiki/Free_variables_and_bound_variables">free variables</a> have a single fixed value which is computed by a process known as <em>evaluation</em>. For example, consider the following more complex expression:</p>
+<pre><code>(and true (or true false))</code></pre>
+<p>This expression has an <em>operator</em>, the logical function <code>and</code>, and <em>arguments</em>, <code>true</code> and the <em>subexpression</em> which is itself an application of <code>or</code>. When reasoning about evaluation, it is best to think of evaluating the subexpressions first, then applying the function to the return values of its arguments. In this example <code>or</code> is first applied to <code>true</code> and <code>false</code>, returning true, then <code>and</code> is applied to <code>true</code> and the subexpression’s return value, again returning true.</p>
+<p>As a slightly more complex example, consider:</p>
+<pre><code>;this line is a comment
+(if
+ (= 1 2)         ;the condition of &quot;if&quot;
+ 100                ;the consequent (&quot;then&quot;)
+ (or true false) ;the alternate (&quot;else&quot;)
+)</code></pre>
+<p>This expression is composed of an <code>if</code> conditional that evaluates the first expression (a test here of whether <code>1</code> equals <code>2</code>) then evaluates the second expression if the first is true or otherwise evaluates the third expression. The operator <code>if</code> is strictly not a function, because it does not evaluate all of its arguments, but instead <em>short-circuits</em> evaluating only the second or third. It has a value like any other function. (We have also used comments here: anything after a semicolon is ignored when evaluating.)</p>
+<p>Note the particular indentation style used above (called ‘’pretty-printing’’). To clarify the structure of a function call, the arguments can split up across different lines, but keeping them vertically aligned helps readability:</p>
+<pre><code>(+ (* 3
+      (+ (* 2 4)
+         (+ 3 5)))
+   (+ (- 10 7)
+      6))</code></pre>
+<p>The online editor will automatically pretty-print for you. You can re-indent according to this style by selecting some lines and pressing the TAB key.</p>
+<p>We often want to name objects in our programs so that they can be reused. This can be done with the <code>define</code> statement. <code>define</code> looks like this:</p>
+<pre class="norun"><code>(define variable-name expression)</code></pre>
+<p><code>variable-name</code> is a <em>symbol</em> that is bound to the value that <code>expression</code> evaluates to. When variables themselves are evaluated they return the value that they have been bound to:</p>
+<pre><code>(define some-variable 10) ;assign the value 10 to the variable some-variable
+
+some-variable ;when this is evaluated it looks up and returns the value 10</code></pre>
+<h1 id="lists-and-symbols"><a href="#lists-and-symbols">Lists and symbols</a></h1>
+<p>There are several special kinds of values in Church. One kind of special value is a <em>list</em>: a sequence of other values. Lists are a fundamental data structure in LISP-like languages. In fact, a Church program is just a list—the list of expressions comprising the program. Lists can be built using the <code>list</code> function and manipulated using functions such as <code>first</code> (get the first element in a list) and <code>rest</code> (get the rest of the list after the first element).</p>
+<pre><code>(first ;get the first element of
+  (rest  ;get non-first elements of
+    (list &quot;this&quot; &quot;is&quot; &quot;a&quot; &quot;list&quot;))) ;build a list!</code></pre>
+<p>Experiment with different combinations of these functions. What happens when you apply <code>list</code> to the result of <code>list</code>? (In this program we have used another kind of special value: a string, which is anything between double-quotes.)</p>
+<p>Sometimes we wish to treat a piece of Church code “literally”, that is, to view it as a value rather than an expression. We can do this using a special <code>quote</code> operation (which can also be written with a single quote: <code>(quote ...)</code> is the same as <code>'...</code>):</p>
+<pre><code>(define quoted-value &#39;(1 2 3))
+(first quoted-value)</code></pre>
+<p>What is the value of <code>quoted-value</code>? What happens if you remove the quote? Why?</p>
+<p>The <code>quote</code> operator is not the same as the <code>list</code> function. Everything inside a quote is taken literally, with no evaluation, while the arguments to <code>list</code> are first evaluated and then made into a list. Compare the value of:</p>
+<pre><code>(list (+ 1 2) 2)</code></pre>
+<p>to the value of:</p>
+<pre><code>&#39;( (+ 1 2) 3)</code></pre>
+<p>If we quote the name of a variable, what we get back is a symbol: a value which is the literal variable, rather than the value it is bound to. A symbol is just an identifier; it will be equal to itself, but to no other symbol:</p>
+<pre><code>(define foo 1)
+(list
+ ;a symbol is equal to itself
+ (equal? &#39;foo &#39;foo)
+ ;but not equal to any other symbol
+ (equal? &#39;foo &#39;bar)
+ ;or value
+ (equal? &#39;foo 2)
+ ;even the value that it is bound to as a variable
+ (equal? &#39;foo foo))</code></pre>
+<p>The ability to make new symbols as needed is a crucial feature in building models that reason over unbounded worlds, as we’ll see below.</p>
+<p>Some useful functions on lists:</p>
+<ul>
+<li><code>(length lst)</code> returns the number of items in a list.</li>
+<li><code>(null? lst)</code> returns true if a list is empty, false otherwise</li>
+<li><code>(first lst)</code> returns the first item of <code>lst</code>, while <code>(rest lst)</code> returns everything but the first item of <code>lst</code>. For convenience, <code>second</code>, <code>third</code>, <code>fourth</code>, <code>fifth</code>, <code>sixth</code>, and <code>seventh</code> are also defined.</li>
+<li><p><code>(append lst1 lst2 ...)</code> will put lists together:</p>
+<pre><code>(append &#39;(1 2 3) &#39;(4 5) &#39;(6 7))</code></pre>
+<p>Note that append is a variadic function.</p></li>
+</ul>
+<p>Lists can contain lists, e.g.:</p>
+<pre><code>&#39;( 1 2 3 (4.1 4.2 4.3) 5)</code></pre>
+<p>This nesting property is useful because it allows us to represent hierarchical structure. Note that calling <code>length</code> on the above function would return 5 (not 7) - <code>length</code> only counts the top-level items. You can remove all the nesting from a list using the <code>flatten</code> function (so <code>(length (flatten '( 1 2 3 (4.1 4.2 4.3) 5)))</code> would return 7).</p>
+<p>Sometimes, you’ll want to call a variadic function, but you don’t know how many arguments you will have in advance. In these cases, you can keep around a list of arguments and use <code>apply</code> to call the variadic function on that list. In other words, this:</p>
+<p><code>(+ 1 2 3 4 5 6 7)</code></p>
+<p>is equivalent to this:</p>
+<p><code>(apply + '(1 2 3 4 5 6 7))</code></p>
+<h1 id="building-functions-lambda"><a href="#building-functions-lambda">Building Functions: <code>lambda</code></a></h1>
+<p>The power of lambda calculus as a model of computation comes from the ability to make new functions. To do so, we use the <code>lambda</code> primitive. For example, we can construct a function that doubles any number it is applied to:</p>
+<pre><code>(define double (lambda (x) (+ x x)))
+
+(double 3)</code></pre>
+<p>The general form of a lambda expression is: (lambda arguments body) The first sub-expression of the lambda, the arguments, is a list of symbols that tells us what the inputs to the function will be called; the second sub-expression, the body, tells us what to do with these inputs. The value which results from a lambda expression is called a <em>compound procedure</em>. When a compound procedure is applied to input values (e.g. when <code>double</code> was applied to <code>3</code>) we imagine identifying (also called <em>binding</em>) the argument variables with these inputs, then evaluating the body. As another simple example, consider this function:</p>
+<figure>
+<img src="images/Sicp-lambda-diagram.png" />
+</figure>
+<p>In lambda calculus we can build procedures that manipulate any kind of value—even other procedures. Here we define a function <code>twice</code> which takes a procedure and returns a new procedure that applies the original twice:</p>
+<pre><code>(define double (lambda (x) (+ x x)))
+
+(define twice (lambda (f) (lambda (x) (f (f x)))))
+
+((twice double) 3)</code></pre>
+<p>This ability to make <em>higher-order</em> functions is what makes the lambda calculus a universal model of computation.</p>
+<p>Since we often want to assign names to functions, <code>(define (foo x) ...)</code> is short (“syntactic sugar”) for <code>(define foo (lambda (x) ...))</code>. For example we could have written the previous example:</p>
+<pre><code>(define (double x) (+ x x))
+
+(define (twice f) (lambda (x) (f (f x))))
+
+((twice double) 3)</code></pre>
+<!--
+
+There are two ways to define functions in Scheme, the short way and the long way. They look like this:
+
+~~~~
+;; short way
+(define (f1 a b) (expt (+ a b) 3))
+
+;; long way
+(define f2 (lambda (a b) (expt (+ a b) 3)))
+~~~~
+
+The short way has this basic form:
+
+`(define (<name> <argument-name-1> <argument-name-2> ...) <whatever function does to arguments>)`
+
+Note that the short way looks similar to function application, except that we surround it within a `define` statement to give meaning to this ''particular'' function application.
+
+The long way has this basic form:
+
+`(define <name> (lambda (<argument-name-1> <argument-name-2> ...) <whatever function does to arguments>))`
+
+Note that the long way looks like we're defining a variable, except that the value of this variable is given by the special form `(lambda (...) ...)`. This `lambda` object is the actual function and you can in fact use it to define functions that don't have names associated with them, so-called '''anonymous functions''' (you will see an examples of this in the section below on Map and Fold).
+
+-->
+
+<h1 id="useful-syntax"><a href="#useful-syntax">Useful Syntax</a></h1>
+<p>Scheme comes with some syntax to make it more pleasant to build programs. (All of this syntax, however, can be quickly converted to the basic syntax, such as <code>lambda</code> and function application.) The <code>let</code> construct is a way to bind values to names (much like <code>define</code>), and it can be used as an ordinary expression:</p>
+<pre><code>(let ((a (+ 1 1)))
+  (+ a 1))</code></pre>
+<p>The <code>case</code> construct is an alternative to writing a long list of <code>if</code> statement. For instance:</p>
+<pre><code>(define a 1)
+(case a
+      ((1) &quot;hi&quot;)
+      ((2) &quot;bye&quot;)
+      (else &quot;error&quot;))</code></pre>
+<p>This is equivalent to:</p>
+<pre><code>(define a 1)
+(if (equal? a 1)
+    &quot;hi&quot;
+    (if (equal? a 2)
+        &quot;bye&quot;
+        &quot;error&quot;))</code></pre>
+<h1 id="higher-order-functions"><a href="#higher-order-functions">Higher-Order Functions</a></h1>
+<p>Higher-order functions can be used to represent common patterns of computation. Several such higher-order functions are provided in Church.</p>
+<p><code>map</code> is a higher-order function that takes a procedure and applies it to each element of a list. For instance we could use map to test whether each element of a list of numbers is greater than zero:</p>
+<pre><code>(map (lambda (x) (&gt; x 0)) &#39;(1 -3 2 0))</code></pre>
+<p>The <code>map</code> higher-order function can also be used to map a function of more than one argument over multiple lists, element by element. For example, here is the MATLAB “dot-star” function (or “.*”) written using <code>map</code>:</p>
+<pre><code>(define dot-star (lambda (v1 v2) (map * v1 v2)))
+(dot-star &#39;(1 2 3) &#39;(4 5 6))</code></pre>
+<p>The higher-order function <code>apply</code>, takes a procedure and applies to a list as if the list were direct arguments to the procedure. The standard functions <code>sum</code> and <code>product</code> can be easily defined in terms of <code>(apply + ...)</code> and <code>(apply * ...)</code>, respectively. To illustrate this:</p>
+<pre><code>(define my-list &#39;(3 5 2047))
+(list &quot;These numbers should all be equal:&quot; (sum my-list) (apply + my-list) (+ 3 5 2047))</code></pre>
+<!--
+Higher-order functions like `repeat`, `map`, or `apply` can be quite useful.  Here we use them to visualize the number of heads we expect to see if we flip a weighted coin (weight = 0.8) 10 times.  We'll repeat this experiment 1000 times and then use `hist` to visualize the results.  Try varying the coin weight or the number of repetitions to see how the expected distribution changes.
+
+~~~~
+(define make-coin (lambda (weight) (lambda () (flip weight))))
+(define coin (make-coin 0.8))
+
+(define data (repeat 1000 (lambda () (sum (map (lambda (x) (if x 1 0)) (repeat 10 coin))))))
+(hist data  "Distribution of coin flips")
+~~~~
+-->
+
+
+<h1 id="exercises"><a href="#exercises">Exercises</a></h1>
+<ol type="1">
+<li><p>In Church you call functions like this: <code>(function arg1 arg2 arg3)</code>. For example, <code>(+ 1 2)</code> would return 3. Try running it:</p>
+<pre><code>; comments are preceded by semicolons 
+(+ 1 2)</code></pre>
+<ol type="A">
+<li><p>Write the computation <span class="math">\(3 \times 4\)</span> in Church (<code>*</code> is the multiplication function).</p>
+<pre data-exercise="ex1a"><code></code></pre></li>
+<li><p>Write the computation <span class="math">\(3 \times (4 + 6)\)</span> in Church (make sure the result is 30).</p>
+<pre data-exercise="ex1b"><code></code></pre></li>
+<li><p>Write the computation <span class="math">\(3 \times [4+ (6/7)]\)</span> in Church (make sure the result is <span class="math">\(\approx\)</span> 14.57)</p>
+<pre data-exercise="ex1c"><code></code></pre></li>
+<li><p>Write the computation <span class="math">\(3 \times [4+ (6/7)^2]\)</span> in Church. The Church function <code>(expt a b)</code> will give you <span class="math">\(a^b\)</span>. Make sure the result is <span class="math">\(\approx\)</span> 14.20.</p>
+<pre data-exercise="ex1d"><code></code></pre></li>
+<li><p>Convert this Church expression into an arithmetic expression:</p>
+<pre data-exercise="ex1e"><code>(/ 1 (+ 4 5))</code></pre></li>
+<li><p>Convert this Church expression to an arithmetic expression:</p>
+<pre data-exercise="ex1f"><code>(/ 1
+   (*
+    (+ 2 3)
+    (- 4 6)))</code></pre></li>
+<li><p>Why doesn’t this code work?</p>
+<pre class="shouldfail" data-exercise="ex1g"><code>(4 + 6)</code></pre></li>
+</ol></li>
+<li><p>Defining variables and functions:</p>
+<ol type="A">
+<li><p>Write a function <span class="math">\(f(x, y) = (x + y)^{x - y}\)</span> and use it to compute <span class="math">\(f(5,3)\)</span>. Fill in the blanks for defining <span class="math">\(f\)</span> using the short syntax:</p>
+<pre data-exercise="ex2a-short"><code>(define (f ...) ...)
+(f 5 3)</code></pre>
+<p>Now fill in the blank for defining <span class="math">\(f\)</span> using the long syntax; make sure that you get the same answer for <span class="math">\(f(5,3)\)</span>.</p>
+<pre data-exercise="ex2a-long"><code>(define f (lambda (...) ... ))
+(f 5 3)</code></pre></li>
+<li><p>Below, we have already defined <span class="math">\(h(x,y) = x + 2y\)</span>. Using the short syntax, write a function <span class="math">\(g(x, y, z) = x - y \times z\)</span> and use it to compute <span class="math">\(g(1, 4, h(6,3))\)</span>.</p>
+<pre data-exercise="ex2b-short"><code>(define (h x y) (+ x (* 2 y)))</code></pre>
+<p>Now define <span class="math">\(g\)</span> using the long syntax; make sure that you get the same answer for <span class="math">\(g(1, 4, h(6, 3))\)</span></p>
+<pre data-exercise="ex2b-long"><code>(define (h x y) (+ x (* 2 y)))</code></pre></li>
+<li><p>The <code>(if &lt;condition&gt; &lt;true-clause&gt; &lt;false-clause&gt; )</code> special form is used for if-else statements. For instance, it’s used below to define a function that returns <code>yes</code> if the first argument is bigger than the second and <code>no</code> otherwise.</p>
+<pre><code>(define (bigger? a b)
+  (if (&gt; a b)
+      &#39;yes
+      &#39;no))
+
+(bigger? 3 4)</code></pre>
+<p>In Church, the Boolean values true and false are represented by <code>#t</code> and <code>#f</code> (so <code>(&gt; 5 1)</code> would return <code>#t</code> and <code>(&gt; 5 7)</code> would return <code>#f</code>).</p>
+<p>What does the function below do?</p>
+<pre data-exercise="ex2c"><code>(define (f x) (if (&gt; x 5)
+                  &#39;Z
+                  (if (&gt; x 2)
+                      &#39;R
+                      &#39;M)))</code></pre></li>
+<li><p>Scheme and Church are <em>functional</em> programming languages, so functions have a special place in these languages. Speaking very loosely, if you think of variables as nouns and functions as verbs, functional programming languages blur the noun-verb distinction. A consequence of this is that you can treat functions like regular old values. For instance, in the function below, there are three arguments: <code>thing1</code>, <code>thing2</code>, and <code>thing3</code>. <code>thing1</code> is assumed to be a function and it gets applied to <code>thing2</code> and <code>thing3</code>:</p>
+<pre><code>(define (use-thing1-on-other-things thing1 thing2 thing3)
+  (thing1 thing2 thing3))
+
+(use-thing1-on-other-things * 3 4)</code></pre>
+<p>Write a function, <code>f</code>, that takes three arguments, <code>g</code>, <code>x</code>, and <code>y</code>. Assume that <code>g</code> is a function of two variables and define <code>f</code> so that it returns <code>'yes</code> if <span class="math">\(g(x,y) &gt; x + y\)</span>, otherwise <code>'no</code>. Use it to compute <span class="math">\(f(\times, 2.6, 1.2)\)</span>.</p>
+<pre data-exercise="ex2d"><code>(define (f g x y) ...)</code></pre></li>
+<li><p>In D we defined <code>f</code> as a function that takes in a function as one of its arguments. Here, we are going to define a different sort of function, one that takes in normal values as arguments but <em>returns</em> a function.</p>
+<pre class="norun"><code>(define (bigger-than-factory num) (lambda (x) (&gt; x num)))</code></pre>
+<p>You can think of this function as a “factory”. You hand this factory a number, <code>num</code>, and the factory hands you back a machine. This machine is itself a function that takes an number, <code>x</code>, and tells you whether <code>x</code> is larger than num.</p>
+<p>Without running any code, compute <code>((bigger-than-factory 5) 4)</code> and <code>((bigger-than-factory -1) 7)</code>.</p>
+<p>The functions we’ve defined in parts D and E are called “higher order functions”. A function <span class="math">\(f\)</span> is a higher order function if it takes other functions as input or if it outputs a function.</p></li>
+<li><p>What does this function do?</p>
+<pre data-exercise="ex2f"><code>(define (Q f g) (lambda (x y) (&gt; (f x y) (g x y))))</code></pre></li>
+</ol></li>
+<li><p>Two important data structures in Scheme/Church are pairs and lists. A pair is just a combination of two things, a head and a tail. In Church, if you already have <code>x</code> and <code>y</code>, you can combine them into a pair by calling <code>(pair x y)</code>:</p>
+<pre><code>(define x 3)
+(define y 9)
+(pair x y)</code></pre>
+<p>Observe that this code returns the result <code>(3 . 9)</code> - you can recognize a pair by the dot in the middle.</p>
+<p>Lists are built out of pairs. In particular, a list is just a sequence of nested pairs whose last element is <code>'()</code> (pronounced “null”). So, this would be the list containing <code>'a</code>, <code>'6</code>, <code>'b</code>, <code>'c</code>, <code>7</code>, and <code>'d</code>:</p>
+<pre><code>(pair &#39;a
+      (pair &#39;6
+            (pair &#39;b
+                  (pair &#39;c
+                        (pair 7
+                              (pair &#39;d &#39;()))))))</code></pre>
+<p>Of course, stringing together a bunch of <code>pair</code> statements gets tedious, so there is a shorthand - the <code>list</code> function:</p>
+<pre><code>(list &#39;a 6 &#39;b &#39;c 7 &#39;d)</code></pre>
+<p>An alternate way of specifying the above list is using the quote syntax:</p>
+<pre><code>&#39;(a 6 b c 7 d)</code></pre>
+<ol type="A">
+<li><p>The following code tries to define a list but gives an error instead. Why?</p>
+<pre class="shouldfail"><code>(3 4 7 8)</code></pre></li>
+<li><p>Using <code>list</code> syntax, write a list of the even numbers between 0 and 10 inclusive.</p>
+<pre data-exercise="3b"><code></code></pre></li>
+<li><p>Using quote syntax, write a list of the odd numbers between 1 and 9 inclusive.</p>
+<pre data-exercise="3c"><code></code></pre></li>
+<li><p>Without running any code, guess the result of each expression below. Some of these expressions have intentional errors—see if you can spot them.</p>
+<p><code>(pair 1 (pair 'foo (pair 'bar '() ))</code></p>
+<p><code>(pair (1 2))</code></p>
+<p><code>(length '(1 2 3 (4 5 6) 7))</code></p>
+<p><code>(append '(1 2 3) '(4 5) '( 7 (8 9) ))</code></p>
+<p><code>(length (apple pear banana))</code></p>
+<p><code>(equal? (pair 'a (pair 'b (pair 'c '() ))) (append '(a b) '(c)))</code></p>
+<p><code>(equal? (pair 'd (pair 'e (pair 'f 'g))) '(d e f g))</code></p>
+<p>Check your guesses by actually running the code. If you made any mistakes, explain why your initial guess was incorrect.</p>
+<pre data-exercise="ex3d"><code>;; run code here</code></pre></li>
+</ol></li>
+<li><p>Two common patterns for working with lists are called <code>map</code> and <code>fold</code> (fold is also sometimes called <code>reduce</code>).</p>
+<p>Map takes two arguments, a function, <code>f</code>, and a list, <code>(list a b c ...)</code>, and returns a list with <code>f</code> applied to every item of the list: <code>(list (f a) (f b) (f c) ...)</code>. In the example below, we map <code>square</code> (which squares numbers) over the first five natural numbers:</p>
+<pre data-exercise="ex4square"><code>(define (square x) (* x x))
+(map square &#39;(1 2 3 4 5))</code></pre>
+<p>Fold takes three arguments, a function, <code>f</code>, an initial value, <code>i</code>, and a list, <code>(list a b c ...)</code>, and returns <code>(f ... (f c (f b (f a i))))</code>. In the example below, we define a function that computes the product of a list:</p>
+<pre><code>(define (my-product lst)
+  (fold
+
+   ;; function
+   (lambda (list-item cumulative-value) (* list-item cumulative-value))
+
+   ;; initial value
+   1
+
+   ;; list
+   lst))
+
+(my-product &#39;(1 2 3 4 5))</code></pre>
+<p>Note the use of the “anonymous” function here—we don’t care about using this function outside the context of the fold, so we don’t bother giving it a name with <code>define</code>.</p>
+<ol type="A">
+<li><p>Write <code>my-sum-squares</code> using <code>fold</code>. This function should take in a list of numbers and return the sum of the squares of all those numbers. Use it on the list <code>'(1 2 3 4 5)</code></p>
+<pre data-exercise="ex4a"><code>(define (square x) (* x x))
+(define (my-sum-squares lst) ...)
+(my-sum-squares &#39;(1 2 3 4 5))</code></pre></li>
+<li><p>Write <code>my-sum-squares</code> <em>without</em> using <code>fold</code>—instead use <code>map</code> and <code>apply</code>:</p>
+<pre data-exercise="ex4b"><code>(define (square x) (* x x))
+(define (my-sum-squares lst) ...)
+(my-sum-squares &#39;(1 2 3 4 5))</code></pre></li>
+</ol></li>
+<li><p>One benefit of functional programming languages is that they make it possible to elegantly and concisely write down interesting programs that would be complicated and ugly to express in non-functional languages (if you have some time, it is well worth understanding the <a href="http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-11.html#%_sec_1.2.1">change counting example</a> from SICP). Elegance and concision usually derive from recursion, i.e., expressing a problem in terms of a smaller subproblem.</p>
+<p>Here is a very simple recursive function, one that computes the length of a list:</p>
+<pre data-exercise="my-length"><code>(define (my-length lst)
+  (if (null? lst)
+      0
+      (+ 1 (my-length (rest lst)))))
+
+(my-length &#39;(a b c d e))</code></pre>
+<ol type="A">
+<li><p>How does <code>my-length</code> work?</p></li>
+<li><p>Below, <code>my-max</code> is intended to be a recursive function that returns the largest item in a list. Finish writing it and use it to compute the largest item in <code>'(1 2 3 6 7 4 2 9 8 -5 0 12 3)</code></p>
+<pre data-exercise="5b"><code>; returns the larger of a and b.
+(define (bigger a b) (if (&gt; a b) a b))
+
+(define (my-max lst)
+  (if (= (length lst) 1)
+      (first lst)
+      ...))
+
+(my-max &#39;(1 2 3 6 7 4 2 9 8 -5 0 12 3))</code></pre></li>
+<li><p>Write a version of <code>my-max</code> using <code>fold</code>.</p>
+<pre data-exercise="5c"><code>(define (bigger a b) (if (&gt; a b) a b))
+
+(define (my-max lst) 
+  (fold
+   ...))
+
+(my-max &#39;(1 2 3 6 7 4 2 9 8 -5 0 12 3))</code></pre></li>
+</ol></li>
+</ol>
+<h1 id="references"><a href="#references">References</a></h1>
+   </div>
+</div>
+</body>
+
+<script src="scripts/after-body.js"></script>
+</html>

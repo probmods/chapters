@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>ProbMods: Play space</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="stylesheet" type="text/css" href="webchurch/online/css/codemirror.css">
+    <link rel="stylesheet" type="text/css" href="webchurch/online/css/d3.css">
+    <link rel="shortcut icon" href="images/favicon.ico" />
+    <script src="scripts/underscore-min.js"></script>
+    <script src="scripts/jquery.js"></script>
+    <link class="katex-include" rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.5.1/katex.min.css">
+    <script class="katex-include" src="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.5.1/katex.min.js"></script>
+    <script src="scripts/cookies-0.3.1.min.js"></script>
+    <script src="scripts/gg.js"></script>
+    <script src="scripts/nav.js"></script>
+    <script src="scripts/cosmetics.js"></script>
+    <script src="scripts/md5.js"></script>
+    <script src="webchurch/online/webchurch.min.js"></script>
+    <script src="scripts/globals.js"></script>
+    <script src="webchurch/online/vega.min.js"></script>
+    <script src="scripts/new-injector.js"></script>
+    <script src="scripts/headroom.min.js"></script>
+  </head>
+<body>
+<div id="chapter-wrapper">
+  <div id='header' class="headroom">
+    <div id='logotype'><a href="index.html">Probabilistic Models of Cognition</a></div>
+    <ul id="nav">
+      <span class="nav0"><li class="all-chapters">All chapters
+<ol start="0">
+<a href="index.html"><li class="nonum">Index</li></a>
+<a href="introduction.html"><li>Introduction</li></a>
+<a href="generative-models.html"><li>Generative models</li></a>
+<a href="conditioning.html"><li>Conditioning</li></a>
+<a href="patterns-of-inference.html"><li>Patterns of inference</li></a>
+<a href="observing-sequences.html"><li>Models for sequences of observations</li></a>
+<a href="inference-about-inference.html"><li>Inference about inference</li></a>
+<a href="inference-process.html"><li>Algorithms for inference</li></a>
+<a href="learning-as-conditional-inference.html"><li>Learning as conditional inference</li></a>
+<a href="hierarchical-models.html"><li>Hierarchical models</li></a>
+<a href="occam's-razor.html"><li>Occam's Razor</li></a>
+<a href="mixture-models.html"><li>Mixture models</li></a>
+<a href="non-parametric-models.html"><li>Non-parametric models</li></a>
+<a href="appendix-scheme.html"><li>Appendix: Scheme basics</li></a>
+<a href="webchurch/online/ref.html"><li>Church Reference</li></a>
+</ol>
+      </li></span>
+      <a class="nav0" href="/login"><li id="login-link">Login</li></a>
+      <!-- <a class="nav0" href="/profile"><li id="profile-link" style='display: none'>Profile</li></a>  -->
+      <a class="nav0" href="/logout"><li id="logout-link" style='display: none'>Logout</li></a>
+    </ul>
+    <div class="clear"></div>
+  </div>
+
+  <div id="chapter">
+<h1 id="chapter-title"> Play space</h1>
+<p><a href="webchurch/online/ref.html">Church Reference</a></p>
+<p>Keyboard shortcuts:</p>
+<p><code>Cmd + .</code> or <code>Ctrl + .</code> – Fold code</acronym> (start foldable segments with <code>;;;fold:</code> and end with <code>;;;</code> )</p>
+<p><code>Cmd + ;</code> or <code>Ctrl + ;</code> – Comment selection section</p>
+<p>Currently editing: <select id="code-names"></select></p>
+<pre data-exercise="scratch"><code></code></pre>
+<script src="scripts/play-space.js"></script>
+
+<button type="button" onclick="save();">
+Save
+</button>
+<button type="button" onclick="saveAs();">
+Save as…
+</button>
+
+   </div>
+</div>
+</body>
+
+<script src="scripts/after-body.js"></script>
+</html>

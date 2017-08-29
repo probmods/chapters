@@ -1,0 +1,124 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Probabilistic Javascript in the Browser!</title>
+    <link rel="stylesheet" href="codemirror/codemirror.css">
+    <script src="codemirror/codemirror.js"></script>
+    <script src="codemirror/matchbrackets.js"></script>
+    <script src="codemirror/continuecomment.js"></script>
+    <script src="codemirror/javascript.js"></script>
+    <script src="probabilistic.js"></script>
+    <link rel="stylesheet" href="codemirror/docs.css">
+    <style type="text/css">.CodeMirror {border-top: 1px solid black; border-bottom: 1px solid black;}</style>
+  </head>
+  <body>
+    <h1>Probabilistic Javascript in the Browser!</h1>
+
+<div><textarea id="code" name="code">
+
+var meaning = function(utterance)
+{
+  if(utterance == "foo"){return function(w){return w}} //"foo" is true only in true worlds.
+  return function(w){return true} //"bar" is always true
+}
+
+var listener = function(utterance) {
+  var world = flip(); //world prior
+  condition(speaker(world) == utterance)
+  return world
+}
+
+
+var speaker = marginalize(function(world) {
+  var utterance = flip() ? "foo" : "bar"
+  condition(litlistener(utterance) == world)
+  return utterance
+})
+
+  
+var litlistener = marginalize(function(utterance)
+{
+  var world = flip(); //world prior
+  condition(meaning(utterance)(world)) //simple stand-in for truth-functional meaning..
+  return world
+})
+
+var hist =
+  distrib(
+    function() {return listener("foo")},
+      traceMH,
+      1000)
+
+output(hist)
+
+</textarea></div>
+
+    <script>
+      var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+        lineNumbers: true,
+        matchBrackets: true,
+        continueComments: "Enter"
+      });
+      var outmirror = null
+
+      var pr = require("./probabilistic/index")
+      var util = require("./probabilistic/util")
+      var transform = require("./probabilistic/transform")
+      util.openModule(pr)
+
+      function __updateOutput(str)
+      {
+        if (!outmirror)
+        {
+          outmirror = CodeMirror(document.getElementById("output"))
+          outmirror.readonly = true
+        }
+        outmirror.setValue(str)
+        document.getElementById("clearBtn").style.display = "inline"
+      }
+
+      function __clearOutput()
+      {
+        var outelem = document.getElementById("output")
+        outelem.removeChild(outelem.childNodes[0])
+        outmirror = null
+        document.getElementById("clearBtn").style.display = "none"
+      }
+
+      function output(obj)
+      {
+        var text = JSON.stringify(obj, null, '\t')
+        __updateOutput(text)
+      }
+
+      function __runCode()
+      {
+        var codestring = editor.getValue()
+        try
+        {
+          codestring = transform.probTransform(codestring)
+          eval(codestring)
+        }
+        catch (e)
+        {
+          __updateOutput(JSON.stringify(e.message))
+        }
+      }
+    </script>
+
+    <button style="margin-top: 10px; font-size: 14pt" onclick="__runCode()">
+      Run
+    </button>
+
+    <div>
+      <br/>
+    <h3>Output:</h3>
+    <div id="output"></div>
+    <button id="clearBtn" style="margin-top: 10px; font-size: 14pt; display: none" onclick="__clearOutput()">
+      Clear
+    </button>
+    </div>
+
+  </body>
+</html>

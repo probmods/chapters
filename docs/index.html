@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Probabilistic Models of Cognition</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="shortcut icon" href="images/favicon.ico" />
+    <style>
+      li {
+      font-size: 1.1em;
+      line-height: 1.5em;
+      }
+      ol a, ul a {
+      text-decoration: none;
+      }
+      ul {
+      list-style-type: none;
+      padding-left: 0.5em
+      }
+      li a  {
+      text-decoration: none;
+      }
+      #header {
+      width: 100%;
+      padding: 1.5em 0em 1.5em 0em;
+      text-align: center;
+      margin-bottom: 0;
+      color: white
+      }
+
+      #title {
+      font-family: 'Crimson Text', Crimson, Times, serif;
+      font-size: 50px;
+      text-shadow: 1px 1px 2px #666;
+      }
+
+      #authors {
+      font-family: 'Crimson Text', Crimson, Times, serif;
+      font-size: 20px;
+      /* text-shadow: 1px 1px black */
+      }
+
+      #chapter {
+      padding-top: 1px
+      }
+
+      .columns-container {
+      width: 100%;
+      }
+
+      .left-column {
+      width: 48%;
+      float: left;
+      }
+
+      .right-column {
+      width: 48%;
+      float: right;
+      }
+
+      .clear {
+      clear: both
+      }
+
+    </style>
+    <script src="scripts/underscore-min.js"></script>
+    <script src="scripts/jquery.js"></script>
+    <script src="scripts/cookies-0.3.1.min.js"></script>
+    <script src="scripts/gg.js"></script>
+    <script src="scripts/nav.js"></script>
+    <script src="scripts/cosmetics.js"></script>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+  </head>
+  <body>
+    <div id="chapter-wrapper">
+      <div id='header'>
+        <span id='title'>Probabilistic Models of Cognition</span><br>
+        <span id='authors'><i style='opacity: 0.5'>by</i> Noah D. Goodman <i style='opacity: 0.5'>and</i> Joshua B. Tenenbaum</span>
+      </div>
+      <div id="chapter">
+<p>In this book, we explore the probabilistic approach to cognitive science, which models learning and reasoning as inference in complex probabilistic models. In particular, we examine how a broad range of empirical phenomena in cognitive science (including intuitive physics, concept learning, causal reasoning, social cognition, and language understanding) can be modeled using a functional probabilistic programming language called Church.</p>
+<div class='column-container'>
+
+<div class='left-column'>
+<h2 id="how-to-use">How to use</h2>
+<p>Best viewed in Chrome/Safari on a laptop/desktop (smartphone/tablet not recommended).</p>
+<p>This book contains exercises where you write and run Church code directly in the browser. To save your progress on these exercises, you can register an account. Registering also helps us improve the book by tracking what kinds of programs users run and what kinds of errors they encounter.</p>
+<!-- login/register links need to be in a div with id 'register' so that nav.js can show the appropriate content (i.e., a login/register section if the user is not logged in and a logout section if the user is logged in)   -->
+<!--
+<div id="register" style='display: none; font-style: italic'>
+<a href="/login">Login</a> or <a href="/register">register an account</a>
+</div>
+-->
+
+<h2 id="how-to-cite">How to cite</h2>
+<p>N. D. Goodman and J. B. Tenenbaum (electronic). Probabilistic Models of Cognition. Retrieved &lt;Date&gt; from http://probmods.org.</p>
+<h2 id="how-to-help">How to help</h2>
+<p>Send any errors to <u>probmods@<span style='display:none'>REMOVETHIS</span>gmail.com</u></p>
+<p>This book is open source. See Github for the <a href="http://github.com/probmods/chapters">book content</a>, the <a href="http://github.com/probmods/accounts">accounts infrastructure</a>, and the <a href="http://github.com/probmods/webchurch">webchurch engine</a>, which runs Church code in the browser. We welcome issues and pull requests.</p>
+<h2 id="acknowledgements">Acknowledgements</h2>
+<p>We are grateful to the following people, who contributed content or technical expertise: Timothy J. O’Donnell, Andreas Stuhlmuller, Tomer Ullman, John McCoy, Long Ouyang, Julius Cheng.</p>
+The construction and ongoing support of this tutorial are made possible by grants from the Office of Naval Research, the James S. McDonnell Foundation, the Stanford VPOL, and the Center for Brains, Minds, and Machines (funded by NSF STC award CCF-1231216).
+</div>
+
+<div class='right-column'>
+<h2 id="chapters">Chapters</h2>
+<ol start="0">
+<a href="index.html"><li class="nonum">Index</li></a>
+<a href="introduction.html"><li>Introduction</li></a>
+<a href="generative-models.html"><li>Generative models</li></a>
+<a href="conditioning.html"><li>Conditioning</li></a>
+<a href="patterns-of-inference.html"><li>Patterns of inference</li></a>
+<a href="observing-sequences.html"><li>Models for sequences of observations</li></a>
+<a href="inference-about-inference.html"><li>Inference about inference</li></a>
+<a href="inference-process.html"><li>Algorithms for inference</li></a>
+<a href="learning-as-conditional-inference.html"><li>Learning as conditional inference</li></a>
+<a href="hierarchical-models.html"><li>Hierarchical models</li></a>
+<a href="occam's-razor.html"><li>Occam's Razor</li></a>
+<a href="mixture-models.html"><li>Mixture models</li></a>
+<a href="non-parametric-models.html"><li>Non-parametric models</li></a>
+<a href="appendix-scheme.html"><li>Appendix: Scheme basics</li></a>
+<a href="webchurch/online/ref.html"><li>Church Reference</li></a>
+</ol>
+
+<h2 id="resources">Resources</h2>
+<ul>
+<li><p><a href="play-space.html">Play space</a>: an online Church editor.</p></li>
+<li><p><a href="http://forestdb.org">Forest</a>: a repository for Church models.</p></li>
+</ul>
+</div>
+
+<div class='clear'></div>
+
+</div>
+
+      </div>
+    </div>
+  </body>
+
+<script>
+  (function() {
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-44328902-1', 'probmods.org');
+  ga('send', 'pageview');
+  })();
+</script>
+</html>

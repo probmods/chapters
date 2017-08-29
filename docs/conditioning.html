@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>ProbMods: Conditioning</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="stylesheet" type="text/css" href="webchurch/online/css/codemirror.css">
+    <link rel="stylesheet" type="text/css" href="webchurch/online/css/d3.css">
+    <link rel="shortcut icon" href="images/favicon.ico" />
+    <script src="scripts/underscore-min.js"></script>
+    <script src="scripts/jquery.js"></script>
+    <link class="katex-include" rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.5.1/katex.min.css">
+    <script class="katex-include" src="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.5.1/katex.min.js"></script>
+    <script src="scripts/cookies-0.3.1.min.js"></script>
+    <script src="scripts/gg.js"></script>
+    <script src="scripts/nav.js"></script>
+    <script src="scripts/cosmetics.js"></script>
+    <script src="scripts/md5.js"></script>
+    <script src="webchurch/online/webchurch.min.js"></script>
+    <script src="scripts/globals.js"></script>
+    <script src="webchurch/online/vega.min.js"></script>
+    <script src="scripts/new-injector.js"></script>
+    <script src="scripts/headroom.min.js"></script>
+  </head>
+<body>
+<div id="chapter-wrapper">
+  <div id='header' class="headroom">
+    <div id='logotype'><a href="index.html">Probabilistic Models of Cognition</a></div>
+    <ul id="nav">
+      <span class="nav0"><li class="all-chapters">All chapters
+<ol start="0">
+<a href="index.html"><li class="nonum">Index</li></a>
+<a href="introduction.html"><li>Introduction</li></a>
+<a href="generative-models.html"><li>Generative models</li></a>
+<a href="conditioning.html"><li>Conditioning</li></a>
+<a href="patterns-of-inference.html"><li>Patterns of inference</li></a>
+<a href="observing-sequences.html"><li>Models for sequences of observations</li></a>
+<a href="inference-about-inference.html"><li>Inference about inference</li></a>
+<a href="inference-process.html"><li>Algorithms for inference</li></a>
+<a href="learning-as-conditional-inference.html"><li>Learning as conditional inference</li></a>
+<a href="hierarchical-models.html"><li>Hierarchical models</li></a>
+<a href="occam's-razor.html"><li>Occam's Razor</li></a>
+<a href="mixture-models.html"><li>Mixture models</li></a>
+<a href="non-parametric-models.html"><li>Non-parametric models</li></a>
+<a href="appendix-scheme.html"><li>Appendix: Scheme basics</li></a>
+<a href="webchurch/online/ref.html"><li>Church Reference</li></a>
+</ol>
+      </li></span>
+      <a class="nav0" href="/login"><li id="login-link">Login</li></a>
+      <!-- <a class="nav0" href="/profile"><li id="profile-link" style='display: none'>Profile</li></a>  -->
+      <a class="nav0" href="/logout"><li id="logout-link" style='display: none'>Logout</li></a>
+    </ul>
+    <div class="clear"></div>
+  </div>
+
+  <div id="chapter">
+<h1 id="chapter-title">3. Conditioning</h1>
+<div class='toc'>
+<div class='name'>Contents:</div>
+<ul>
+<li><a href="#cognition-and-conditioning">Cognition and conditioning</a></li>
+<li><a href="#hypothetical-reasoning-with-query">Hypothetical Reasoning with <code>query</code></a><ul>
+<li><a href="#rejection-sampling">Rejection Sampling</a></li>
+<li><a href="#conditional-distributions">Conditional Distributions</a></li>
+<li><a href="#bayes-rule">Bayes Rule</a></li>
+<li><a href="#implementations-of-query">Implementations of <code>query</code></a></li>
+</ul></li>
+<li><a href="#reasoning-with-arbitrary-propositions">Reasoning with Arbitrary Propositions</a><ul>
+<li><a href="#example-reasoning-about-the-tug-of-war">Example: Reasoning about the Tug of War</a></li>
+</ul></li>
+<li><a href="#example-inverse-intuitive-physics">Example: Inverse intuitive physics</a></li>
+<li><a href="#example-causal-inference-in-medical-diagnosis">Example: Causal Inference in Medical Diagnosis</a></li>
+<li><a href="#exercises">Exercises</a></li>
+<li><a href="#references">References</a></li>
+</ul>
+</div>
+<script src="scripts/box2d.uglified.js"></script>
+<script src="scripts/phys.js"></script>
+
+<h1 id="cognition-and-conditioning"><a href="#cognition-and-conditioning">Cognition and conditioning</a></h1>
+<p>We have built up a tool set for constructing probabilistic generative models. These can represent knowledge about causal processes in the world: running one of these programs generates a particular outcome by sampling a “history” for that outcome. However, the power of a causal model lies in the flexible ways it can be used to reason about the world. In the <a href="generative-models.html">last chapter</a> we ran generative models <em>forward</em> to reason about outcomes from initial conditions. Generative models also enable reasoning in other directions. For instance, if we have a generative model in which X is the output of a process that depends on Y (say <code>(define X (fun Y))</code>) we may ask: “assuming I have observed X, how must Y have been?” That is we can reason <em>backward</em> from outcomes to initial conditions. More generally, we can make hypothetical assumptions and reason about the generative history: “assuming <em>something</em>, how must the generative model have run?” In this section we describe how a wide variety of such hypothetical inferences can be made from a single generative model by <em>conditioning</em> the model on an assumed or observed fact.</p>
+<p>Much of cognition can be understood in terms of conditional inference. In its most basic form, <em>causal attribution</em> is conditional inference: given some observed effects, what were the likely causes? <em>Predictions</em> are conditional inferences in the opposite direction: given that I have observed some known cause, what are its likely effects? These inferences can be described by conditioning a probabilistic program that expresses a causal model, or understanding of how effects depend on causes. The acquisition of that causal model, or <em>learning</em>, is also conditional inference at a higher level of abstraction: given our general knowledge of how causal relations operate in the world, and some observed events in which candidate causes and effects co-occur in various ways, what specific causal relations are likely to hold between these observed variables?</p>
+<p>To see how the same concepts apply in a domain that is not usually thought of as causal, consider language. The core questions of interest in the study of natural language are all at heart conditional inference problems. Given beliefs about the syntactic structure of my language, and an observed sentence, what should I believe about the syntactic structure of that sentence? This is the <em>parsing</em> problem. The complementary problem of <em>speech production</em> is related: given some beliefs about the syntactic structure of my language (and beliefs about others’ beliefs about that), and a particular thought I want to express, how should I encode the thought syntactically? Finally, the discovery or <em>acquisition</em> problem: given general knowledge about universals of grammar and some data from a particular language, what should we believe about that language’s structure? This problem is simultaneously the problem facing the linguist and the child trying to learn a language.</p>
+<p>Parallel problems of conditional inference arise in visual perception, social cognition, and virtually every other domain of cognition. In visual perception, we observe an image or image sequence that is the result of rendering a three-dimensional physical scene onto our two-dimensional retinas. A probabilistic program can model both the physical processes at work in the world that produce natural scenes, and the imaging processes (the “graphics”) that generate images from scenes. <em>Perception</em> can then be seen as conditioning this program on some observed output image and inferring the scenes most likely to have given rise to it.</p>
+<p>When interacting with other people, we observe their actions, which result from a planning process, and often want to guess their desires, beliefs, or future actions. Planning can be modeled as a program that takes as input an agent’s mental states (beliefs and desires) and produces action sequences—for a rational agent, these will be actions that are likely to produce the agent’s desired states as reliably or efficiently as possible, given the agent’s beliefs. A rational agent can <em>plan</em> their actions by conditional inference to infer what steps would be most likely to achieve their desired state. <em>Action understanding</em>, or interpreting an agent’s observed behavior, can be expressed as conditioning a planning program (a “theory of mind”) on observed actions to infer the mental states that most likely gave rise to those actions, and to predict how the agent is likely to act in the future.</p>
+<h1 id="hypothetical-reasoning-with-query"><a href="#hypothetical-reasoning-with-query">Hypothetical Reasoning with <code>query</code></a></h1>
+<p>Suppose that we know some fixed fact, and we wish to consider hypotheses about how a generative model could have given rise to that fact. In Church we can use a special function called <code>query</code> with the following syntax:</p>
+<pre class="norun"><code>(query
+   generative-model
+   what-we-want-to-know
+   (condition what-we-know))</code></pre>
+<p><code>query</code> takes three arguments. The first is some generative model expressed as a series of <code>define</code> statements. The second is an expression, called the <em>query expression</em>, which represents the aspects of the computation that we are interested in. The last argument is the condition that must be met; this may encode observations, data, or more general assumptions. It is called the <em>conditioner.</em> <!-- We call this the distribution of values returned by the query-expression *conditioned on* the conditioner being true. --></p>
+<p>Consider the following simple generative process:</p>
+<pre><code>(define A (if (flip) 1 0))
+(define B (if (flip) 1 0))
+(define C (if (flip) 1 0))
+(define D (+ A B C))
+D</code></pre>
+<p>This process samples three digits <code>0</code>/<code>1</code> and adds the result. The value of the final expression here is either 0, 1, 2 or 3. A priori, each of the variables <code>A</code>, <code>B</code>, <code>C</code> has .5 probability of being <code>1</code> or <code>0</code>. However, suppose that we know that the sum <code>D</code> is equal to 3. How does this change the space of possible values that variable <code>A</code> can take on? It is obvious that <code>A</code> must be equal to 1 for this result to happen. We can see this in the following Church query (which uses a particular implementation, rejection sampling, to be described shortly):</p>
+<pre><code>(define (take-sample)
+  (rejection-query
+
+   (define A (if (flip) 1 0))
+   (define B (if (flip) 1 0))
+   (define C (if (flip) 1 0))
+   (define D (+ A B C))
+
+   A
+
+   (condition (equal? D 3))))
+
+(hist (repeat 100 take-sample) &quot;Value of A, given that D is 3&quot;)</code></pre>
+<p>The output of <code>rejection-query</code> is a “guess” about the likely value of <code>A</code>, conditioned on <code>D</code> being equal to 3. (We use <code>repeat</code> to take 100 guesses, which are then turned into a bar graph representing relative probabilities using the <code>hist</code> function.) Because <code>A</code> must necessarily equal <code>1</code>, the histogram shows 100% of the sampled values are <code>1</code>.</p>
+<p>Now suppose that we condition on <code>D</code> being greater than or equal to 2. Then <code>A</code> need not be 1, but it is more likely than not to be. (Why?) The corresponding histogram shows the appropriate distribution of “guesses” for <code>A</code> conditioned on this new fact:</p>
+<pre><code>(define (take-sample)
+  (rejection-query
+
+   (define A (if (flip) 1 0))
+   (define B (if (flip) 1 0))
+   (define C (if (flip) 1 0))
+   (define D (+ A B C))
+
+   A
+
+   (condition (&gt;= D 2))))
+
+(hist (repeat 100 take-sample) &quot;Value of A, given that D is greater than or equal to 2&quot;)</code></pre>
+<p>Predicting the outcome of a generative process is simply a special case of querying, where we condition on no restrictions and ask about the outcome. Try changing the condition in the above program to <code>(condition true)</code>.</p>
+<p>When the <code>condition</code> operator is the last expression in a query (which is typical) it can be dropped, and we often do this for simplicity:</p>
+<pre class="norun"><code>(query
+   generative-model
+   what-we-want-to-know
+   what-we-know)</code></pre>
+<p>Going beyond the basic intuition of “hypothetical reasoning”, the <code>query</code> operation can be understood in several, equivalent, ways. We focus on two: the process of <em>rejection sampling</em>, and the the mathematical operation of <em>conditioning</em> a distribution.</p>
+<h2 id="rejection-sampling"><a href="#rejection-sampling">Rejection Sampling</a></h2>
+<p>How can we imagine answering a hypothetical such as those above? We have already seen how to get a sample from a generative model, without constraint, by simply running the evaluation process “forward” (i.e. simulating the process). We can get conditional samples by forward sampling the entire query, including both the query expression and conditioner, but only keeping the sample if the value returned by the conditioner expression is <em>true</em>. For instance, to sample from the above model “A given that D is greater than 2” we could:</p>
+<pre><code>(define (take-sample)
+   (define A (if (flip) 1 0))
+   (define B (if (flip) 1 0))
+   (define C (if (flip) 1 0))
+   (define D (+ A B C))
+   (if (&gt;= D 2) A (take-sample)))
+
+(hist (repeat 100 take-sample) &quot;Value of A, given that D is greater than or equal to 2&quot;)</code></pre>
+<p>Notice that we have used a stochastic recursion to sample the definitions repeatedly until we get <code>(&gt;= D 2)</code>, and we then return <code>A</code>: we generate and test until the condition is satisfied. This process is known as <em>rejection sampling</em>; we can use this technique to make a more general function that implements <code>query</code>—called <code>rejection-query</code>, schematically defined as:</p>
+<pre class="norun"><code>(define (rejection-query ..defines.. ..query-expression.. ..conditioner..)
+       ..defines..
+       (define query-value ..query-expression..)
+       (define condition-value ..conditioner..)
+       (if (equal? condition-value true)
+           query-value
+           (rejection-query defines query-expression conditioner)))</code></pre>
+<p>(This is only schematic because we must avoid evaluating the query-expression and conditioner until <em>inside</em> the rejection-query function. The Church implementation does this by <em>de-sugaring</em>: transforming the code before evaluation.)</p>
+<p>While many implementations of <code>query</code> are possible, and others are discussed later, we can take the <code>rejection-query</code> process to <em>define</em> the distribution of values returned by a query expression.</p>
+<h2 id="conditional-distributions"><a href="#conditional-distributions">Conditional Distributions</a></h2>
+<p>The formal definition of <em>conditional probability</em> in probability theory is <span class="math">\[ P(A=a \mid B=b)=\frac{ P(A=a,B=b)}{P(B=b)} \]</span> Here <span class="math">\(P(A=a \mid B=b)\)</span> is the probability that “event” <span class="math">\(A\)</span> has value <span class="math">\(a\)</span> given that <span class="math">\(B\)</span> has value <span class="math">\(b\)</span>. (The meaning of events <span class="math">\(A\)</span> and <span class="math">\(B\)</span> must be given elsewhere in this notation, unlike a Church program, which contains the full model specification within the query.) The <em>joint probability</em>, <span class="math">\(P(A=a,B=b)\)</span>, is the probability that <span class="math">\(A\)</span> has value <span class="math">\(a\)</span> and <span class="math">\(B\)</span> has value <span class="math">\(b\)</span>. So the conditional probability is simply the ratio of the joint probability to the probability of the condition. In the case of a Church query, <span class="math">\(A=a\)</span> is the “event” of the query expression returning value <span class="math">\(a\)</span>, while <span class="math">\(B=b\)</span> will be the conditioner returning true (so <span class="math">\(b\)</span> will be <em>True</em>).</p>
+<p>The above definition of conditional distribution in terms of rejection sampling is equivalent to this mathematical definition, when both are well-defined. (There are special cases when only one definition makes sense. For instance, when continuous random choices are used it is possible to find situations where rejection sampling almost never returns a sample but the conditional distribution is still well defined. Why?) Indeed, we can use the process of rejection sampling to understand this alternative definition of the conditional probability <span class="math">\(P(A=a \mid B=b)\)</span>. We imagine sampling many times, but only keeping those samples in which the condition is true. The frequency of the query expression returning a particular value <span class="math">\(a\)</span> (i.e. <span class="math">\(A=a\)</span>) <em>given</em> that the condition is true, will be the number of times that <span class="math">\(A=a\)</span> <strong>and</strong> <span class="math">\(B=True\)</span> divided by the number of times that <span class="math">\(B=True\)</span>. Since the frequency of the conditioner returning true will be <span class="math">\(P(B=True)\)</span> in the long run, and the frequency that the condition returns true <em>and</em> the query expression returns a given value <span class="math">\(a\)</span> will be <span class="math">\(P(A=a, B=True)\)</span>, we get the above formula for the conditional probability. <!-- FIXME: clarify this last argument? --></p>
+<p>Try using the above formula for conditional probability to compute the probability of the different return values in the above query examples. Check that you get the same probability that you observe when using rejection sampling.</p>
+<h2 id="bayes-rule"><a href="#bayes-rule">Bayes Rule</a></h2>
+<p>One of the most famous rules of probability is <em>Bayes’ rule</em>, which states: <span class="math">\[P(h \mid d) = \frac{P(d \mid h)P(h)}{P(d)}\]</span> It is first worth noting that this follows immediately from the definition of conditional probability: <span class="math">\[P(h \mid d) = \frac{P(h,d)}{P(d)} = \frac{\frac{P(d,h)P(h)}{P(h)}}{P(d)} = \frac{P(d \mid h)P(h)}{P(d)}\]</span></p>
+<p>Next we can ask what this rule means in terms of sampling processes. Consider the Church program:</p>
+<pre><code>(define observed-data true)
+
+(define (prior) (flip))
+
+(define (observe h) (if h (flip 0.9) (flip 0.1)))
+
+(rejection-query
+
+ (define hypothesis (prior))
+ (define data (observe hypothesis))
+
+ hypothesis
+
+ (equal? data observed-data))</code></pre>
+<p>We have generated a value, the <em>hypothesis</em>, from some distribution called the <em>prior</em>, then used an observation function which generates data given this hypothesis, the probability of such an observation function is called the <em>likelihood</em>. Finally we have queried the hypothesis conditioned on the observation being equal to some observed data—this conditional distribution is called the <em>posterior</em>. This is a typical setup in which Bayes’ rule is used. Notice that in this case the conditional distribution <span class="math">\(P(\text{data} \mid \text{hypothesis})\)</span> is just the probability distribution on return values from the <code>observe</code> function given an input value.</p>
+<!--
+If we replace the conditioner with `true` in the code above, that is equivalent to observing no data.  Then query draws samples from the prior distribution, rather than the posterior.
+-->
+
+<p>Bayes rule simply says that, in special situations where the model decomposes nicely into a part “before” the query-expression and a part “after” the query expression, then the conditional probability can be expressed in terms of these components of the model. This is often a useful way to think about conditional inference in simple settings. However, we will see examples as we go along where Bayes’ rule doesn’t apply in a simple way, but the conditional distribution is equally well understood in terms of sampling.</p>
+<h2 id="implementations-of-query"><a href="#implementations-of-query">Implementations of <code>query</code></a></h2>
+<p>Much of the difficulty of implementing the Church language (or probabilistic models in general) is in finding useful ways to do conditional inference—to implement <code>query</code>. The Church implementation that we will use in this tutorial has several different methods for query, each of which has its own limitations. We will explore the different algorithms used in these implementations in the section on <a href="inference-process.html">Algorithms for inference</a>, for now we just need to note a few differences in usage.</p>
+<p>As we have seen already, the method of rejection sampling is implemented in <code>rejection-query</code>. This is a very useful starting point, but is often not efficient: even if we are sure that our model can satisfy the condition, it will often take a very long time to find evaluations that do so. The AI literature is replete with other algorithms and techniques for dealing with conditional probabilistic inference. Several of these have been adapted into Church to give implementations of <code>query</code> that may be more efficient in various cases.</p>
+<!-- TODO: put in exact-query once that has been implemented in web church.-->
+
+<p>One implementation that we will often use is based on the <em>Metropolis Hastings</em> (MH) algorithm. This <code>mh-query</code> implementation takes two extra arguments and returns a list of samples (not just one sample):</p>
+<pre><code>(define baserate 0.1)
+
+(define samples
+  (mh-query 100 ;number of samples
+            100 ;lag
+
+   (define A (if (flip baserate) 1 0))
+   (define B (if (flip baserate) 1 0))
+   (define C (if (flip baserate) 1 0))
+   (define D (+ A B C))
+
+   A
+
+   (condition (&gt;= D 2))))
+
+(hist samples &quot;Value of A, given that D is greater than or equal to 2&quot;)</code></pre>
+<p>The first extra argument is the number of samples to take, and the second controls the “lag” (the number of internal random choices that the algorithm makes in a sequence of iterative steps between samples). The workings of MH will be explored in a later chapter, but very roughly: The algorithm implements a random walk or diffusion process (a <em>Markov chain</em>) in the space of possible program evaluations that lead to the conditioner being true. Each MH iteration is one step of this random walk, and the process is specially designed to visit each program evaluation with a long-run frequency proportional to its conditional probability.</p>
+<!-- TODO: should talk about levels of analysis, and why we are ignoring the algorithms as much as possible to start with. -->
+
+
+<h1 id="reasoning-with-arbitrary-propositions"><a href="#reasoning-with-arbitrary-propositions">Reasoning with Arbitrary Propositions</a></h1>
+<p>It is natural to condition a generative model on a value for one of the variables declared in this model. However, one may also wish to ask for more complex hypotheticals: “what if P,” where P is a complex proposition composed out of variables declared in the model. Consider the following Church <code>query</code>:</p>
+<pre><code>(define samples
+  (mh-query
+   100 100
+
+   (define A (if (flip) 1 0))
+   (define B (if (flip) 1 0))
+   (define C (if (flip) 1 0))
+
+   A
+
+   (condition (&gt;= (+ A B C) 2))))
+
+(hist samples &quot;Value of A, given that the sum is greater than or equal to 2&quot;)</code></pre>
+<p>This query has the same meaning as the example above, but the formulation is importantly different. We have defined a generative model that samples 3 instances of <code>0</code>/<code>1</code> digits, then we have directly conditioned on the complex assumption that the sum of these random variables is greater than or equal to 2. This involves a new random variable, <code>(&gt;= (+ A B C) 2)</code>. This latter random variable <em>did not appear</em> anywhere in the generative model (the definitions). In the traditional presentation of conditional probabilities we usually think of conditioning as <em>observation</em>: it explicitly enforces random variables to take on certain values. For example, when we say <span class="math">\(P(A \mid B=b)\)</span> we explicitly require <span class="math">\(B = b\)</span>. In order to express the above query in this way, we could add the complex variable to the generative model, then condition on it. However this intertwines the hypothetical assumption (condition) with the generative model knowledge (definitions), and this is not what we want: we want a simple model which supports many queries, rather than a complex model in which only a prescribed set of queries is allowed.</p>
+<p>Writing models in Church allows the flexibility to build complex random expressions like this as needed, making assumptions that are phrased as complex propositions, rather than simple observations. Hence the effective number of queries we can construct for most programs will not merely be a large number but countably infinite, much like the sentences in a natural language. The <code>query</code> function (in principle, though with variable efficiency) supports correct conditional inference for this infinite array of situations.</p>
+<h2 id="example-reasoning-about-the-tug-of-war"><a href="#example-reasoning-about-the-tug-of-war">Example: Reasoning about the Tug of War</a></h2>
+<p>Returning to the earlier example of a series of tug-of-war matches, we can use query to ask a variety of different questions. For instance, how likely is it that Bob is strong, given that he’s been in a series of winning teams? (Note that we have written the <code>winner</code> function slightly differently here, to return the labels <code>'team1</code> or <code>'team2</code> rather than the list of team members. This makes for more compact conditioning statements.)</p>
+<pre><code>(define samples
+  (mh-query 1000 10
+
+    (define strength (mem (lambda (person) (gaussian 0 1))))
+
+    (define lazy (lambda (person) (flip (/ 1 3))))
+
+    (define (total-pulling team)
+      (sum
+         (map
+          (lambda (person) (if (lazy person) (/ (strength person) 2) (strength person)))
+          team)))
+
+    (define (winner team1 team2)
+      (if (&gt; (total-pulling team1) (total-pulling team2)) &#39;team1 &#39;team2))
+
+    (strength &#39;bob)
+
+    (and (eq? &#39;team1 (winner &#39;(bob mary) &#39;(tom sue)))
+         (eq? &#39;team1 (winner &#39;(bob sue) &#39;(tom jim))))))
+
+(display (list &quot;Expected strength: &quot; (mean samples)))
+(density samples &quot;Bob strength&quot; true)</code></pre>
+<p>Try varying the number of different teams and teammates that Bob plays with. How does this change the estimate of Bob’s strength? (To summarize and just look at Bob’s expected strength you can replace the <code>hist</code> with <code>(mean samples)</code>.) Do these changes agree with your intuitions? Can you modify this example to make laziness a continuous quantity? Can you add a person-specific tendency toward laziness?</p>
+<p>A model very similar to this was used in <span class="citation" data-cites="Gerstenberg2012">Gerstenberg &amp; Goodman (2012)</span> to predict human judgements about the strength of players in ping-pong tournaments. It achieved very accurate quantitative predictions without many free parameters.</p>
+<!-- [I don't think we need this:
+As an exercise, let's go back to the tug-of-war tournament described under [Generative Models](generative-models.html#example-bayesian-tug-of-war) and write a Church program to infer the probability that Alice is stronger than Bob, given a particular tournament outcome:
+
+~~~~
+(define samples
+  (mh-query 100 100
+    (define strength (mem (lambda (person) (if (flip) 10 5))))
+    (define lazy (lambda (person) (flip (/ 1 3))))
+
+    (define (total-pulling team)
+      (sum
+         (map (lambda (person) (if (lazy person) (/ (strength person) 2) (strength person)))
+               team)))
+
+    (define (winner team1 team2) (if (< (total-pulling team1) (total-pulling team2)) 'team2 'team1))
+
+    (> (strength 'alice) (strength 'bob))
+
+    (and (eq? 'team1 (winner '(alice bob) '(sue tom)))
+         (eq? 'team2 (winner '(alice bob) '(sue tom)))
+         (eq? 'team1 (winner '(alice sue) '(bob tom)))
+         (eq? 'team1 (winner '(alice sue) '(bob tom)))
+         (eq? 'team1 (winner '(alice tom) '(bob sue)))
+         (eq? 'team1 (winner '(alice tom) '(bob sue))))))
+
+(hist samples "Is alice stronger than bob?")
+~~~~
+-->
+
+<p>We can form many complex queries from this simple model. We could ask how likely a team of Bob and Mary is to win over a team of Jim and Sue, given that Mary is at least as strong as sue, and Bob was on a team that won against Jim previously:</p>
+<pre><code>(define samples
+  (mh-query 100 100
+    (define strength (mem (lambda (person) (gaussian 0 1))))
+    (define lazy (lambda (person) (flip (/ 1 3))))
+
+    (define (total-pulling team)
+      (sum
+         (map (lambda (person) (if (lazy person) (/ (strength person) 2) (strength person)))
+               team)))
+
+    (define (winner team1 team2) (if (&lt; (total-pulling team1) (total-pulling team2)) &#39;team2 &#39;team1))
+
+    (eq? &#39;team1 (winner &#39;(bob mary) &#39;(jim sue)))
+
+    (and (&gt;= (strength &#39;mary) (strength &#39;sue))
+         (eq? &#39;team1 (winner &#39;(bob francis) &#39;(tom jim)))))
+)
+(hist samples &quot;Do bob and mary win against jim and sue&quot;)</code></pre>
+<h1 id="example-inverse-intuitive-physics"><a href="#example-inverse-intuitive-physics">Example: Inverse intuitive physics</a></h1>
+<p>We previously saw how a generative model of physics—a noisy, intuitive version of Newtonian mechanics—could be used to make judgements about the final state of physical worlds from initial conditions. We showed how this forward simulation could be used to model judgements about stability. We can also use a physics model to reason backward: from final to initial states.</p>
+<p>Imagine that we drop a block from a random position at the top of a world with two fixed obstacles:</p>
+<pre><code>;set up some bins on a floor:
+(define (bins xmin xmax width)
+  (if (&lt; xmax (+ xmin width))
+      ;the floor:
+      &#39;( ((&quot;rect&quot; #t (400 10)) (175 500)) )
+      ;add a bin, keep going:
+      (pair (list &#39;(&quot;rect&quot; #t (1 10)) (list xmin 490))
+            (bins (+ xmin width) xmax width))))
+
+;make a world with two fixed circles and bins:
+(define world (pair &#39;((&quot;circle&quot; #t (60)) (60 200))
+                    (pair &#39;((&quot;circle&quot; #t (30)) (300 300))
+                          (bins -1000 1000 25))))
+
+;make a random block at the top:
+(define (random-block) (list (list &quot;circle&quot; #f &#39;(10))
+                             (list (uniform 0 worldWidth) 0)))
+
+;add a random block to world, then animate:
+(animatePhysics 1000 (pair (random-block) world))</code></pre>
+<!--
+We can use forward simulation to understand where a ball might come to rest if it starts at a particular initial position:
+
+-->
+
+<p>Assuming that the block comes to rest in the middle of the floor, where did it come from?</p>
+<pre><code>;;;fold: Set up the world, as above:
+;set up some bins on a floor:
+(define (bins xmin xmax width)
+  (if (&lt; xmax (+ xmin width))
+      ;the floor:
+      &#39;( ((&quot;rect&quot; #t (400 10)) (175 500)) )
+      ;add a bin, keep going:
+      (pair (list &#39;(&quot;rect&quot; #t (1 10)) (list xmin 490))
+            (bins (+ xmin width) xmax width))))
+
+;make a world with two fixed circles and bins:
+(define world (pair &#39;((&quot;circle&quot; #t (60)) (60 200))
+                    (pair &#39;((&quot;circle&quot; #t (30)) (300 300))
+                          (bins -1000 1000 25))))
+
+;make a random block at the top:
+(define (random-block) (list (list &quot;circle&quot; #f &#39;(10))
+                             (list (uniform 0 worldWidth) 0)))
+;;;
+
+;helper to get X position of the movable block:
+(define (getX world)
+  (if (second (first (first world)))
+      (getX (rest world))
+      (first (second (first world)))))
+
+;given an observed final position, where did the block come from?
+(define observed-x 160)
+
+(define init-xs
+  (mh-query 100 10
+    (define init-state (pair (random-block) world))
+    (define final-state (runPhysics 1000 init-state))
+    (getX init-state)
+    (= (gaussian (getX final-state) 10) observed-x)))
+
+
+(density init-xs &quot;init state&quot; true)</code></pre>
+<p>What if the ball comes to rest at the left side, under the large circle (x about 60)? The right side?</p>
+<!-- TODO: the model here is too certain about the physics: it knows just how the ball will bounce off the pegs... should add collision noise? anyhow discuss this? -->
+
+
+<h1 id="example-causal-inference-in-medical-diagnosis"><a href="#example-causal-inference-in-medical-diagnosis">Example: Causal Inference in Medical Diagnosis</a></h1>
+<p>This classic Bayesian inference task is a special case of conditioning. Kahneman and Tversky, and Gigerenzer and colleagues, have studied how people make simple judgments like the following:</p>
+<blockquote>
+<p>The probability of breast cancer is 1% for a woman at 40 who participates in a routine screening. If a woman has breast cancer, the probability is 80% that she will have a positive mammography. If a woman does not have breast cancer, the probability is 9.6% that she will also have a positive mammography. A woman in this age group had a positive mammography in a routine screening. What is the probability that she actually has breast cancer?</p>
+</blockquote>
+<p>What is your intuition? Many people without training in statistical inference judge the probability to be rather high, typically between 0.7 and 0.9. The correct answer is much lower, less than 0.1, as we can see by evaluating this Church query:</p>
+<pre><code>(define samples
+ (mh-query 100 100
+   (define breast-cancer (flip 0.01))
+
+   (define positive-mammogram (if breast-cancer (flip 0.8) (flip 0.096)))
+
+   breast-cancer
+
+   positive-mammogram
+ )
+)
+(hist samples &quot;breast cancer&quot;)</code></pre>
+<p><span class="citation" data-cites="Tversky1974">Tversky &amp; Kahneman (1974)</span> named this kind of judgment error <em>base rate neglect</em>, because in order to make the correct judgment, one must realize that the key contrast is between the <em>base rate</em> of the disease, 0.01 in this case, and the <em>false alarm rate</em> or probability of a positive mammogram given no breast cancer, 0.096. The false alarm rate (or <em>FAR</em> for short) seems low compared to the probability of a positive mammogram given breast cancer (the <em>likelihood</em>), but what matters is that it is almost ten times higher than the base rate of the disease. All three of these quantities are needed to compute the probability of having breast cancer given a positive mammogram using Bayes’ rule for posterior conditional probability:</p>
+<p><span class="math">\[P(\text{cancer} \mid \text{positive mammogram}) = \frac{P(\text{positive mammogram} \mid \text{cancer} ) \times P(\text{cancer})}{P(\text{ positive mammogram})}\]</span> <span class="math">\[= \frac{0.8 \times 0.01}{0.8 \times 0.01 + 0.096 \times 0.99} = 0.078\]</span></p>
+<p><span class="citation" data-cites="Gigerenzer1995">Gigerenzer &amp; Hoffrage (1995)</span> showed that this kind of judgment can be made much more intuitive to untrained reasoners if the relevant probabilities are presented as “natural frequencies”, or the sizes of subsets of relevant possible outcomes:</p>
+<blockquote>
+<p>On average, ten out of every 1000 women at age 40 who come in for a routine screen have breast cancer. Eight out of those ten women will get a positive mammography. Of the 990 women without breast cancer, 95 will also get a positive mammography. We assembled a sample of 1000 women at age 40 who participated in a routine screening. How many of those who got a positive mammography do you expect to actually have breast cancer?</p>
+</blockquote>
+<p>Now one can practically read off the answer from the problem formulation: 8 out of 103 (95+8) women in this situation will have breast cancer.</p>
+<p>Gigerenzer (along with Cosmides, Tooby and other colleagues) has argued that this formulation is easier because of evolutionary and computational considerations: human minds have evolved to count and compare natural frequencies of discrete events in the world, not to add, multiply and divide decimal probabilities. But this argument alone cannot account for the very broad human capacity for causal reasoning. We routinely make inferences for which we haven’t stored up sufficient frequencies of events observed <em>in the world.</em> (And often for which no one has told us the relevant frequencies, although perhaps we have been told about degrees of causal strength or base rates in the form of probabilities or other linguistic encoding).</p>
+<p>However, the basic idea that the mind is good at manipulating frequencies of situations, but bad at arithmetic on continuous probability values, can be extended to cope with novel situations if the frequencies that are manipulated can be frequencies of <em>imagined</em> situations. Recall that Church programs explicitly give instructions for sampling imagined situations, and only implicitly specify probability distributions. If human inference is similar to a Church query then it would readily create and manipulate imagined situations, and this could explain both why the frequency framing of Bayesian probability judgment is natural to people and how people cope with rarer and more novel situations. The numbers given in the frequency formulation (or close approximations thereof) can be read off a tree of evaluation histories for 1000 calls of the Church program that specifies the causal model for this problem:</p>
+<center>
+<img src="images/Cancer-world-tree.png" width="40%" height="40%" >
+</center>
+
+<p>Each path from root to leaf of this tree represents a sequence of random choices made in evaluating the above program (the first flip for breast-cancer, the second for positive-mammogram), with the number of traversals and the sampled value labeling each edge. (Because this is 1000 <em>random</em> samples, the number are close (but not exactly) those in the Gigerenzer, et al, story.) Selecting just the 106 hypothetical cases of women with a positive mammogram, and computing the fraction of those who also have breast cancer (7/106), corresponds exactly to <code>rejection-query</code>. Thus, we have used the causal representation in the above church program to manufacture frequencies which can be used to arrive at the inference that relatively few women with positive mammograms actually have breast cancer.</p>
+<p>Yet unlike the rejection sampler people are quite bad at reasoning in this scenario. Why? One answer is that people don’t represent their knowledge in quite the form of this simple church program. Indeed, <span class="citation" data-cites="Krynski2007">Krynski &amp; Tenenbaum (2007)</span> have argued that human statistical judgment is fundamentally based on conditioning more explicit causal models: they suggested that “base rate neglect” and other judgment errors may occur when people are given statistical information that cannot be easily mapped to the parameters of the causal models they intuitively adopt to describe the situation. In the above example, they suggested that the notion of a false alarm rate is not intuitive to many people—particularly when the false alarm rate is ten times higher than the base rate of the disease that the test is intended to diagnose! They showed that “base rate neglect” could be eliminated by reformulating the breast cancer problem in terms of more intuitive causal models. For example, consider their version of the breast cancer problem (the exact numbers and wording differed slightly):</p>
+<blockquote>
+<p>1% of women at age 40 who participate in a routine screening will have breast cancer. Of those with breast cancer, 80% will receive a positive mammogram. 20% of women at age 40 who participate in a routine screening will have a benign cyst. Of those with a benign cyst, 50% will receive a positive mammogram due to unusually dense tissue of the cyst. All others will receive a negative mammogram. Suppose that a woman in this age group has a positive mammography in a routine screening. What is the probability that she actually has breast cancer?</p>
+</blockquote>
+<p>This question is easy for people to answer—empirically, just as easy as the frequency-based formulation given above. We may conjecture this is because the relevant frequencies can be computed from a simple query on the following more intuitive causal model:</p>
+<pre><code>(define samples
+ (mh-query 100 100
+   (define breast-cancer (flip 0.01))
+   (define benign-cyst (flip 0.2))
+
+   (define positive-mammogram (or (and breast-cancer (flip 0.8)) (and benign-cyst (flip 0.5))))
+
+   breast-cancer
+
+   positive-mammogram
+ )
+)
+(hist samples &quot;breast cancer&quot;)</code></pre>
+<p>Because this causal model—this Church program—is more intuitive to people, they can imagine the appropriate situations, despite having been given percentages rather than frequencies. What makes this causal model more intuitive than the one above with an explicitly specified false alarm rate? Essentially we have replaced probabilistic dependencies on the “non-occurrence” of events (e.g., the dependence of a positive mammogram on <em>not</em> having breast cancer) with dependencies on explicitly specified alternative causes for observed effects (e.g., the dependence of a positive mammogram on having a benign cyst).</p>
+<p>A causal model framed in this way can scale up to significantly more complex situations. Recall our more elaborate medical diagnosis network from the previous section, which was also framed in this way using noisy-logical functions to describe the dependence of symptoms on disease:</p>
+<pre><code>(define samples
+  (mh-query 1000 100
+    (define lung-cancer (flip 0.01))
+    (define TB (flip 0.005))
+    (define cold (flip 0.2))
+    (define stomach-flu (flip 0.1))
+    (define other (flip 0.1))
+
+    (define cough (or (and cold (flip 0.5)) (and lung-cancer (flip 0.3)) (and TB (flip 0.7)) (and other (flip 0.01))))
+    (define fever (or (and cold (flip 0.3)) (and stomach-flu (flip 0.5)) (and TB (flip 0.2)) (and other (flip 0.01))))
+    (define chest-pain (or (and lung-cancer (flip 0.4)) (and TB (flip 0.5)) (and other( flip 0.01))))
+    (define shortness-of-breath (or (and lung-cancer (flip 0.4)) (and TB (flip 0.5)) (and other (flip 0.01))))
+
+    (list lung-cancer TB)
+
+    (and cough fever chest-pain shortness-of-breath)
+
+  )
+)
+(hist samples &quot;Joint inferences for lung cancer and TB&quot;)</code></pre>
+<!-- NOTE: this doesn't initialize well, because the condition is unlikely and it can't push the condition back through the refs. -->
+
+<p>You can use this model to infer conditional probabilities for any subset of diseases conditioned on any pattern of symptoms. Try varying the symptoms in the conditioning set or the diseases in the query, and see how the model’s inferences compare with your intuitions. For example, what happens to inferences about lung cancer and TB in the above model if you remove chest pain and shortness of breath as symptoms? (Why? Consider the alternative explanations.) More generally, we can condition on any set of events – any combination of symptoms and diseases – and query any others. We can also condition on the negation of an event using <code>(not ...)</code>: e.g., how does the probability of lung cancer (versus TB) change if we observe that the patient does <em>not</em> have a fever, does <em>not</em> have a cough, or does not have either symptom?</p>
+<p>A Church program thus effectively encodes the answers to a very large number of possible questions in a very compact form, where each question has the form, “Suppose we observe X, what can we infer about Y?”. In the program above, there are <span class="math">\(3^9=19683\)</span> possible simple conditioners (possible X’s) corresponding to conjunctions of events or their negations (because the program has 9 stochastic Boolean-valued functions, each of which can be observed true, observed false, or not observed). Then for each of those X’s there are a roughly comparable number of Y’s, corresponding to all the possible conjunctions of variables that can be in the query set Y, making the total number of simple questions encoded on the order of 100 million. In fact, as we will see below when we describe complex queries, the true number of possible questions encoded in just a short Church program like this one is very much larger than that; usually the set is infinite. With <code>query</code> we can in principle compute the answer to every one of these questions. We are beginning to see the sense in which probabilistic programming provides the foundations for constructing a <em>language of thought</em>, as described in the Introduction: a finite system of knowledge that compactly and efficiently supports an infinite number of inference and decision tasks.</p>
+<p>Expressing our knowledge as a probabilistic program of this form also makes it easy to add in new relevant knowledge we may acquire, without altering or interfering with what we already know. For instance, suppose we decide to consider behavioral and demographic factors that might contribute causally to whether a patient has a given disease:</p>
+<pre><code>(define samples
+  (mh-query 1000 100
+    (define works-in-hospital (flip 0.01))
+    (define smokes (flip 0.2))
+
+    (define lung-cancer (or (flip 0.01) (and smokes (flip 0.02))))
+    (define TB (or (flip 0.005) (and works-in-hospital (flip 0.01))))
+    (define cold (or (flip 0.2) (and works-in-hospital (flip 0.25))))
+    (define stomach-flu (flip 0.1))
+    (define other (flip 0.1))
+
+    (define cough (or (and cold (flip 0.5)) (and lung-cancer (flip 0.3)) (and TB (flip 0.7)) (and other (flip 0.01))))
+    (define fever (or (and cold (flip 0.3)) (and stomach-flu (flip 0.5)) (and TB (flip 0.2)) (and other (flip 0.01))))
+    (define chest-pain (or (and lung-cancer (flip 0.4)) (and TB (flip 0.5)) (and other( flip 0.01))))
+    (define shortness-of-breath (or (and lung-cancer (flip 0.4)) (and TB (flip 0.5)) (and other (flip 0.01))))
+
+   (list lung-cancer TB)
+
+   (and cough chest-pain shortness-of-breath)
+
+  )
+)
+(hist samples &quot;Joint inferences for lung cancer and TB&quot;)</code></pre>
+<p>Under this model, a patient with coughing, chest pain and shortness of breath is likely to have either lung cancer or TB. Modify the above code to see how these conditional inferences shift if you also know that the patient smokes or works in a hospital (where they could be exposed to various infections, including many worse infections than the typical person encounters). More generally, the causal structure of knowledge representation in a probabilistic program allows us to model intuitive theories that can grow in complexity continually over a lifetime, adding new knowledge without bound.</p>
+<h1 id="exercises"><a href="#exercises">Exercises</a></h1>
+<ol type="1">
+<li><p>Conditioning and prior manipulation: In the earlier <a href="generative-models.html#example-causal-models-in-medical-diagnosis">Medical Diagnosis</a> section we suggested understanding the patterns of symptoms for a particular disease by changing the prior probability of the disease such that it is always true.</p>
+<ol type="A">
+<li><p>For this example, does this procedure give the same answers as using <code>query</code> to <em>condition</em> on the disease being true?</p></li>
+<li><p>Why would this procedure give different answers than conditioning for more general hypotheticals? Construct an example where these are different. Then translate this into a Church model and show that manipulating the prior gives different answers than manipulating the observation. Hint: think about changing the prior versus observing a variable that has a causal parent.</p></li>
+</ol></li>
+<li><p>Computing marginals: Use the rules for computing probabilities to compute the marginal distribution on return values from these Church programs.</p>
+<pre data-exercise="ex2-1"><code>(rejection-query
+  (define a (flip))
+  (define b (flip))
+  a
+  (or a b))</code></pre>
+<pre data-exercise="ex2-2"><code>(rejection-query
+ (define nice (mem (lambda (person) (flip 0.7))))
+ (define (smiles person) (if (nice person) (flip 0.8) (flip 0.5)))
+ (nice &#39;alice)
+ (and (smiles &#39;alice)  (smiles &#39;bob) (smiles &#39;alice)))</code></pre></li>
+<li><p>Extending the smiles model:</p>
+<ol type="A">
+<li><p>Describe (using ordinary English) what the second Church program above means.</p></li>
+<li><p>Write a version of the model that captures these two intuitions: (1) people are more likely to smile if they want something and (2) <em>nice</em> people are less likely to want something.</p>
+<pre data-exercise="ex3-b"><code></code></pre></li>
+<li><p>Given your extended model, how would you ask whether someone wants something from you, given that they are smiling and have rarely smiled before? In your answer, show the Church query and a histogram of the answers – in what ways do these answers make intuitive sense or fail to?</p>
+<pre data-exercise="ex3-c"><code></code></pre></li>
+</ol></li>
+<li><p><strong>Casino game</strong>. Consider the following game. A machine randomly gives Bob a letter of the alphabet; it gives a, e, i, o, u, y (the vowels) with probability 0.01 each and the remaining letters (i.e., the consonants) with probability 0.047 each. The probability that Bob wins depends on which letter he got. Letting <span class="math">\(h\)</span> denote the letter and letting <span class="math">\(Q(h)\)</span> denote the numeric position of that letter (e.g., <span class="math">\(Q(\text{a}) = 1, Q(\text{b}) = 2\)</span>, and so on), the probability of winning is <span class="math">\(1/Q(h)^2\)</span>. Suppose that we observe Bob winning but we don’t know what letter he got. How can we use the observation that he won to update our beliefs about which letter he got? Let’s express this formally. Before we begin, a bit of terminology: the set of letters that Bob could have gotten, <span class="math">\(\{a, b, c, d, ..., y, z\}\)</span>, is called the <em>hypothesis space</em> – it’s our set of hypotheses about the letter.</p>
+<ol type="A">
+<li>In English, what does the posterior probability <span class="math">\(p(h \mid \text{win})\)</span> represent?</li>
+<li>Manually compute <span class="math">\(p(h \mid \text{win})\)</span> for each hypothesis (Excel or something like it is helpful here). Remember to normalize - make sure that summing all your <span class="math">\(p(h \mid \text{win})\)</span> values gives you 1.</li>
+</ol>
+<p>Now, we’re going to write this model in Church using <code>enumeration-query</code>. Here is some starter code for you:</p>
+<pre data-exercise="ex5"><code>;; define some variables and utility functions
+(define letters &#39;(a b c d e f g h i j k l m n o p q r s t u v w x y z) )
+(define (vowel? letter) (if (member letter &#39;(a e i o u y)) #t #f))
+(define letter-probabilities (map (lambda (letter) (if (vowel? letter) 0.01 0.047)) letters))
+
+(define (my-list-index needle haystack counter)
+  (if (null? haystack)
+      &#39;error
+    (if (equal? needle (first haystack))
+        counter
+      (my-list-index needle (rest haystack) (+ 1 counter)))))
+
+(define (get-position letter) (my-list-index letter letters 1))
+
+;; actually compute p(h | win)
+(define distribution
+  (enumeration-query
+   (define my-letter (multinomial letters letter-probabilities))
+
+   (define my-position (get-position my-letter))
+   (define my-win-probability (/ 1.0 (* my-position my-position)))
+   (define win? ...)
+
+   ;; query
+   ...
+
+   ;; condition
+   ...
+   ))
+
+(barplot distribution)</code></pre>
+<p>Note that you don’t use <code>hist</code> or <code>repeat</code> here. With <code>enumeration-query</code>, function calls directly correspond to <em>distributions</em> (whereas with <code>rejection-query</code> or <code>mh-query</code>, function calls correspond only to <em>samples</em> and you have to build the data for histograms manually). If you have a distribution, you call <code>barplot</code>.</p>
+<ol start="3" type="A">
+<li><p>What does the <code>my-list-index</code> function do? What would happen if you ran <code>(my-list-index 'mango '(apple banana) 1)</code>?</p></li>
+<li><p>What does the <code>multinomial</code> function do? Use <code>multinomial</code> to express this distribution:</p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;">x</th>
+<th style="text-align: left;">P(x)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">red</td>
+<td style="text-align: left;">0.5</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">blue</td>
+<td style="text-align: left;">0.05</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">green</td>
+<td style="text-align: left;">0.4</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">black</td>
+<td style="text-align: left;">0.05</td>
+</tr>
+</tbody>
+</table>
+<pre data-exercise="casino-multinomial"><code>(define x ...)</code></pre></li>
+<li><p>Fill in the <code>...</code>’s in the code to compute <span class="math">\(p(h \mid \text{win})\)</span>. Include a screenshot of the resulting graph. What letter has the highest posterior probability? In English, what does it mean that this letter has the highest posterior? Make sure that your Church answers and hand-computed answers agree – note that this demonstrates the equivalence between the program view of conditional probability and the distributional view.</p></li>
+<li><p>Which is higher, <span class="math">\(p(\text{vowel} \mid \text{win})\)</span> or <span class="math">\(p(\text{consonant} \mid \text{win})\)</span>? Answer this using the Church code you wrote (hint: use the <code>vowel?</code> function)</p></li>
+<li><p>What difference do you see between your code and the mathematical notation? What are the advantages and disadvantages of each? Which do you prefer?</p></li>
+</ol></li>
+</ol>
+<!--
+
+1. Write a church program that reproduces approximately the model from Griffiths and Tenenbaum (2006), "Optimal predictions in everyday cognition", Psychological Science.  Specifically, make a version of Figure 1, for Gaussian and Gamma priors (the Erlang is a special case of a Gamma distribution).  Your version of this figure can be discrete and approximate, using the church functions for drawing histograms of samples `(hist and density)` and line plots with discrete data points `(lineplot ...)` that are introduced in the churchserv examples on the [[Learning as Conditional Inference]] page.
+
+(a) Your basic programs should do two things: (1) Draw samples from the priors for various parameter settings (e.g., mean and variance of the Gaussian), which should approximate the top panels of Fig 1; (2) Compute the prediction function, the median of the posterior for $t_{total}$ conditioned on observing one value of $t$ sampled from between 0 and $t_{total}$, which should approximate the bottom panels of Fig 1. Plot the median posterior prediction as a function of the observed sample of $t$ for approximately 7-10 different values, enough to give a good sense of the shape of the function.
+
+(b) Modify your program for the prediction function to condition on the proposition that $t_{total}$ is greater than or equal to some observed quantity $t$, rather than taking $t$ to be a random sample from between 0 and $t_{total}$.  How does the prediction function change as a result of this modification, either qualitatively or quantitatively?  Why does it change?  (Extra credit: The appendix of Griffiths and Tenenbaum (2006) derives the prediction function in (a) analytically, using calculus.  Derive the prediction function for (b) analytically using a similar approach, and show how the two different mathematical forms derived correspond to the sampling-based approximate results that church returns.)
+
+(c) From a Bayesian viewpoint, the two different church programs described in (a) and (b) correspond to using two different likelihood functions, or observation models, with the same prior on event durations or magnitudes.  What kinds of natural learning situations would be best captured by these different likelihood function or observation models?
+-->
+
+
+<h1 id="references"><a href="#references">References</a></h1>
+<p><span style="font-variant: small-caps;">Gerstenberg2012</span>Gerstenberg, T., &amp; Goodman, N. D. (2012). Ping pong in Church: Productive use of concepts in human probabilistic inference. In <em>Proceedings of the 34th Annual Conference of the Cognitive Science Society</em>. Retrieved from <a href="http://www.stanford.edu/~ngoodman/papers/GerstenbergGoodman2012.pdf" title="http://www.stanford.edu/~ngoodman/papers/GerstenbergGoodman2012.pdf">http://www.stanford.edu/~ngoodman/papers/GerstenbergGoodman2012.pdf</a></p>
+<p><span style="font-variant: small-caps;">Gigerenzer1995</span>Gigerenzer, G., &amp; Hoffrage, U. (1995). How to improve Bayesian reasoning without instruction: Frequency formats. <em>Psychological Review</em>, <em>102</em>(4), 684.</p>
+<p>Krynski, T. R., &amp; Tenenbaum, J. B. (2007). The role of causality in judgment under uncertainty. <em>Journal of Experimental Psychology: General</em>, <em>136</em>(3), 430.</p>
+<p><span style="font-variant: small-caps;">Tversky1974</span>Tversky, A., &amp; Kahneman, D. (1974). Judgment under uncertainty: Heuristics and biases. <em>Science</em>, <em>185</em>(4157), 1124–1131.</p>
+   </div>
+</div>
+</body>
+
+<script src="scripts/after-body.js"></script>
+</html>

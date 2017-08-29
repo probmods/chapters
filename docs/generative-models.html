@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>ProbMods: Generative models</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="stylesheet" type="text/css" href="webchurch/online/css/codemirror.css">
+    <link rel="stylesheet" type="text/css" href="webchurch/online/css/d3.css">
+    <link rel="shortcut icon" href="images/favicon.ico" />
+    <script src="scripts/underscore-min.js"></script>
+    <script src="scripts/jquery.js"></script>
+    <link class="katex-include" rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.5.1/katex.min.css">
+    <script class="katex-include" src="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.5.1/katex.min.js"></script>
+    <script src="scripts/cookies-0.3.1.min.js"></script>
+    <script src="scripts/gg.js"></script>
+    <script src="scripts/nav.js"></script>
+    <script src="scripts/cosmetics.js"></script>
+    <script src="scripts/md5.js"></script>
+    <script src="webchurch/online/webchurch.min.js"></script>
+    <script src="scripts/globals.js"></script>
+    <script src="webchurch/online/vega.min.js"></script>
+    <script src="scripts/new-injector.js"></script>
+    <script src="scripts/headroom.min.js"></script>
+  </head>
+<body>
+<div id="chapter-wrapper">
+  <div id='header' class="headroom">
+    <div id='logotype'><a href="index.html">Probabilistic Models of Cognition</a></div>
+    <ul id="nav">
+      <span class="nav0"><li class="all-chapters">All chapters
+<ol start="0">
+<a href="index.html"><li class="nonum">Index</li></a>
+<a href="introduction.html"><li>Introduction</li></a>
+<a href="generative-models.html"><li>Generative models</li></a>
+<a href="conditioning.html"><li>Conditioning</li></a>
+<a href="patterns-of-inference.html"><li>Patterns of inference</li></a>
+<a href="observing-sequences.html"><li>Models for sequences of observations</li></a>
+<a href="inference-about-inference.html"><li>Inference about inference</li></a>
+<a href="inference-process.html"><li>Algorithms for inference</li></a>
+<a href="learning-as-conditional-inference.html"><li>Learning as conditional inference</li></a>
+<a href="hierarchical-models.html"><li>Hierarchical models</li></a>
+<a href="occam's-razor.html"><li>Occam's Razor</li></a>
+<a href="mixture-models.html"><li>Mixture models</li></a>
+<a href="non-parametric-models.html"><li>Non-parametric models</li></a>
+<a href="appendix-scheme.html"><li>Appendix: Scheme basics</li></a>
+<a href="webchurch/online/ref.html"><li>Church Reference</li></a>
+</ol>
+      </li></span>
+      <a class="nav0" href="/login"><li id="login-link">Login</li></a>
+      <!-- <a class="nav0" href="/profile"><li id="profile-link" style='display: none'>Profile</li></a>  -->
+      <a class="nav0" href="/logout"><li id="logout-link" style='display: none'>Logout</li></a>
+    </ul>
+    <div class="clear"></div>
+  </div>
+
+  <div id="chapter">
+<h1 id="chapter-title">2. Generative models</h1>
+<div class='toc'>
+<div class='name'>Contents:</div>
+<ul>
+<li><a href="#models-simulation-and-degrees-of-belief">Models, simulation, and degrees of belief</a></li>
+<li><a href="#building-generative-models">Building Generative Models</a><ul>
+<li><a href="#example-flipping-coins">Example: Flipping Coins</a></li>
+</ul></li>
+<li><a href="#example-causal-models-in-medical-diagnosis">Example: Causal Models in Medical Diagnosis</a></li>
+<li><a href="#prediction-simulation-and-probabilities">Prediction, Simulation, and Probabilities</a><ul>
+<li><a href="#product-rule">Product Rule</a></li>
+<li><a href="#sum-rule-or-marginalization">Sum Rule or Marginalization</a></li>
+</ul></li>
+<li><a href="#stochastic-recursion">Stochastic recursion</a></li>
+<li><a href="#persistent-randomness-mem">Persistent Randomness: <code>mem</code></a></li>
+<li><a href="#example-bayesian-tug-of-war">Example: Bayesian Tug of War</a></li>
+<li><a href="#example-intuitive-physics">Example: Intuitive physics</a></li>
+<li><a href="#exercises">Exercises</a></li>
+<li><a href="#references">References</a></li>
+</ul>
+</div>
+<script src="scripts/box2d.uglified.js"></script>
+<script src="scripts/phys.js"></script>
+<script src="scripts/plinko.js"></script>
+
+<h1 id="models-simulation-and-degrees-of-belief"><a href="#models-simulation-and-degrees-of-belief">Models, simulation, and degrees of belief</a></h1>
+<p>One view of knowledge is that the mind maintains working models of parts of the world. ‘Model’ in the sense that it captures some of the structure in the world, but not all (and what it captures need not be exactly what is in the world—just useful). ‘Working’ in the sense that it can be used to simulate this part of the world, imagining what will follow from different initial conditions. As an example take the Plinko machine: a box with uniformly spaced pegs, with bins at the bottom. Into this box we can drop marbles:</p>
+<canvas id="plinkocanvas" width="10" height="10"" style="background-color:#333333;"></canvas>
+<button id="makeplinko" onclick="plinkoinit(); $('#makeplinko').hide();">
+Set-up Plinko!
+</button>
+
+<p>The plinko machine is a ‘working model’ for many physical processes in which many small perturbations accumulate—for instance a leaf falling from a tree. It is an approximation to these systems because we use a discrete grid (the pegs) and discrete bins. Yet it is useful as a model: for instance, we can ask where we expect a marble to end up depending on where we drop it in, by running the machine several times—simulating the outcome.</p>
+<p>Simulation is intimately connected to degrees of belief. For instance, imagine that someone has dropped a marble into the plinko machine; before looking at the outcome, you can probably report how much you believe that the ball has landed in each possible bin. Indeed, if you run the plinko machine many times, you will see a shape emerge in the bins. The number of balls in a bin gives you some idea how much you should expect a new marble to end up there. This ‘shape of expected outcomes’ can be formalized as a probability distribution (described below). Indeed, there is an intimate connection between simulation and probability, which we explore in the rest of this section.</p>
+<p>There is one more thing to note about our Plinko machine above: we are using a computer program to <em>simulate</em> the simulation. Computers can be seen as universal simulators. How can we, clearly and precisely, describe the simulation we want a computer to do?</p>
+<h1 id="building-generative-models"><a href="#building-generative-models">Building Generative Models</a></h1>
+<p>We wish to describe in formal terms how to generate states of the world. That is, we wish to describe the causal process, or steps that unfold, leading to some potentially observable states. The key idea of this section is that these generative processes can be described as <em>computations</em>—computations that involve random choices to capture uncertainty about the process.</p>
+<p>As our formal model of computation we start with the <span class="math">\(\lambda\)</span>-calculus, and its embodiment in the LISP family of programming languages. The <span class="math">\(\lambda\)</span>-calculus is a formal system which was invented by Alonzo Church in 1936 as a way of formalizing the notion of an effectively computable function <span class="citation" data-cites="Church1936">(Church, 1936)</span>. The <span class="math">\(\lambda\)</span>-calculus has only two basic operations for computing: creating and applying functions. Despite this simplicity, it is a <em>universal</em> model of computation—it is (conjectured to be) equivalent to all other notions of classical computation. (The <span class="math">\(\lambda\)</span>-calculus was shown to have the same computational power as the Turing machine, and vice versa, by Alan Turing in his famous paper which introduced the Turing machine <span class="citation" data-cites="Turing1937">(Turing, 1937)</span>).</p>
+<p>In 1958 John McCarthy introduced LISP (<strong>LIS</strong>t <strong>P</strong>rocessing), a programming language based on the <span class="math">\(\lambda\)</span>-calculus. Scheme is a variant of LISP developed by Guy L. Steele and Gerald Jay Sussman with particularly simple syntax and semantics. We will use Scheme-style notation for the <span class="math">\(\lambda\)</span>-calculus in this tutorial. For a quick introduction to programming in Scheme see <a href="appendix-scheme.html">the appendix on Scheme basics</a>. The Church programming language <span class="citation" data-cites="Goodman2008">(N. Goodman, Mansinghka, Roy, Bonawitz, &amp; Tenenbaum, 2008)</span>, named in honor of Alonzo Church, is a generalization of Scheme which introduces the notion of probabilistic computation to the language. This addition results in a powerful language for describing generative models.</p>
+<p>In Church, in addition to deterministic functions, we have a set of random functions implementing <em>random choices.</em> These random primitive functions are called <em>Exchangeable Random Primitives</em> (XRPs). Application of an XRP results in a <em>sample</em> from the probability distribution defined by that XRP. For example, the simplest XRP is <code>flip</code> which results in either true or false – it simulates a (possibly biased) coin toss. (Note that the return values <code>true</code> and <code>false</code> will look like this in the output: <code>#t</code> and <code>#f</code>.)</p>
+<pre><code>(flip)</code></pre>
+<p>Run this program a few times. You will get back a different sample on each execution. Also, notice the parentheses around <code>flip</code>. These are meaningful; they tell Church that you are asking for an application of the XRP <code>flip</code>—resulting in a sample. Without parentheses <code>flip</code> is a <em>procedure</em> object—a representation of the simulator itself, which can be used to get samples.</p>
+<p>In Church, each time you run a program you get a <em>sample</em> by simulating the computations and random choices that the program specifies. If you run the program many times, and collect the values in a histogram, you can see what a typical sample looks like:</p>
+<pre><code>(hist (repeat 1000 flip) &quot;Flips&quot;)</code></pre>
+<p>Here we have used the <code>repeat</code> procedure which takes a number of repetitions, <span class="math">\(K\)</span>, and a random distribution (in this case <code>flip</code>) and returns a list of <span class="math">\(K\)</span> samples from that distribution. We have used the <code>hist</code> procedure to display the results of taking 1000 samples from <code>flip</code>. As you can see, the result is an approximately uniform distribution over <code>true</code> and <code>false</code>.</p>
+<p>An important idea here is that <code>flip</code> can be thought of in two different ways. From one perspective, <code>flip</code> is a procedure which returns a sample from a fair coin. That is, it’s a <em>sampler</em> or <em>simulator</em>. From another perspective, <code>flip</code> is <em>itself</em> a characterization of the distribution over <code>true</code> and <code>false</code>. When we think about probabilistic programs we will often move back and forth between these two views, emphasizing either the sampling perspective or the distributional perspective. (With suitable restrictions this duality is complete: any Church program implicitly represents a distribution and any distribution can be represented by a Church program; see e.g. <span class="citation" data-cites="Ackerman2011">Ackerman, Freer, &amp; Roy (2011)</span> for more details on this duality.) We return to this relationship between probability and simulation below.</p>
+<p>The <code>flip</code> function is the simplest XRP in Church, but you will find other XRPs corresponding to familiar probability distributions, such as <code>gaussian</code>, <code>gamma</code>, <code>dirichlet</code>, and so on. <!-- TODO: Many but not all of the XRPs and other basic functions implemented in Church can be found on the church reference appendix. --> Using these XRPs we can construct more complex expressions that describe more complicated sampling processes. For instance here we describe a process that samples a number by multiplying two samples from a gaussian distribution:</p>
+<pre><code>(* (gaussian 0 1) (gaussian 0 1) )</code></pre>
+<p>What if we want to invoke this sampling process multiple times? We would like to construct a stochastic function that multiplies two Gaussians each time it is called. We can use <code>lambda</code> to construct such complex stochastic functions from the primitive ones.</p>
+<pre><code>(define two-gaussians (lambda () (* (gaussian 0 1) (gaussian 0 1) )))
+(density (repeat 100 two-gaussians))</code></pre>
+<p>A lambda expression with an empty argument list, <code>(lambda () ...)</code>, is called a <em>thunk</em>: this is a function that takes no input arguments. If we apply a thunk (to no arguments!) we get a return value back, for example <code>(flip)</code>. A thunk is an object that represents a whole <em>probability distribution</em>. Complex functions can also have arguments. Here is a stochastic function that will only sometimes double its input:</p>
+<pre><code>(define noisy-double (lambda (x) (if (flip) x (+ x x))))
+
+(noisy-double 3)</code></pre>
+<p>By using higher-order functions we can construct and manipulate probability distributions. A good example comes from coin flipping…</p>
+<h2 id="example-flipping-coins"><a href="#example-flipping-coins">Example: Flipping Coins</a></h2>
+<p>The following program defines a fair coin, and flips it 20 times:</p>
+<pre><code>(define fair-coin (lambda () (if (flip 0.5) &#39;h &#39;t))) ;the thunk is a fair coin
+
+(hist (repeat 20 fair-coin) &quot;fair coin&quot;)</code></pre>
+<p>This program defines a “trick” coin that comes up heads most of the time (95%), and flips it 20 times:</p>
+<pre><code>(define trick-coin (lambda () (if (flip 0.95) &#39;h &#39;t)))
+
+(hist (repeat 20 trick-coin) &quot;trick coin&quot;)</code></pre>
+<!-- TODO: do something with this??
+<style classes="bg-yellow">
+<em>Note on Church syntax:</em>
+
+A common mistake when defining names for new functions and using them with higher-order functions like `repeat` is to confuse the name of a thunk with the name of a variable that stands for the output of a single function evaluation.  For instance, why doesn't this work?
+
+~~~~
+(define trick-coin-1 (if (flip 0.95) 'h 't))
+(hist (repeat 20 trick-coin-1) "trick coin")
+~~~~
+The higher-order function `repeat` requires as input a thunk, a procedure (or function) with no arguments, as returned by `lambda` in the examples above.  Consider the difference in what is returned by these two code fragments:
+
+~~~~
+(define trick-coin-1 (if (flip 0.95) 'h 't))
+trick-coin-1
+~~~~
+`trick-coin-1` names a variable that is defined to be the result of evaluating the `(if ...)` expression a single time (either `h` or `t`), while below `trick-coin-2` names a thunk that can serve as the input to the higher-order function `repeat`.
+
+~~~~
+(define trick-coin-2 (lambda () (if (flip 0.95) 'h 't)))
+trick-coin-2
+~~~~
+The difference between these two programs becomes particularly subtle when using the `(define (name) ... )` syntax.  Simply putting the name to be defined in parentheses turns a variable definition into a thunk definition:
+
+~~~~
+(define (trick-coin-2) (if (flip 0.95) 'h 't))
+trick-coin-2
+~~~~
+To Church the last two definitions of `trick-coin-2` are the same -- both output a thunk -- although superficially the last one looks more similar to the variable definition that assigns `trick-coin-1` to a single value of `h` or `t`.
+</style>
+-->
+
+<p>The higher-order function <code>make-coin</code> takes in a weight and outputs a function (a thunk) describing a coin with that weight. Then we can use <code>make-coin</code> to make the coins above, or others.</p>
+<pre><code>(define (make-coin weight) (lambda () (if (flip weight) &#39;h &#39;t)))
+(define fair-coin (make-coin 0.5))
+(define trick-coin (make-coin 0.95))
+(define bent-coin (make-coin 0.25))
+
+(hist (repeat 20 fair-coin) &quot;20 fair coin flips&quot;)
+(hist (repeat 20 trick-coin) &quot;20 trick coin flips&quot;)
+(hist (repeat 20 bent-coin) &quot;20 bent coin flips&quot;)</code></pre>
+<p>We can also define a higher-order function that takes a “coin” and “bends it”:</p>
+<pre><code>(define (make-coin weight) (lambda () (if (flip weight) &#39;h &#39;t)))
+(define (bend coin)
+  (lambda () (if (equal? (coin) &#39;h)
+                 ( (make-coin 0.7) )
+                 ( (make-coin 0.1) ) )))
+
+(define fair-coin (make-coin 0.5))
+(define bent-coin (bend fair-coin))
+
+(hist (repeat 100 bent-coin) &quot;bent coin&quot;)</code></pre>
+<p>Make sure you understand how the <code>bend</code> function works! Why are there an “extra” pair of parentheses outside each <code>make-coin</code> statement?</p>
+<p>Higher-order functions like <code>repeat</code>, <code>map</code>, and <code>apply</code> can be quite useful. Here we use them to visualize the number of heads we expect to see if we flip a weighted coin (weight = 0.8) 10 times. We’ll repeat this experiment 1000 times and then use <code>hist</code> to visualize the results. Try varying the coin weight or the number of repetitions to see how the expected distribution changes.</p>
+<pre><code>(define make-coin (lambda (weight) (lambda () (flip weight))))
+(define coin (make-coin 0.8))
+
+(define data (repeat 1000 (lambda () (sum (map (lambda (x) (if x 1 0)) (repeat 10 coin))))))
+(hist data  &quot;Distribution of coin flips&quot;)</code></pre>
+<h1 id="example-causal-models-in-medical-diagnosis"><a href="#example-causal-models-in-medical-diagnosis">Example: Causal Models in Medical Diagnosis</a></h1>
+<p>Generative knowledge is often <em>causal</em> knowledge that describes how events or states of the world are related to each other. As an example of how causal knowledge can be encoded in Church expressions, consider a simplified medical scenario:</p>
+<pre><code>(define lung-cancer (flip 0.01))
+(define cold (flip 0.2))
+
+(define cough (or cold lung-cancer))
+
+cough</code></pre>
+<p>This program models the diseases and symptoms of a patient in a doctor’s office. It first specifies the base rates of two diseases the patient could have: lung cancer is rare while a cold is common, and there is an independent chance of having each disease. The program then specifies a process for generating a common symptom of these diseases – an effect with two possible causes: The patient coughs if they have a cold or lung cancer (or both).</p>
+<p>Here is a more complex version of this causal model:</p>
+<pre><code>(define lung-cancer (flip 0.01))
+(define TB (flip 0.005))
+(define stomach-flu (flip 0.1))
+(define cold (flip 0.2))
+(define other (flip 0.1))
+
+(define cough
+  (or (and cold (flip 0.5))
+      (and lung-cancer (flip 0.3))
+      (and TB (flip 0.7))
+      (and other (flip 0.01))))
+
+
+(define fever
+  (or (and cold (flip 0.3))
+      (and stomach-flu (flip 0.5))
+      (and TB (flip 0.1))
+      (and other (flip 0.01))))
+
+
+(define chest-pain
+  (or (and lung-cancer (flip 0.5))
+      (and TB (flip 0.5))
+      (and other (flip 0.01))))
+
+(define shortness-of-breath
+  (or (and lung-cancer (flip 0.5))
+      (and TB (flip 0.2))
+      (and other (flip 0.01))))
+
+(list &quot;cough&quot; cough
+      &quot;fever&quot; fever
+      &quot;chest-pain&quot; chest-pain
+      &quot;shortness-of-breath&quot; shortness-of-breath)</code></pre>
+<p>Now there are four possible diseases and four symptoms. Each disease causes a different pattern of symptoms. The causal relations are now probabilistic: Only some patients with a cold have a cough (50%), or a fever (30%). There is also a catch-all disease category “other”, which has a low probability of causing any symptom. <em>Noisy logical</em> functions, or functions built from <code>and</code>, <code>or</code>, and <code>flip</code>, provide a simple but expressive way to describe probabilistic causal dependencies between Boolean (true-false valued) variables.</p>
+<p>When you run the above code, the program generates a list of symptoms for a hypothetical patient. Most likely all the symptoms will be false, as (thankfully) each of these diseases is rare. Experiment with running the program multiple times. Now try modifying the <code>define</code> statement for one of the diseases, setting it to be true, to simulate only patients known to have that disease. For example, replace <code>(define lung-cancer (flip 0.01))</code> with <code>(define lung-cancer true)</code>. Run the program several times to observe the characteristic patterns of symptoms for that disease.</p>
+<h1 id="prediction-simulation-and-probabilities"><a href="#prediction-simulation-and-probabilities">Prediction, Simulation, and Probabilities</a></h1>
+<p>Suppose that we flip two fair coins, and return the list of their values:</p>
+<pre><code>(list (flip) (flip))</code></pre>
+<p>How can we predict the return value of this program? For instance, how likely is it that we will see <code>(#t #f)</code>? A <strong>probability</strong> is a number between 0 and 1 that expresses the answer to such a question: it is a degree of belief that we will see a given outcome, such as <code>(#t #f)</code>. The probability of an event <span class="math">\(A\)</span> (such as the above program returning <code>(#t #f)</code>) is usually written as: <span class="math">\(P(A)\)</span>.</p>
+<p>As we did above, we can sample many times and examine the histogram of return values:</p>
+<pre><code>(define (random-pair) (list (flip) (flip)))
+
+(hist (repeat 1000 random-pair) &quot;return values&quot;)</code></pre>
+<p>We see by examining this histogram that <code>(#t #f)</code> comes out about 25% of the time. We may define the <strong>probability</strong> of a return value to be the fraction of times (in the long run) that this value is returned from evaluating the program – then the probability of <code>(#t #f)</code> from the above program is 0.25.</p>
+<p>Even for very complicated programs we can predict the probability of different outcomes by simulating (sampling from) the program. It is also often useful to compute these probabilities directly by reasoning about the sampling process.</p>
+<h2 id="product-rule"><a href="#product-rule">Product Rule</a></h2>
+<p>In the above example we take three steps to compute the output value: we sample from the first <code>(flip)</code>, then from the second, then we make a list from these values. To make this more clear let us re-write the program as:</p>
+<pre><code>(define A (flip))
+(define B (flip))
+(define C (list A B))
+C</code></pre>
+<p>We can directly observe (as we did above) that the probability of <code>#t</code> for <code>A</code> is 0.5, and the probability of <code>#f</code> from <code>B</code> is 0.5. Can we use these two probabilities to arrive at the probability of 0.25 for the overall outcome <code>C</code> = <code>(#t #f)</code>? Yes, using the <em>product rule</em> of probabilities: The probability of two random choices is the product of their individual probabilities. The probability of several random choices together is often called the <em>joint probability</em> and written as <span class="math">\(P(A,B)\)</span>. Since the first and second random choices must each have their specified values in order to get <code>(#t #f)</code> in the example, the joint probability is their product: 0.25.</p>
+<p>We must be careful when applying this rule, since the probability of a choice can depend on the probabilities of previous choices. For instance, compute the probability of <code>(#t #f)</code> resulting from this program:</p>
+<pre><code>(define A (flip))
+(define B (flip (if A 0.3 0.7)))
+(list A B)</code></pre>
+<p>In general, the joint probability of two random choices <span class="math">\(A\)</span> and <span class="math">\(B\)</span> made sequentially, in that order, can be written as <span class="math">\(P(A,B) = P(A) P(B|A)\)</span>. This is read as the product of the probability of <span class="math">\(A\)</span> and the probability of “<span class="math">\(B\)</span> given <span class="math">\(A\)</span>”, or “<span class="math">\(B\)</span> conditioned on <span class="math">\(A\)</span>”—that is, the probability of making choice <span class="math">\(B\)</span> given that choice <span class="math">\(A\)</span> has been made in a certain way. Only when the second choice does not depend on (or “look at”) the first choice does this expression reduce to a simple product of the probabilities of each choice individually: <span class="math">\(P(A,B) = P(A) P(B)\)</span>.</p>
+<p>What is the relation between <span class="math">\(P(A,B)\)</span> and <span class="math">\(P(B,A)\)</span>, the joint probability of the same choices written in the opposite order? The only logically consistent definitions of probability require that these two probabilities be equal, so <span class="math">\(P(A) P(B|A) = P(B) P(A|B)\)</span>. This is the basis of <em>Bayes’ theorem</em>, which we will encounter later. <!--For more see [[The Meaning of Probabilistic Programs]].--></p>
+<h2 id="sum-rule-or-marginalization"><a href="#sum-rule-or-marginalization">Sum Rule or Marginalization</a></h2>
+<p>Now let’s consider an example where we can’t determine from the overall return value the sequence of random choices that were made:</p>
+<pre><code>(or (flip) (flip))</code></pre>
+<p>We can sample from this program and determine that the probability of returning <code>#t</code> is about 0.75.</p>
+<p>We cannot simply use the product rule to determine this probability because we don’t know the sequence of random choices that led to this return value. However we can notice that the program will return true if the two component choices are <code>#t,#t</code>, or <code>#t,#f</code>, or <code>#f,#t</code>. To combine these possibilities we use another rule for probabilities: If there are two alternative sequences of choices that lead to the same return value, the probability of this return value is the sum of the probabilities of the sequences. We can write this using probability notation as: <span class="math">\(P(A) = \sum_{B} P(A,B)\)</span>, where we view <span class="math">\(A\)</span> as the final value and <span class="math">\(B\)</span> as a random choice on the way to that value. Using the product rule we can determine that the probability in the example above is 0.25 for each sequence that leads to return value <code>#t</code>, then, by the sum rule, the probability of <code>#t</code> is 0.25+0.25+0.25=0.75.</p>
+<p>Using the sum rule to compute the probability of a final value is called <em>marginalization</em>. From the point of view of sampling processes marginalization is simply ignoring (or not looking at) intermediate random values that are created on the way to a final return value. From the point of view of directly computing probabilities, marginalization is summing over all the possible “histories” that could lead to a return value. Putting the product and sum rules together, the marginal probability of return values from a program that we have explored above is the sum over sampling histories of the product over choice probabilities—a computation that can quickly grow unmanageable, but can be approximated by sampling.</p>
+<h1 id="stochastic-recursion"><a href="#stochastic-recursion">Stochastic recursion</a></h1>
+<p><a href="appendix-scheme.html#recursion">Recursive functions</a> are a powerful way to structure computation in deterministic systems. In Church it is possible to have a <em>stochastic</em> recursion that randomly decides whether to stop. For example, the <em>geometric distribution</em> is a probability distribution over the non-negative integers. We imagine flipping a (weighted) coin, returning <span class="math">\(N-1\)</span> if the first <code>true</code> is on the Nth flip (that is, we return the number of times we get <code>false</code> before our first <code>true</code>):</p>
+<pre><code>(define (geometric p)
+  (if (flip p)
+      0
+      (+ 1 (geometric p))))
+
+(hist (repeat 1000 (lambda () (geometric 0.6))) &quot;Geometric of 0.6&quot;)</code></pre>
+<p>There is no upper bound on how long the computation can go on, although the probability of reaching some number declines quickly as we go. Indeed, stochastic recursions must be constructed to halt eventually (with probability 1).</p>
+<h1 id="persistent-randomness-mem"><a href="#persistent-randomness-mem">Persistent Randomness: <code>mem</code></a></h1>
+<p>It is often useful to model a set of objects that each have a randomly chosen property. For instance, describing the eye colors of a set of people:</p>
+<pre><code>(define (eye-color person) (uniform-draw &#39;(blue green brown)))
+
+(list
+ (eye-color &#39;bob)
+ (eye-color &#39;alice)
+ (eye-color &#39;bob) )</code></pre>
+<p>The results of this generative process are clearly wrong: Bob’s eye color can change each time we ask about it! What we want is a model in which eye color is random, but <em>persistent.</em> We can do this using another Church primitive: <code>mem</code>. <code>mem</code> is a higher order function that takes a procedure and produces a <em>memoized</em> version of the procedure. When a stochastic procedure is memoized, it will sample a random value the <em>first</em> time it is used for some arguments, but return that same value when called with those arguments thereafter. The resulting memoized procedure has a persistent value within each “run” of the generative model (or simulated world). For instance consider the equality of two flips, and the equality of two memoized flips:</p>
+<pre><code>(equal? (flip) (flip))</code></pre>
+<pre><code>(define mem-flip (mem flip))
+(equal? (mem-flip) (mem-flip))</code></pre>
+<p>Now returning to the eye color example, we can represent the notion that eye color is random, but each person has a fixed eye color.</p>
+<pre><code>(define eye-color
+  (mem (lambda (person) (uniform-draw &#39;(blue green brown)))))
+
+(list
+ (eye-color &#39;bob)
+ (eye-color &#39;alice)
+ (eye-color &#39;bob) )</code></pre>
+<p>This type of modeling is called <em>random world</em> style <span class="citation" data-cites="Mcallester2008">(McAllester, Milch, &amp; Goodman, 2008)</span>. Note that we don’t have to specify ahead of time the people whose eye color we will ask about: the distribution on eye colors is implicitly defined over the infinite set of possible people, but only constructed “lazily” when needed. Memoizing stochastic functions thus provides a powerful toolkit to represent and reason about an unbounded set of properties of an unbounded set of objects. For instance, here we define a function <code>flip-n</code> that encodes the outcome of the <span class="math">\(n\)</span>th flip of a particular coin:</p>
+<pre><code>(define flip-n (mem (lambda (n) (flip))))
+(list (list (flip-n 1) (flip-n 12) (flip-n 47) (flip-n 1548))
+      (list (flip-n 1) (flip-n 12) (flip-n 47) (flip-n 1548)))</code></pre>
+<p>There are a countably infinite number of such flips, each independent of all the others. The outcome of each, once determined, will always have the same value.</p>
+<!--
+Here we define a function that encodes the outcome of the $n$th flip
+of the $m$th coin, a doubly infinite set of properties:
+
+~~~~
+(define flip-n-coin-m (mem (lambda (n m) (flip))))
+(list (list (flip-n-coin-m 1 1) (flip-n-coin-m 12 1) (flip-n-coin-m 1 47) (flip-n-coin-m 12 47))
+      (list (flip-n-coin-m 1 3) (flip-n-coin-m 12 3) (flip-n-coin-m 1 47) (flip-n-coin-m 12 47)))
+~~~~
+-->
+
+<p>In computer science memoization is an important technique for optimizing programs by avoiding repeated work. In the probabilistic setting, such as in Church, memoization actually affects the meaning of the memoized function.</p>
+<h1 id="example-bayesian-tug-of-war"><a href="#example-bayesian-tug-of-war">Example: Bayesian Tug of War</a></h1>
+<p>Imagine a game of tug of war, where each person may be strong or weak, and may be lazy or not on each match. If a person is lazy they only pull with half their strength. The team that pulls hardest will win. We assume that strength is a continuous property of an individual, and that on any match, each person has a 25% chance of being lazy. This Church program runs a tournament between several teams, mixing up players across teams. Can you guess who is strong or weak, looking at the tournament results?</p>
+<pre><code>(define strength (mem (lambda (person) (gaussian 0 1))))
+
+(define lazy (lambda (person) (flip 0.25)))
+
+(define (pulling person)
+  (if (lazy person) (/ (strength person) 2) (strength person)))
+
+(define (total-pulling team)
+  (sum (map pulling team)))
+
+(define (winner team1 team2) (if (&lt; (total-pulling team1) (total-pulling team2)) team2 team1))
+
+(list &quot;Tournament results:&quot;
+      (winner &#39;(alice bob) &#39;(sue tom))
+      (winner &#39;(alice bob) &#39;(sue tom))
+      (winner &#39;(alice sue) &#39;(bob tom))
+      (winner &#39;(alice sue) &#39;(bob tom))
+      (winner &#39;(alice tom) &#39;(bob sue))
+      (winner &#39;(alice tom) &#39;(bob sue)))
+</code></pre>
+<p>Notice that <code>strength</code> is memoized because this is a property of a person true across many matches, while <code>lazy</code> isn’t. Each time you run this program, however, a new “random world” will be created: people’s strengths will be randomly re-generated, then used in all the matches.</p>
+<h1 id="example-intuitive-physics"><a href="#example-intuitive-physics">Example: Intuitive physics</a></h1>
+<p>Humans have a deep intuitive understanding of everyday physics—this allows us to make furniture, appreciate sculpture, and play baseball. How can we describe this intuitive physics? One approach is to posit that humans have a generative model that captures key aspects of real physics, though perhaps with approximations and noise. This mental physics simulator could for instance approximate Newtonian mechanics, allowing us to imagine the future state of a collection of (rigid) bodies. We have included such a 2-dimensional physics simulator, the function <code>runPhysics</code>, that takes a collection of physical objects and runs physics ‘forward’ by some amount of time. (We also have <code>animatePhysics</code>, which does the same, but gives us an animation to see what is happening.) We can use this to imagine the outcome of various initial states, as in the Plinko machine example above:</p>
+<pre><code>(define (dim) (uniform 5 20))
+(define (staticDim) (uniform 10 50))
+(define (shape) (if (flip) &quot;circle&quot; &quot;rect&quot;))
+(define (xpos) (uniform 100 (- worldWidth 100)))
+(define (ypos) (uniform 100 (- worldHeight 100)))
+
+; an object in the word is a list of two things:
+;  shape properties: a list of SHAPE (&quot;rect&quot; or &quot;circle&quot;), IS_STATIC (#t or #f),
+;                    and dimensions (either (list WIDTH HEIGHT) for a rect or
+;                    (list RADIUS) for a circle
+;  position: (list X Y)
+(define (makeFallingShape) (list (list (shape) #f (list (dim) (dim)))
+                                       (list (xpos) 0)))
+
+(define (makeStaticShape) (list (list (shape) #t (list (staticDim) (staticDim)))
+                                      (list (xpos) (ypos))))
+
+(define ground (list (list &quot;rect&quot; #t (list worldWidth 10))
+                                     (list (/ worldWidth 2) worldHeight)))
+(define fallingWorld (list ground
+                           (makeFallingShape) (makeFallingShape) (makeFallingShape)
+                           (makeStaticShape) (makeStaticShape)))
+
+(animatePhysics 1000 fallingWorld)</code></pre>
+<p>There are many judgments that you could imagine making with such a physics simulator. <span class="citation" data-cites="Hamrick2011">Hamrick, Battaglia, &amp; Tenenbaum (2011)</span> have explored human intuitions about the stability of block towers. Look at several different random block towers; first judge whether you think the tower is stable, then simulate to find out if it is:</p>
+<pre><code>(define xCenter (/ worldWidth 2))
+(define (getWidth worldObj) (first (third (first worldObj))))
+(define (getHeight worldObj) (second (third (first worldObj))))
+(define (getX worldObj) (first (second worldObj)))
+(define (getY worldObj) (second (second worldObj)))
+
+(define ground (list (list &quot;rect&quot; #t (list worldWidth 10))
+                     (list (/ worldWidth 2) worldHeight)))
+
+(define (dim) (uniform 10 50))
+
+(define (xpos prevBlock)
+  (define prevW (getWidth prevBlock))
+  (define prevX (getX prevBlock))
+  (uniform (- prevX prevW) (+ prevX prevW)))
+
+(define (ypos prevBlock h)
+  (define prevY (getY prevBlock))
+  (define prevH (getHeight prevBlock))
+  (- prevY prevH h))
+
+(define (addBlock prevBlock first?)
+  (define w (dim))
+  (define h (dim))
+  (list (list &quot;rect&quot; #f (list w h))
+        (list (if first? xCenter (xpos prevBlock)) (ypos prevBlock h))))
+
+(define (makeTowerWorld)
+  (define firstBlock (addBlock ground #t))
+  (define secondBlock (addBlock firstBlock #f))
+  (define thirdBlock (addBlock secondBlock #f))
+  (define fourthBlock (addBlock thirdBlock #f))
+  (define fifthBlock (addBlock fourthBlock #f))
+  (list ground firstBlock secondBlock thirdBlock fourthBlock fifthBlock))
+
+(animatePhysics 1000 (makeTowerWorld))</code></pre>
+<p>Were you often right? Were there some cases of ‘surprisingly stable’ towers? <span class="citation" data-cites="Hamrick2011">Hamrick et al. (2011)</span> account for these cases by positing that people are not entirely sure where the blocks are initially (perhaps due to noise in visual perception). Thus our intuitions of stability are really stability given noise (or the expected stability marginalizing over slightly different initial configurations). We can realize this measure of stability as:</p>
+<pre><code>(define (getWidth worldObj) (first (third (first worldObj))))
+(define (getHeight worldObj) (second (third (first worldObj))))
+(define (getX worldObj) (first (second worldObj)))
+(define (getY worldObj) (second (second worldObj)))
+(define (static? worldObj) (second (first worldObj)))
+
+(define ground
+  (list (list &quot;rect&quot; #t (list worldWidth 10)) (list (/ worldWidth 2) (+ worldHeight 6))))
+
+(define stableWorld
+  (list ground (list (list &#39;rect #f (list 60 22)) (list 175 473))
+        (list (list &#39;rect #f (list 50 38)) (list 159.97995044874122 413))
+        (list (list &#39;rect #f (list 40 35)) (list 166.91912737427202 340))
+        (list (list &#39;rect #f (list 30 29)) (list 177.26195677111082 276))
+        (list (list &#39;rect #f (list 11 17)) (list 168.51354470809122 230))))
+
+(define almostUnstableWorld
+  (list ground (list (list &#39;rect #f (list 24 22)) (list 175 473))
+        (list (list &#39;rect #f (list 15 38)) (list 159.97995044874122 413))
+        (list (list &#39;rect #f (list 11 35)) (list 166.91912737427202 340))
+        (list (list &#39;rect #f (list 11 29)) (list 177.26195677111082 276))
+        (list (list &#39;rect #f (list 11 17)) (list 168.51354470809122 230))))
+
+(define unstableWorld
+  (list ground (list (list &#39;rect #f (list 60 22)) (list 175 473))
+        (list (list &#39;rect #f (list 50 38)) (list 90 413))
+        (list (list &#39;rect #f (list 40 35)) (list 140 340))
+        (list (list &#39;rect #f (list 10 29)) (list 177.26195677111082 276))
+        (list (list &#39;rect #f (list 50 17)) (list 140 230))))
+
+(define (doesTowerFall initialW finalW)
+  ;y position is 0 at the TOP of the screen
+  (define (highestY world) (apply min (map getY world)))
+  (define eps 1) ;things might move around a little, but within 1 pixel is close
+  (define (approxEqual a b) (&lt; (abs (- a b)) eps))
+  (not (approxEqual (highestY initialW) (highestY finalW))))
+
+(define (noisify world)
+  (define (xNoise worldObj)
+    (define noiseWidth 10) ;how many pixels away from the original xpos can we go?
+    (define (newX x) (uniform (- x noiseWidth) (+ x noiseWidth)))
+    (if (static? worldObj)
+        worldObj
+        (list (first worldObj)
+              (list (newX (getX worldObj)) (getY worldObj)))))
+  (map xNoise world))
+
+(define (runStableTower)
+  (define initialWorld (noisify stableWorld))
+  (define finalWorld (runPhysics 1000 initialWorld))
+  (doesTowerFall initialWorld finalWorld))
+
+(define (runAlmostUnstableTower)
+  (define initialWorld (noisify almostUnstableWorld))
+  (define finalWorld (runPhysics 1000 initialWorld))
+  (doesTowerFall initialWorld finalWorld))
+
+(define (runUnstableTower)
+  (define initialWorld (noisify unstableWorld))
+  (define finalWorld (runPhysics 1000 initialWorld))
+  (doesTowerFall initialWorld finalWorld))
+
+(hist (repeat 10 runStableTower) &quot;stable&quot;)
+(hist (repeat 10 runAlmostUnstableTower) &quot;almost unstable&quot;)
+(hist (repeat 10 runUnstableTower) &quot;unstable&quot;)
+
+;uncomment any of these that you&#39;d like to see for yourself
+;(animatePhysics 1000 stableWorld)
+;(animatePhysics 1000 almostUnstableWorld)
+;(animatePhysics 1000 unstableWorld)</code></pre>
+<h1 id="exercises"><a href="#exercises">Exercises</a></h1>
+<ol type="1">
+<li><p>Here are three Church programs:</p>
+<pre data-exercise="ex1-1"><code>(if (flip) (flip 0.7) (flip 0.1))</code></pre>
+<pre data-exercise="ex1-2"><code>(flip (if (flip) 0.7 0.1))</code></pre>
+<pre data-exercise="ex1-3"><code>(flip 0.4)</code></pre>
+<ol type="a">
+<li><p>Show that the marginal distribution on return values for these three programs is the same by directly computing the probability using the rules of probability (hint: write down each possible history of random choices for each program). Check your answers by sampling from the programs.</p></li>
+<li><p>Explain why these different-looking programs can give the same results.</p></li>
+</ol></li>
+<li><p>Explain why (in terms of the evaluation process) these two programs give different answers (i.e. have different distributions on return values):</p></li>
+</ol>
+<pre data-exercise="ex2-1"><code>(define foo (flip))
+(list foo foo foo)</code></pre>
+<pre data-exercise="ex2-2"><code>(define (foo) (flip))
+(list (foo) (foo) (foo))</code></pre>
+<ol start="3" type="1">
+<li>In the simple medical diagnosis example we imagined a generative process for the diseases and symptoms of a single patient. If we wanted to represent the diseases of many patients we might have tried to make each disease and symptom into a ‘’function’’ from a person to whether they have that disease, like this:</li>
+</ol>
+<pre data-exercise="ex3"><code>(define (lung-cancer person)  (flip 0.01))
+(define (cold person)  (flip 0.2))
+
+(define (cough person) (or (cold person) (lung-cancer person)))
+
+(list  (cough &#39;bob) (cough &#39;alice))</code></pre>
+<p>Why doesn’t this work correctly if we try to do the same thing for the more complex medical diagnosis example? How could we fix it?</p>
+<ol start="4" type="1">
+<li>Work through the evaluation process for the <code>bend</code> higher-order function in this example:</li>
+</ol>
+<pre data-exercise="ex4"><code>(define (make-coin weight) (lambda () (if (flip weight) &#39;h &#39;t)))
+(define (bend coin)
+  (lambda () (if (equal? (coin) &#39;h)
+                 ( (make-coin 0.7) )
+                 ( (make-coin 0.1) ) )))
+
+(define fair-coin (make-coin 0.5))
+(define bent-coin (bend fair-coin))
+
+(hist (repeat 100 bent-coin) &quot;bent coin&quot;)</code></pre>
+<p>Directly compute the probability of the bent coin in the example. Check your answer by comparing to the histogram of many samples.</p>
+<ol start="5" type="1">
+<li><p>Here is a modified version of the tug of war game. Instead of drawing strength from the continuous Gaussian distribution, strength is either 5 or 10 with equal probability. Also the probability of laziness is changed from 1/4 to 1/3. Here are four expressions you could evaluate using this modified model:</p>
+<pre data-exercise="ex5"><code>(define strength (mem (lambda (person) (if (flip) 5 10))))
+
+(define lazy (lambda (person) (flip (/ 1 3))))
+
+(define (total-pulling team)
+  (sum
+   (map (lambda (person) (if (lazy person) (/ (strength person) 2) (strength person)))
+        team)))
+
+(define (winner team1 team2) (if (&lt; (total-pulling team1) (total-pulling team2)) team2 team1))
+
+(winner &#39;(alice) &#39;(bob))                        ;; expression 1
+
+(equal? &#39;(alice) (winner &#39;(alice) &#39;(bob)))      ;; expression 2
+
+(and (equal? &#39;(alice) (winner &#39;(alice) &#39;(bob))) ;; expression 3
+     (equal? &#39;(alice) (winner &#39;(alice) &#39;(fred))))
+
+(and (equal? &#39;(alice) (winner &#39;(alice) &#39;(bob))) ;; expression 4
+     (equal? &#39;(jane) (winner &#39;(jane) &#39;(fred))))</code></pre>
+<ol type="a">
+<li><p>Write down the sequence of expression evaluations and random choices that will be made in evaluating each expression.</p></li>
+<li><p>Directly compute the probability for each possible return value from each expression.</p></li>
+<li><p>Why are the probabilities different for the last two? Explain both in terms of the probability calculations you did and in terms of the “causal” process of evaluating and making random choices.</p></li>
+</ol></li>
+<li><p>Use the rules of probability, described above, to compute the probability that the geometric distribution defined by the following stochastic recursion returns the number 5.</p>
+<pre data-exercise="ex6"><code>(define (geometric p)
+  (if (flip p)
+      0
+      (+ 1 (geometric p))))</code></pre></li>
+<li><p>Convert the following probability table to a compact Church program:</p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;">A</th>
+<th style="text-align: center;">B</th>
+<th style="text-align: center;">P(A,B)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">F</td>
+<td style="text-align: center;">F</td>
+<td style="text-align: center;">0.14</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">F</td>
+<td style="text-align: center;">T</td>
+<td style="text-align: center;">0.06</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">T</td>
+<td style="text-align: center;">F</td>
+<td style="text-align: center;">0.4</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">T</td>
+<td style="text-align: center;">T</td>
+<td style="text-align: center;">0.4</td>
+</tr>
+</tbody>
+</table>
+<p>Hint: fix the probability of A and then define the probability of B to <em>depend</em> on whether A is true or not. Run your Church program and build a histogram to check that you get the correct distribution</p>
+<pre data-exercise="ex7"><code>(define a ...)
+(define b ...)
+(list a b)</code></pre></li>
+<li><p>In <a href="#example-intuitive-physics">Example: Intuitive physics</a> above we modeled stability of a tower as the probability that the tower falls when perturbed, and we modeled “falling” as getting shorter. It would be reasonable to instead measure <em>how much shorter</em> the tower gets.</p>
+<ol type="a">
+<li>Below, modify the stability model by writing a continuous measure, <code>towerFallDegree</code>. Make sure that your continuous measure is in some way numerically comparable to the discrete measure, <code>doesTowerFall</code> (defined here as either 0 or 1). Mathematically, what is your continuous measure?</li>
+</ol>
+<pre data-exercise="ex8a"><code>(define (getWidth worldObj) (first (third (first worldObj))))
+(define (getHeight worldObj) (second (third (first worldObj))))
+(define (getX worldObj) (first (second worldObj)))
+(define (getY worldObj) (second (second worldObj)))
+(define (getIsStatic worldObj) (second (first worldObj)))
+
+(define ground
+  (list (list &quot;rect&quot; #t (list worldWidth 10)) (list (/ worldWidth 2) (+ worldHeight 6))))
+
+(define almostUnstableWorld
+  (list ground (list (list &#39;rect #f (list 24 22)) (list 175 473))
+        (list (list &#39;rect #f (list 15 38)) (list 159.97995044874122 413))
+        (list (list &#39;rect #f (list 11 35)) (list 166.91912737427202 340))
+        (list (list &#39;rect #f (list 11 29)) (list 177.26195677111082 276))
+        (list (list &#39;rect #f (list 11 17)) (list 168.51354470809122 230))))
+
+(define (noisify world)
+  (define (xNoise worldObj)
+    (define noiseWidth 10) ;how many pixels away from the original xpos can we go?
+    (define (newX x) (uniform (- x noiseWidth) (+ x noiseWidth)))
+    (if (getIsStatic worldObj)
+        worldObj
+        (list (first worldObj)
+              (list (newX (getX worldObj)) (getY worldObj)))))
+  (map xNoise world))
+
+(define (boolean-&gt;number x) (if x 1 0))
+
+;; round a number, x, to n decimal places
+(define (decimals x n)
+  (define a (expt 10 n))
+  (/ (round (* x a)) a))
+
+(define (highestY world) (apply min (map getY world))) ;; y = 0 is at the TOP of the screen
+
+;; get the height of the tower in a world
+(define (getTowerHeight world) (- worldHeight (highestY world)))
+
+;; 0 if tower falls, 1 if it stands
+(define (doesTowerFall initialW finalW)
+  (define eps 1) ;things might move around a little, but within 1 pixel is close
+  (define (approxEqual a b) (&lt; (abs (- a b)) eps))
+  (boolean-&gt;number (approxEqual (highestY initialW) (highestY finalW))))
+
+
+(define (towerFallDegree initialW finalW)
+  ;; FILL THIS PART IN
+  -999)
+
+;; visualize stability measure value and animation
+(define (visualizeStabilityMeasure measureFunction)
+  (define initialWorld (noisify almostUnstableWorld))
+  (define finalWorld (runPhysics 1000 initialWorld))
+  (define measureValue (measureFunction initialWorld finalWorld))
+
+  (display (list &quot;Stability measure: &quot;
+                                (decimals measureValue 2) &quot;//&quot;
+                                &quot;Initial height: &quot;
+                                (decimals (getTowerHeight initialWorld) 2) &quot;//&quot;
+                                &quot;Final height: &quot;
+                                (decimals (getTowerHeight finalWorld) 2)))
+  (animatePhysics 1000 initialWorld))
+
+;; visualize doesTowerFall measure
+;;(visualizeStabilityMeasure doesTowerFall)
+
+;; visualize towerFallDegree measure
+(visualizeStabilityMeasure towerFallDegree)</code></pre>
+<ol start="2" type="a">
+<li>Are there worlds where your new model makes very different predictions about stability from the original model? Which best captures the meaning of “stable”? (it might be useful to actually code up your worlds and test them).</li>
+</ol></li>
+</ol>
+<h1 id="references"><a href="#references">References</a></h1>
+<p><span style="font-variant: small-caps;">Ackerman2011</span>Ackerman, N. L., Freer, C. E., &amp; Roy, D. M. (2011). Noncomputable conditional distributions. In <em>Logic in Computer Science (LICS), 2011 26th Annual IEEE Symposium on</em> (pp. 107–116). IEEE.</p>
+<p><span style="font-variant: small-caps;">Church1936</span>Church, A. (1936). An Unsolvable Problem of Elementary Number Theory. <em>American Journal of Mathematics</em>, <em>58</em>(2), 345–363.</p>
+<p><span style="font-variant: small-caps;">Goodman2008</span>Goodman, N., Mansinghka, V., Roy, D., Bonawitz, K., &amp; Tenenbaum, J. (2008). Church: a language for generative models. In <em>UAI 2008</em>. Retrieved from <a href="http://stanford.edu/~ngoodman/papers/churchUAI08_rev2.pdf" title="http://stanford.edu/~ngoodman/papers/churchUAI08_rev2.pdf">http://stanford.edu/~ngoodman/papers/churchUAI08_rev2.pdf</a></p>
+<p><span style="font-variant: small-caps;">Hamrick2011</span>Hamrick, J., Battaglia, P., &amp; Tenenbaum, J. B. (2011). Internal physics models guide probabilistic judgments about object dynamics. In <em>Proceedings of the 33rd Annual Meeting of the Cognitive Science Society, Boston, MA</em>. Retrieved from <a href="http://web.mit.edu/pbatt/www/publications/HamrBattTene11CogSci33.pdf" title="http://web.mit.edu/pbatt/www/publications/HamrBattTene11CogSci33.pdf">http://web.mit.edu/pbatt/www/publications/HamrBattTene11CogSci33.pdf</a></p>
+<p><span style="font-variant: small-caps;">Mcallester2008</span>McAllester, D., Milch, B., &amp; Goodman, N. D. (2008). Random-world semantics and syntactic independence for expressive languages. Retrieved from <a href="http://hdl.handle.net/1721.1/41516" title="http://hdl.handle.net/1721.1/41516">http://hdl.handle.net/1721.1/41516</a></p>
+<p><span style="font-variant: small-caps;">Turing1937</span>Turing, A. M. (1937). Computability and λ-definability. <em>The Journal of Symbolic Logic</em>, <em>2</em>(4), 153–163.</p>
+   </div>
+</div>
+</body>
+
+<script src="scripts/after-body.js"></script>
+</html>

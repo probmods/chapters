@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>ProbMods: Introduction</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="stylesheet" type="text/css" href="webchurch/online/css/codemirror.css">
+    <link rel="stylesheet" type="text/css" href="webchurch/online/css/d3.css">
+    <link rel="shortcut icon" href="images/favicon.ico" />
+    <script src="scripts/underscore-min.js"></script>
+    <script src="scripts/jquery.js"></script>
+    <link class="katex-include" rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.5.1/katex.min.css">
+    <script class="katex-include" src="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.5.1/katex.min.js"></script>
+    <script src="scripts/cookies-0.3.1.min.js"></script>
+    <script src="scripts/gg.js"></script>
+    <script src="scripts/nav.js"></script>
+    <script src="scripts/cosmetics.js"></script>
+    <script src="scripts/md5.js"></script>
+    <script src="webchurch/online/webchurch.min.js"></script>
+    <script src="scripts/globals.js"></script>
+    <script src="webchurch/online/vega.min.js"></script>
+    <script src="scripts/new-injector.js"></script>
+    <script src="scripts/headroom.min.js"></script>
+  </head>
+<body>
+<div id="chapter-wrapper">
+  <div id='header' class="headroom">
+    <div id='logotype'><a href="index.html">Probabilistic Models of Cognition</a></div>
+    <ul id="nav">
+      <span class="nav0"><li class="all-chapters">All chapters
+<ol start="0">
+<a href="index.html"><li class="nonum">Index</li></a>
+<a href="introduction.html"><li>Introduction</li></a>
+<a href="generative-models.html"><li>Generative models</li></a>
+<a href="conditioning.html"><li>Conditioning</li></a>
+<a href="patterns-of-inference.html"><li>Patterns of inference</li></a>
+<a href="observing-sequences.html"><li>Models for sequences of observations</li></a>
+<a href="inference-about-inference.html"><li>Inference about inference</li></a>
+<a href="inference-process.html"><li>Algorithms for inference</li></a>
+<a href="learning-as-conditional-inference.html"><li>Learning as conditional inference</li></a>
+<a href="hierarchical-models.html"><li>Hierarchical models</li></a>
+<a href="occam's-razor.html"><li>Occam's Razor</li></a>
+<a href="mixture-models.html"><li>Mixture models</li></a>
+<a href="non-parametric-models.html"><li>Non-parametric models</li></a>
+<a href="appendix-scheme.html"><li>Appendix: Scheme basics</li></a>
+<a href="webchurch/online/ref.html"><li>Church Reference</li></a>
+</ol>
+      </li></span>
+      <a class="nav0" href="/login"><li id="login-link">Login</li></a>
+      <!-- <a class="nav0" href="/profile"><li id="profile-link" style='display: none'>Profile</li></a>  -->
+      <a class="nav0" href="/logout"><li id="logout-link" style='display: none'>Logout</li></a>
+    </ul>
+    <div class="clear"></div>
+  </div>
+
+  <div id="chapter">
+<h1 id="chapter-title">1. Introduction</h1>
+<p>What is thought? How can we describe the intelligent inferences made in everyday human reasoning and learning? How can we engineer intelligent machines? The computational theory of mind aims to answer these questions starting from the hypothesis that the mind is a computer, mental representations are computer programs, and thinking is a computational process – running a computer program.</p>
+<p>But what kind of program? A natural assumption is that these programs take the inputs – percepts from the senses, facts from memory, etc – and compute the outputs – the intelligent behaviors. Thus the mental representations that lead to thinking are functions from inputs to outputs. However, this input-output view suffers from a combinatorial explosion: we must posit an input-output program for each task in which humans draw intelligent inferences. A different approach is to assume that mental representations are more like theories in science: pieces of knowledge that can support many inferences in many different situations. For instance, Newton’s theory of motion makes predictions about infinitely many different configurations of objects and can be used to reason both forward in time and from the final state of a physical system to the initial state. The <em>generative</em> approach to cognition posits that some mental representations are more like theories in this way: they capture general descriptions of how the world <em>works</em> – these programs of the mind are models of the world that can be used to make many inferences. (While other programs of the mind take these generative programs and actually draw inferences.)</p>
+<p>A generative model describes a process, usually one by which observable data is generated. Generative models represent knowledge about the causal structure of the world – simplified, “working models” of a domain. These models may then be used to answer many different questions, by conditional inference. This contrasts to a more procedural or mechanistic approach in which knowledge represents the input-output mapping for a particular question directly. <!-- TODO: add some examples of cognitive capacities and the 'world models' they depend on... --> While such generative models often describe how we think the “actual world” works, there are many cases where it is useful to have a generative model even if there is no “fact of the matter”. A prime example of the latter is in linguistics, where generative models of grammar can usefully describe the possible sentences in a language by describing a process for constructing sentences.</p>
+<p>It is possible to use deterministic generative models to describe possible ways a process could unfold, but due to sparsity of observations or actual randomness there will often be many ways that our observations could have been generated. How can we choose amongst them? Probability theory provides a system for reasoning under exactly this kind of uncertainty. Probabilistic generative models describe processes which unfold with some amount of randomness, and probabilistic inference describes ways to ask questions of such processes. This book is concerned with the knowledge that can be represented by probabilistic generative models and the inferences that can be drawn from them.</p>
+<p>In order to make the idea of generative models precise we want a formal language that is designed to express the kinds of knowledge individuals have about the world. This language should be universal in the sense that it should be able to express any (computable) process. We build on the <span class="math">\(\lambda\)</span>-calculus (as realized in functional programming languages) because the <span class="math">\(\lambda\)</span>-calculus describes computational processes and captures the idea that what is important is causal dependence—in particular the <span class="math">\(\lambda\)</span>-calculus does not focus on the sequence of time, but rather on which events influence which other events. We introduce randomness into this language to construct a stochastic <span class="math">\(\lambda\)</span>-calculus, and describe conditional inferences in this language.</p>
+   </div>
+</div>
+</body>
+
+<script src="scripts/after-body.js"></script>
+</html>

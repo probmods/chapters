@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>ProbMods: The strategic use of noise in pragmatic reasoning</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="stylesheet" type="text/css" href="webchurch/online/css/codemirror.css">
+    <link rel="stylesheet" type="text/css" href="webchurch/online/css/d3.css">
+    <link rel="shortcut icon" href="images/favicon.ico" />
+    <script src="scripts/underscore-min.js"></script>
+    <script src="scripts/jquery.js"></script>
+    <link class="katex-include" rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.5.1/katex.min.css">
+    <script class="katex-include" src="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.5.1/katex.min.js"></script>
+    <script src="scripts/cookies-0.3.1.min.js"></script>
+    <script src="scripts/gg.js"></script>
+    <script src="scripts/nav.js"></script>
+    <script src="scripts/cosmetics.js"></script>
+    <script src="scripts/md5.js"></script>
+    <script src="webchurch/online/webchurch.min.js"></script>
+    <script src="scripts/globals.js"></script>
+    <script src="webchurch/online/vega.min.js"></script>
+    <script src="scripts/new-injector.js"></script>
+    <script src="scripts/headroom.min.js"></script>
+  </head>
+<body>
+<div id="chapter-wrapper">
+  <div id='header' class="headroom">
+    <div id='logotype'><a href="index.html">Probabilistic Models of Cognition</a></div>
+    <ul id="nav">
+      <span class="nav0"><li class="all-chapters">All chapters
+<ol start="0">
+<a href="index.html"><li class="nonum">Index</li></a>
+<a href="introduction.html"><li>Introduction</li></a>
+<a href="generative-models.html"><li>Generative models</li></a>
+<a href="conditioning.html"><li>Conditioning</li></a>
+<a href="patterns-of-inference.html"><li>Patterns of inference</li></a>
+<a href="observing-sequences.html"><li>Models for sequences of observations</li></a>
+<a href="inference-about-inference.html"><li>Inference about inference</li></a>
+<a href="inference-process.html"><li>Algorithms for inference</li></a>
+<a href="learning-as-conditional-inference.html"><li>Learning as conditional inference</li></a>
+<a href="hierarchical-models.html"><li>Hierarchical models</li></a>
+<a href="occam's-razor.html"><li>Occam's Razor</li></a>
+<a href="mixture-models.html"><li>Mixture models</li></a>
+<a href="non-parametric-models.html"><li>Non-parametric models</li></a>
+<a href="appendix-scheme.html"><li>Appendix: Scheme basics</li></a>
+<a href="webchurch/online/ref.html"><li>Church Reference</li></a>
+</ol>
+      </li></span>
+      <a class="nav0" href="/login"><li id="login-link">Login</li></a>
+      <!-- <a class="nav0" href="/profile"><li id="profile-link" style='display: none'>Profile</li></a>  -->
+      <a class="nav0" href="/logout"><li id="logout-link" style='display: none'>Logout</li></a>
+    </ul>
+    <div class="clear"></div>
+  </div>
+
+  <div id="chapter">
+<h1 id="chapter-title"> The strategic use of noise in pragmatic reasoning</h1>
+<div class='toc'>
+<div class='name'>Contents:</div>
+<ul>
+<li><a href="#ellipsis">Ellipsis</a></li>
+<li><a href="#exhaustivity">Exhaustivity</a></li>
+<li><a href="#scalar-implicature">Scalar Implicature</a></li>
+<li><a href="#complex-prosody">Complex Prosody</a></li>
+</ul>
+</div>
+<h1 id="ellipsis"><a href="#ellipsis">Ellipsis</a></h1>
+<pre><code>(define (filter pred lst)
+  (fold (lambda (x y)
+          (if (pred x)
+              (pair x y)
+              y))
+        &#39;()
+        lst))
+
+(define (my-iota n)
+  (define (helper n x)
+    (if (= x n)
+        &#39;()
+        (pair x (helper n (+ x 1)))
+        )
+    )
+  (helper n 0))
+
+(define (my-sample-integer n)
+  (uniform-draw (my-iota n))
+  )
+
+(define (extend a b)
+  (if (equal? a &#39;())
+      b
+      (extend (rest a) (pair (first a) b))))
+
+(define (flatten-nonrecursive a)
+  (fold (lambda (x y) (extend x y)) &#39;() a))
+
+(define (generate-subsets elements)
+  (if (equal? (length elements) 0)
+      &#39;()
+      (let ((first-element (first elements))
+            (rest-subsets (generate-subsets (rest elements))))
+        (let ((new-subsets (pair (list first-element)
+                                 (map (lambda (x) (pair first-element x)) rest-subsets))))
+          (extend new-subsets rest-subsets)))))
+
+(define (sample-nonempty-subset elements)
+  (let ((subsets (generate-subsets elements)))
+    (list-ref subsets (my-sample-integer (length subsets)))))
+
+(define (zip a b)
+  (if (equal? (length a) 0)
+      &#39;()
+      (pair (list (first a) (first b)) (zip (rest a) (rest b)))))
+
+(define (member-of e elements)
+  (if (&gt; (length elements) 0)
+      (if (equal? e (first elements))
+          #t
+          (member-of e (rest elements)))
+      #f))
+
+(define (list-product a b)
+  (flatten-nonrecursive (map (lambda (x) (map (lambda (y) (list x y)) b)) a)))
+
+;_______________________________________________________________________________
+
+(define states (list-product (list &#39;bob &#39;mary &#39;nobody) (list &#39;restaurant)))
+
+(define knowledge-states (list (list (list &#39;bob &#39;restaurant))
+                               (list (list &#39;mary &#39;restaurant))
+                               (list (list &#39;nobody &#39;restaurant))))
+(define (knowledge-prior) (multinomial knowledge-states (list 1 1 1)))
+
+(define knowledge-state-combinations
+  (flatten-nonrecursive (map (lambda (x) (map (lambda (y) (list x y)) x)) knowledge-states)))
+
+(define (sample-from-knowledge-state knowledge-state)
+  (list-ref knowledge-state (my-sample-integer (length knowledge-state))))
+
+(define utterances (list-product (list &#39;null &#39;bob &#39;mary &#39;nobody) (list &#39;null &#39;restaurant)))
+(define grammatical-utterances (list-product (list &#39;bob &#39;mary &#39;nobody) (list &#39;restaurant)))
+(define (get-utterance-prob utterance)
+  (* (case (first utterance)
+       ((&#39;bob &#39;mary &#39;nobody) 1)
+       ((&#39;null) 1))
+     (case (second utterance)
+       ((&#39;restaurant) 1)
+       ((&#39;null) 1))))
+
+(define (utterance-prior) (multinomial utterances (map get-utterance-prob utterances)))
+(define (grammatical-utterance-prior) (multinomial grammatical-utterances (map get-utterance-prob grammatical-utterances)))
+
+(define (noise-model utterance)
+  (lambda (x)
+  (* (case (first x)
+                     (((first utterance)) 0.99)
+                     ((&#39;null) 0.01)
+                     (else 0))
+                   (case (second x)
+                     (((second utterance)) 0.99)
+                     ((&#39;null) 0.01)
+                     (else 0)))))
+
+(define (sample-noise-model utterance prosody)
+  (let ((noise-dist (noise-model utterance prosody)))
+    (multinomial utterances (map noise-dist utterances))))
+
+(define (literal-meaning utterance)
+  (list
+   (case (first utterance)
+     ((&#39;bob) (list &#39;bob))
+     ((&#39;mary) (list &#39;mary))
+     ((&#39;nobody) (list &#39;nobody))
+     ((&#39;null) (list &#39;bob &#39;mary)))
+   (case (second utterance)
+     ((&#39;restaurant) (list &#39;restaurant))
+     ((&#39;null) (list &#39;restaurant )))))
+
+(define (literal-evaluation utterance state)
+  (let ((lit (literal-meaning utterance)))
+    (and (member-of (first state) (first lit))
+         (member-of (second state) (second lit)))))
+
+ (define (find-state-prob listener-probs state)
+   (if (equal? listener-probs &#39;())
+       0
+       (if (equal? state (second (first (first listener-probs))))
+           (second (first listener-probs))
+           (find-state-prob (rest listener-probs) state))))
+
+ (define (get-expected-surprisal knowledge-state listener)
+   (let ((listener (zip (first listener) (second listener))))
+     (let ((relevant-listener-probs (filter (lambda (x) (equal? knowledge-state (first (first x))))
+                                            listener)))
+       (let ((state-probs (map (lambda (x) (find-state-prob relevant-listener-probs x)) knowledge-state)))
+         (sum (map (lambda (x) (* (/ 1 (length knowledge-state)) (log x))) state-probs))))))
+
+ (define (speaker-utility knowledge-state utterance depth)
+   (let ((utterance-dist (zip utterances (map (noise-model utterance) utterances))))
+     (let ((utterance-dist (filter (lambda (x) (&gt; (second x) 0)) utterance-dist)))
+       (let ((listeners (map (lambda (x) (listener (first x) (- depth 1))) utterance-dist)))
+         (let ((surprisals (map (lambda (x) (get-expected-surprisal knowledge-state x)) listeners)))
+           (sum (map (lambda (x y) (* (second x) y)) utterance-dist surprisals)))))))
+
+
+(define speaker
+  (mem (lambda (knowledge-state depth)
+         (enumeration-query
+          (define utterance (utterance-prior))
+
+          (list (sample-noise-model utterance))
+
+
+          (factor (+ (* (- hardness 1) (log (get-utterance-prob utterance)))
+                (* hardness (speaker-utility knowledge-state utterance depth))))))))
+
+(define listener
+  (mem (lambda (utterance depth)
+         (enumeration-query
+          (define knowledge-state (knowledge-prior))
+          (define state (sample-from-knowledge-state knowledge-state))
+
+          (list knowledge-state state)
+          
+          (if (equal? depth 0)
+              (let ((intended-utterance (grammatical-utterance-prior)))
+                (and (equal? utterance (sample-noise-model intended-utterance))
+                     (literal-evaluation intended-utterance state)))
+              (equal? (list utterance) (apply multinomial (speaker knowledge-state depth))))))))
+
+
+(define hardness  2)
+
+(speaker (list (list &#39;bob &#39;restaurant)) 1)
+</code></pre>
+<h1 id="exhaustivity"><a href="#exhaustivity">Exhaustivity</a></h1>
+<pre><code>(define (filter pred lst)
+  (fold (lambda (x y)
+          (if (pred x)
+              (pair x y)
+              y))
+        &#39;()
+        lst))
+
+(define (my-iota n)
+  (define (helper n x)
+    (if (= x n)
+        &#39;()
+        (pair x (helper n (+ x 1)))
+        )
+    )
+  (helper n 0))
+
+(define (my-sample-integer n)
+  (uniform-draw (my-iota n))
+  )
+
+(define (extend a b)
+  (if (equal? a &#39;())
+      b
+      (extend (rest a) (pair (first a) b))))
+
+(define (flatten-nonrecursive a)
+  (fold (lambda (x y) (extend x y)) &#39;() a))
+
+(define (generate-subsets elements)
+  (if (equal? (length elements) 0)
+      &#39;()
+      (let ((first-element (first elements))
+            (rest-subsets (generate-subsets (rest elements))))
+        (let ((new-subsets (pair (list first-element)
+                                 (map (lambda (x) (pair first-element x)) rest-subsets))))
+          (extend new-subsets rest-subsets)))))
+
+(define (sample-nonempty-subset elements)
+  (let ((subsets (generate-subsets elements)))
+    (list-ref subsets (my-sample-integer (length subsets)))))
+
+(define (zip a b)
+  (if (equal? (length a) 0)
+      &#39;()
+      (pair (list (first a) (first b)) (zip (rest a) (rest b)))))
+
+(define (member-of e elements)
+  (if (&gt; (length elements) 0)
+      (if (equal? e (first elements))
+          #t
+          (member-of e (rest elements)))
+      #f))
+
+;_______________________________________________________________________________
+
+(define states (list &#39;bob &#39;mary &#39;bobmary))
+;;either bob went to the restaurant alone, or mary did, or both bob and mary went
+
+;;the speaker either knows the exact state, or knows that at least bob went, or knows that at least mary went
+(define knowledge-states (list (list &#39;bob) (list &#39;mary) (list &#39;bobmary) (list &#39;bob &#39;bobmary) (list &#39;mary &#39;bobmary)))
+(define (knowledge-prior) (multinomial knowledge-states &#39;(1 1 1 1 1)))
+
+(define knowledge-state-combinations
+  (flatten-nonrecursive (map (lambda (x) (map (lambda (y) (list x y)) x)) knowledge-states)))
+
+(define (sample-from-knowledge-state knowledge-state)
+  (uniform-draw knowledge-state))
+
+(define utterances &#39;(bob mary bobandmary))
+(define (get-utterance-prob utterance)
+  (case utterance
+        ((&#39;bob &#39;mary) 1)
+        ((&#39;bobandmary) 0.5)
+        ((&#39;null) 0)))
+(define (utterance-prior) (multinomial utterances (map get-utterance-prob utterances)))
+
+(define prosodies (list #f #t))
+(define (get-prosody-prob prosody)
+  (case prosody
+        ((#f) 1)
+        ((#t) 1)))
+(define (prosody-prior) (multinomial prosodies (map get-prosody-prob prosodies)))
+
+(define (noise-model utterance prosody)
+  (if prosody
+      (lambda (x)
+        (case x
+              ((utterance) 0.99)
+              ((&#39;bob) 0.005)
+              ((&#39;mary) 0.005)
+              (else 0)))
+      (lambda (x)
+        (case x
+              ((utterance) 0.98)
+              ((&#39;bob) 0.01)
+              ((&#39;mary) 0.01)
+              (else 0)))))
+
+;;sample a new utterance from the noise model
+(define (sample-noise-model utterance prosody)
+  (let ((noise-dist (noise-model utterance prosody)))
+    (multinomial utterances (map noise-dist utterances))))
+
+(define (literal-meaning utterance)
+  (case utterance
+        ((&#39;bob) (list &#39;bob &#39;bobmary))
+        ((&#39;mary) (list &#39;mary &#39;bobmary))
+        ((&#39;bobandmary) (list &#39;bobmary))
+        ((&#39;null) (list &#39;bob &#39;mary &#39;bobmary))))
+
+(define (literal-evaluation utterance state)
+  (member-of state (literal-meaning utterance)))
+
+(define (find-state-prob listener-probs state)
+  (if (equal? listener-probs &#39;())
+      0
+      (if (equal? state (second (first (first listener-probs))))
+          (second (first listener-probs))
+          (find-state-prob (rest listener-probs) state))))
+
+(define (get-expected-surprisal knowledge-state listener)
+  (let ((listener (zip (first listener) (second listener))))
+    (let ((relevant-listener-probs (filter (lambda (x) (equal? knowledge-state (first (first x))))
+                                           listener)))
+      (let ((state-probs (map (lambda (x) (find-state-prob relevant-listener-probs x)) knowledge-state)))
+        (sum (map (lambda (x) (* (/ 1 (length knowledge-state)) (log x))) state-probs))))))
+
+(define (speaker-utility knowledge-state utterance prosody depth)
+  (let ((utterance-dist (zip utterances (map (noise-model utterance prosody) utterances))))
+    (let ((utterance-dist (filter (lambda (x) (&gt; (second x) 0)) utterance-dist)))
+      (let ((listeners (map (lambda (x) (listener (first x) prosody (- depth 1))) utterance-dist)))
+        (let ((surprisals (map (lambda (x) (get-expected-surprisal knowledge-state x)) listeners)))
+          (sum (map (lambda (x y) (* (second x) y)) utterance-dist surprisals)))))))
+
+(define (speaker-literal-evaluate knowledge-state utterance)
+  (let ((truth-value (all (map (lambda (x) (literal-evaluation utterance x)) knowledge-state))))
+    (if truth-value
+        1
+        0)))
+
+(define speaker
+  (mem (lambda (knowledge-state depth)
+         (enumeration-query
+          (define utterance (utterance-prior))
+          (define prosody (prosody-prior))
+          
+          (list (sample-noise-model utterance prosody) prosody)
+          
+          (factor (+ (* (- hardness 1) (log (get-utterance-prob utterance)))
+                     (* (- hardness 1) (log (get-prosody-prob prosody)))
+                     (* hardness (speaker-utility knowledge-state utterance prosody depth))))))))
+
+(define listener
+  (mem (lambda (utterance prosody depth)
+         (enumeration-query
+          (define knowledge-state (knowledge-prior))
+          (define state (sample-from-knowledge-state knowledge-state))
+          
+          (list knowledge-state state)
+          
+          (if (equal? depth 0)
+              (let ((intended-utterance (utterance-prior)))
+                (and (equal? utterance (sample-noise-model intended-utterance prosody))
+                     (literal-evaluation intended-utterance state)))
+              (equal? (list utterance prosody) (apply multinomial (speaker knowledge-state depth))))))))
+
+(define hardness 2)
+
+(map first (map (lambda (x) (second (listener &#39;bob #f x))) (list 0 1 2 3 4 5 6 7 8 9 10 11 12)))
+
+</code></pre>
+<h1 id="scalar-implicature"><a href="#scalar-implicature">Scalar Implicature</a></h1>
+<pre><code>(define (filter pred lst)
+  (fold (lambda (x y)
+          (if (pred x)
+              (pair x y)
+              y))
+        &#39;()
+        lst))
+
+(define (my-iota n)
+  (define (helper n x)
+    (if (= x n)
+        &#39;()
+        (pair x (helper n (+ x 1)))
+        )
+    )
+  (helper n 0))
+
+(define (my-sample-integer n)
+  (uniform-draw (my-iota n))
+  )
+
+(define (extend a b)
+  (if (equal? a &#39;())
+      b
+      (extend (rest a) (pair (first a) b))))
+
+(define (flatten-nonrecursive a)
+  (fold (lambda (x y) (extend x y)) &#39;() a))
+
+(define (generate-subsets elements)
+  (if (equal? (length elements) 0)
+      &#39;()
+      (let ((first-element (first elements))
+            (rest-subsets (generate-subsets (rest elements))))
+        (let ((new-subsets (pair (list first-element)
+                                 (map (lambda (x) (pair first-element x)) rest-subsets))))
+          (extend new-subsets rest-subsets)))))
+
+(define (sample-nonempty-subset elements)
+  (let ((subsets (generate-subsets elements)))
+    (list-ref subsets (my-sample-integer (length subsets)))))
+
+(define (zip a b)
+  (if (equal? (length a) 0)
+      &#39;()
+      (pair (list (first a) (first b)) (zip (rest a) (rest b)))))
+
+(define (member-of e elements)
+  (if (&gt; (length elements) 0)
+      (if (equal? e (first elements))
+          #t
+          (member-of e (rest elements)))
+      #f))
+
+;_______________________________________________________________________________
+
+(define states (list &#39;some &#39;all))
+;;either bob went to the restaurant alone, or mary did, or both bob and mary went
+
+;;the speaker either knows the exact state, or knows that at least bob went, or knows that at least mary went
+(define knowledge-states (list (list &#39;some) (list &#39;all) (list &#39;some &#39;all)))
+(define (knowledge-prior) (multinomial knowledge-states &#39;(1 1 1)))
+
+(define knowledge-state-combinations
+  (flatten-nonrecursive (map (lambda (x) (map (lambda (y) (list x y)) x)) knowledge-states)))
+
+(define (sample-from-knowledge-state knowledge-state)
+  (uniform-draw knowledge-state))
+
+(define utterances &#39;(some all))
+(define (get-utterance-prob utterance)
+  (case utterance
+        ((&#39;some &#39;all) 1)
+        ((&#39;null) 0)))
+(define (utterance-prior) (multinomial utterances (map get-utterance-prob utterances)))
+
+(define prosodies (list #f #t))
+(define (get-prosody-prob prosody)
+  (case prosody
+        ((#f) 1)
+        ((#t) 1)))
+(define (prosody-prior) (multinomial prosodies (map get-prosody-prob prosodies)))
+
+(define (noise-model utterance prosody)
+  (if prosody
+      (lambda (x)
+        (case x
+              ((utterance) 0.99)
+              ((&#39;some) 0.005)
+              ((&#39;all) 0.005)
+              (else 0)))
+      (lambda (x)
+        (case x
+              ((utterance) 0.98)
+              ((&#39;some) 0.01)
+              ((&#39;all) 0.01)
+              (else 0)))))
+
+;;sample a new utterance from the noise model
+(define (sample-noise-model utterance prosody)
+  (let ((noise-dist (noise-model utterance prosody)))
+    (multinomial utterances (map noise-dist utterances))))
+
+(define (literal-meaning utterance)
+  (case utterance
+        ((&#39;some) (list &#39;some &#39;all))
+        ((&#39;all) (list &#39;all))))
+
+(define (literal-evaluation utterance state)
+  (member-of state (literal-meaning utterance)))
+
+(define (find-state-prob listener-probs state)
+  (if (equal? listener-probs &#39;())
+      0
+      (if (equal? state (second (first (first listener-probs))))
+          (second (first listener-probs))
+          (find-state-prob (rest listener-probs) state))))
+
+(define (get-expected-surprisal knowledge-state listener)
+  (let ((listener (zip (first listener) (second listener))))
+    (let ((relevant-listener-probs (filter (lambda (x) (equal? knowledge-state (first (first x))))
+                                           listener)))
+      (let ((state-probs (map (lambda (x) (find-state-prob relevant-listener-probs x)) knowledge-state)))
+        (sum (map (lambda (x) (* (/ 1 (length knowledge-state)) (log x))) state-probs))))))
+
+(define (speaker-utility knowledge-state utterance prosody depth)
+  (let ((utterance-dist (zip utterances (map (noise-model utterance prosody) utterances))))
+    (let ((utterance-dist (filter (lambda (x) (&gt; (second x) 0)) utterance-dist)))
+      (let ((listeners (map (lambda (x) (listener (first x) prosody (- depth 1))) utterance-dist)))
+        (let ((surprisals (map (lambda (x) (get-expected-surprisal knowledge-state x)) listeners)))
+          (sum (map (lambda (x y) (* (second x) y)) utterance-dist surprisals)))))))
+
+(define (speaker-literal-evaluate knowledge-state utterance)
+  (let ((truth-value (all (map (lambda (x) (literal-evaluation utterance x)) knowledge-state))))
+    (if truth-value
+        1
+        0)))
+
+(define speaker
+  (mem (lambda (knowledge-state depth)
+         (enumeration-query
+          (define utterance (utterance-prior))
+          (define prosody (prosody-prior))
+          
+          (list (sample-noise-model utterance prosody) prosody)
+          
+          (factor (+ (* (- hardness 1) (log (get-utterance-prob utterance)))
+                     (* (- hardness 1) (log (get-prosody-prob prosody)))
+                     (* hardness (speaker-utility knowledge-state utterance prosody depth))))))))
+
+(define listener
+  (mem (lambda (utterance prosody depth)
+         (enumeration-query
+          (define knowledge-state (knowledge-prior))
+          (define state (sample-from-knowledge-state knowledge-state))
+          
+          (list knowledge-state state)
+          
+          (if (equal? depth 0)
+              (let ((intended-utterance (utterance-prior)))
+                (and (equal? utterance (sample-noise-model intended-utterance prosody))
+                     (literal-evaluation intended-utterance state)))
+              (equal? (list utterance prosody) (apply multinomial (speaker knowledge-state depth))))))))
+
+(define hardness 2)
+(map third (map (lambda (x) (second (speaker (list &#39;some) x))) (list 1 2 3 4 5 6 7 8 9 10)))</code></pre>
+<h1 id="complex-prosody"><a href="#complex-prosody">Complex Prosody</a></h1>
+<pre><code>(define (filter pred lst)
+  (fold (lambda (x y)
+          (if (pred x)
+              (pair x y)
+              y))
+        &#39;()
+        lst))
+
+(define (my-iota n)
+  (define (helper n x)
+    (if (= x n)
+        &#39;()
+        (pair x (helper n (+ x 1)))
+        )
+    )
+  (helper n 0))
+
+(define (my-sample-integer n)
+  (uniform-draw (my-iota n))
+  )
+
+(define (extend a b)
+  (if (equal? a &#39;())
+      b
+      (extend (rest a) (pair (first a) b))))
+
+(define (flatten-nonrecursive a)
+  (fold (lambda (x y) (extend x y)) &#39;() a))
+
+(define (generate-subsets elements)
+  (if (equal? (length elements) 0)
+      &#39;()
+      (let ((first-element (first elements))
+            (rest-subsets (generate-subsets (rest elements))))
+        (let ((new-subsets (pair (list first-element)
+                                 (map (lambda (x) (pair first-element x)) rest-subsets))))
+          (extend new-subsets rest-subsets)))))
+
+(define (sample-nonempty-subset elements)
+  (let ((subsets (generate-subsets elements)))
+    (list-ref subsets (my-sample-integer (length subsets)))))
+
+(define (zip a b)
+  (if (equal? (length a) 0)
+      &#39;()
+      (pair (list (first a) (first b)) (zip (rest a) (rest b)))))
+
+(define (member-of e elements)
+  (if (&gt; (length elements) 0)
+      (if (equal? e (first elements))
+          #t
+          (member-of e (rest elements)))
+      #f))
+
+(define (list-product a b)
+  (flatten-nonrecursive (map (lambda (x) (map (lambda (y) (list x y)) b)) a)))
+
+;_______________________________________________________________________________
+
+(define states (list-product (list &#39;bob &#39;mary &#39;bobmary) (list &#39;restaurant &#39;bar &#39;restaurantbar)))
+
+(define knowledge-states (list (list (list &#39;bob &#39;restaurant))
+                               (list (list &#39;mary &#39;restaurant))
+                               (list (list &#39;bob &#39;bar))
+                               (list (list &#39;mary &#39;bar))
+                               (list (list &#39;bobmary &#39;restaurant))
+                               (list (list &#39;bobmary &#39;bar))
+                               (list (list &#39;bob &#39;restaurantbar))
+                               (list (list &#39;mary &#39;restaurantbar))
+                               (list (list &#39;bobmary &#39;restaurantbar))
+                               (list (list &#39;bob &#39;restaurant) (list &#39;bobmary &#39;restaurant))
+                               (list (list &#39;mary &#39;restaurant) (list &#39;bobmary &#39;restaurant))
+                               (list (list &#39;bob &#39;bar) (list &#39;bobmary &#39;bar))
+                               (list (list &#39;mary &#39;bar) (list &#39;bobmary &#39;bar))
+                               (list (list &#39;bob &#39;restaurant) (list &#39;bob &#39;restaurantbar))
+                               (list (list &#39;mary &#39;restaurant) (list &#39;mary &#39;restaurantbar))
+                               (list (list &#39;bob &#39;bar) (list &#39;bob &#39;restaurantbar))
+                               (list (list &#39;mary &#39;bar) (list &#39;mary &#39;restaurantbar))))
+(define (knowledge-prior) (uniform-draw knowledge-states))
+
+(define knowledge-state-combinations
+  (flatten-nonrecursive (map (lambda (x) (map (lambda (y) (list x y)) x)) knowledge-states)))
+
+(define (sample-from-knowledge-state knowledge-state)
+  (list-ref knowledge-state (my-sample-integer (length knowledge-state))))
+
+(define utterances (list-product (list &#39;bob &#39;mary &#39;bobmary) (list &#39;restaurant &#39;bar &#39;restaurantbar)))
+(define (get-utterance-prob utterance)
+  (* (case (first utterance)
+           ((&#39;bob &#39;mary) 0.4)
+           ((&#39;bobmary) 0.2)
+           ((&#39;null) 0))
+     (case (second utterance)
+           ((&#39;restaurant &#39;bar) 0.4)
+           ((&#39;restaurantbar) 0.2)
+           ((&#39;null) 0))))
+
+(define (utterance-prior) (multinomial utterances (map get-utterance-prob utterances)))
+
+(define prosodies (list &#39;none &#39;first &#39;second))
+(define (get-prosody-prob prosody)
+  (case prosody
+        ((&#39;none) 0.5)
+        ((&#39;first &#39;second) 0.25)))
+(define (prosody-prior) (multinomial prosodies (map get-prosody-prob prosodies)))
+
+(define (noise-model utterance prosody)
+  (case prosody
+        ((&#39;first) (lambda (x)
+                    (* (case (first x)
+                             (((first utterance)) 0.98)
+                             ((&#39;bob) 0.01)
+                             ((&#39;mary) 0.01)
+                             (else 0))
+                       (case (second x)
+                             (((second utterance)) 0.96)
+                             ((&#39;restaurant) 0.02)
+                             ((&#39;bar) 0.02)
+                             (else 0)))))
+        ((&#39;second) (lambda (x)
+                     (* (case (first x)
+                              (((first utterance)) 0.96)
+                              ((&#39;bob) 0.02)
+                              ((&#39;mary) 0.02)
+                              (else 0))
+                        (case (second x)
+                              (((second utterance)) 0.98)
+                              ((&#39;restaurant) 0.01)
+                              ((&#39;bar) 0.01)
+                              (else 0)))))
+        ((&#39;none) (lambda (x)
+                   (* (case (first x)
+                            (((first utterance)) 0.96)
+                            ((&#39;bob) 0.02)
+                            ((&#39;mary) 0.02)
+                            (else 0))
+                      (case (second x)
+                            (((second utterance)) 0.96)
+                            ((&#39;restaurant) 0.02)
+                            ((&#39;bar) 0.02)
+                            (else 0)))))))
+
+(define (sample-noise-model utterance prosody)
+  (let ((noise-dist (noise-model utterance prosody)))
+    (multinomial utterances (map noise-dist utterances))))
+
+(define (literal-meaning utterance)
+  (list
+   (case (first utterance)
+         ((&#39;bob) (list &#39;bob &#39;bobmary))
+         ((&#39;mary) (list &#39;mary &#39;bobmary))
+         ((&#39;bobmary) (list &#39;bobmary))
+         ((&#39;null) (list &#39;bob &#39;mary &#39;bobmary)))
+   (case (second utterance)
+         ((&#39;restaurant) (list &#39;restaurant &#39;restaurantbar))
+         ((&#39;bar) (list &#39;bar &#39;restaurantbar))
+         ((&#39;restaurantbar) (list &#39;restaurantbar))
+         ((&#39;null) (list &#39;restaurant &#39;bar &#39;restaurantbar)))))
+
+(define (literal-evaluation utterance state)
+  (let ((lit (literal-meaning utterance)))
+    (and (member-of (first state) (first lit))
+         (member-of (second state) (second lit)))))
+
+(define (find-state-prob listener-probs state)
+  (if (equal? listener-probs &#39;())
+      0
+      (if (equal? state (second (first (first listener-probs))))
+          (second (first listener-probs))
+          (find-state-prob (rest listener-probs) state))))
+
+(define (get-expected-surprisal knowledge-state listener)
+  (let ((listener (zip (first listener) (second listener))))
+    (let ((relevant-listener-probs (filter (lambda (x) (equal? knowledge-state (first (first x))))
+                                           listener)))
+      (let ((state-probs (map (lambda (x) (find-state-prob relevant-listener-probs x)) knowledge-state)))
+        (sum (map (lambda (x) (* (/ 1 (length knowledge-state)) (log x))) state-probs))))))
+
+(define (speaker-utility knowledge-state utterance prosody depth)
+  (let ((utterance-dist (zip utterances (map (noise-model utterance prosody) utterances))))
+    (let ((utterance-dist (filter (lambda (x) (&gt; (second x) 0)) utterance-dist)))
+      (let ((listeners (map (lambda (x) (listener (first x) prosody (- depth 1))) utterance-dist)))
+        (let ((surprisals (map (lambda (x) (get-expected-surprisal knowledge-state x)) listeners)))
+          (sum (map (lambda (x y) (* (second x) y)) utterance-dist surprisals)))))))
+
+
+(define speaker
+  (mem (lambda (knowledge-state depth)
+         (enumeration-query
+          (define utterance (utterance-prior))
+          (define prosody (prosody-prior))
+          
+          (list (sample-noise-model utterance prosody) prosody)
+          
+          
+          (factor (+ (* (- hardness 1) (log (get-utterance-prob utterance)))
+                     (* (- hardness 1) (log (get-prosody-prob prosody)))
+                     (* hardness (speaker-utility knowledge-state utterance prosody depth))))))))
+
+(define listener
+  (mem (lambda (utterance prosody depth)
+         (enumeration-query
+          (define knowledge-state (knowledge-prior))
+          (define state (sample-from-knowledge-state knowledge-state))
+          
+          (list knowledge-state state)
+          
+          (if (equal? depth 0)
+              (let ((intended-utterance (utterance-prior)))
+                (and (equal? utterance (sample-noise-model intended-utterance prosody))
+                     (literal-evaluation intended-utterance state)))
+              (equal? (list utterance prosody) (apply multinomial (speaker knowledge-state depth))))))))
+
+
+(define hardness 2)
+
+(map (lambda (y) (map (lambda (x) 
+                        (list x y (filter (lambda (z) (&gt; (second z) 0.01)) 
+                                          (let ((l (listener (list &#39;bob &#39;restaurant) y x)))
+                                            (zip (first l) (second l))))))
+                      (list 1 2 3 4 5 6 7 8 9 10)))
+     (list &#39;none &#39;first &#39;second))
+</code></pre>
+   </div>
+</div>
+</body>
+
+<script src="scripts/after-body.js"></script>
+</html>

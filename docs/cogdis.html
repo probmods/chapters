@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>ProbMods: Model of Cognitive Dissonance/Correspondence Bias</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="stylesheet" type="text/css" href="webchurch/online/css/codemirror.css">
+    <link rel="stylesheet" type="text/css" href="webchurch/online/css/d3.css">
+    <link rel="shortcut icon" href="images/favicon.ico" />
+    <script src="scripts/underscore-min.js"></script>
+    <script src="scripts/jquery.js"></script>
+    <link class="katex-include" rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.5.1/katex.min.css">
+    <script class="katex-include" src="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.5.1/katex.min.js"></script>
+    <script src="scripts/cookies-0.3.1.min.js"></script>
+    <script src="scripts/gg.js"></script>
+    <script src="scripts/nav.js"></script>
+    <script src="scripts/cosmetics.js"></script>
+    <script src="scripts/md5.js"></script>
+    <script src="webchurch/online/webchurch.min.js"></script>
+    <script src="scripts/globals.js"></script>
+    <script src="webchurch/online/vega.min.js"></script>
+    <script src="scripts/new-injector.js"></script>
+    <script src="scripts/headroom.min.js"></script>
+  </head>
+<body>
+<div id="chapter-wrapper">
+  <div id='header' class="headroom">
+    <div id='logotype'><a href="index.html">Probabilistic Models of Cognition</a></div>
+    <ul id="nav">
+      <span class="nav0"><li class="all-chapters">All chapters
+<ol start="0">
+<a href="index.html"><li class="nonum">Index</li></a>
+<a href="introduction.html"><li>Introduction</li></a>
+<a href="generative-models.html"><li>Generative models</li></a>
+<a href="conditioning.html"><li>Conditioning</li></a>
+<a href="patterns-of-inference.html"><li>Patterns of inference</li></a>
+<a href="observing-sequences.html"><li>Models for sequences of observations</li></a>
+<a href="inference-about-inference.html"><li>Inference about inference</li></a>
+<a href="inference-process.html"><li>Algorithms for inference</li></a>
+<a href="learning-as-conditional-inference.html"><li>Learning as conditional inference</li></a>
+<a href="hierarchical-models.html"><li>Hierarchical models</li></a>
+<a href="occam's-razor.html"><li>Occam's Razor</li></a>
+<a href="mixture-models.html"><li>Mixture models</li></a>
+<a href="non-parametric-models.html"><li>Non-parametric models</li></a>
+<a href="appendix-scheme.html"><li>Appendix: Scheme basics</li></a>
+<a href="webchurch/online/ref.html"><li>Church Reference</li></a>
+</ol>
+      </li></span>
+      <a class="nav0" href="/login"><li id="login-link">Login</li></a>
+      <!-- <a class="nav0" href="/profile"><li id="profile-link" style='display: none'>Profile</li></a>  -->
+      <a class="nav0" href="/logout"><li id="logout-link" style='display: none'>Logout</li></a>
+    </ul>
+    <div class="clear"></div>
+  </div>
+
+  <div id="chapter">
+<h1 id="chapter-title"> Model of Cognitive Dissonance/Correspondence Bias</h1>
+<p><a href="webchurch/refs.html">Church Reference</a></p>
+<p>Keyboard shortcuts:</p>
+<p><code>Cmd + .</code> or <code>Ctrl + .</code> – Fold code</acronym> (start foldable segments with <code>;;;fold:</code> and end with <code>;;;</code> )</p>
+<p><code>Cmd + ;</code> or <code>Ctrl + ;</code> – Comment selection section</p>
+<p>Simple model of cognitive model of a participant in Jones and Harris’s class 1967. By adjusting the participant’s priors and construal of the situation, one can see that the correspondence bias can be due to a number of latent factors (e.g., participant’s estimate of the essay writer’s susceptibility to social pressure).</p>
+<pre><code>;;;fold; utils ;;
+(define (expectation dist) (sum (apply map (pair * dist))))
+
+(define (zip a b)
+  (if (equal? (length a) 0)
+      &#39;()
+      (pair (list (first a) (first b)) (zip (rest a) (rest b)))))
+
+(define (zip-pair a b)
+  (if (equal? (length a) 0)
+      &#39;()
+      (pair (pair (first a) (first b)) (zip-pair (rest a) (rest b)))))
+
+;; logistic regression ;;
+(define (dot-product lists) (sum (apply map (pair * lists))))
+
+(define (normalize xs)
+  (let ([Z (sum xs)])
+  (map (lambda (x) (/ x Z))
+         xs)))
+
+(define (sigmoid x)
+  (/ 1 (+ 1 (exp (* -1 x)))))
+
+(define (logistic-regression x weights)
+  (sigmoid (dot-product (list (normalize weights)  x))))
+
+;; priors and parameters ;;
+
+(define preference-scale &#39;(-10 -5 0 5 10)) ;(- is anti castro; + is pro castro)
+
+(define influence-scale &#39;(.005 .2 .4 .6 .8 .995))
+
+(define options &#39;(anti-castro pro-castro)) ; experimental domain
+
+(define (act-prior) (uniform-draw options)) ; uniform prior over actions
+
+(define (belief-prior) (multinomial preference-scale &#39;(.3 .25 .2 .15 .1))) ; actor&#39;s beliefs
+
+(define (situation-constraint-prior) (uniform-draw preference-scale)) ; direction and degree of induced action
+
+(define (conviction-prior) (uniform-draw influence-scale)) ; strength of actor&#39;s (initial) belief
+
+(define (power-of-situation-prior) (uniform-draw influence-scale)) ; strength of inducement to act
+
+(define (susceptibility-to-social-influence-prior) (uniform-draw influence-scale)) ; actor&#39;s susceptibility to social pressure
+
+  ;; the intuitive social psychologist ;;
+(define (ip description actors-chose actors-conviction situation-constraint power-of-situation actors-susceptibility-to-social-pressure)
+  (enumeration-query
+   (define actors-belief (belief-prior))
+   (define actor (apply multinomial (actors-choice actors-belief actors-conviction situation-constraint actors-susceptibility-to-social-pressure power-of-situation)))
+
+   actors-belief
+
+   ;ip observed:
+   (equal? actors-chose (second actor)))) ; actor wrote __ essay
+
+
+
+;;; ip&#39;s model of the actor ;;;
+(define actors-choice
+  (mem (lambda (actors-belief actors-conviction situation-constraint actors-susceptibility-to-social-pressure power-of-situation)
+         (enumeration-query
+          (define resultant-weight (logistic-regression (list actors-belief situation-constraint) (list actors-conviction (* actors-susceptibility-to-social-pressure power-of-situation))))
+          (define action (act-prior))
+          (define consonant-action (if (flip resultant-weight) (second options) (first options)))
+
+          (list resultant-weight action)
+
+          (equal? action consonant-action)))))
+
+;; Observe Model&#39;s behavior in different situations/parameter regimes
+
+
+(define params
+  (list
+    (list
+    &quot;Actor complies to situation pressure&quot;
+    &#39;pro-castro ; Actor&#39;s action
+    .6 ; actor&#39;s conviction
+     5 ; situation constraint
+    .6 ; power of situation
+    .6) ; actor&#39;s susceptibility to social pressure
+
+    (list
+     &quot;Actor doesn&#39;t comply to situation pressure&quot;
+    &#39;anti-castro ; Actor&#39;s action
+    .6 ; actor&#39;s conviction
+     5 ; situation constraint
+    .6 ; power of situation
+    .6) ; actor&#39;s susceptibility to social pressure
+
+   (list
+    &quot;Actor complies to situation pressure. Actor doesn&#39;t have strong belief&quot;
+    &#39;pro-castro ; Actor&#39;s action
+    .1 ; actor&#39;s conviction
+     5 ; situation constraint
+    .6 ; power of situation
+    .6) ; actor&#39;s susceptibility to social pressure
+
+
+   (list
+    &quot;Actor behaves consistently with situation pressure, but is not effected by it&quot;
+    &#39;pro-castro ; Actor&#39;s action
+    .6 ; actor&#39;s conviction
+     5 ; situation constraint
+    .6 ; power of situation
+    0) ; actor&#39;s susceptibility to social pressure
+))
+
+
+(define (run-model model params)
+  (map (lambda (xp) (pair (expectation (apply model xp)) xp)) params))
+
+(define results
+  (run-model ip params))
+
+(barplot (list
+           (map second results)
+           (map first results))
+           &quot;Observers estimate of the probability that actor is pro-Castro&quot;)</code></pre>
+   </div>
+</div>
+</body>
+
+<script src="scripts/after-body.js"></script>
+</html>
