@@ -1,0 +1,1236 @@
+<link rel="stylesheet" type="text/css" href="css/ref.css" />
+<p><h2>Work in progress: email probmods@gmail.com with corrections (or send a pull request on Github)</h2></p><p></p>
+<div class="function">
+<code class="function-name">(abs x)</code>
+<code class="aliases"></code>
+<div class="description">Absolute value</div>
+<table>
+<tr><td><code>x</code><td>real</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(acos x)</code>
+<code class="aliases"></code>
+<div class="description">Arccosine</div>
+<table>
+<tr><td><code>x</code><td>real</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(all lst)</code>
+<code class="aliases"></code>
+<div class="description">Test whether all of the values in a list are true</div>
+<table>
+<tr><td><code>lst</code><td>list<boolean></td><td>List of boolean values</td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(and [b ...])</code>
+<code class="aliases"></code>
+<div class="description">Logical conjunction</div>
+<table>
+<tr><td><code>[b ...]</code><td>boolean</td><td>Boolean values</td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(append [lst ...])</code>
+<code class="aliases"></code>
+<div class="description">Merge an arbitrary number of lists</div>
+<table>
+<tr><td><code>[lst ...]</code><td>list</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(apply fn lst)</code>
+<code class="aliases"></code>
+<div class="description">If lst is (x1 x2 x3 ...), returns the function call (fn x1 x2 x3 ...)</div>
+<table>
+<tr><td><code>fn</code><td>function</td><td></td></tr>
+<tr><td><code>lst</code><td>list</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(asin x)</code>
+<code class="aliases"></code>
+<div class="description">Arcsine</div>
+<table>
+<tr><td><code>x</code><td>real</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(assoc x alist)</code>
+<code class="aliases"></code>
+<div class="description">Lookup a value in an association list</div>
+<table>
+<tr><td><code>x</code><td></td><td></td></tr>
+<tr><td><code>alist</code><td>list<pair></td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(atan x)</code>
+<code class="aliases"></code>
+<div class="description">Arctangent</div>
+<table>
+<tr><td><code>x</code><td>real</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(atan2 y x)</code>
+<code class="aliases"></code>
+<div class="description">Arctangent (quotient version)</div>
+<table>
+<tr><td><code>y</code><td>real</td><td></td></tr>
+<tr><td><code>x</code><td>real</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(bang-bang x)</code>
+<code class="aliases"></code>
+<div class="description">Coerce an object to a boolean</div>
+<table>
+<tr><td><code>x</code><td></td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(beta a b [conditionedValue])</code>
+<code class="aliases"></code>
+<div class="description">Sample from the beta distribution B(a,b). Returns only the first element.</div>
+<table>
+<tr><td><code>a</code><td>positive real</td><td></td></tr>
+<tr><td><code>b</code><td>positive real</td><td></td></tr>
+<tr><td><code>[conditionedValue]</code><td></td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(boolean->number b)</code>
+<code class="aliases"></code>
+<div class="description">Convert a boolean to a number</div>
+<table>
+<tr><td><code>b</code><td>boolean</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(bootstrap fn fileName n)</code>
+<code class="aliases"></code>
+<div class="description"></div>
+<table>
+<tr><td><code>fn</code><td>function</td><td></td></tr>
+<tr><td><code>fileName</code><td>string</td><td></td></tr>
+<tr><td><code>n</code><td>nat</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(but-last lst)</code>
+<code class="aliases"><br />&nbsp;Aliases: initial</code>
+<div class="description">Get everything except the last item in a list</div>
+<table>
+<tr><td><code>lst</code><td>list</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(ceil x)</code>
+<code class="aliases"><br />&nbsp;Aliases: ceiling</code>
+<div class="description">Ceiling of a number</div>
+<table>
+<tr><td><code>x</code><td>real</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(compose [f ...])</code>
+<code class="aliases"><br />&nbsp;Aliases: o</code>
+<div class="description">compose functions: ((o f g) a) == (f (g a))</div>
+<table>
+<tr><td><code>[f ...]</code><td>function</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(condition-equal comp value)</code>
+<code class="aliases"></code>
+<div class="description"></div>
+<table>
+<tr><td><code>comp</code><td></td><td></td></tr>
+<tr><td><code>value</code><td></td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(condition-repeat-equal comp values)</code>
+<code class="aliases"></code>
+<div class="description"></div>
+<table>
+<tr><td><code>comp</code><td></td><td></td></tr>
+<tr><td><code>values</code><td></td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(conditional comp params)</code>
+<code class="aliases"></code>
+<div class="description"></div>
+<table>
+<tr><td><code>comp</code><td>function</td><td></td></tr>
+<tr><td><code>params</code><td>list</td><td>List where the first element is the sampling strategy, one of ("enumeration", "rejection, "mh"), if "mh", second element is the lag</td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(console-log [s ...])</code>
+<code class="aliases"></code>
+<div class="description">Print arguments to Javascript console</div>
+<table>
+<tr><td><code>[s ...]</code><td></td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(cos x)</code>
+<code class="aliases"></code>
+<div class="description">Cosine</div>
+<table>
+<tr><td><code>x</code><td>real</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(curry f)</code>
+<code class="aliases"><br />&nbsp;Aliases: c</code>
+<div class="description">curry function: (f::a)::b -> f::a,b</div>
+<table>
+<tr><td><code>f</code><td>function</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(difference lst [lst ...])</code>
+<code class="aliases"></code>
+<div class="description">difference of sets</div>
+<table>
+<tr><td><code>lst</code><td>list</td><td></td></tr>
+<tr><td><code>[lst ...]</code><td>list</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(dirichlet alpha [conditionedValue])</code>
+<code class="aliases"></code>
+<div class="description">Sample from the Dirichlet distribution Dir(alpha).</div>
+<table>
+<tr><td><code>alpha</code><td>list<positive real></td><td></td></tr>
+<tr><td><code>[conditionedValue]</code><td></td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(display [s ...])</code>
+<code class="aliases"><br />&nbsp;Aliases: print,pn</code>
+<div class="description"></div>
+<table>
+<tr><td><code>[s ...]</code><td></td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(div [x] [y ...])</code>
+<code class="aliases"><br />&nbsp;Aliases: /</code>
+<div class="description">Divide numbers. Returns x / (y1 * y2 * ... )</div>
+<table>
+<tr><td><code>[x]</code><td>real</td><td>Numerator</td></tr>
+<tr><td><code>[y ...]</code><td>real</td><td>Denominator values</td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(DPmem alpha f)</code>
+<code class="aliases"></code>
+<div class="description">Stochastic memoization using the Dirichlet Process</div>
+<table>
+<tr><td><code>alpha</code><td>positive real</td><td>Concentration parameter of the DP</td></tr>
+<tr><td><code>f</code><td>function</td><td>Function to stochastically memoize</td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(drop lst n)</code>
+<code class="aliases"></code>
+<div class="description">Drop the first n items from a list. If there are fewer than n items in the list, return the empty list.</div>
+<table>
+<tr><td><code>lst</code><td>list</td><td></td></tr>
+<tr><td><code>n</code><td>nat</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(enumeration-query comp)</code>
+<code class="aliases"></code>
+<div class="description">Do enumeration query on a model</div>
+<table>
+<tr><td><code>comp</code><td></td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(eq [x ...])</code>
+<code class="aliases"><br />&nbsp;Aliases: =</code>
+<div class="description">Test whether all (numeric) arguments are equal</div>
+<table>
+<tr><td><code>[x ...]</code><td>real</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(eq? x y)</code>
+<code class="aliases"></code>
+<div class="description">Type-strict and reference-based equality check (e.g., (eq? '(1 2) '(1 2)) returns #f)</div>
+<table>
+<tr><td><code>x</code><td></td><td></td></tr>
+<tr><td><code>y</code><td></td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(equal? x y)</code>
+<code class="aliases"></code>
+<div class="description">Less strict and value-based equality check (e.g., (equal? '(1 2) '(1 2)) returns #f)</div>
+<table>
+<tr><td><code>x</code><td></td><td></td></tr>
+<tr><td><code>y</code><td></td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(eval lst)</code>
+<code class="aliases"></code>
+<div class="description">Evaluate a list representing a Church s-expression, e.g., <code>(eval (list + 1 2))</code> returns 3</div>
+<table>
+<tr><td><code>lst</code><td></td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(exp x)</code>
+<code class="aliases"></code>
+<div class="description">Exponential</div>
+<table>
+<tr><td><code>x</code><td>real</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(exponential rate [conditionedValue])</code>
+<code class="aliases"></code>
+<div class="description">Sample from the exponential distribution with parameter rate</div>
+<table>
+<tr><td><code>rate</code><td>positive real</td><td></td></tr>
+<tr><td><code>[conditionedValue]</code><td></td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(expt x y)</code>
+<code class="aliases"><br />&nbsp;Aliases: pow</code>
+<div class="description">Compute x raised to the power y</div>
+<table>
+<tr><td><code>x</code><td>real</td><td></td></tr>
+<tr><td><code>y</code><td>real</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(fifth lst)</code>
+<code class="aliases"></code>
+<div class="description">Get the fifth item of a list</div>
+<table>
+<tr><td><code>lst</code><td>list</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(filter pred lst)</code>
+<code class="aliases"></code>
+<div class="description">Select subset of elements of a list that satisfy a predicate pred</div>
+<table>
+<tr><td><code>pred</code><td>function</td><td></td></tr>
+<tr><td><code>lst</code><td>list</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(first lst)</code>
+<code class="aliases"><br />&nbsp;Aliases: car</code>
+<div class="description">Get the first item of a list (or pair)</div>
+<table>
+<tr><td><code>lst</code><td>pair</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(flatten lst)</code>
+<code class="aliases"></code>
+<div class="description"></div>
+<table>
+<tr><td><code>lst</code><td>list</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(flip [p] [conditionedValue])</code>
+<code class="aliases"></code>
+<div class="description">Flip a weighted coin. Returns true or false</div>
+<table>
+<tr><td><code>[p]</code><td>real</td><td></td></tr>
+<tr><td><code>[conditionedValue]</code><td></td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(floor x)</code>
+<code class="aliases"></code>
+<div class="description">Floor of a number</div>
+<table>
+<tr><td><code>x</code><td>real</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(fold f init [lst ...])</code>
+<code class="aliases"></code>
+<div class="description">Accumulate the result of applying a function to a list</div>
+<table>
+<tr><td><code>f</code><td>function</td><td>Function to apply</td></tr>
+<tr><td><code>init</code><td></td><td>Seed value for function</td></tr>
+<tr><td><code>[lst ...]</code><td>list</td><td>List to apply the fold over</td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(foldl f init lst)</code>
+<code class="aliases"></code>
+<div class="description">Accumulate the result of applying a function to a list left to right</div>
+<table>
+<tr><td><code>f</code><td>function</td><td>Function to apply</td></tr>
+<tr><td><code>init</code><td></td><td>Seed value for function</td></tr>
+<tr><td><code>lst</code><td>list</td><td>List to apply the fold over</td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(foldr f init lst)</code>
+<code class="aliases"></code>
+<div class="description">Accumulate the result of applying a function to a list right to left</div>
+<table>
+<tr><td><code>f</code><td>function</td><td>Function to apply</td></tr>
+<tr><td><code>init</code><td></td><td>Seed value for function</td></tr>
+<tr><td><code>lst</code><td>list</td><td>List to apply the fold over</td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(for-each fn lst)</code>
+<code class="aliases"></code>
+<div class="description">Apply a function to every member of a list, but don't return anything</div>
+<table>
+<tr><td><code>fn</code><td>function</td><td></td></tr>
+<tr><td><code>lst</code><td>list</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(fourth lst)</code>
+<code class="aliases"></code>
+<div class="description">Get the fourth item of a list</div>
+<table>
+<tr><td><code>lst</code><td>list</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(gamma a b [conditionedValue])</code>
+<code class="aliases"></code>
+<div class="description">Sample from the gamma distribution G(a,b)</div>
+<table>
+<tr><td><code>a</code><td>real</td><td></td></tr>
+<tr><td><code>b</code><td>real</td><td></td></tr>
+<tr><td><code>[conditionedValue]</code><td></td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(gaussian [mu] [sigma] [isStructural] [conditionedValue])</code>
+<code class="aliases"></code>
+<div class="description">Sample from the Gaussian distribution N(mu, sigma)</div>
+<table>
+<tr><td><code>[mu]</code><td>real</td><td></td></tr>
+<tr><td><code>[sigma]</code><td>real</td><td></td></tr>
+<tr><td><code>[isStructural]</code><td></td><td></td></tr>
+<tr><td><code>[conditionedValue]</code><td></td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(gensym )</code>
+<code class="aliases"></code>
+<div class="description">A default gensym (prefix is g)</div>
+<table>
+
+</table>
+</div>
+<div class="function">
+<code class="function-name">(geq x [y ...])</code>
+<code class="aliases"><br />&nbsp;Aliases: >=</code>
+<div class="description">Test whether x is greater than or equal to all y's</div>
+<table>
+<tr><td><code>x</code><td>real</td><td></td></tr>
+<tr><td><code>[y ...]</code><td>real</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(get-time )</code>
+<code class="aliases"></code>
+<div class="description"></div>
+<table>
+
+</table>
+</div>
+<div class="function">
+<code class="function-name">(greater x [y ...])</code>
+<code class="aliases"><br />&nbsp;Aliases: ></code>
+<div class="description">Test whether x is greater than all y's</div>
+<table>
+<tr><td><code>x</code><td>real</td><td></td></tr>
+<tr><td><code>[y ...]</code><td>real</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(identity v)</code>
+<code class="aliases"><br />&nbsp;Aliases: id</code>
+<div class="description">The Identity function</div>
+<table>
+<tr><td><code>v</code><td></td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(intersection [lst ...])</code>
+<code class="aliases"></code>
+<div class="description">intersection of sets</div>
+<table>
+<tr><td><code>[lst ...]</code><td>list</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(iota count [start] [step])</code>
+<code class="aliases"></code>
+<div class="description">Create list based on arithmetic progressions</div>
+<table>
+<tr><td><code>count</code><td>nat</td><td>Number of items</td></tr>
+<tr><td><code>[start]</code><td>real</td><td>First item in list</td></tr>
+<tr><td><code>[step]</code><td>real</td><td>Difference between successive items in the list</td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(js-debug )</code>
+<code class="aliases"></code>
+<div class="description">Trigger the javascript debugger</div>
+<table>
+
+</table>
+</div>
+<div class="function">
+<code class="function-name">(last lst)</code>
+<code class="aliases"></code>
+<div class="description">Get the last item in a list</div>
+<table>
+<tr><td><code>lst</code><td>list</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(length lst)</code>
+<code class="aliases"></code>
+<div class="description">Get the length of a list</div>
+<table>
+<tr><td><code>lst</code><td>list</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(leq x [y ...])</code>
+<code class="aliases"><br />&nbsp;Aliases: <=</code>
+<div class="description">Test whether x is less than or equal to all y's</div>
+<table>
+<tr><td><code>x</code><td>real</td><td></td></tr>
+<tr><td><code>[y ...]</code><td>real</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(less x [y ...])</code>
+<code class="aliases"><br />&nbsp;Aliases: <</code>
+<div class="description">Test whether x is less than all y's</div>
+<table>
+<tr><td><code>x</code><td>real</td><td></td></tr>
+<tr><td><code>[y ...]</code><td>real</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(list [...])</code>
+<code class="aliases"></code>
+<div class="description">List constructor</div>
+<table>
+<tr><td><code>[...]</code><td></td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(list-elt lst n)</code>
+<code class="aliases"></code>
+<div class="description">Get the nth item of a list (1-indexed)</div>
+<table>
+<tr><td><code>lst</code><td>list</td><td></td></tr>
+<tr><td><code>n</code><td>nat</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(list-index lst x)</code>
+<code class="aliases"><br />&nbsp;Aliases: position</code>
+<div class="description"></div>
+<table>
+<tr><td><code>lst</code><td>list</td><td></td></tr>
+<tr><td><code>x</code><td></td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(list-ref lst n)</code>
+<code class="aliases"></code>
+<div class="description">Get the nth item of a list (0-indexed)</div>
+<table>
+<tr><td><code>lst</code><td>list</td><td></td></tr>
+<tr><td><code>n</code><td>nat</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(list? x)</code>
+<code class="aliases"></code>
+<div class="description">Test whether x is a list</div>
+<table>
+<tr><td><code>x</code><td></td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(load-url path)</code>
+<code class="aliases"></code>
+<div class="description">Load a remote url</div>
+<table>
+<tr><td><code>path</code><td>string</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(log x)</code>
+<code class="aliases"></code>
+<div class="description">Natural logarithm</div>
+<table>
+<tr><td><code>x</code><td>real</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(make-gensym [prefix])</code>
+<code class="aliases"></code>
+<div class="description">Returns a gensym, which is a function that returns a new string value every time you call it (i.e., you're guaranteed to never get the same return value twice). You can specify an optional prefix for these values (default is 'g')</div>
+<table>
+<tr><td><code>[prefix]</code><td>string</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(make-list n x)</code>
+<code class="aliases"></code>
+<div class="description">Make a list of length n where all elements are x</div>
+<table>
+<tr><td><code>n</code><td>nat</td><td></td></tr>
+<tr><td><code>x</code><td></td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(map fn [lst ...])</code>
+<code class="aliases"></code>
+<div class="description">Apply a function to every element of a list</div>
+<table>
+<tr><td><code>fn</code><td>function</td><td></td></tr>
+<tr><td><code>[lst ...]</code><td>list</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(map-at lst i f)</code>
+<code class="aliases"><br />&nbsp;Aliases: f-at</code>
+<div class="description"></div>
+<table>
+<tr><td><code>lst</code><td>list</td><td></td></tr>
+<tr><td><code>i</code><td>nat</td><td></td></tr>
+<tr><td><code>f</code><td>function</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(max [x ...])</code>
+<code class="aliases"></code>
+<div class="description">Maximum of arguments</div>
+<table>
+<tr><td><code>[x ...]</code><td>real</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(mean lst)</code>
+<code class="aliases"></code>
+<div class="description">Mean of a list</div>
+<table>
+<tr><td><code>lst</code><td>list<real></td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(member x list [cmp])</code>
+<code class="aliases"></code>
+<div class="description">Test whether x is in a list according to some optional comparator function cmp</div>
+<table>
+<tr><td><code>x</code><td></td><td></td></tr>
+<tr><td><code>list</code><td>list</td><td></td></tr>
+<tr><td><code>[cmp]</code><td>function</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(mh-query comp samples lag)</code>
+<code class="aliases"></code>
+<div class="description"></div>
+<table>
+<tr><td><code>comp</code><td></td><td></td></tr>
+<tr><td><code>samples</code><td>nat</td><td></td></tr>
+<tr><td><code>lag</code><td>nat</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(mh-query-scored comp samples lag)</code>
+<code class="aliases"></code>
+<div class="description"></div>
+<table>
+<tr><td><code>comp</code><td></td><td></td></tr>
+<tr><td><code>samples</code><td>nat</td><td></td></tr>
+<tr><td><code>lag</code><td>nat</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(min [x ...])</code>
+<code class="aliases"></code>
+<div class="description">Minimum of arguments</div>
+<table>
+<tr><td><code>[x ...]</code><td>real</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(minus [x ...])</code>
+<code class="aliases"><br />&nbsp;Aliases: -</code>
+<div class="description">Subtract numbers</div>
+<table>
+<tr><td><code>[x ...]</code><td>real</td><td>Numbers to subtract</td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(mod x y)</code>
+<code class="aliases"><br />&nbsp;Aliases: modulo</code>
+<div class="description">Modulo. Returns x mod y</div>
+<table>
+<tr><td><code>x</code><td>real</td><td></td></tr>
+<tr><td><code>y</code><td>real</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(mult [x ...])</code>
+<code class="aliases"><br />&nbsp;Aliases: *</code>
+<div class="description">Multiply numbers</div>
+<table>
+<tr><td><code>[x ...]</code><td>real</td><td>Numbers to multiply</td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(multi-equals-condition fn n value)</code>
+<code class="aliases"></code>
+<div class="description"></div>
+<table>
+<tr><td><code>fn</code><td>function</td><td></td></tr>
+<tr><td><code>n</code><td>nat</td><td></td></tr>
+<tr><td><code>value</code><td>list</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(multinomial lst probs [conditionedValue])</code>
+<code class="aliases"></code>
+<div class="description">Sample an element from lst with the probability specified in probs</div>
+<table>
+<tr><td><code>lst</code><td>list</td><td></td></tr>
+<tr><td><code>probs</code><td>list<real></td><td></td></tr>
+<tr><td><code>[conditionedValue]</code><td></td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(none lst)</code>
+<code class="aliases"></code>
+<div class="description">Test whether none of the values in a list are true</div>
+<table>
+<tr><td><code>lst</code><td>list<boolean></td><td>List of boolean values</td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(not b)</code>
+<code class="aliases"></code>
+<div class="description">Logical negation</div>
+<table>
+<tr><td><code>b</code><td>boolean</td><td>Boolean value</td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(nub lst)</code>
+<code class="aliases"></code>
+<div class="description">Remove duplicates with equality as ===</div>
+<table>
+<tr><td><code>lst</code><td>list</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(null? x)</code>
+<code class="aliases"></code>
+<div class="description">Test whether x is null</div>
+<table>
+<tr><td><code>x</code><td></td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(number->boolean x)</code>
+<code class="aliases"></code>
+<div class="description">Convert a number to a boolean</div>
+<table>
+<tr><td><code>x</code><td>real</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(number->string x)</code>
+<code class="aliases"></code>
+<div class="description">Convert a number to a string</div>
+<table>
+<tr><td><code>x</code><td>real</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(or [b ...])</code>
+<code class="aliases"></code>
+<div class="description">Logical disjunction</div>
+<table>
+<tr><td><code>[b ...]</code><td>boolean</td><td>Boolean values</td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(pair head tail)</code>
+<code class="aliases"><br />&nbsp;Aliases: cons</code>
+<div class="description">Pair constructor</div>
+<table>
+<tr><td><code>head</code><td></td><td></td></tr>
+<tr><td><code>tail</code><td></td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(pair? x)</code>
+<code class="aliases"></code>
+<div class="description">Test whether x is a pair</div>
+<table>
+<tr><td><code>x</code><td></td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(partition pred lst)</code>
+<code class="aliases"></code>
+<div class="description">Partition elements of a list into those that satisfy a predicate and those that don't</div>
+<table>
+<tr><td><code>pred</code><td>function</td><td></td></tr>
+<tr><td><code>lst</code><td>list</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(plus [x ...])</code>
+<code class="aliases"><br />&nbsp;Aliases: +</code>
+<div class="description">Add numbers</div>
+<table>
+<tr><td><code>[x ...]</code><td>real</td><td>Numbers to add</td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(prod lst)</code>
+<code class="aliases"></code>
+<div class="description">Multiply a list of numbers</div>
+<table>
+<tr><td><code>lst</code><td>list<real></td><td>List of numbers to multiply</td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(pw-geq x [y ...])</code>
+<code class="aliases"><br />&nbsp;Aliases: .>=.</code>
+<div class="description">Test whether greater than or equal to applies transitively</div>
+<table>
+<tr><td><code>x</code><td>real</td><td></td></tr>
+<tr><td><code>[y ...]</code><td>real</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(pw-greater x [y ...])</code>
+<code class="aliases"><br />&nbsp;Aliases: .>.</code>
+<div class="description">Test whether greater applies transitively</div>
+<table>
+<tr><td><code>x</code><td>real</td><td></td></tr>
+<tr><td><code>[y ...]</code><td>real</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(pw-leq x [y ...])</code>
+<code class="aliases"><br />&nbsp;Aliases: .<=.</code>
+<div class="description">Test whether less than or equal to applies transitively</div>
+<table>
+<tr><td><code>x</code><td>real</td><td></td></tr>
+<tr><td><code>[y ...]</code><td>real</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(pw-less x [y ...])</code>
+<code class="aliases"><br />&nbsp;Aliases: .<.</code>
+<div class="description">Test whether less than applies transitively</div>
+<table>
+<tr><td><code>x</code><td>real</td><td></td></tr>
+<tr><td><code>[y ...]</code><td>real</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(random-integer n [conditionedValue])</code>
+<code class="aliases"><br />&nbsp;Aliases: sample-integer</code>
+<div class="description"></div>
+<table>
+<tr><td><code>n</code><td>nat</td><td></td></tr>
+<tr><td><code>[conditionedValue]</code><td></td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(range start end)</code>
+<code class="aliases"></code>
+<div class="description">Create list based on a range</div>
+<table>
+<tr><td><code>start</code><td>integer</td><td></td></tr>
+<tr><td><code>end</code><td>integer</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(read-csv fileName [sep])</code>
+<code class="aliases"></code>
+<div class="description"></div>
+<table>
+<tr><td><code>fileName</code><td>string</td><td></td></tr>
+<tr><td><code>[sep]</code><td>string</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(read-file fileName)</code>
+<code class="aliases"></code>
+<div class="description"></div>
+<table>
+<tr><td><code>fileName</code><td>string</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(regexp-split s sep)</code>
+<code class="aliases"><br />&nbsp;Aliases: string-split</code>
+<div class="description">Split a string into a list of substrings based on a separator</div>
+<table>
+<tr><td><code>s</code><td>string</td><td></td></tr>
+<tr><td><code>sep</code><td>string</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(rejection-query comp)</code>
+<code class="aliases"></code>
+<div class="description"></div>
+<table>
+<tr><td><code>comp</code><td></td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(repeat n f)</code>
+<code class="aliases"></code>
+<div class="description">Repeat a function n times</div>
+<table>
+<tr><td><code>n</code><td>nat</td><td>Number of times to repeat</td></tr>
+<tr><td><code>f</code><td>function</td><td>Function to repeat</td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(rest x)</code>
+<code class="aliases"><br />&nbsp;Aliases: cdr</code>
+<div class="description">Get everything after the first item in a pair or list</div>
+<table>
+<tr><td><code>x</code><td>pair</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(reverse lst)</code>
+<code class="aliases"></code>
+<div class="description">Reverse a list</div>
+<table>
+<tr><td><code>lst</code><td>list</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(round x)</code>
+<code class="aliases"></code>
+<div class="description">Round a number</div>
+<table>
+<tr><td><code>x</code><td>real</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(sample thunk)</code>
+<code class="aliases"></code>
+<div class="description">apply a thunk</div>
+<table>
+<tr><td><code>thunk</code><td>function</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(sample-discrete weights)</code>
+<code class="aliases"></code>
+<div class="description">Takes a list of weights and samples an index between 0 and (number of weights - 1) with probability proportional to the weights.</div>
+<table>
+<tr><td><code>weights</code><td>list<real></td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(second lst)</code>
+<code class="aliases"></code>
+<div class="description">Get the second item of a list</div>
+<table>
+<tr><td><code>lst</code><td>list</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(set-seed seed)</code>
+<code class="aliases"></code>
+<div class="description">Seed a seed for the PRNG</div>
+<table>
+<tr><td><code>seed</code><td>string</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(seventh lst)</code>
+<code class="aliases"></code>
+<div class="description">Get the seventh item of a list</div>
+<table>
+<tr><td><code>lst</code><td>list</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(sin x)</code>
+<code class="aliases"></code>
+<div class="description">Sine</div>
+<table>
+<tr><td><code>x</code><td>real</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(sixth lst)</code>
+<code class="aliases"></code>
+<div class="description">Get the sixth item of a list</div>
+<table>
+<tr><td><code>lst</code><td>list</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(soft-equal y x tol)</code>
+<code class="aliases"><br />&nbsp;Aliases: soft=</code>
+<div class="description">Check whether y is in the interval [x - tol, x + tol]</div>
+<table>
+<tr><td><code>y</code><td>real</td><td></td></tr>
+<tr><td><code>x</code><td>real</td><td></td></tr>
+<tr><td><code>tol</code><td>real</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(some lst)</code>
+<code class="aliases"><br />&nbsp;Aliases: any</code>
+<div class="description">Test whether some of the values in a list are true</div>
+<table>
+<tr><td><code>lst</code><td>list<boolean></td><td>List of boolean values</td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(sort lst [cmp])</code>
+<code class="aliases"></code>
+<div class="description">Sort a list according to a comparator function cmp(a,b) that returns a number greater than 0 if a > b, 0 if a == b, and a number less than 0 if a < b</div>
+<table>
+<tr><td><code>lst</code><td>list</td><td></td></tr>
+<tr><td><code>[cmp]</code><td>function</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(sqrt x)</code>
+<code class="aliases"></code>
+<div class="description">Square root</div>
+<table>
+<tr><td><code>x</code><td>real</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(string->number s)</code>
+<code class="aliases"></code>
+<div class="description">Convert a string to a number</div>
+<table>
+<tr><td><code>s</code><td>string</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(string->symbol s)</code>
+<code class="aliases"></code>
+<div class="description">Convert a string to a symbol</div>
+<table>
+<tr><td><code>s</code><td>string</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(string-append [x ...])</code>
+<code class="aliases"></code>
+<div class="description">Concatenates the given strings</div>
+<table>
+<tr><td><code>[x ...]</code><td>string</td><td>Strings to concatenate</td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(string-append [s ...])</code>
+<code class="aliases"></code>
+<div class="description">Append an arbitrary number of strings</div>
+<table>
+<tr><td><code>[s ...]</code><td>string</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(string-length string)</code>
+<code class="aliases"></code>
+<div class="description">Get the length of string</div>
+<table>
+<tr><td><code>string</code><td>string</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(string-slice string start [end])</code>
+<code class="aliases"></code>
+<div class="description">Extract a substring from a string</div>
+<table>
+<tr><td><code>string</code><td>string</td><td></td></tr>
+<tr><td><code>start</code><td>nat</td><td></td></tr>
+<tr><td><code>[end]</code><td>nat</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(stringify x)</code>
+<code class="aliases"></code>
+<div class="description">Convert an object to a string</div>
+<table>
+<tr><td><code>x</code><td></td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(sum lst)</code>
+<code class="aliases"></code>
+<div class="description">Sum a list of numbers</div>
+<table>
+<tr><td><code>lst</code><td>list<real></td><td>List of numbers to sum</td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(symbol->string sym)</code>
+<code class="aliases"></code>
+<div class="description"></div>
+<table>
+<tr><td><code>sym</code><td>string</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(take lst n)</code>
+<code class="aliases"></code>
+<div class="description">Get the first n items in a list. If there are fewer than n items in the list, returns just the list.</div>
+<table>
+<tr><td><code>lst</code><td>list</td><td></td></tr>
+<tr><td><code>n</code><td>nat</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(tan x)</code>
+<code class="aliases"></code>
+<div class="description">Tangent</div>
+<table>
+<tr><td><code>x</code><td>real</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(third lst)</code>
+<code class="aliases"></code>
+<div class="description">Get the third item of a list</div>
+<table>
+<tr><td><code>lst</code><td>list</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(transpose mat)</code>
+<code class="aliases"></code>
+<div class="description">Transpose list of lists</div>
+<table>
+<tr><td><code>mat</code><td>list</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(uncurry f)</code>
+<code class="aliases"><br />&nbsp;Aliases: uc</code>
+<div class="description">uncurry function: f::a,b -> (f::a)::b</div>
+<table>
+<tr><td><code>f</code><td>function</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(uniform a b [conditionedValue])</code>
+<code class="aliases"></code>
+<div class="description">Sample a random real uniformly from the interval [a,b]</div>
+<table>
+<tr><td><code>a</code><td>real</td><td></td></tr>
+<tr><td><code>b</code><td>real</td><td></td></tr>
+<tr><td><code>[conditionedValue]</code><td></td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(uniform-draw items [conditionedValue])</code>
+<code class="aliases"></code>
+<div class="description">Uniformly sample an element from a list</div>
+<table>
+<tr><td><code>items</code><td>list</td><td></td></tr>
+<tr><td><code>[conditionedValue]</code><td></td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(union [lst ...])</code>
+<code class="aliases"></code>
+<div class="description">union of sets</div>
+<table>
+<tr><td><code>[lst ...]</code><td>list</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(unique lst [eq])</code>
+<code class="aliases"></code>
+<div class="description">Get the unique items in a list</div>
+<table>
+<tr><td><code>lst</code><td>list</td><td></td></tr>
+<tr><td><code>[eq]</code><td>function</td><td>Optional equality comparison function</td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(update-list lst n value)</code>
+<code class="aliases"></code>
+<div class="description"></div>
+<table>
+<tr><td><code>lst</code><td>list</td><td></td></tr>
+<tr><td><code>n</code><td>nat</td><td></td></tr>
+<tr><td><code>value</code><td></td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(variance lst)</code>
+<code class="aliases"><br />&nbsp;Aliases: var</code>
+<div class="description">Population variance</div>
+<table>
+<tr><td><code>lst</code><td>list<real></td><td>List of numbers</td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(write-csv data fileName [sep])</code>
+<code class="aliases"></code>
+<div class="description"></div>
+<table>
+<tr><td><code>data</code><td>list<list></td><td></td></tr>
+<tr><td><code>fileName</code><td>string</td><td></td></tr>
+<tr><td><code>[sep]</code><td>string</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(zip [lst ...])</code>
+<code class="aliases"></code>
+<div class="description">Zip together lists using longest list as base -- is invertable</div>
+<table>
+<tr><td><code>[lst ...]</code><td>list</td><td></td></tr>
+</table>
+</div>
+<div class="function">
+<code class="function-name">(zipT [lst ...])</code>
+<code class="aliases"></code>
+<div class="description">Zip together lists using shortest list as base -- not invertable as it truncates</div>
+<table>
+<tr><td><code>[lst ...]</code><td>list</td><td></td></tr>
+</table>
+</div>
